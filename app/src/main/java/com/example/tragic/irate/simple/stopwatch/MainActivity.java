@@ -539,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: First addition on app launch overwrites another row w/ its values, and adds the actual activity w/ zero.
+  //Todo: Deleting entire day for activities does not change green date text color.
   //Todo: Sometimes adding a new activity defaults to "1" calories.
   //Todo: Should we change calendar day highlight color depending on +/- calories?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.

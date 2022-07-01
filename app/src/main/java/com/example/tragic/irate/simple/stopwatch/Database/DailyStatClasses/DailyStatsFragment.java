@@ -311,7 +311,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
-            addOrEditActivityStatsInDatabase();
+            if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
+                addActivityStatsInDatabase();
+            }
+            if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
+                editActivityStatsInDatabase();
+            }
             tdeeEditPopUpWindow.dismiss();
         });
 
@@ -646,43 +651,23 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
     }
 
-    private void addOrEditActivityStatsInDatabase() {
+    private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(mPositionToEdit);
 
-            long newActivityTime = getMillisValueToSaveFromEditTextString();
-            long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
-            long timeInEditedRow = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(mPositionToEdit);
-
-            remainingDailyTime += timeInEditedRow;
-            newActivityTime = cappedActivityTimeInMillis(newActivityTime, remainingDailyTime);
-
-            double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
-            double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
-            double newCaloriesForActivity = ((double) (newActivityTime/1000) * caloriesBurnedPerSecond);
-            newCaloriesForActivity = roundDownDoubleValuesToSyncCalories(newCaloriesForActivity);
+            long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
+            double newCaloriesBurned = newCaloriesBurned();
 
             dailyStatsAccess.setTotalSetTimeForSelectedActivity(newActivityTime);
-            dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesForActivity);
+            dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesBurned);
 
-            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
-            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-            dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
-            dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
-
+            setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues(daySelectedFromCalendar);
             dailyStatsAccess.setTotalSetTimeFromDayHolderEntity(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
             dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
 
-            if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
-                dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar);
-                dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar);
-            }
-
-            if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
-                dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
-                dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
-            }
+            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
+            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -690,6 +675,63 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
             });
         });
+    }
+
+    private void addActivityStatsInDatabase() {
+        long newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
+        double newCaloriesBurned = newCaloriesBurned();
+
+        AsyncTask.execute(()-> {
+            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar, newActivityTime, newCaloriesBurned);
+
+            //This queries database, so we have the most recently added list of StatsForEachActivity.
+            setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues(daySelectedFromCalendar);
+
+            long setTime = dailyStatsAccess.getTotalSetTimeVariableForDayHolder();
+            double caloriesBurned = dailyStatsAccess.getTotalCaloriesVariableForDayHolder();
+
+            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, setTime, caloriesBurned);
+
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+            });
+        });
+    }
+
+    private void setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues(int daySelected) {
+        dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
+        dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
+        dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
+        dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
+    }
+
+    private long newActivityTimeFromEditText(int addingOrEditingActivity) {
+        long timeSetInEditText = getMillisValueToSaveFromEditTextString();
+        long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
+        long timeInEditedRow = 0;
+
+        if (addingOrEditingActivity==EDITING_ACTIVITY) {
+            timeInEditedRow = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(mPositionToEdit);
+        }
+
+        remainingDailyTime += timeInEditedRow;
+        timeSetInEditText = cappedActivityTimeInMillis(timeSetInEditText, remainingDailyTime);
+
+        return timeSetInEditText;
+    }
+
+    private double newCaloriesBurned() {
+        int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
+        long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity);
+
+        double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
+        double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
+        double newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
+        newCaloriesForActivity = roundDownDoubleValuesToSyncCalories(newCaloriesForActivity);
+
+        return newCaloriesForActivity;
     }
 
     private long cappedActivityTimeInMillis(long activityTime, long remainingTime) {

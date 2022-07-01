@@ -188,15 +188,16 @@ public class DailyStatsAccess {
         }
     }
 
-    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected) {
+    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected, long setTime, double caloriesBurned) {
         mDayHolder = new DayHolder();
 
         String date = getDateString();
 
         mDayHolder.setDayId(daySelected);
         mDayHolder.setDate(date);
+        mDayHolder.setTotalSetTime(setTime);
+        mDayHolder.setTotalCaloriesBurned(caloriesBurned);
 
-        //Times and calories set in fragment.
         cyclesDatabase.cyclesDao().insertDay(mDayHolder);
     }
 
@@ -484,14 +485,14 @@ public class DailyStatsAccess {
         }
     }
 
-    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay) {
+    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay, long setTime, double caloriesBurned) {
         mStatsForEachActivity = new StatsForEachActivity();
 
         mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
         mStatsForEachActivity.setActivity(mActivityString);
         mStatsForEachActivity.setMetScore(mMetScore);
-
-        //Time and calorie values are set in Fragment.
+        mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
     }
