@@ -539,13 +539,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Deleting entire day for activities does not change green date text color. This is executed from our custom action bar which is accessed from Main.
   //Todo: Sometimes adding a new activity defaults to "1" calories.
-  //Todo: Should we change calendar day highlight color depending on +/- calories?
-  //Todo: Can still have tdee option if user doesn't want to track specific activities.
   //Todo: Longer total time/calorie values exceed width allowances.
   //Todo: Fix calendar minimization issue.
   //Todo: Some harder to replicate errors w/ wrong rows being added.
+  //Todo: Should we change calendar day highlight color depending on +/- calories?
+  //Todo: Can still have tdee option if user doesn't want to track specific activities.
 
   //Todo: Cycles Completed needs to be saved in sharedPref or database - will reset on app close.
   //Todo: Black background on stats frag may be b0rking date selection highlight.
@@ -1156,7 +1155,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     stopWatchPopUpWindow.setOnDismissListener(()-> {
       getSupportActionBar().setCustomView(R.layout.custom_bar);
-      setCustomActionBarEditButtonLayoutIdsAndDefaultViews();
+      setCustomActionBarDefaultViews();
       removeCycleHighlights();
 
       if (mode==1) {
@@ -1474,6 +1473,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     appHeader = findViewById(R.id.app_header);
     edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
     cancelHighlight = findViewById(R.id.cancel_highlight);
+    delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     sortButton = findViewById(R.id.sortButton);
   }
 
@@ -1806,11 +1806,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
   }
 
-  private void setCustomActionBarEditButtonLayoutIdsAndDefaultViews() {
-    edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
-    delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
-    cancelHighlight = findViewById(R.id.cancel_highlight);
-
+  private void setCustomActionBarDefaultViews() {
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
@@ -1819,6 +1815,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setDefaultLayoutVisibilities() {
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
+    delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     reset.setVisibility(View.INVISIBLE);
     savedPomCycleRecycler.setVisibility(View.GONE);
     new_lap.setAlpha(0.3f);
