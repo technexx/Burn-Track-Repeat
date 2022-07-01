@@ -1313,6 +1313,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
                 totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
                 caloriesComparedLayout.setVisibility(View.GONE);
+
+                dailyStatsAdapter.turnOffEditMode();
+                caloriesConsumedAdapter.turnOffEditMode();
             }
 
             @Override

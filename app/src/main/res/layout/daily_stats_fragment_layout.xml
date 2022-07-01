@@ -276,7 +276,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="48dp"
             android:layout_marginStart="2dp"
             android:textSize="24sp">
         </TextView>
@@ -313,7 +313,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_activities_header"
             android:layout_marginStart="2dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="48dp"
             android:textSize="24sp">
         </TextView>
 
@@ -335,7 +335,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="48dp"
             android:layout_marginEnd="2dp"
             android:textSize="24sp"
             android:textColor="@color/green">
@@ -372,7 +372,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_activities"
             android:layout_marginEnd="2dp"
-            android:layout_marginTop="30dp"
+            android:layout_marginTop="48dp"
             android:textSize="24sp"
             android:textStyle="bold">
         </TextView>

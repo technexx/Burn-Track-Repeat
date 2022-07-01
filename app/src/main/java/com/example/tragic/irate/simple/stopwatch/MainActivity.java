@@ -539,12 +539,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Fix calendar minimization issue.
-  //Todo: Some harder to replicate errors w/ wrong rows being added.
+  //Todo: Monthly/year-to-date will add up BMR despite having no foods assigned to long-past dates. Should have an option to add foods and activities to multiple dates at once.
   //Todo: Should we change calendar day highlight color depending on +/- calories?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
   //Todo: Possibly make BMR calories (as it changes based on non-activity time) more clear. Possibly add time elapsed next to BMR and activities in comparison tab.
 
+  //Todo: Fix calendar minimization issue.
   //Todo: Cycles Completed needs to be saved in sharedPref or database - will reset on app close.
   //Todo: Black background on stats frag may be b0rking date selection highlight.
   //Todo: Transitions between Main and its match_parent FrameLayout for our fragments needs smoothing.
