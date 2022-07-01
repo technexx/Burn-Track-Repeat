@@ -539,7 +539,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Calories compared error - BMR does not show and only one row of activities seems to show up.
   //Todo: Sometimes adding a new activity defaults to "1" calories.
   //Todo: Fix calendar minimization issue.
   //Todo: Some harder to replicate errors w/ wrong rows being added.

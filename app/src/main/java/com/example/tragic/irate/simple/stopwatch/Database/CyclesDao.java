@@ -17,7 +17,7 @@ import java.util.List;
 @Dao
 public interface
 CyclesDao {
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertDay(DayHolder dayHolder);
 
     @Update
