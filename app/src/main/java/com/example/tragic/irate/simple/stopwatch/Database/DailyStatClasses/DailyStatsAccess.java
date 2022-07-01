@@ -174,7 +174,6 @@ public class DailyStatsAccess {
         if (!doesDayExistInDatabase) {
             String date = getDateString();
 
-            //Todo: New DayHolder instance overwrites the values set beforehand in Fragment. Same w/ DayHolder.
             mDayHolder = new DayHolder();
 
             mDayHolder.setDayId(daySelected);
@@ -197,6 +196,9 @@ public class DailyStatsAccess {
         mDayHolder.setDate(date);
         mDayHolder.setTotalSetTime(setTime);
         mDayHolder.setTotalCaloriesBurned(caloriesBurned);
+
+        Log.i("testInsert", "dayholder id is " + daySelected);
+        Log.i("testInsert", "time send to access class is " + setTime);
 
         cyclesDatabase.cyclesDao().insertDay(mDayHolder);
     }
@@ -657,8 +659,10 @@ public class DailyStatsAccess {
     public void setTotalSetTimeVariableForDayHolder() {
         long valueToReturn = 0;
 
+        Log.i("testInsert", "activity list size is " + totalSetTimeListForEachActivityForSelectedDuration.size());
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
+            Log.i("testInsert", "activity list values are " + totalSetTimeListForEachActivityForSelectedDuration.get(i));
         }
 
         totalSetTimeForSelectedDuration = valueToReturn;
@@ -687,6 +691,7 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
+    //Todo: DayHolder list not updating.
     public double getTotalCaloriesBurnedFromDayHolderList() {
         double valueToReturn = 0;
 

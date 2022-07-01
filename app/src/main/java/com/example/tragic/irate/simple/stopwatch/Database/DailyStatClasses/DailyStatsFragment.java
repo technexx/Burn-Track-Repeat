@@ -693,10 +693,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             //This queries database, so we have the most recently added list of StatsForEachActivity.
             setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues(daySelectedFromCalendar);
 
+            //Todo: This insertion IGNORES and fails because dayHolder ID already exists. Anything sent to dayHolder needs to be set to REPLACE in DAO or call UPDATE instead.
             long setTime = dailyStatsAccess.getTotalSetTimeVariableForDayHolder();
             double caloriesBurned = dailyStatsAccess.getTotalCaloriesVariableForDayHolder();
 
+            Log.i("testInsert", "fetched time is " + setTime);
+
             dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, setTime, caloriesBurned);
+
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 

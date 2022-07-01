@@ -539,8 +539,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: Calories compared error - BMR does not show and only one row of activities seems to show up.
   //Todo: Sometimes adding a new activity defaults to "1" calories.
-  //Todo: Longer total time/calorie values exceed width allowances.
   //Todo: Fix calendar minimization issue.
   //Todo: Some harder to replicate errors w/ wrong rows being added.
   //Todo: Should we change calendar day highlight color depending on +/- calories?
@@ -552,6 +552,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
+  //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add padding to sort layout width + change highlight color.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
