@@ -1101,8 +1101,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         int userWeight = sp.getInt("tdeeWeight,", 150);
 
         double weightConversion = userWeight;
-        if (!metricMode) weightConversion = weightConversion / 2.205;
+        if (!metricMode) {
+            weightConversion = weightConversion / 2.205;
+        }
+
         double caloriesBurnedPerMinute = (metValue * 3.5 * weightConversion) / 200;
+
         return caloriesBurnedPerMinute;
     }
 
@@ -1111,7 +1115,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
-        caloriesToRound += 1;
+//        caloriesToRound += 1;
         DecimalFormat df = new DecimalFormat("#");
         String truncatedCalorieString = df.format(caloriesToRound);
 
