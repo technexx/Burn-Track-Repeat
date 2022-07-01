@@ -539,7 +539,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
-  //Todo: Deleting entire day for activities does not change green date text color.
+  //Todo: Deleting entire day for activities does not change green date text color. This is executed from our custom action bar which is accessed from Main.
   //Todo: Sometimes adding a new activity defaults to "1" calories.
   //Todo: Should we change calendar day highlight color depending on +/- calories?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
@@ -1473,7 +1473,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     appHeader = findViewById(R.id.app_header);
     edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
-    delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
     cancelHighlight = findViewById(R.id.cancel_highlight);
     sortButton = findViewById(R.id.sortButton);
   }
@@ -1819,7 +1818,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setDefaultLayoutVisibilities() {
     edit_highlighted_cycle.setVisibility(View.INVISIBLE);
-    delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     cancelHighlight.setVisibility(View.INVISIBLE);
     reset.setVisibility(View.INVISIBLE);
     savedPomCycleRecycler.setVisibility(View.GONE);
@@ -2469,6 +2467,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.deleteMultipleStatsForEachActivityEntries(longListOfStatsForEachIdsToDelete);
 
     refreshDailyStats();
+    dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
+  }
+
+  private void deleteDailyStatsForAllDays() {
+    dailyStatsAccess.deleteAllDayHolderEntries();
+    dailyStatsAccess.deleteAllStatsForEachActivityEntries();
+    refreshDailyStats();
+    dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
   }
 
   private boolean areAllDaysEmptyOfActivities(List<StatsForEachActivity> statsForEachActivityList) {
@@ -2479,12 +2485,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     return listOfActivities.size()==0;
-  }
-
-  private void deleteDailyStatsForAllDays() {
-    dailyStatsAccess.deleteAllDayHolderEntries();
-    dailyStatsAccess.deleteAllStatsForEachActivityEntries();
-    refreshDailyStats();
   }
 
   private void refreshDailyStats() {

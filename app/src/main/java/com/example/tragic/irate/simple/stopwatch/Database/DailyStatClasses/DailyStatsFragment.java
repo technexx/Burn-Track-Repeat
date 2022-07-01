@@ -446,6 +446,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setListsOfDayHolderAndStatsPrimaryIds();
     }
 
+    public void setNumberOfDaysWithActivitiesHasChangedBoolean(boolean numberOfDaysHaveChanged) {
+        this.numberOfDaysWithActivitiesHasChanged = numberOfDaysHaveChanged;
+    }
+
     public void setActivitySortMode(int sortMode) {
         this.mActivitySortMode = sortMode;
     }
@@ -678,6 +682,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void addActivityStatsInDatabase() {
+        numberOfDaysWithActivitiesHasChanged = true;
+
         long newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
         double newCaloriesBurned = newCaloriesBurned();
 
