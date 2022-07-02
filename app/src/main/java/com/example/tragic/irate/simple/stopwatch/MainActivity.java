@@ -3607,8 +3607,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     AsyncTask.execute(()-> {
       if (cycleLaunchedFromEditPopUp) {
-        saveAddedOrEditedCycleASyncRunnable();
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+        if (isNewCycle) {
+          saveAddedOrEditedCycleASyncRunnable();
+        } else {
+          retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+        }
 
         if (addTDEEfirstMainTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
@@ -3791,7 +3794,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
     if (mode == 1) {
-      //Todo: Tries to get position 0 @ empty list.
       cycles = cyclesList.get(positionOfSelectedCycle);
 
       totalCycleSetTimeInMillis = cycles.getTotalSetTime();
