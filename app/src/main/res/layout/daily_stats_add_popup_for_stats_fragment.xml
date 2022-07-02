@@ -23,7 +23,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activity_category_spinner"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="24dp"
         android:layout_marginStart="6dp"
         android:textSize="16sp"
         android:popupBackground="@color/black">
@@ -35,8 +35,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/met_score_textView"
-        android:layout_marginTop="20dp"
+        app:layout_constraintBottom_toTopOf="@id/add_activity_confirm_button"
+        android:layout_marginBottom="16dp"
         android:textSize="18sp"
         android:textColor="@color/white">
     </TextView>
@@ -60,8 +60,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/calories_burned_in_tdee_addition_popUp_textView"
-        android:layout_marginTop="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="4dp"
         android:backgroundTint="@color/Gray"
         android:textColor="@color/white"
         app:cornerRadius="10dp"

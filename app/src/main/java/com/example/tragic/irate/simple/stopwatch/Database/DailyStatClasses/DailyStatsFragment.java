@@ -1224,6 +1224,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
 
         metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
+        metScoreTextView.setVisibility(View.GONE);
         caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
 
         confirmActivityAddition.setText(R.string.save);
