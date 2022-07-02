@@ -1154,8 +1154,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
             totalActivityStatsValuesTextViewLayout.setLayoutParams(totalActivityStatsValuesTextViewsLayoutParams);
             totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
-
-            setCalendarMinimizationAnimations(totalActivityStatsValuesTextViewLayout);
         }
 
         if (caloriesComparisonTabLayout.getSelectedTabPosition()==1) {
@@ -1164,8 +1162,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             caloriesConsumedRecyclerView.setLayoutParams(caloriesConsumedRecyclerViewLayoutParams);
             totalFoodStatsValuesTextViewLayout.setLayoutParams(totalFoodStatsValuesTextViewLayoutParams);
             totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
-
-            setCalendarMinimizationAnimations(totalFoodStatsValuesTextViewLayout);
         }
     }
 
@@ -1182,7 +1178,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
             calendarView.startAnimation(slideInFromBottom);
 
-            recyclerParams.height = dpToPxConv(280);
+            recyclerParams.height = dpToPxConv(275);
             recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
             textViewParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
@@ -1433,13 +1429,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         slideInFromBottom.setDuration(250);
         slideInFromBottom.setFillAfter(true);
 
+        // If animation not set to setFillAfter, it goes back to constraint against arrow button. We WANT this tho, otherwise the total calories will be obscured. Issue is w/ the vertical range of the animation.
         slideOutToBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom_no_alpha_change);
         slideOutToBottomNoAlphaChange.setDuration(250);
 //        slideOutToBottomNoAlphaChange.setFillAfter(true);
         slideInFromBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom_untouched_alpha);
         slideInFromBottomNoAlphaChange.setDuration(250);
 //        slideInFromBottomNoAlphaChange.setFillAfter(true);
-
     }
 
     private int dpToPxConv(float pixels) {

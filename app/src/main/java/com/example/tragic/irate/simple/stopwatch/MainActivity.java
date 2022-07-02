@@ -547,7 +547,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Should we include a pounds gained/lost row?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
 
-  //Todo: Fix calendar minimization issue.
   //Todo: Transitions between Main and its match_parent FrameLayout for our fragments needs smoothing.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
