@@ -304,9 +304,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         editTdeeStatsButton.setOnClickListener(v-> {
             if (dailyStatsRecyclerView.isShown()) {
                 dailyStatsAdapter.toggleEditMode();
+                scrollToBottomOfDailyStatsRecycler();
             }
             if (caloriesConsumedRecyclerView.isShown()) {
                 caloriesConsumedAdapter.toggleEditMode();
+                scrollToBottomOfCaloriesConsumedRecycler();
             }
         });
 
@@ -338,6 +340,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    public void scrollToBottomOfDailyStatsRecycler() {
+        dailyStatsRecyclerView.smoothScrollToPosition(dailyStatsAdapter.getItemCount()-1);
+    }
+
+    public void scrollToBottomOfCaloriesConsumedRecycler() {
+        dailyStatsRecyclerView.smoothScrollToPosition(caloriesConsumedAdapter.getItemCount()-1);
     }
 
     private void addOrEditFoodInStats() {

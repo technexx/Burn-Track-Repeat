@@ -539,12 +539,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  //Todo: Should scroll to bottom on edit button, to see "add" imageButton;
+  //Todo: "time remaining" shows date range total at moment.
   //Todo: Monthly/year-to-date will add up BMR despite having no foods assigned to long-past dates. Should have an option to add foods and activities to multiple dates at once.
+      //Todo: E.g. in custom date selection, allow all highlighted dates to be added to.
+          //Todo: How would we do edits though? We could have separate buttons, and only allow edits on single days.
+      //Todo: Option to add misc. calories burned?
+  //Todo: Expanded view can
   //Todo: Should we change calendar day highlight color depending on +/- calories?
+  //Todo: Should we include a pounds gained/lost row?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
   //Todo: Possibly make BMR calories (as it changes based on non-activity time) more clear. Possibly add time elapsed next to BMR and activities in comparison tab.
 
   //Todo: Fix calendar minimization issue.
+  //Todo: Calendar minimization should be disabled in "calories compared" tab.
   //Todo: Cycles Completed needs to be saved in sharedPref or database - will reset on app close.
   //Todo: Black background on stats frag may be b0rking date selection highlight.
   //Todo: Transitions between Main and its match_parent FrameLayout for our fragments needs smoothing.
