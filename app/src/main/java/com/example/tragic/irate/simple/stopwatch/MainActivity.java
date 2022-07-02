@@ -544,14 +544,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: E.g. in custom date selection, allow all highlighted dates to be added to.
           //Todo: How would we do edits though? We could have separate buttons, and only allow edits on single days.
       //Todo: Option to add misc. calories burned?
-
-  //Todo: BUG: Index exception crash when adding first cycle.
   //Todo: Should we include a pounds gained/lost row?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
 
+  //Todo: BUG: Saved cycle time recalling the same on multiple cycle retrievals.
   //Todo: Fix calendar minimization issue.
   //Todo: Transitions between Main and its match_parent FrameLayout for our fragments needs smoothing.
-  //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
@@ -1627,7 +1625,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setDefaultUserSettings();
         setDefaultEditRoundViews();
         getTimerVariablesForEachMode();
-        savedCycleAdapter.notifyDataSetChanged();
       });
     });
   }
@@ -2067,7 +2064,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       runOnUiThread(()->{
         clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
-        savedCycleAdapter.notifyDataSetChanged();
       });
     }
 
@@ -2081,7 +2077,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       runOnUiThread(()->{
         clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
-        savedPomCycleAdapter.notifyDataSetChanged();
       });
     }
   }
@@ -2175,6 +2170,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
       }
+      savedCycleAdapter.notifyDataSetChanged();
     }
     if (mode==3 || forAllModes) {
       pomArray.clear();
@@ -2183,6 +2179,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomArray.add(pomCyclesList.get(i).getFullCycle());
         pomTitleArray.add(pomCyclesList.get(i).getTitle());
       }
+      savedPomCycleAdapter.notifyDataSetChanged();
     }
   }
 
