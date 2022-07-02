@@ -1306,13 +1306,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     case 0:
                         dailyStatsRecyclerView.setVisibility(View.VISIBLE);
                         totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+                        editTdeeStatsButton.setEnabled(true);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
                         totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+                        editTdeeStatsButton.setEnabled(true);
                         break;
                     case 2:
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
+                        editTdeeStatsButton.setEnabled(false);
                         break;
                 }
             }

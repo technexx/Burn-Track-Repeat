@@ -545,15 +545,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Todo: How would we do edits though? We could have separate buttons, and only allow edits on single days.
       //Todo: Option to add misc. calories burned?
 
-
+  //Todo: BUG: Index exception crash when adding first cycle.
   //Todo: Should we include a pounds gained/lost row?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
-  //Todo: Possibly make BMR calories (as it changes based on non-activity time) more clear. Possibly add time elapsed next to BMR and activities in comparison tab.
 
-  //Todo; Should we remove MET entirely?
   //Todo: Fix calendar minimization issue.
-  //Todo: Calendar minimization should be disabled in "calories compared" tab.
-  //Todo: Cycles Completed needs to be saved in sharedPref or database - will reset on app close.
   //Todo: Transitions between Main and its match_parent FrameLayout for our fragments needs smoothing.
   //Todo: DP -> PX for conversions is better since PX is actual pixels.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
@@ -1508,6 +1504,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
     confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
     metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
+    metScoreTextView.setVisibility(View.GONE);
     caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
   }
 
@@ -3128,7 +3125,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public int convertDensityPixelsToScalable(float pixels) {
-    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
   }
 
   private void replaceCycleListWithEmptyTextViewIfNoCyclesExist() {
@@ -3794,6 +3791,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
     if (mode == 1) {
+      //Todo: Tries to get position 0 @ empty list.
       cycles = cyclesList.get(positionOfSelectedCycle);
 
       totalCycleSetTimeInMillis = cycles.getTotalSetTime();

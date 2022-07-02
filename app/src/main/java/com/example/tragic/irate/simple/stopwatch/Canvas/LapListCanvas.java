@@ -67,7 +67,7 @@ public class LapListCanvas extends View {
     }
 
     private int convertDensityPixelsToScalable(float pixels) {
-        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_SP, pixels, getResources().getDisplayMetrics());
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
     }
 
     @Override
