@@ -5077,7 +5077,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void showToastIfNoneActive (String message){
     if (mToast != null) {
       mToast.cancel();
-      Log.i("testToast", "toast is active and we're cancelling it!");
     }
     mToast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
     mToast.show();

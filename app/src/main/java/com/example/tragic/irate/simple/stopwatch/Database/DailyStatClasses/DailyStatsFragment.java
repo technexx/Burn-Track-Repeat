@@ -692,11 +692,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
+    //Todo: Delete button should be "cancel" instead of if in Add mode (from onClick). Deletion will also try to delete a non-existent row at the moment.
     private void addActivityStatsInDatabase() {
         numberOfDaysWithActivitiesHasChanged = true;
 
         long newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
         double newCaloriesBurned = newCaloriesBurned();
+
+        if (newActivityTime<=0) {
+            getActivity().runOnUiThread(()-> {
+                showToastIfNoneActive("Time cannot be empty!");
+            });
+            return;
+        }
 
         AsyncTask.execute(()-> {
             dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar, newActivityTime, newCaloriesBurned);
@@ -707,20 +715,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long setTime = dailyStatsAccess.getTotalSetTimeVariableForDayHolder();
             double caloriesBurned = dailyStatsAccess.getTotalCaloriesVariableForDayHolder();
 
-            if (newActivityTime<=0) {
-                getActivity().runOnUiThread(()-> {
-                    showToastIfNoneActive("Time cannot be empty!");
-                });
-            } else {
-                dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, setTime, caloriesBurned);
+            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, setTime, caloriesBurned);
 
-                populateListsAndTextViewsFromEntityListsInDatabase();
+            populateListsAndTextViewsFromEntityListsInDatabase();
 
-                getActivity().runOnUiThread(()-> {
-                    showToastIfNoneActive("Saved!");
-                    tdeeEditPopUpWindow.dismiss();
-                });
-            }
+            getActivity().runOnUiThread(()-> {
+                showToastIfNoneActive("Saved!");
+                tdeeEditPopUpWindow.dismiss();
+            });
         });
     }
 
@@ -1451,7 +1453,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void showToastIfNoneActive (String message){
         if (mToast != null) {
             mToast.cancel();
-            Log.i("testToast", "toast is active and we're cancelling it!");
         }
         mToast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         mToast.show();
