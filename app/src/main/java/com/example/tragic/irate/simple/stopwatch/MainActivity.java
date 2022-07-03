@@ -553,7 +553,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Transitions between Main and its match_parent FrameLayout for our fragments needs smoothing.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
-  //Todo: Stopwatch mode causing edit cycle mode buttons in action bar to show themselves.
 
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
@@ -1151,8 +1150,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     stopWatchPopUpWindow.setOnDismissListener(()-> {
-      getSupportActionBar().setCustomView(R.layout.custom_bar);
-      setCustomActionBarDefaultViews();
+      getSupportActionBar().show();
       removeCycleHighlights();
 
       if (mode==1) {
@@ -1197,7 +1195,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void stopWatchLaunchLogic() {
-    getSupportActionBar().setCustomView(R.layout.empty_action_bar_view);
+    getSupportActionBar().hide();
+
     savedCycleRecycler.setVisibility(View.INVISIBLE);
     savedPomCycleRecycler.setVisibility(View.INVISIBLE);
     savedCyclesTabLayout.setVisibility(View.INVISIBLE);
@@ -1717,7 +1716,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     slideGlobalSettingsFragmentOutFromLeft.setAnimationListener(new Animation.AnimationListener() {
       @Override
       public void onAnimationStart(Animation animation) {
-
       }
 
       @Override
@@ -1725,13 +1723,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         getSupportFragmentManager().beginTransaction()
                 .remove(rootSettingsFragment)
                 .commit();
-
         mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
       }
 
       @Override
       public void onAnimationRepeat(Animation animation) {
-
       }
     });
 
@@ -1745,7 +1741,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         getSupportFragmentManager().beginTransaction()
                 .remove(dailyStatsFragment)
                 .commit();
-
         mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
       }
 
