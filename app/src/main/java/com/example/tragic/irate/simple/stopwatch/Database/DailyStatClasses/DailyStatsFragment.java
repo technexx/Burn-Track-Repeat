@@ -181,6 +181,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     double metScore;
 
     ImageButton exitExpansionImageButton;
+    Toast mToast;
 
     @Override
     public void onDestroy() {
@@ -194,6 +195,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
 
+        mToast = new Toast(getContext());
         dailyStatsAccess = new DailyStatsAccess(getContext());
 
         dailyStatsExpandedButton = mRoot.findViewById(R.id.daily_stats_expanded_button);
@@ -617,7 +619,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 });
             } else {
                 getActivity().runOnUiThread(()->{
-                    Toast.makeText(getContext(), "Activity exists!", Toast.LENGTH_SHORT).show();
+                    showToastIfNoneActive("Activity exists!");
                 });
             }
         });
@@ -707,7 +709,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             if (newActivityTime<=0) {
                 getActivity().runOnUiThread(()-> {
-                    Toast.makeText(getContext(), "Time cannot be empty!", Toast.LENGTH_SHORT).show();
+                    showToastIfNoneActive("Time cannot be empty!");
                 });
             } else {
                 dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, setTime, caloriesBurned);
@@ -715,7 +717,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 populateListsAndTextViewsFromEntityListsInDatabase();
 
                 getActivity().runOnUiThread(()-> {
-                    Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+                    showToastIfNoneActive("Saved!");
                     tdeeEditPopUpWindow.dismiss();
                 });
             }
@@ -981,11 +983,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void addFoodToStats() {
         if (getFoodStringFromEditText().isEmpty()) {
-            Toast.makeText(getContext(), "Must enter a food!", Toast.LENGTH_SHORT).show();
+            showToastIfNoneActive("Must enter a food!");
             return;
         }
         if (getCaloriesForFoodItemFromEditText().isEmpty()) {
-            Toast.makeText(getContext(), "Must enter a caloric value!", Toast.LENGTH_SHORT).show();
+            showToastIfNoneActive("Must enter a caloric value!");
             return;
         }
             AsyncTask.execute(()-> {
@@ -1444,6 +1446,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private int dpToPxConv(float pixels) {
         return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+    }
+
+    private void showToastIfNoneActive (String message){
+        if (mToast != null) {
+            mToast.cancel();
+            Log.i("testToast", "toast is active and we're cancelling it!");
+        }
+        mToast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
+        mToast.show();
     }
 
     private void logTotalStatRows() {

@@ -543,6 +543,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  Toast mToast;
+
   //Todo: "time remaining" shows date range total at moment.
   //Todo: Monthly/year-to-date will add up BMR despite having no foods assigned to long-past dates. Should have an option to add foods and activities to multiple dates at once.
       //Todo: E.g. in custom date selection, allow all highlighted dates to be added to.
@@ -553,8 +555,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Should we move this and calories compared into the separate expanded popUp?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
 
-  //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
+  //Todo: Repeating toast in intervals for trying to repeatedly add empty time activity.
 
+  //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
@@ -653,7 +656,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case R.id.delete_all_cycles:
         if (mode==1 && workoutCyclesArray.size()==0 || mode==3 && pomArray.size()==0) {
-          Toast.makeText(getApplicationContext(), "No cycles to delete!", Toast.LENGTH_SHORT).show();
+          showToastIfNoneActive("No cycles to delete!");
         } else {
           delete_all_text.setText(R.string.delete_all_cycles);
           deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
@@ -1388,6 +1391,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
     vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+
+    mToast = new Toast(getApplicationContext());
   }
 
   private void instantiateTabLayouts() {
@@ -2490,7 +2495,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (areAllDaysEmptyOfActivities(statsForEachActivityList)) {
       runOnUiThread(()-> {
-        Toast.makeText(getApplicationContext(), "Nothing to delete!", Toast.LENGTH_SHORT).show();
+        showToastIfNoneActive("Nothing to delete!");
         return;
       });
     }
@@ -3370,7 +3375,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleRoundsAdapter.setPomFade(true);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
-          Toast.makeText(getApplicationContext(), "Pomodoro cycle already loaded!", Toast.LENGTH_SHORT).show();
+          showToastIfNoneActive("Pomodoro cycle already loaded!");
         }
       }
     } else {
@@ -3388,15 +3393,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           subtractedRoundIsFading = true;
         } else {
-          Toast toast = Toast.makeText(getApplicationContext(), "No rounds to clear!", Toast.LENGTH_SHORT);
-          toast.show();
+          showToastIfNoneActive("No rounds to clear!");
         }
       } else if (mode==3) {
         if (pomValuesTime.size() != 0) {
           cycleRoundsAdapter.setPomFade(false);
           cycleRoundsAdapter.notifyDataSetChanged();
           subtractRoundFromCycleButton.setClickable(false);
-        } else Toast.makeText(getApplicationContext(), "No Pomodoro cycle to clear!", Toast.LENGTH_SHORT).show();
+        } else {
+          showToastIfNoneActive("No Pomodoro cycle to clear!");
+        }
       }
     }
   }
@@ -3423,7 +3429,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
         } else {
-          Toast.makeText(getApplicationContext(), "Full!", Toast.LENGTH_SHORT).show();
+          showToastIfNoneActive("Full!");
         }
 
         setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
@@ -3491,7 +3497,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           roundIsSelected = false;
         }
         roundSelectedPosition = workoutTime.size()-1;
-      } else Toast.makeText(getApplicationContext(), "Empty!", Toast.LENGTH_SHORT).show();
+      } else {
+        showToastIfNoneActive("Empty!");
+      }
     }
   }
 
@@ -3611,7 +3619,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void launchPomTimerCycle(boolean cycleLaunchedFromEditPopUp) {
     if (pomValuesTime.size()==0) {
-      Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
+      showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
 
@@ -3634,7 +3642,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
     if (workoutTime.size()==0) {
-      Toast.makeText(getApplicationContext(), "Cycle cannot be empty!", Toast.LENGTH_SHORT).show();
+      showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
 
@@ -5064,6 +5072,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.remove("modeThreeTimerEnded");
     prefEdit.remove("modeThreeTimerDisabled");
     prefEdit.apply();
+  }
+
+  private void showToastIfNoneActive (String message){
+    if (mToast != null) {
+      mToast.cancel();
+      Log.i("testToast", "toast is active and we're cancelling it!");
+    }
+    mToast = Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT);
+    mToast.show();
   }
 
   private void logSelectedCyclePositionAndItsValues(String location) {
