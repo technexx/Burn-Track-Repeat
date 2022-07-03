@@ -319,7 +319,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
                 editActivityStatsInDatabase();
             }
-            tdeeEditPopUpWindow.dismiss();
         });
 
         confirmActivityDeletionWithinEditPopUpButton.setOnClickListener(v-> {
@@ -706,13 +705,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long setTime = dailyStatsAccess.getTotalSetTimeVariableForDayHolder();
             double caloriesBurned = dailyStatsAccess.getTotalCaloriesVariableForDayHolder();
 
-            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, setTime, caloriesBurned);
+            if (newActivityTime<=0) {
+                getActivity().runOnUiThread(()-> {
+                    Toast.makeText(getContext(), "Time cannot be empty!", Toast.LENGTH_SHORT).show();
+                });
+            } else {
+                dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, setTime, caloriesBurned);
 
-            populateListsAndTextViewsFromEntityListsInDatabase();
+                populateListsAndTextViewsFromEntityListsInDatabase();
 
-            getActivity().runOnUiThread(()-> {
-                Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
-            });
+                getActivity().runOnUiThread(()-> {
+                    Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+                    tdeeEditPopUpWindow.dismiss();
+                });
+            }
         });
     }
 
@@ -745,7 +751,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
         double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
         double newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
-        newCaloriesForActivity = roundDownDoubleValuesToSyncCalories(newCaloriesForActivity);
+//        newCaloriesForActivity = roundDownDoubleValuesToSyncCalories(newCaloriesForActivity);
 
         return newCaloriesForActivity;
     }
@@ -1432,10 +1438,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         // If animation not set to setFillAfter, it goes back to constraint against arrow button. We WANT this tho, otherwise the total calories will be obscured. Issue is w/ the vertical range of the animation.
         slideOutToBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom_no_alpha_change);
         slideOutToBottomNoAlphaChange.setDuration(250);
-//        slideOutToBottomNoAlphaChange.setFillAfter(true);
         slideInFromBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom_untouched_alpha);
         slideInFromBottomNoAlphaChange.setDuration(250);
-//        slideInFromBottomNoAlphaChange.setFillAfter(true);
     }
 
     private int dpToPxConv(float pixels) {

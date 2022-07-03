@@ -549,9 +549,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           //Todo: How would we do edits though? We could have separate buttons, and only allow edits on single days.
       //Todo: Option to add misc. calories burned?
   //Todo: Should we include a pounds gained/lost row?
+      //Todo: May want to include a starting/current weight as well.
+      //Todo: Should we move this and calories compared into the separate expanded popUp?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
 
-  //Todo: Transitions between Main and its match_parent FrameLayout for our fragments needs smoothing.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
 
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
@@ -565,7 +566,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
-  //Todo: Add disclaimer about accuracy, for entertainment purposes, not medical advice, etc.
+  //Todo: Add disclaimer about accuracy, for entertainment purposes, not medical advice, etc. Should pop up on app start.
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
