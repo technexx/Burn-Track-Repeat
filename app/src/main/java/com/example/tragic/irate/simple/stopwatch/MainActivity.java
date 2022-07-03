@@ -275,6 +275,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
   Animation slideLeft;
+  Animation slideDailyStatsFragmentInFromLeft;
+  Animation slideDailyStatsFragmentOutFromLeft;
+  Animation slideGlobalSettingsFragmentInFromLeft;
+  Animation slideGlobalSettingsFragmentOutFromLeft;
 
   ConstraintLayout.LayoutParams cycleTitleLayoutParams;
   ConstraintLayout.LayoutParams cyclesCompletedLayoutParams;
@@ -549,6 +553,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Transitions between Main and its match_parent FrameLayout for our fragments needs smoothing.
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
+  //Todo: Stopwatch mode causing edit cycle mode buttons in action bar to show themselves.
 
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
@@ -614,20 +619,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
+
       if (rootSettingsFragment.isVisible()) {
-        getSupportFragmentManager().beginTransaction()
-                .remove(rootSettingsFragment)
-                .commit();
+        mainActivityFragmentFrameLayout.startAnimation(slideGlobalSettingsFragmentOutFromLeft);
       }
 
       if (dailyStatsFragment.isVisible()) {
-        getSupportFragmentManager().beginTransaction()
-                .remove(dailyStatsFragment)
-                .commit();
+        mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentOutFromLeft);
       }
-
-      mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
-      mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_out_anim));
 
       setTypeOFMenu(DEFAULT_MENU);
       toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
@@ -1693,13 +1692,67 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void instantiateAnimationAndColorMethods() {
     fadeIn = new AlphaAnimation(0.0f, 1.0f);
-    fadeOut = new AlphaAnimation(1.0f, 0.0f);
     fadeIn.setDuration(750);
-    fadeOut.setDuration(750);
     fadeIn.setFillAfter(true);
+
+    fadeOut = new AlphaAnimation(1.0f, 0.0f);
+    fadeOut.setDuration(750);
     fadeOut.setFillAfter(true);
+
     slideLeft =  AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
     slideLeft.setDuration(400);
+
+    slideDailyStatsFragmentInFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_from_left);
+    slideDailyStatsFragmentInFromLeft.setDuration(600);
+
+    slideDailyStatsFragmentOutFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_from_left);
+    slideDailyStatsFragmentOutFromLeft.setDuration(400);
+
+    slideGlobalSettingsFragmentInFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_from_left);
+    slideGlobalSettingsFragmentInFromLeft.setDuration(300);
+
+    slideGlobalSettingsFragmentOutFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_from_left);
+    slideGlobalSettingsFragmentOutFromLeft.setDuration(400);
+
+    slideGlobalSettingsFragmentOutFromLeft.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+
+      }
+
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        getSupportFragmentManager().beginTransaction()
+                .remove(rootSettingsFragment)
+                .commit();
+
+        mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
+      }
+
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+
+      }
+    });
+
+    slideDailyStatsFragmentOutFromLeft.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+      }
+
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        getSupportFragmentManager().beginTransaction()
+                .remove(dailyStatsFragment)
+                .commit();
+
+        mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
+      }
+
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+      }
+    });
 
     fadeProgressIn = new AlphaAnimation(0.3f, 1.0f);
     fadeProgressOut = new AlphaAnimation(1.0f, 0.3f);
@@ -2409,12 +2462,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
   private void launchGlobalSettingsFragment() {
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+      mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentInFromLeft);
       mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
       if (rootSettingsFragment !=null) {
         getSupportFragmentManager().beginTransaction()
-                .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
                 .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
                 .commit();
       }
@@ -2424,10 +2476,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void launchDailyStatsFragment() {
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(AnimationUtils.loadAnimation(getApplicationContext(), R.anim.fade_in_anim));
+      mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentInFromLeft);
       mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+
       fragmentManager.beginTransaction()
-              .setCustomAnimations(R.anim.slide_in_from_left, R.anim.slide_out_from_right)
               .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
               .commit();
       setTypeOFMenu(DAILY_SETTINGS_MENU);
