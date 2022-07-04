@@ -137,7 +137,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     EditText tdeeEditTextSeconds;
     TextView unassignedTimeInEditPopUpTextView;
     Button confirmActivityEditWithinPopUpButton;
-    Button confirmActivityDeletionWithinEditPopUpButton;
+    Button deleteActivityIfEditingRowWithinEditPopUpButton;
 
     int mActivitySortMode;
     int mPositionToEdit;
@@ -323,8 +323,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             }
         });
 
-        confirmActivityDeletionWithinEditPopUpButton.setOnClickListener(v-> {
-            deleteActivity(mPositionToEdit);
+        deleteActivityIfEditingRowWithinEditPopUpButton.setOnClickListener(v-> {
+            if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
+                deleteActivity(mPositionToEdit);
+            }
             tdeeEditPopUpWindow.dismiss();
         });
 
@@ -626,7 +628,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void populateActivityEditPopUpWithNewRow() {
-        replaceActivityAddPopUpWithEditPopUp();
+        replaceActivityAddPopUpWithEmptyEditPopUp();
 
         String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
@@ -634,10 +636,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         zeroOutActivityEditPopUpEditTexts();
     }
 
-    private void replaceActivityAddPopUpWithEditPopUp() {
+    private void replaceActivityAddPopUpWithEmptyEditPopUp() {
         addTdeePopUpWindow.dismiss();
 
         setActivityEditPopUpTimeRemainingTextView();
+        toggleCancelOrDeleteButtonInEditPopUoTextView(ADDING_ACTIVITY);
+
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
@@ -655,6 +659,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         activityTextViewInEditPopUp.setText(activityString);
         setActivityEditPopUpEditTexts(timeToEditLongValue);
         setActivityEditPopUpTimeRemainingTextView();
+        toggleCancelOrDeleteButtonInEditPopUoTextView(EDITING_ACTIVITY);
 
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
@@ -664,6 +669,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String timeLeftInDay = longToStringConverters.convertSecondsForStatDisplay(dailyStatsAccess.getUnassignedDailyTotalTime());
         String timeLeftInDayConcatString = getString(R.string.day_time_remaining, timeLeftInDay);
         unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
+    }
+
+    private void toggleCancelOrDeleteButtonInEditPopUoTextView(int addingOrEditing) {
+        if (addingOrEditing==ADDING_ACTIVITY) {
+            deleteActivityIfEditingRowWithinEditPopUpButton.setText(R.string.cancel);
+        }
+        if (addingOrEditing==EDITING_ACTIVITY) {
+            deleteActivityIfEditingRowWithinEditPopUpButton.setText(R.string.delete);
+        }
     }
 
     private void editActivityStatsInDatabase() {
@@ -692,7 +706,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    //Todo: Delete button should be "cancel" instead of if in Add mode (from onClick). Deletion will also try to delete a non-existent row at the moment.
     private void addActivityStatsInDatabase() {
         numberOfDaysWithActivitiesHasChanged = true;
 
@@ -1265,7 +1278,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         unassignedTimeInEditPopUpTextView = tdeeEditView.findViewById(R.id.unassigned_time_textView);
 
         confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit);
-        confirmActivityDeletionWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
+        deleteActivityIfEditingRowWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
 
         popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
 
