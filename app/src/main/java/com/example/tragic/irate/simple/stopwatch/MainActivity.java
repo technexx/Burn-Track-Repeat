@@ -555,8 +555,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Should we move this and calories compared into the separate expanded popUp?
   //Todo: Can still have tdee option if user doesn't want to track specific activities.
 
-  //Todo: Repeating toast in intervals for trying to repeatedly add empty time activity.
-
   //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.

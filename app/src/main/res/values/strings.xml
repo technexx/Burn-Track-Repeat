@@ -115,6 +115,9 @@
     <string name="set_time_text_header">Time</string>
     <string name="calories_burned_text_header">Calories</string>
 
+    <string name="current_day">Selected day</string>
+    <string name="date_range">Date range</string>
+
     <string name="food_name_header">Food/Drink</string>
     <string name="food_portion_header">Portion</string>
     <string name="calories_header">Calories</string>
