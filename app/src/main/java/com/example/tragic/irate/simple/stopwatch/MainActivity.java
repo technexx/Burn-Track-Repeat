@@ -545,11 +545,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: "time remaining" shows date range total at moment.
-  //Todo: Monthly/year-to-date will add up BMR despite having no foods assigned to long-past dates. Should have an option to add foods and activities to multiple dates at once.
-      //Todo: E.g. in custom date selection, allow all highlighted dates to be added to.
-          //Todo: How would we do edits though? We could have separate buttons, and only allow edits on single days.
-      //Todo: Option to add misc. calories burned?
+  //Todo: "Activity exists" should pop if it exists anywhere in duration range, if that's what we're adding.
+  //Todo: Option to add misc. calories burned?
   //Todo: Should we include a pounds gained/lost row?
       //Todo: May want to include a starting/current weight as well.
       //Todo: Should we move this and calories compared into the separate expanded popUp?
