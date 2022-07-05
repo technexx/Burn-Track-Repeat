@@ -173,61 +173,6 @@ public class DailyStatsAccess {
         }
     }
 
-    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabaseWithZeroedOutTimesAndCalories(int daySelected) {
-        if (!doesDayExistInDatabase) {
-            String date = getDateString();
-
-            mDayHolder = new DayHolder();
-
-            mDayHolder.setDayId(daySelected);
-            mDayHolder.setDate(date);
-
-            mDayHolder.setTotalSetTime(0);
-            mDayHolder.setTotalBreakTime(0);
-            mDayHolder.setTotalCaloriesBurned(0);
-
-            cyclesDatabase.cyclesDao().insertDay(mDayHolder);
-        }
-    }
-
-    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected, long setTime, double caloriesBurned) {
-
-        if (mDayHolderList.size() == 0) {
-            mDayHolder = new DayHolder();
-            mDayHolder.setDayId(daySelected);
-        } else {
-            for (int i=0; i<mDayHolderList.size(); i++) {
-                mDayHolder = mDayHolderList.get(i);
-            }
-        }
-        mDayHolder.setDayId(daySelected);
-        mDayHolder.setTotalSetTime(setTime);
-        mDayHolder.setTotalCaloriesBurned(caloriesBurned);
-
-        Log.i("testInsert", "dayholder id is " + daySelected);
-        Log.i("testInsert", "time send to access class is " + setTime);
-
-        cyclesDatabase.cyclesDao().insertDay(mDayHolder);
-    }
-
-    private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
-        if (integerListOfSelectedDays.size()>0) {
-            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
-            mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
-        } else {
-            mDayHolderList = new ArrayList<>();
-            mStatsForEachActivityList = new ArrayList<>();
-        }
-    }
-
-    private void populateCaloriesForEachFoodList(List<Integer> integerListOfSelectedDays) {
-        if (integerListOfSelectedDays.size()>0) { ;
-            mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedDays);
-        } else {
-            mCaloriesForEachFoodList = new ArrayList<>();
-        }
-    }
-
     public List<DayHolder> getDayHolderList() {
         return mDayHolderList;
     }
@@ -236,20 +181,42 @@ public class DailyStatsAccess {
         return mStatsForEachActivityList;
     }
 
-    ////////////////////////////////////////////////////////////////////
+//    public void setDayHolderAndStatsListsForSingleDayFromDatabase(List<Integer> dayToRetrieve) {
+//        //Fetches and sets sole list position to a list so we can use the same DAO insertion method for single/multiple days.
+//        if (mDayHolderList.size()==1) {
+//            dayToRetrieve = Collections.singletonList(dayToRetrieve.get(0));
+//            convertToStringAndSetSingleDay(dayToRetrieve.get(0));
+//        }
+//
+//        mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(dayToRetrieve);
+//
+//        mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(dayToRetrieve);
+//
+//        mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(dayToRetrieve);
+//    }
 
-    public void setDayHolderAndStatForEachActivityListsForSelectedDaysFromDatabase(List<Integer> daysToRetrieve) {
-        //Fetches and sets sole list position to a list so we can use the same DAO insertion method for single/multiple days.
-        if (mDayHolderList.size()==1) {
-            daysToRetrieve = Collections.singletonList(daysToRetrieve.get(0));
-            convertToStringAndSetSingleDay(daysToRetrieve.get(0));
+    public void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
+        if (integerListOfSelectedDays.size()>0) {
+            if (integerListOfSelectedDays.size()==1) {
+                integerListOfSelectedDays = Collections.singletonList(integerListOfSelectedDays.get(0));
+            }
+            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
+            mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
+        } else {
+            mDayHolderList = new ArrayList<>();
+            mStatsForEachActivityList = new ArrayList<>();
         }
+    }
 
-        mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysToRetrieve);
-
-        mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(daysToRetrieve);
-
-        mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(daysToRetrieve);
+    public void populateCaloriesForEachFoodList(List<Integer> integerListOfSelectedDays) {
+        if (integerListOfSelectedDays.size()>0) {
+            if (integerListOfSelectedDays.size()==1) {
+                integerListOfSelectedDays = Collections.singletonList(integerListOfSelectedDays.get(0));
+            }
+            mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedDays);
+        } else {
+            mCaloriesForEachFoodList = new ArrayList<>();
+        }
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -492,13 +459,21 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(int selectedDay, long setTime, double caloriesBurned) {
-        //List is set as new ArrayList (i.e. 0 size) if none of its selected days have a row, so this conditional handles that.
-        if (mStatsForEachActivityList.size() == 0) {
-            mStatsForEachActivity = new StatsForEachActivity();
-            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+        if (mAddingOrEditingSingleDay) {
+            if (mStatsForEachActivityList.size() == 0) {
+                mStatsForEachActivity = new StatsForEachActivity();
+                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+            } else {
+                mStatsForEachActivity = mStatsForEachActivityList.get(selectedDay);
+            }
         } else {
-            for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-                mStatsForEachActivity = mStatsForEachActivityList.get(i);
+            if (mStatsForEachActivityList.size() == 0) {
+                mStatsForEachActivity = new StatsForEachActivity();
+                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+            } else {
+                for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+                    mStatsForEachActivity = mStatsForEachActivityList.get(i);
+                }
             }
         }
 
@@ -508,6 +483,55 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
+    }
+
+    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabaseWithZeroedOutTimesAndCalories(int daySelected) {
+        if (!doesDayExistInDatabase) {
+            String date = getDateString();
+
+            mDayHolder = new DayHolder();
+
+            mDayHolder.setDayId(daySelected);
+            mDayHolder.setDate(date);
+
+            mDayHolder.setTotalSetTime(0);
+            mDayHolder.setTotalBreakTime(0);
+            mDayHolder.setTotalCaloriesBurned(0);
+
+            cyclesDatabase.cyclesDao().insertDay(mDayHolder);
+        }
+    }
+
+    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected, long setTime, double caloriesBurned) {
+        if (mAddingOrEditingSingleDay) {
+            if (mDayHolderList.size() == 0) {
+                mDayHolder = new DayHolder();
+                mDayHolder.setDayId(daySelected);
+            } else {
+                mDayHolder = mDayHolderList.get(daySelected);
+            }
+        } else {
+            if (mDayHolderList.size() == 0) {
+                mDayHolder = new DayHolder();
+                mDayHolder.setDayId(daySelected);
+            } else {
+                for (int i=0; i<mDayHolderList.size(); i++) {
+                    mDayHolder = mDayHolderList.get(i);
+                }
+            }
+        }
+
+        mDayHolder.setTotalSetTime(setTime);
+        mDayHolder.setTotalCaloriesBurned(caloriesBurned);
+
+        Log.i("testInsert", "dayHolder id is " + daySelected);
+        Log.i("testInsert", "time send to access class is " + setTime);
+
+        cyclesDatabase.cyclesDao().insertDay(mDayHolder);
+    }
+
+    public void setAddingOrEditingSingleDayBoolean(boolean singleDay) {
+        this.mAddingOrEditingSingleDay = singleDay;
     }
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
@@ -700,7 +724,6 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    //Todo: DayHolder list not updating.
     public double getTotalCaloriesBurnedFromDayHolderList() {
         double valueToReturn = 0;
 

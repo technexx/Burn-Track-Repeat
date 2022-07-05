@@ -323,12 +323,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         addOrEditCurrentDayOnlyTextView.setOnClickListener(v-> {
             SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = SINGLE_DAY;
+            setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditCurrentDayOnlyTextView, true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditAllSelectedDaysTextView, false);
         });
 
         addOrEditAllSelectedDaysTextView.setOnClickListener(v-> {
             SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
+            setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(false);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditCurrentDayOnlyTextView, false);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditAllSelectedDaysTextView, true);
         });
@@ -442,7 +444,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
             List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
-            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDaysFromDatabase(singleItemList);
+            dailyStatsAccess.populateDayHolderAndStatsForEachActivityLists(singleItemList);
         }
         if (mode==WEEKLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_YEAR));
@@ -642,7 +644,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
-        //Todo: Need to change save based on single/multiple days.
+        //Todo: Want popUp explaining overwrite for multiple.
         AsyncTask.execute(()-> {
             dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSelectedDays(daySelectedFromCalendar, newActivityTime, newCaloriesBurned);
 
@@ -761,6 +763,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    private void setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(boolean singleDay) {
+        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(singleDay);
+    }
+
     private long newActivityTimeFromEditText(int addingOrEditingActivity) {
         long timeSetInEditText = getMillisValueToSaveFromEditTextString();
         long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
@@ -804,7 +810,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.deleteStatsForEachActivityEntity();
 
             List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
-            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDaysFromDatabase(singleItemList);
+            dailyStatsAccess.populateDayHolderAndStatsForEachActivityLists(singleItemList);
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
             dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
             dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
