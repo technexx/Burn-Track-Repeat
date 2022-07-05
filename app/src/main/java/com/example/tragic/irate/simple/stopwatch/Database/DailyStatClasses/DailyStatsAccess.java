@@ -50,6 +50,7 @@ public class DailyStatsAccess {
     double totalAggregateCaloriesForSelectedDuration;
 
     int numberOfDaysSelected;
+    boolean mAddingOrEditingSingleDay;
 
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;

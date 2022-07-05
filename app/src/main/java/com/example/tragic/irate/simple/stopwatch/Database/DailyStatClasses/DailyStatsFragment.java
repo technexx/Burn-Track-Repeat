@@ -613,19 +613,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
 //            dailyStatsAccess.setActivityPositionInListForCurrentDay();
 
-                if (!dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
-                    getActivity().runOnUiThread(()-> {
-                        populateActivityEditPopUpWithNewRow();
-                        addTdeePopUpWindow.dismiss();
-                    });
-                } else {
-                    getActivity().runOnUiThread(()->{
-                        showToastIfNoneActive("Activity exists!");
-                    });
-                }
+                getActivity().runOnUiThread(()-> {
+                    launchEditPopUpIfActivityDoesNotExistAndToastIfItDoes(dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay());
+                });
+            } else {
+                populateActivityEditPopUpWithNewRow();
             }
-
         });
+    }
+
+    private void launchEditPopUpIfActivityDoesNotExistAndToastIfItDoes(boolean activityExists) {
+        if (!activityExists) {
+            populateActivityEditPopUpWithNewRow();
+            addTdeePopUpWindow.dismiss();
+        } else {
+            showToastIfNoneActive("Activity exists!");
+        }
     }
 
     private void addActivityStatsInDatabase() {
@@ -639,6 +642,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
+        //Todo: Need to change save based on single/multiple days.
         AsyncTask.execute(()-> {
             dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSelectedDays(daySelectedFromCalendar, newActivityTime, newCaloriesBurned);
 
