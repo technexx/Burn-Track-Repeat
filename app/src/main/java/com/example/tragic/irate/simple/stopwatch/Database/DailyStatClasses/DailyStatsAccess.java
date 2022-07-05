@@ -471,7 +471,6 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
-
         if (!doesActivityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = new StatsForEachActivity();
 
@@ -499,6 +498,15 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
     }
 
+    public void insertTotalTimesAndCaloriesForEachActivityForMultipleDays(List<Integer> daysToAdd, long setTime, double caloriesBurned) {
+        mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysToAdd);
+        cyclesDatabase.cyclesDao().insertMultipleDays(mDayHolderList);
+
+        for (int i=0; i<daysToAdd.size(); i++) {
+
+        }
+    }
+
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
@@ -511,7 +519,6 @@ public class DailyStatsAccess {
     public void checkIfActivityExistsForSpecificDayAndSetBooleanForIt() {
         doesActivityExistsInDatabaseForSelectedDay = false;
 
-        //This only returns true once, when our activity matches one in the database.
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
                 doesActivityExistsInDatabaseForSelectedDay = true;
@@ -519,6 +526,30 @@ public class DailyStatsAccess {
             }
         }
     }
+
+//    private void checkIfActivityExistsForEachDayInDateRange(List<Integer> uniqueDayIDsToCheck) {
+//        for (int i=0; i<uniqueDayIDsToCheck.size(); i++) {
+//
+//            int uniqueIDToCheck = uniqueDayIDsToCheck.get(i);
+//
+//            List<String> stringListOfActivitiesForSingleDay = new ArrayList<>();
+//
+//            for (int k=0; i<mStatsForEachActivityList.size(); k++) {
+//                if (mStatsForEachActivityList.get(k).getUniqueIdTiedToTheSelectedActivity()==uniqueIDToCheck) {
+//                    stringListOfActivitiesForSingleDay.add(mStatsForEachActivityList.get(k).getActivity());
+//                }
+//            }
+//        }
+//    }
+//
+//    public boolean doesActivityExistsForSelectedDayInDateRange(int dayToCheck) {
+//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+//            if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==dayToCheck) {
+//                return true;
+//            }
+//        }
+//        return false;
+//    }
 
     public void setActivityPositionInListForCurrentDay() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
@@ -529,7 +560,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: Since we add a blank row and THEN edit, it's likely an issue of sort/row positioning.
     public void assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() {
         //New database pull to account for most recent insertion.
         if (doesActivityExistsInDatabaseForSelectedDay) {

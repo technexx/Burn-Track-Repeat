@@ -38,7 +38,10 @@ CyclesDao {
     @Query("DELETE from DayHolder WHERE daySelectedId IN (:listIDs)")
     void deleteMultipleDays(List<Long> listIDs);
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertMultipleDays (List<DayHolder> dayHolderList);
+
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertStatsForEachActivityWithinCycle(StatsForEachActivity statsForEachActivity);
 
     @Update
@@ -52,9 +55,6 @@ CyclesDao {
 
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs)")
     List<StatsForEachActivity> loadActivitiesForMultipleDays(List<Integer> uniqueIDs);
-
-    @Query("SELECT * from StatsForEachActivity")
-    List<StatsForEachActivity> loadAllActivitiesForAllDays();
 
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by activity ASC")
     List<StatsForEachActivity> loadActivitiesByAToZTitle(List<Integer> uniqueIDs);
