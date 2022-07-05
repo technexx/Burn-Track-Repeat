@@ -134,6 +134,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View popUpAnchorBottom;
     PopupWindow tdeeEditPopUpWindow;
 
+    View confirmEditView;
+    PopupWindow confirmEditPopUpWindow;
+    Button confirmMultipleAddOrEditButton;
+    Button cancelMultipleAddOrEditButton;
+
     TextView activityInEditPopUpTextView;
     EditText tdeeEditTextHours;
     EditText tdeeEditTextMinutes;
@@ -342,6 +347,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
                 editActivityStatsInDatabase();
             }
+        });
+
+        confirmMultipleAddOrEditButton.setOnClickListener(v-> {
+
+        });
+
+        cancelMultipleAddOrEditButton.setOnClickListener(v-> {
+
         });
 
         deleteActivityIfEditingRowWithinEditPopUpButton.setOnClickListener(v-> {
@@ -633,6 +646,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    //Todo: Want popUp explaining overwrite for multiple before we allow this to go.
     private void addActivityStatsInDatabase() {
         long newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
         double newCaloriesBurned = newCaloriesBurned();
@@ -644,7 +658,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
-        //Todo: Want popUp explaining overwrite for multiple.
         AsyncTask.execute(()-> {
             dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSelectedDays(daySelectedFromCalendar, newActivityTime, newCaloriesBurned);
 
@@ -665,6 +678,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         numberOfDaysWithActivitiesHasChanged = true;
+    }
+
+    private void confirmationForMultipleAddOrEditPopUpDisplay() {
+
     }
 
     @Override
@@ -1308,6 +1325,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addOrEditAllSelectedDaysTextView.setAlpha(0.3f);
 
         popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
+
+        confirmEditView = inflater.inflate(R.layout.edit_confirm_popup_layout, null);
+        confirmEditPopUpWindow = new PopupWindow(confirmEditView, dpToPxConv(150), dpToPxConv(150), true);
+        confirmMultipleAddOrEditButton = confirmEditView.findViewById(R.id.edit_confirm_button);
+        cancelMultipleAddOrEditButton = confirmEditView.findViewById(R.id.edit_cancel_button);
 
         tdeeEditPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
