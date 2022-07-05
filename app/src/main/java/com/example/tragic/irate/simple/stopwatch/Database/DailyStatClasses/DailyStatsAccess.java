@@ -74,6 +74,8 @@ public class DailyStatsAccess {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
+    List<Integer> mIntegerListOfDaysSelected = new ArrayList<>();
+
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateDailyStatsDatabase();
@@ -188,12 +190,16 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected, long setTime, double caloriesBurned) {
-        mDayHolder = new DayHolder();
 
-        String date = getDateString();
-
+        if (mDayHolderList.size() == 0) {
+            mDayHolder = new DayHolder();
+            mDayHolder.setDayId(daySelected);
+        } else {
+            for (int i=0; i<mDayHolderList.size(); i++) {
+                mDayHolder = mDayHolderList.get(i);
+            }
+        }
         mDayHolder.setDayId(daySelected);
-        mDayHolder.setDate(date);
         mDayHolder.setTotalSetTime(setTime);
         mDayHolder.setTotalCaloriesBurned(caloriesBurned);
 
@@ -204,7 +210,6 @@ public class DailyStatsAccess {
     }
 
     private void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
-
         if (integerListOfSelectedDays.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
@@ -232,24 +237,23 @@ public class DailyStatsAccess {
 
     ////////////////////////////////////////////////////////////////////
 
-    public void setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(int dayToRetrieve) {
-        mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
+    public void setDayHolderAndStatForEachActivityListsForSelectedDaysFromDatabase(List<Integer> daysToRetrieve) {
+        //Fetches and sets sole list position to a list so we can use the same DAO insertion method for single/multiple days.
+        if (mDayHolderList.size()==1) {
+            daysToRetrieve = Collections.singletonList(daysToRetrieve.get(0));
+            convertToStringAndSetSingleDay(daysToRetrieve.get(0));
+        }
 
-        List<Integer> singleDayListForActivities = Collections.singletonList(dayToRetrieve);
-        mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(singleDayListForActivities);
+        mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysToRetrieve);
 
-        mCalorieDayHolderList = cyclesDatabase.cyclesDao().loadSingleCalorieDay(dayToRetrieve);
+        mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(daysToRetrieve);
 
-        List<Integer> singleDayListForCaloriesConsumed = Collections.singletonList(dayToRetrieve);
-        mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(singleDayListForCaloriesConsumed);
-
-        convertToStringAndSetSingleDay(dayToRetrieve);
-
-        numberOfDaysSelected = 1;
+        mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(daysToRetrieve);
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> populatedDaysOfWeekList = new ArrayList<>();
+        mIntegerListOfDaysSelected = new ArrayList<>();
 
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         int lastDayOfDuration = firstDayOfDuration + 6;
@@ -486,25 +490,23 @@ public class DailyStatsAccess {
         }
     }
 
-    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(int selectedDay, long setTime, double caloriesBurned) {
-        mStatsForEachActivity = new StatsForEachActivity();
+    public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(int selectedDay, long setTime, double caloriesBurned) {
+        //List is set as new ArrayList (i.e. 0 size) if none of its selected days have a row, so this conditional handles that.
+        if (mStatsForEachActivityList.size() == 0) {
+            mStatsForEachActivity = new StatsForEachActivity();
+            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+        } else {
+            for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+                mStatsForEachActivity = mStatsForEachActivityList.get(i);
+            }
+        }
 
-        mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
         mStatsForEachActivity.setActivity(mActivityString);
         mStatsForEachActivity.setMetScore(mMetScore);
         mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
-    }
-
-    public void insertTotalTimesAndCaloriesForEachActivityForMultipleDays(List<Integer> daysToAdd, long setTime, double caloriesBurned) {
-        mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(daysToAdd);
-        cyclesDatabase.cyclesDao().insertMultipleDays(mDayHolderList);
-
-        for (int i=0; i<daysToAdd.size(); i++) {
-
-        }
     }
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
@@ -526,30 +528,6 @@ public class DailyStatsAccess {
             }
         }
     }
-
-//    private void checkIfActivityExistsForEachDayInDateRange(List<Integer> uniqueDayIDsToCheck) {
-//        for (int i=0; i<uniqueDayIDsToCheck.size(); i++) {
-//
-//            int uniqueIDToCheck = uniqueDayIDsToCheck.get(i);
-//
-//            List<String> stringListOfActivitiesForSingleDay = new ArrayList<>();
-//
-//            for (int k=0; i<mStatsForEachActivityList.size(); k++) {
-//                if (mStatsForEachActivityList.get(k).getUniqueIdTiedToTheSelectedActivity()==uniqueIDToCheck) {
-//                    stringListOfActivitiesForSingleDay.add(mStatsForEachActivityList.get(k).getActivity());
-//                }
-//            }
-//        }
-//    }
-//
-//    public boolean doesActivityExistsForSelectedDayInDateRange(int dayToCheck) {
-//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-//            if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==dayToCheck) {
-//                return true;
-//            }
-//        }
-//        return false;
-//    }
 
     public void setActivityPositionInListForCurrentDay() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {

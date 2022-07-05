@@ -52,6 +52,7 @@ import com.prolificinteractive.materialcalendarview.OnRangeSelectedListener;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -440,7 +441,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
-            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
+            List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
+            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDaysFromDatabase(singleItemList);
         }
         if (mode==WEEKLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_YEAR));
@@ -638,10 +640,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         AsyncTask.execute(()-> {
-            //Inserts row, queries database for new lists, retrieves time/calories
-            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDay(daySelectedFromCalendar, newActivityTime, newCaloriesBurned);
+            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSelectedDays(daySelectedFromCalendar, newActivityTime, newCaloriesBurned);
 
-            setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues(daySelectedFromCalendar);
+            setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
+            setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
 
             long setTime = dailyStatsAccess.getTotalSetTimeVariableForDayHolder();
             double caloriesBurned = dailyStatsAccess.getTotalCaloriesVariableForDayHolder();
@@ -676,7 +678,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setTotalSetTimeForSelectedActivity(newActivityTime);
             dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesBurned);
 
-            setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues(daySelectedFromCalendar);
+            setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
+            setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
+
             dailyStatsAccess.setTotalSetTimeFromDayHolderEntity(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
             dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
 
@@ -691,9 +695,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    //Todo: Will need a multiple day query for DayHolder since we'll be adding to every added day's total.
-    private void setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues(int daySelected) {
-        dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
+    private void setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
         dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
         dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
         dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
@@ -797,7 +799,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(position);
             dailyStatsAccess.deleteStatsForEachActivityEntity();
 
-            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDayFromDatabase(daySelectedFromCalendar);
+            List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
+            dailyStatsAccess.setDayHolderAndStatForEachActivityListsForSelectedDaysFromDatabase(singleItemList);
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
             dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
             dailyStatsAccess.setTotalCaloriesVariableForDayHolder();

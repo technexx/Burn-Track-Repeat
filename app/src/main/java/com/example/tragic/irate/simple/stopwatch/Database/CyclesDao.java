@@ -44,6 +44,9 @@ CyclesDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertStatsForEachActivityWithinCycle(StatsForEachActivity statsForEachActivity);
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    void insertMultipleActivities (List<StatsForEachActivity> statsForEachActivitiesList);
+
     @Update
     void updateStatsForEachActivity(StatsForEachActivity statsForEachActivity);
 
