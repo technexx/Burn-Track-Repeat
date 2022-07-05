@@ -341,20 +341,31 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
+            if (SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT==SINGLE_DAY) {
+                if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
+                    addActivityStatsInDatabase();
+                }
+                if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
+                    editActivityStatsInDatabase();
+                }
+            } else {
+                displayPopUpFoMultipleAddOrEditConfirmation();
+            }
+
+        });
+
+        confirmMultipleAddOrEditButton.setOnClickListener(v-> {
             if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
                 addActivityStatsInDatabase();
             }
             if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
                 editActivityStatsInDatabase();
             }
-        });
-
-        confirmMultipleAddOrEditButton.setOnClickListener(v-> {
-
+            confirmEditPopUpWindow.dismiss();
         });
 
         cancelMultipleAddOrEditButton.setOnClickListener(v-> {
-
+            confirmEditPopUpWindow.dismiss();
         });
 
         deleteActivityIfEditingRowWithinEditPopUpButton.setOnClickListener(v-> {
@@ -457,7 +468,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
             List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
-            dailyStatsAccess.populateDayHolderAndStatsForEachActivityLists(singleItemList);
+            dailyStatsAccess.setAllDayAndStatLists(singleItemList);
         }
         if (mode==WEEKLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_YEAR));
@@ -680,8 +691,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         numberOfDaysWithActivitiesHasChanged = true;
     }
 
-    private void confirmationForMultipleAddOrEditPopUpDisplay() {
-
+    private void displayPopUpFoMultipleAddOrEditConfirmation() {
+        confirmEditPopUpWindow.showAtLocation(mRoot, Gravity.CENTER_VERTICAL, 0, 0);
     }
 
     @Override
@@ -827,7 +838,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.deleteStatsForEachActivityEntity();
 
             List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
-            dailyStatsAccess.populateDayHolderAndStatsForEachActivityLists(singleItemList);
+            dailyStatsAccess.setAllDayAndStatLists(singleItemList);
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
             dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
             dailyStatsAccess.setTotalCaloriesVariableForDayHolder();

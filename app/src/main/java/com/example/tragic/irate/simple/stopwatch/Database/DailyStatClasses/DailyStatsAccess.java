@@ -181,42 +181,18 @@ public class DailyStatsAccess {
         return mStatsForEachActivityList;
     }
 
-//    public void setDayHolderAndStatsListsForSingleDayFromDatabase(List<Integer> dayToRetrieve) {
-//        //Fetches and sets sole list position to a list so we can use the same DAO insertion method for single/multiple days.
-//        if (mDayHolderList.size()==1) {
-//            dayToRetrieve = Collections.singletonList(dayToRetrieve.get(0));
-//            convertToStringAndSetSingleDay(dayToRetrieve.get(0));
-//        }
-//
-//        mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(dayToRetrieve);
-//
-//        mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(dayToRetrieve);
-//
-//        mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(dayToRetrieve);
-//    }
-
-    public void populateDayHolderAndStatsForEachActivityLists(List<Integer> integerListOfSelectedDays) {
+    public void setAllDayAndStatLists(List<Integer> integerListOfSelectedDays) {
         if (integerListOfSelectedDays.size()>0) {
-            if (integerListOfSelectedDays.size()==1) {
-                integerListOfSelectedDays = Collections.singletonList(integerListOfSelectedDays.get(0));
-            }
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedDays);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedDays);
+            mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedDays);
         } else {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
-        }
-    }
-
-    public void populateCaloriesForEachFoodList(List<Integer> integerListOfSelectedDays) {
-        if (integerListOfSelectedDays.size()>0) {
-            if (integerListOfSelectedDays.size()==1) {
-                integerListOfSelectedDays = Collections.singletonList(integerListOfSelectedDays.get(0));
-            }
-            mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedDays);
-        } else {
             mCaloriesForEachFoodList = new ArrayList<>();
         }
+
+        numberOfDaysSelected = 1;
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -239,8 +215,7 @@ public class DailyStatsAccess {
             }
         }
 
-        populateDayHolderAndStatsForEachActivityLists(populatedDaysOfWeekList);
-        populateCaloriesForEachFoodList(populatedDaysOfWeekList);
+        setAllDayAndStatLists(populatedDaysOfWeekList);
 
         numberOfDaysSelected = 7;
     }
@@ -262,8 +237,7 @@ public class DailyStatsAccess {
             }
         }
 
-        populateDayHolderAndStatsForEachActivityLists(populatedDaysOfMonthList);
-        populateCaloriesForEachFoodList(populatedDaysOfMonthList);
+        setAllDayAndStatLists(populatedDaysOfMonthList);
 
         numberOfDaysSelected = numberOfDaysInMonth;
     }
@@ -284,8 +258,7 @@ public class DailyStatsAccess {
             }
         }
 
-        populateDayHolderAndStatsForEachActivityLists(populatedDaysOfYearList);
-        populateCaloriesForEachFoodList(populatedDaysOfYearList);
+        setAllDayAndStatLists(populatedDaysOfYearList);
 
         numberOfDaysSelected = daysInYear;
     }
@@ -312,10 +285,7 @@ public class DailyStatsAccess {
             }
         }
 
-        populateDayHolderAndStatsForEachActivityLists(populatedCustomDayList);
-        populateCaloriesForEachFoodList(populatedCustomDayList);
-
-        numberOfDaysSelected = populatedCustomDayList.size();
+        setAllDayAndStatLists(populatedCustomDayList);
     }
 
     private void convertToStringAndSetSingleDay(int day) {
