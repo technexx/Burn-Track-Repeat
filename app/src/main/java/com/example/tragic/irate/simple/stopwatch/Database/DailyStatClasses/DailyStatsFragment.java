@@ -135,18 +135,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View popUpAnchorBottom;
     PopupWindow tdeeEditPopUpWindow;
 
+    ConstraintLayout editActivityPopUpLayout;
     View confirmEditView;
     PopupWindow confirmEditPopUpWindow;
     Button confirmMultipleAddOrEditButton;
     Button cancelMultipleAddOrEditButton;
 
     TextView activityInEditPopUpTextView;
+    ConstraintLayout.LayoutParams activityInEditPopUpTextViewLayoutParams;
     EditText tdeeEditTextHours;
     EditText tdeeEditTextMinutes;
     EditText tdeeEditTextSeconds;
     TextView unassignedTimeInEditPopUpTextView;
     Button confirmActivityEditWithinPopUpButton;
     Button deleteActivityIfEditingRowWithinEditPopUpButton;
+    ConstraintLayout.LayoutParams confirmActivityEditWithinPopUpButtonLayoutParams;
+    ConstraintLayout.LayoutParams deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams;
     TextView addOrEditCurrentDayOnlyTextView;
     TextView addOrEditAllSelectedDaysTextView;
 
@@ -484,7 +488,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, calendar.get(Calendar.DAY_OF_YEAR));
         }
 
-
         if (numberOfDaysWithActivitiesHasChanged) {
             colorDaysWithAtLeastOneActivity();
             numberOfDaysWithActivitiesHasChanged = false;
@@ -492,6 +495,38 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         setListsOfDayHolderAndStatsPrimaryIds();
+    }
+
+    private void setStatDurationViews(int mode) {
+        calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
+        toggleSingleOrMultipleDayInsertionTextViewVisibilities(true);
+        setEditActivityPopUpButtonsLayoutParams(false);
+
+        if (mode==DAILY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.day_total_header);
+            setSingleDateStringOnTextView();
+        }
+        if (mode==WEEKLY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.weekly_total_header);
+            convertAndSetDateRangeStringOnTextView();
+        }
+        if (mode==MONTHLY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.monthly_total_header);
+            convertAndSetDateRangeStringOnTextView();
+        }
+        if (mode==YEARLY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.yearly_total_header);
+            convertAndSetDateRangeStringOnTextView();
+        }
+        if (mode==CUSTOM_STATS) {
+            totalStatsHeaderTextView.setText(R.string.custom_total_header);
+            calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
+            convertAndSetDateRangeStringOnTextView();
+            toggleSingleOrMultipleDayInsertionTextViewVisibilities(false);
+            setEditActivityPopUpButtonsLayoutParams(true);
+        }
+
+        calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
     }
 
     public void setNumberOfDaysWithActivitiesHasChangedBoolean(boolean numberOfDaysHaveChanged) {
@@ -551,36 +586,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 currentStatDurationMode=4;
             }
         }
-    }
-
-    private void setStatDurationViews(int mode) {
-        calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
-        toggleSingleOrMultipleDayInsertionTextViewVisibilities(true);
-
-        if (mode==DAILY_STATS) {
-            totalStatsHeaderTextView.setText(R.string.day_total_header);
-            setSingleDateStringOnTextView();
-        }
-        if (mode==WEEKLY_STATS) {
-            totalStatsHeaderTextView.setText(R.string.weekly_total_header);
-            convertAndSetDateRangeStringOnTextView();
-        }
-        if (mode==MONTHLY_STATS) {
-            totalStatsHeaderTextView.setText(R.string.monthly_total_header);
-            convertAndSetDateRangeStringOnTextView();
-        }
-        if (mode==YEARLY_STATS) {
-            totalStatsHeaderTextView.setText(R.string.yearly_total_header);
-            convertAndSetDateRangeStringOnTextView();
-        }
-        if (mode==CUSTOM_STATS) {
-            totalStatsHeaderTextView.setText(R.string.custom_total_header);
-            calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
-            convertAndSetDateRangeStringOnTextView();
-            toggleSingleOrMultipleDayInsertionTextViewVisibilities(false);
-        }
-
-        calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
     }
 
     private void setSingleDateStringOnTextView() {
@@ -1212,7 +1217,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
-//        caloriesToRound += 1;
         DecimalFormat df = new DecimalFormat("#");
         String truncatedCalorieString = df.format(caloriesToRound);
 
@@ -1285,6 +1289,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             textViewParams.bottomToTop = R.id.minimize_calendarView_button;
         }
     }
+
+    private void setEditActivityPopUpButtonsLayoutParams(boolean constrainedToTop) {
+        if (!constrainedToTop) {
+            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
+        } else {
+            activityInEditPopUpTextViewLayoutParams.topMargin = 0;
+        }
+    }
+
     private void instantiateCalendarObjects() {
         calendar = Calendar.getInstance(Locale.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
@@ -1334,8 +1347,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+        editActivityPopUpLayout = tdeeEditView.findViewById(R.id.edit_activity_popUp_layout);
 
         activityInEditPopUpTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
+        activityInEditPopUpTextViewLayoutParams = (ConstraintLayout.LayoutParams) activityInEditPopUpTextView.getLayoutParams();
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
@@ -1343,6 +1358,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit_button);
         deleteActivityIfEditingRowWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
+        confirmActivityEditWithinPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) confirmActivityEditWithinPopUpButton.getLayoutParams();
+        deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) deleteActivityIfEditingRowWithinEditPopUpButton.getLayoutParams();
+
         addOrEditCurrentDayOnlyTextView = tdeeEditView.findViewById(R.id.add_or_edit_current_day_only_textView);
         addOrEditAllSelectedDaysTextView = tdeeEditView.findViewById(R.id.add_or_edit_all_selected_days_textView);
 
@@ -1415,7 +1433,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                //Todo: Changed from Gone -> Invisible.
                 dailyStatsRecyclerView.setVisibility(View.INVISIBLE);
                 caloriesConsumedRecyclerView.setVisibility(View.INVISIBLE);
                 totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
