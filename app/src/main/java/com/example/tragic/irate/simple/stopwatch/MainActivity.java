@@ -3679,7 +3679,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (trackActivityWithinCycle) {
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
         dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
-        dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabaseWithZeroedOutTimesAndCalories(dayOfYear);
+        dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
 
         dailyStatsAccess.setLocalActivityStringVariable(getTdeeActivityStringFromArrayPosition());

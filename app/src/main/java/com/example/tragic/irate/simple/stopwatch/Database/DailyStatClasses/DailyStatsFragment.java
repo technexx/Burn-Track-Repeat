@@ -335,10 +335,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         addOrEditAllSelectedDaysTextView.setOnClickListener(v-> {
-            SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
-            setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(false);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditCurrentDayOnlyTextView, false);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditAllSelectedDaysTextView, true);
+            if (currentStatDurationMode==CUSTOM_STATS) {
+                SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
+                setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(false);
+                setTextStyleAndAlphaValuesOnTextViews(addOrEditCurrentDayOnlyTextView, false);
+                setTextStyleAndAlphaValuesOnTextViews(addOrEditAllSelectedDaysTextView, true);
+            }
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
@@ -680,11 +682,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long setTime = dailyStatsAccess.getTotalSetTimeVariableForDayHolder();
             double caloriesBurned = dailyStatsAccess.getTotalCaloriesVariableForDayHolder();
 
-            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(daySelectedFromCalendar, setTime, caloriesBurned);
+            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(daySelectedFromCalendar, setTime, caloriesBurned);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
-
-            dailyStatsAccess.logAllDaysAndStats();
 
             getActivity().runOnUiThread(()-> {
                 showToastIfNoneActive("Saved!");

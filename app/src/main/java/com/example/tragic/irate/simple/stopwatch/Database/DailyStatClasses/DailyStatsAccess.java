@@ -287,28 +287,20 @@ public class DailyStatsAccess {
         }
 
         setAllDayAndStatListObjects(populatedCustomDayList);
+        setListOfDaysFromCustomDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
     }
 
+    private void setListOfDaysFromCustomDateSelection(int firstDay, int sizeOfList) {
+        mIntegerListOfDaysSelected.clear();
 
-    public void logAllDaysAndStats() {
-        List<Integer> populatedDaysOfYearList = new ArrayList<>();
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-
-        int firstAggregatedDayOfYearToUse = 1 + valueToAddToStartingDurationDayForFutureYears();
-        int daysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
-
-        for (int i=0; i<daysInYear; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse+i).size()!=0) {
-                populatedDaysOfYearList.add(firstAggregatedDayOfYearToUse + i);
-            }
+        for (int i=0; i<sizeOfList; i++) {
+            mIntegerListOfDaysSelected.add(firstDay + (i+1));
         }
+        Log.i("testList", "integer list is " + mIntegerListOfDaysSelected);
+    }
 
-        setAllDayAndStatListObjects(populatedDaysOfYearList);
-
-        for (int k=0; k<mStatsForEachActivityList.size(); k++) {
-            Log.i("testDb", "set time for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalSetTimeForEachActivity());
-            Log.i("testDb", "calories burned for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalCaloriesBurnedForEachActivity());
-        }
+    private List<Integer> getIntegerListOfDaysSelected() {
+        return mIntegerListOfDaysSelected;
     }
 
     public void convertToStringAndSetSingleDay(int day) {
@@ -454,22 +446,35 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(int selectedDay, long setTime, double caloriesBurned) {
         mStatsForEachActivity = new StatsForEachActivity();
 
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==selectedDay) {
-                mStatsForEachActivity = mStatsForEachActivityList.get(0);
+        if (mAddingOrEditingSingleDay) {
+            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+            mStatsForEachActivity.setActivity(mActivityString);
+            mStatsForEachActivity.setMetScore(mMetScore);
+            mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+            mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
-                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+            cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
+
+        } else {
+            for (int i=0; i<mIntegerListOfDaysSelected.size(); i++) {
+                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(mIntegerListOfDaysSelected.get(i));
                 mStatsForEachActivity.setActivity(mActivityString);
                 mStatsForEachActivity.setMetScore(mMetScore);
                 mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
                 mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
                 cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
+
             }
+        }
+
+        for (int k=0; k<mStatsForEachActivityList.size(); k++) {
+            Log.i("testDb", "set time for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalSetTimeForEachActivity());
+            Log.i("testDb", "calories burned for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalCaloriesBurnedForEachActivity());
         }
     }
 
-    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabaseWithZeroedOutTimesAndCalories(int daySelected) {
+    public void insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(int daySelected) {
         if (!doesDayExistInDatabase) {
             String date = getDateString();
 
@@ -486,34 +491,27 @@ public class DailyStatsAccess {
         }
     }
 
-    public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabase(int daySelected, long setTime, double caloriesBurned) {
+    //Todo: Address deletion, too.
+    public void insertTotalTimesAndCaloriesBurnedForSelectedDays(int daySelected, long setTime, double caloriesBurned) {
+        mDayHolder = new DayHolder();
+
         if (mAddingOrEditingSingleDay) {
-            if (mDayHolderList.size() == 0) {
-                mDayHolder = new DayHolder();
-                mDayHolder.setDayId(daySelected);
-            } else {
-                for (int i=0; i<mDayHolderList.size(); i++) {
-                    if (mDayHolderList.get(i).getDayId()==daySelected) {
-                        mDayHolder = mDayHolderList.get(i);
-                    }
-                }
-            }
+            mDayHolder.setDayId(daySelected);
+            mDayHolder.setTotalSetTime(setTime);
+            mDayHolder.setTotalCaloriesBurned(caloriesBurned);
+
+            cyclesDatabase.cyclesDao().insertDay(mDayHolder);
         } else {
-            if (mDayHolderList.size() == 0) {
-                mDayHolder = new DayHolder();
-                mDayHolder.setDayId(daySelected);
-            } else {
-                for (int i=0; i<mDayHolderList.size(); i++) {
-                    mDayHolder = mDayHolderList.get(i);
-                }
+            List<Integer> listOfSequentialDaysToInsert = getIntegerListOfDaysSelected();
+
+            for (int i=0; i<listOfSequentialDaysToInsert.size(); i++) {
+                mDayHolder.setDayId(listOfSequentialDaysToInsert.get(i));
+                mDayHolder.setTotalSetTime(setTime);
+                mDayHolder.setTotalCaloriesBurned(caloriesBurned);
+
+                cyclesDatabase.cyclesDao().insertDay(mDayHolder);
             }
         }
-
-        mDayHolder.setTotalSetTime(setTime);
-        mDayHolder.setTotalCaloriesBurned(caloriesBurned);
-
-
-        cyclesDatabase.cyclesDao().insertDay(mDayHolder);
     }
 
     public void setAddingOrEditingSingleDayBoolean(boolean singleDay) {
