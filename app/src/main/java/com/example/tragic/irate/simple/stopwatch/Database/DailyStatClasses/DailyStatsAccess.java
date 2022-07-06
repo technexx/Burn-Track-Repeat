@@ -452,25 +452,21 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(int selectedDay, long setTime, double caloriesBurned) {
-        if (mAddingOrEditingSingleDay) {
-            //Adding single day will always be new because we do not allow repeat activities in this case.
-            mStatsForEachActivity = new StatsForEachActivity();
-            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
-        } else {
-            mStatsForEachActivity = new StatsForEachActivity();
-            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+        mStatsForEachActivity = new StatsForEachActivity();
 
-//            for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-//                mStatsForEachActivity = mStatsForEachActivityList.get(i);
-//            }
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==selectedDay) {
+                mStatsForEachActivity = mStatsForEachActivityList.get(0);
+
+                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+                mStatsForEachActivity.setActivity(mActivityString);
+                mStatsForEachActivity.setMetScore(mMetScore);
+                mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+                mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+                cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
+            }
         }
-
-        mStatsForEachActivity.setActivity(mActivityString);
-        mStatsForEachActivity.setMetScore(mMetScore);
-        mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
-        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
-
-        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
     }
 
     public void insertTotalTimesAndCaloriesBurnedOfCurrentDayIntoDatabaseWithZeroedOutTimesAndCalories(int daySelected) {
