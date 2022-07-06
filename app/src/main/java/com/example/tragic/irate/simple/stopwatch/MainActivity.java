@@ -575,6 +575,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: App Ideas:
     //Todo: Mental illness onset game. Java/web based? Can convert from Android.
+        //Todo: "Stabilize the mind" model like Rebel, Inc.
     //Todo: "A Day in the Life" - pick an age and get assigned random stats/locations/events.
     //Todo: Mad Libs RPG/story (monkey's paw type interpretation of inserted adjectives).
 

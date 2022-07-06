@@ -289,6 +289,28 @@ public class DailyStatsAccess {
         setAllDayAndStatListObjects(populatedCustomDayList);
     }
 
+
+    public void logAllDaysAndStats() {
+        List<Integer> populatedDaysOfYearList = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+
+        int firstAggregatedDayOfYearToUse = 1 + valueToAddToStartingDurationDayForFutureYears();
+        int daysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
+
+        for (int i=0; i<daysInYear; i++) {
+            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse+i).size()!=0) {
+                populatedDaysOfYearList.add(firstAggregatedDayOfYearToUse + i);
+            }
+        }
+
+        setAllDayAndStatListObjects(populatedDaysOfYearList);
+
+        for (int k=0; k<mStatsForEachActivityList.size(); k++) {
+            Log.i("testDb", "set time for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalSetTimeForEachActivity());
+            Log.i("testDb", "calories burned for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalCaloriesBurnedForEachActivity());
+        }
+    }
+
     public void convertToStringAndSetSingleDay(int day) {
         String dayToSet = convertDayOfYearToFormattedString(day);
         setSingleDayAsString(dayToSet);
@@ -435,14 +457,12 @@ public class DailyStatsAccess {
             mStatsForEachActivity = new StatsForEachActivity();
             mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
         } else {
-            if (mStatsForEachActivityList.size() == 0) {
-                mStatsForEachActivity = new StatsForEachActivity();
-                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
-            } else {
-                for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-                    mStatsForEachActivity = mStatsForEachActivityList.get(i);
-                }
-            }
+            mStatsForEachActivity = new StatsForEachActivity();
+            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+
+//            for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+//                mStatsForEachActivity = mStatsForEachActivityList.get(i);
+//            }
         }
 
         mStatsForEachActivity.setActivity(mActivityString);

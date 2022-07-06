@@ -84,6 +84,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ConstraintLayout.LayoutParams caloriesConsumedRecyclerViewLayoutParams;
 
     View topOfRecyclerViewAnchor;
+    View bottomOfRecyclerViewAnchor;
     View recyclerAndTotalStatsDivider;
 
     TabLayout caloriesComparisonTabLayout;
@@ -636,15 +637,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setLocalActivityStringVariable(activityToAdd);
             dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
 
-            if (numberOfDaysToAdd==SINGLE_DAY) {
+            if (currentStatDurationMode==DAILY_STATS) {
                 dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
-//            dailyStatsAccess.setActivityPositionInListForCurrentDay();
 
                 getActivity().runOnUiThread(()-> {
                     launchEditPopUpIfActivityDoesNotExistAndToastIfItDoes(dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay());
                 });
             } else {
-                populateActivityEditPopUpWithNewRow();
+                getActivity().runOnUiThread(()-> {
+                    populateActivityEditPopUpWithNewRow();
+                });
             }
         });
     }
@@ -682,6 +684,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
+            dailyStatsAccess.logAllDaysAndStats();
+
             getActivity().runOnUiThread(()-> {
                 showToastIfNoneActive("Saved!");
                 tdeeEditPopUpWindow.dismiss();
@@ -692,7 +696,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void displayPopUpFoMultipleAddOrEditConfirmation() {
-        confirmEditPopUpWindow.showAtLocation(mRoot, Gravity.CENTER_VERTICAL, 0, 0);
+        confirmEditPopUpWindow.showAsDropDown(bottomOfRecyclerViewAnchor);
     }
 
     @Override
@@ -1338,7 +1342,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
 
         confirmEditView = inflater.inflate(R.layout.edit_confirm_popup_layout, null);
-        confirmEditPopUpWindow = new PopupWindow(confirmEditView, dpToPxConv(150), dpToPxConv(150), true);
+        confirmEditPopUpWindow = new PopupWindow(confirmEditView, dpToPxConv(300), dpToPxConv(150), true);
         confirmMultipleAddOrEditButton = confirmEditView.findViewById(R.id.edit_confirm_button);
         cancelMultipleAddOrEditButton = confirmEditView.findViewById(R.id.edit_cancel_button);
 
@@ -1401,8 +1405,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             @Override
             public void onTabUnselected(TabLayout.Tab tab) {
-                dailyStatsRecyclerView.setVisibility(View.GONE);
-                caloriesConsumedRecyclerView.setVisibility(View.GONE);
+                //Todo: Changed from Gone -> Invisible.
+                dailyStatsRecyclerView.setVisibility(View.INVISIBLE);
+                caloriesConsumedRecyclerView.setVisibility(View.INVISIBLE);
                 totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
                 totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
                 caloriesComparedLayout.setVisibility(View.GONE);
@@ -1441,6 +1446,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
         topOfRecyclerViewAnchor = mRoot.findViewById(R.id.top_of_recyclerView_anchor);
+        bottomOfRecyclerViewAnchor = mRoot.findViewById(R.id.bottom_of_recyclerView_anchor);
         totalStatsHeaderTextView = mRoot.findViewById(R.id.activity_stats_duration_header_textView);
 
         totalActivityStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_activity_stats_values_textView_layout);
