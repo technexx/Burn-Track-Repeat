@@ -335,12 +335,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         addOrEditAllSelectedDaysTextView.setOnClickListener(v-> {
-            if (currentStatDurationMode==CUSTOM_STATS) {
-                SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
-                setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(false);
-                setTextStyleAndAlphaValuesOnTextViews(addOrEditCurrentDayOnlyTextView, false);
-                setTextStyleAndAlphaValuesOnTextViews(addOrEditAllSelectedDaysTextView, true);
-            }
+            SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
+            setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(false);
+            setTextStyleAndAlphaValuesOnTextViews(addOrEditCurrentDayOnlyTextView, false);
+            setTextStyleAndAlphaValuesOnTextViews(addOrEditAllSelectedDaysTextView, true);
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
@@ -557,6 +555,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setStatDurationViews(int mode) {
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
+        toggleSingleOrMultipleDayInsertionTextViewVisibilities(true);
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
@@ -578,6 +577,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
             convertAndSetDateRangeStringOnTextView();
+            toggleSingleOrMultipleDayInsertionTextViewVisibilities(false);
         }
 
         calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
@@ -752,7 +752,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addTdeePopUpWindow.dismiss();
 
         setActivityEditPopUpTimeRemainingTextView();
-        toggleCancelOrDeleteButtonInEditPopUoTextView(ADDING_ACTIVITY);
+        toggleCancelOrDeleteButtonInEditPopUpTextView(ADDING_ACTIVITY);
 
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
@@ -764,7 +764,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         activityInEditPopUpTextView.setText(activityString);
         setActivityEditPopUpEditTexts(timeToEditLongValue);
         setActivityEditPopUpTimeRemainingTextView();
-        toggleCancelOrDeleteButtonInEditPopUoTextView(EDITING_ACTIVITY);
+        toggleCancelOrDeleteButtonInEditPopUpTextView(EDITING_ACTIVITY);
 
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
@@ -776,12 +776,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
     }
 
-    private void toggleCancelOrDeleteButtonInEditPopUoTextView(int addingOrEditing) {
+    private void toggleCancelOrDeleteButtonInEditPopUpTextView(int addingOrEditing) {
         if (addingOrEditing==ADDING_ACTIVITY) {
             deleteActivityIfEditingRowWithinEditPopUpButton.setText(R.string.cancel);
         }
         if (addingOrEditing==EDITING_ACTIVITY) {
             deleteActivityIfEditingRowWithinEditPopUpButton.setText(R.string.delete);
+        }
+    }
+
+    private void toggleSingleOrMultipleDayInsertionTextViewVisibilities(boolean areInvisible) {
+        if (areInvisible) {
+            addOrEditCurrentDayOnlyTextView.setVisibility(View.GONE);
+            addOrEditAllSelectedDaysTextView.setVisibility(View.GONE);
+        } else {
+            addOrEditCurrentDayOnlyTextView.setVisibility(View.VISIBLE);
+            addOrEditAllSelectedDaysTextView.setVisibility(View.VISIBLE);
         }
     }
 
@@ -1331,10 +1341,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);
         unassignedTimeInEditPopUpTextView = tdeeEditView.findViewById(R.id.unassigned_time_textView);
 
-        confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit);
+        confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit_button);
         deleteActivityIfEditingRowWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
-        addOrEditCurrentDayOnlyTextView = tdeeEditView.findViewById(R.id.add_or_edit_current_day_only);
-        addOrEditAllSelectedDaysTextView = tdeeEditView.findViewById(R.id.add_or_edit_all_selected_days);
+        addOrEditCurrentDayOnlyTextView = tdeeEditView.findViewById(R.id.add_or_edit_current_day_only_textView);
+        addOrEditAllSelectedDaysTextView = tdeeEditView.findViewById(R.id.add_or_edit_all_selected_days_textView);
 
         addOrEditCurrentDayOnlyTextView.setTypeface(Typeface.DEFAULT_BOLD);
         addOrEditAllSelectedDaysTextView.setAlpha(0.3f);
