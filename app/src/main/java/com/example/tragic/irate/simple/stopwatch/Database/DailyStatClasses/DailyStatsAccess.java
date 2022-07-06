@@ -246,7 +246,8 @@ public class DailyStatsAccess {
         List<Integer> populatedDaysOfYearList = new ArrayList<>();
 
         int firstDayOfDuration = 1;
-        int lastDayOfDuration = getCurrentDayOfYear();
+//        int lastDayOfDuration = getCurrentDayOfYear();
+        int lastDayOfDuration = daysInYear;
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
@@ -288,7 +289,7 @@ public class DailyStatsAccess {
         setAllDayAndStatListObjects(populatedCustomDayList);
     }
 
-    private void convertToStringAndSetSingleDay(int day) {
+    public void convertToStringAndSetSingleDay(int day) {
         String dayToSet = convertDayOfYearToFormattedString(day);
         setSingleDayAsString(dayToSet);
     }

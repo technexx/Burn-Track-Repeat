@@ -581,6 +581,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setSingleDateStringOnTextView() {
+        dailyStatsAccess.convertToStringAndSetSingleDay(daySelectedFromCalendar);
         String dayToSet = dailyStatsAccess.getSingleDayAsString();
         activityStatsDurationRangeTextView.setText(dayToSet);
     }
@@ -1278,7 +1279,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         calendarView.state().edit()
                 .setMinimumDate(CalendarDay.from(2022, 1, 1))
-                .setMaximumDate(calendarDay)
+//                .setMaximumDate(calendarDay)
                 .commit();
     }
 
