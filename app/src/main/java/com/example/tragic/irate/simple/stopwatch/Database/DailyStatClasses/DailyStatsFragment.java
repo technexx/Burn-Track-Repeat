@@ -468,7 +468,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
             List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
-            dailyStatsAccess.setAllDayAndStatLists(singleItemList);
+            dailyStatsAccess.setAllDayAndStatListObjects(singleItemList);
         }
         if (mode==WEEKLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_YEAR));
@@ -657,7 +657,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    //Todo: Want popUp explaining overwrite for multiple before we allow this to go.
     private void addActivityStatsInDatabase() {
         long newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
         double newCaloriesBurned = newCaloriesBurned();
@@ -838,7 +837,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.deleteStatsForEachActivityEntity();
 
             List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
-            dailyStatsAccess.setAllDayAndStatLists(singleItemList);
+            dailyStatsAccess.setAllDayAndStatListObjects(singleItemList);
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
             dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
             dailyStatsAccess.setTotalCaloriesVariableForDayHolder();

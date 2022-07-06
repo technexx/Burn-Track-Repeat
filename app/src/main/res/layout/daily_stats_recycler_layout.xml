@@ -10,7 +10,7 @@
     <!--Stat views (except activity) constrained from END because width of activity String is variable-->
     <TextView
         android:id="@+id/activity_in_daily_stats_textView"
-        android:layout_width="150dp"
+        android:layout_width="175dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
