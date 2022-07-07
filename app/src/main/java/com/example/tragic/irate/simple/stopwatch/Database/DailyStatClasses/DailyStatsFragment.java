@@ -491,7 +491,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (numberOfDaysWithActivitiesHasChanged) {
             colorDaysWithAtLeastOneActivity();
             numberOfDaysWithActivitiesHasChanged = false;
-            Log.i("testchange", "called!");
         }
 
         setListsOfDayHolderAndStatsPrimaryIds();
@@ -854,17 +853,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         AsyncTask.execute(() -> {
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(position);
-            dailyStatsAccess.deleteStatsForEachActivityEntity();
-
-            List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
-            dailyStatsAccess.setAllDayAndStatListObjects(singleItemList);
-            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-            dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
-            dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
-
-            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-            dailyStatsAccess.setTotalSetTimeFromDayHolderEntity(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
-            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
+            dailyStatsAccess.deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(position);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 

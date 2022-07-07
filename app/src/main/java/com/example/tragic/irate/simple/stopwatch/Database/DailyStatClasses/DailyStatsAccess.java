@@ -296,7 +296,6 @@ public class DailyStatsAccess {
         for (int i=0; i<sizeOfList; i++) {
             mIntegerListOfDaysSelected.add(firstDay + (i+1));
         }
-        Log.i("testList", "integer list is " + mIntegerListOfDaysSelected);
     }
 
     private List<Integer> getIntegerListOfDaysSelected() {
@@ -455,6 +454,7 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
 
+            //Todo: Adding to a day w/ the activity ADDS the time to the previous value, instead of replacing.
         } else {
             for (int i=0; i<mIntegerListOfDaysSelected.size(); i++) {
                 mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(mIntegerListOfDaysSelected.get(i));
@@ -471,6 +471,22 @@ public class DailyStatsAccess {
         for (int k=0; k<mStatsForEachActivityList.size(); k++) {
             Log.i("testDb", "set time for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalSetTimeForEachActivity());
             Log.i("testDb", "calories burned for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalCaloriesBurnedForEachActivity());
+        }
+    }
+
+    public void deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(int position) {
+        if (mAddingOrEditingSingleDay) {
+            mStatsForEachActivity = mStatsForEachActivityList.get(position);
+            cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
+        } else {
+            String activityToDelete = mStatsForEachActivityList.get(position).getActivity();
+
+            for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+                if (mStatsForEachActivityList.get(i).getActivity().equals(activityToDelete)) {
+                    mStatsForEachActivity = mStatsForEachActivityList.get(i);
+                    cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
+                }
+            }
         }
     }
 
@@ -491,7 +507,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: Address deletion, too.
     public void insertTotalTimesAndCaloriesBurnedForSelectedDays(int daySelected, long setTime, double caloriesBurned) {
         mDayHolder = new DayHolder();
 
