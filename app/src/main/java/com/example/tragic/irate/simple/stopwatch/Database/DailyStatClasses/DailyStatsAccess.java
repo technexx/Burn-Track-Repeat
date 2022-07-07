@@ -75,7 +75,7 @@ public class DailyStatsAccess {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
-    List<Integer> mIntegerListOfDaysSelected = new ArrayList<>();
+    List<Long> mLongListOfDaysSelected = new ArrayList<>();
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -197,7 +197,7 @@ public class DailyStatsAccess {
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> populatedDaysOfWeekList = new ArrayList<>();
-        mIntegerListOfDaysSelected = new ArrayList<>();
+        mLongListOfDaysSelected = new ArrayList<>();
 
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         int lastDayOfDuration = firstDayOfDuration + 6;
@@ -292,16 +292,16 @@ public class DailyStatsAccess {
         numberOfDaysSelected = calendarDayList.size();
     }
 
-    private void setListOfDaysFromCustomDateSelection(int firstDay, int sizeOfList) {
-        mIntegerListOfDaysSelected.clear();
+    private void setListOfDaysFromCustomDateSelection(long firstDay, int sizeOfList) {
+        mLongListOfDaysSelected.clear();
 
         for (int i=0; i<sizeOfList; i++) {
-            mIntegerListOfDaysSelected.add(firstDay + (i+1));
+            mLongListOfDaysSelected.add(firstDay + (i+1));
         }
     }
 
-    private List<Integer> getIntegerListOfDaysSelected() {
-        return mIntegerListOfDaysSelected;
+    private List<Long> getIntegerListOfDaysSelected() {
+        return mLongListOfDaysSelected;
     }
 
     public void convertToStringAndSetSingleDay(int day) {
@@ -447,6 +447,7 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(int selectedDay, long setTime, double caloriesBurned) {
         mStatsForEachActivity = new StatsForEachActivity();
 
+        //Todo: To consolidate repeating SET methods, create a Collections.singleton list of the single row we receive for single day update, and use the same loop for all insertions.
         if (mAddingOrEditingSingleDay) {
             mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
             mStatsForEachActivity.setActivity(mActivityString);
@@ -456,11 +457,23 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
 
-            //Todo: Adding to a day w/ the activity ADDS the time to the previous value, instead of replacing.
-            //Todo: "Time empty" if 0:00 remaining as we likely pass a 0 value into the conditional checking for that.
         } else {
-            for (int i=0; i<mIntegerListOfDaysSelected.size(); i++) {
-                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(mIntegerListOfDaysSelected.get(i));
+            for (int k=0; k<mStatsForEachActivityList.size(); k++) {
+                long uniqueIDToCheck = mStatsForEachActivityList.get(k).getUniqueIdTiedToTheSelectedActivity();
+                if (mLongListOfDaysSelected.contains(uniqueIDToCheck)) {
+
+                }
+            }
+
+            //Todo: For REPLACE, we may need to reference the PRIMARY KEY, otherwise it will always assume a new row.
+            //Todo: (1) For a row with the activity existing, get an instance of mStats with the primary key.
+            //Todo: (2) For row without activity existing, get a new instance of mStats.
+            for (int i=0; i<mLongListOfDaysSelected.size(); i++) {
+                long iteratedDayInCompleteList = mLongListOfDaysSelected.get(i);
+                if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==iteratedDayInCompleteList) {
+
+                }
+                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(mLongListOfDaysSelected.get(i));
                 mStatsForEachActivity.setActivity(mActivityString);
                 mStatsForEachActivity.setMetScore(mMetScore);
                 mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
@@ -471,7 +484,6 @@ public class DailyStatsAccess {
                 Log.i("testInsert", "mStats instance of time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
 
                 cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
-
             }
         }
     }
@@ -548,7 +560,7 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertDay(mDayHolder);
         } else {
-            List<Integer> listOfSequentialDaysToInsert = getIntegerListOfDaysSelected();
+            List<Long> listOfSequentialDaysToInsert = getIntegerListOfDaysSelected();
 
             for (int i=0; i<listOfSequentialDaysToInsert.size(); i++) {
                 mDayHolder.setDayId(listOfSequentialDaysToInsert.get(i));
