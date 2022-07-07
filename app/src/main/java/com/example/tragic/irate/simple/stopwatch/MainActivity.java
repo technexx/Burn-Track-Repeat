@@ -545,7 +545,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: "Activity exists" should pop if it exists anywhere in duration range, if that's what we're adding.
+  //Todo: If we're accessing total daily time/calories from Timer via DayHolder, we need to make sure that gets updated when we add/edit/subtract activities in our Stats Fragment (not just get our total values from adding up StatsForEachActivity rows).
+      //Todo: Alternatively, we nix DayHolder and just retrieve from StatsForEach.
+  //Todo: For adding/editing multiple days, we'll need to cap the activity time for days w/ not enough time left, or figure out another option.
   //Todo: Option to add misc. calories burned?
   //Todo: Should we include a pounds gained/lost row?
       //Todo: May want to include a starting/current weight as well.

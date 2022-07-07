@@ -288,6 +288,8 @@ public class DailyStatsAccess {
 
         setAllDayAndStatListObjects(populatedCustomDayList);
         setListOfDaysFromCustomDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
+
+        numberOfDaysSelected = calendarDayList.size();
     }
 
     private void setListOfDaysFromCustomDateSelection(int firstDay, int sizeOfList) {
@@ -455,6 +457,7 @@ public class DailyStatsAccess {
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
 
             //Todo: Adding to a day w/ the activity ADDS the time to the previous value, instead of replacing.
+            //Todo: "Time empty" if 0:00 remaining as we likely pass a 0 value into the conditional checking for that.
         } else {
             for (int i=0; i<mIntegerListOfDaysSelected.size(); i++) {
                 mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(mIntegerListOfDaysSelected.get(i));
@@ -463,14 +466,13 @@ public class DailyStatsAccess {
                 mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
                 mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
+                Log.i("testInsert", "time being added is " + setTime);
+                Log.i("testInsert", "mStats unique day ID is is " + mStatsForEachActivity.getUniqueIdTiedToTheSelectedActivity());
+                Log.i("testInsert", "mStats instance of time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
+
                 cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
 
             }
-        }
-
-        for (int k=0; k<mStatsForEachActivityList.size(); k++) {
-            Log.i("testDb", "set time for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalSetTimeForEachActivity());
-            Log.i("testDb", "calories burned for day " + k + " is " + mStatsForEachActivityList.get(k).getTotalCaloriesBurnedForEachActivity());
         }
     }
 
@@ -488,6 +490,35 @@ public class DailyStatsAccess {
                 }
             }
         }
+    }
+
+    //Commenting out option to edit for multiple days.
+    public void updateTotalTimesAndCaloriesForEachActivityForSelectedDays(int position, long setTime, double caloriesBurned) {
+        mStatsForEachActivity = mStatsForEachActivityList.get(position);
+        mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+        cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+
+//        if (mAddingOrEditingSingleDay) {
+//            mStatsForEachActivity = mStatsForEachActivityList.get(position);
+//            mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+//            mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+//
+//            cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+//        } else {
+//            String activityToUpdate = mStatsForEachActivityList.get(position).getActivity();
+//
+//            for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+//                if (mStatsForEachActivityList.get(i).getActivity().equals(activityToUpdate)) {
+//                    mStatsForEachActivity = mStatsForEachActivityList.get(i);
+//                    mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+//                    mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+//
+//                    cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+//                }
+//            }
+//        }
     }
 
     public void insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(int daySelected) {

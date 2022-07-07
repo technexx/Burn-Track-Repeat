@@ -711,23 +711,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
-            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
-            dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(mPositionToEdit);
-
             long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
             double newCaloriesBurned = newCaloriesBurned();
 
-            dailyStatsAccess.setTotalSetTimeForSelectedActivity(newActivityTime);
-            dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(newCaloriesBurned);
+            dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDays(mPositionToEdit, newActivityTime, newCaloriesBurned);
 
-            setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
-            setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
-
-            dailyStatsAccess.setTotalSetTimeFromDayHolderEntity(dailyStatsAccess.getTotalSetTimeVariableForDayHolder());
-            dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(dailyStatsAccess.getTotalCaloriesVariableForDayHolder());
-
-            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
-            dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -761,6 +749,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
+
     private void launchActivityEditPopUpWithEditTextValuesSet(int position) {
         String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(position);
         long timeToEditLongValue = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(position);
@@ -835,7 +824,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
         double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
         double newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
-//        newCaloriesForActivity = roundDownDoubleValuesToSyncCalories(newCaloriesForActivity);
 
         return newCaloriesForActivity;
     }
