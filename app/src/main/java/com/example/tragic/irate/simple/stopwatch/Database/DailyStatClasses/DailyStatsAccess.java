@@ -846,21 +846,30 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertCaloriesForEachFoodRow(mCaloriesForEachFood);
         }
-
     }
 
-    public void updateCaloriesAndEachFoodInDatabase() {
-        mCaloriesForEachFood.setTypeOfFood(mFoodString);
-        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
+    public void updateCaloriesAndEachFoodInDatabase(int position, String food, double calories) {
+        mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
+        mCaloriesForEachFood.setTypeOfFood(food);
+        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(calories);
 
         cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
     }
 
-    public void deleteCaloriesAndEachFoodInDatabase() {
+    public void deleteCaloriesAndEachFoodInDatabase(int position) {
         if (mAddingOrEditingSingleDay) {
+            mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
+            cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodRow(mCaloriesForEachFood);
+        } else {
+            String foodToDelete = mCaloriesForEachFoodList.get(position).getTypeOfFood();
 
+            for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+                if (mCaloriesForEachFoodList.get(i).getTypeOfFood().equals(foodToDelete)) {
+                    mCaloriesForEachFood = mCaloriesForEachFoodList.get(i);
+                    cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodRow(mCaloriesForEachFood);
+                }
+            }
         }
-        cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodRow(mCaloriesForEachFood);
     }
 
     public void setFoodString(String food) {

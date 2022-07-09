@@ -375,7 +375,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         deleteActivityIfEditingRowWithinEditPopUpButton.setOnClickListener(v-> {
             if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
-                deleteActivity(mPositionToEdit);
+                deleteActivityFromStats(mPositionToEdit);
             }
             tdeeEditPopUpWindow.dismiss();
         });
@@ -408,7 +408,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             addFoodToStats();
         }
         if (caloriesConsumedAdapter.getAddingOrEditingFoodVariable()==EDITING_FOOD) {
-            updateFoodInStats();
+            editFoodInStats();
         }
     }
 
@@ -833,12 +833,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return activityTime;
     }
 
-    private void deleteActivity(int position) {
+    private void deleteActivityFromStats(int position) {
         numberOfDaysWithActivitiesHasChanged = true;
 
         AsyncTask.execute(() -> {
-            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
-            dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(position);
+//            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
+//            dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(position);
             dailyStatsAccess.deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(position);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
@@ -1090,13 +1090,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
-    private void updateFoodInStats() {
+    private void editFoodInStats() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
 
-            dailyStatsAccess.setFoodString(getFoodStringFromEditText());
-            dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
-            dailyStatsAccess.updateCaloriesAndEachFoodInDatabase();
+            String food= getFoodStringFromEditText();
+            double calories = Double.parseDouble(getCaloriesForFoodItemFromEditText());
+            dailyStatsAccess.updateCaloriesAndEachFoodInDatabase(mPositionToEdit, food, calories);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -1108,8 +1108,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void deleteConsumedCalories(int position) {
         AsyncTask.execute(()-> {
-            dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
-            dailyStatsAccess.deleteCaloriesAndEachFoodInDatabase();
+//            dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
+            dailyStatsAccess.deleteCaloriesAndEachFoodInDatabase(position);
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
