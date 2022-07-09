@@ -545,6 +545,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: "Overwrite" popUp should also come up when selecting "Selected day" when adding in Custom duration.
+  //Todo: Deleting all days doesn't clear green day color from activity-populated days until we refresh adapter some other way.
   //Todo: If we're accessing total daily time/calories from Timer via DayHolder, we need to make sure that gets updated when we add/edit/subtract activities in our Stats Fragment (not just get our total values from adding up StatsForEachActivity rows).
       //Todo: Alternatively, we nix DayHolder and just retrieve from StatsForEach.
   //Todo: For adding/editing multiple days, we'll need to cap the activity time for days w/ not enough time left, or figure out another option.
@@ -2512,15 +2514,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.deleteMultipleDayHolderEntries(longListOfDayIdsToToDelete);
     dailyStatsAccess.deleteMultipleStatsForEachActivityEntries(longListOfStatsForEachIdsToDelete);
 
-    refreshDailyStats();
     dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
+    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
   }
 
   private void deleteDailyStatsForAllDays() {
     dailyStatsAccess.deleteAllDayHolderEntries();
     dailyStatsAccess.deleteAllStatsForEachActivityEntries();
-    refreshDailyStats();
+
     dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
+    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+
   }
 
   private boolean areAllDaysEmptyOfActivities(List<StatsForEachActivity> statsForEachActivityList) {
@@ -2531,10 +2535,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     return listOfActivities.size()==0;
-  }
-
-  private void refreshDailyStats() {
-    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {

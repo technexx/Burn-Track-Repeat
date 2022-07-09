@@ -484,6 +484,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==YEARLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
         }
+        //Todo: We need to call this list change on EVERY duration change (i.e. in listener).
         if (mode==CUSTOM_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, calendar.get(Calendar.DAY_OF_YEAR));
         }
@@ -715,7 +716,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double newCaloriesBurned = newCaloriesBurned();
 
             dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDays(mPositionToEdit, newActivityTime, newCaloriesBurned);
-
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
