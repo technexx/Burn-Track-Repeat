@@ -201,7 +201,7 @@ public class DailyStatsAccess {
 
         setFullListOfDaysFromCustomDateSelection(daySelected, 1);
         numberOfDaysSelected = 1;
-        Log.i("testCall", "total list size is " + mLongListOfDaysSelected.size());
+        Log.i("testInsert", "total list size is " + mLongListOfDaysSelected.size());
 
     }
 
@@ -309,7 +309,7 @@ public class DailyStatsAccess {
 
         numberOfDaysSelected = calendarDayList.size();
 
-        Log.i("testCall", "total list size is " + mLongListOfDaysSelected.size());
+        Log.i("testInsert", "total list size is " + mLongListOfDaysSelected.size());
     }
 
     private void setFullListOfDaysFromCustomDateSelection(int firstDay, int sizeOfList) {
@@ -473,9 +473,9 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(int selectedDay, long setTime, double caloriesBurned) {
-        mStatsForEachActivity = new StatsForEachActivity();
-
         for (int i=0; i<mLongListOfDaysSelected.size(); i++) {
+
+            mStatsForEachActivity = new StatsForEachActivity();
             int daySelected = mLongListOfDaysSelected.get(i);
 
             if (mListOfDaysWithPopulatedRows.contains(daySelected)) {
