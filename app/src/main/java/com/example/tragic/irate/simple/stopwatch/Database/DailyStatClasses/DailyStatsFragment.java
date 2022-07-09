@@ -472,8 +472,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
-            List<Integer> singleItemList = Collections.singletonList(daySelectedFromCalendar);
-            dailyStatsAccess.setAllDayAndStatListObjects(singleItemList);
+            dailyStatsAccess.setAllDayAndStatListsForSingleDay(daySelectedFromCalendar);
         }
         if (mode==WEEKLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_YEAR));

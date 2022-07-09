@@ -193,8 +193,16 @@ public class DailyStatsAccess {
             mStatsForEachActivityList = new ArrayList<>();
             mCaloriesForEachFoodList = new ArrayList<>();
         }
+    }
 
+    public void setAllDayAndStatListsForSingleDay(int daySelected) {
+        List<Integer> singleItemList = Collections.singletonList(daySelected);
+        setAllDayAndStatListObjects(singleItemList);
+
+        setFullListOfDaysFromCustomDateSelection(daySelected, 1);
         numberOfDaysSelected = 1;
+        Log.i("testCall", "total list size is " + mLongListOfDaysSelected.size());
+
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -467,46 +475,25 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(int selectedDay, long setTime, double caloriesBurned) {
         mStatsForEachActivity = new StatsForEachActivity();
 
-        //Todo: To consolidate repeating SET methods, create a Collections.singleton list of the single row we receive for single day update, and use the same loop for all insertions. Remember to address preset/empty row though.
-        if (mAddingOrEditingSingleDay) {
-            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+        for (int i=0; i<mLongListOfDaysSelected.size(); i++) {
+            int daySelected = mLongListOfDaysSelected.get(i);
+
+            if (mListOfDaysWithPopulatedRows.contains(daySelected)) {
+                for (int k=0; k<mStatsForEachActivityList.size(); k++) {
+                    if (mStatsForEachActivityList.get(k).getUniqueIdTiedToTheSelectedActivity()==daySelected) {
+                        long primaryId = mStatsForEachActivityList.get(k).getStatsForActivityId();
+                        mStatsForEachActivity.setStatsForActivityId(primaryId);
+                    }
+                }
+            }
+
+            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(daySelected);
             mStatsForEachActivity.setActivity(mActivityString);
             mStatsForEachActivity.setMetScore(mMetScore);
             mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
             mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
-        } else {
-            for (int k=0; k<mStatsForEachActivityList.size(); k++) {
-                Log.i("testInsert", "primary keys of all rows are " + mStatsForEachActivityList.get(k).getStatsForActivityId());
-            }
-
-            Log.i("testInsert", "complete list is " + mLongListOfDaysSelected);
-            Log.i("testInsert", "populated list is " + mListOfDaysWithPopulatedRows);
-
-            mStatsForEachActivity = new StatsForEachActivity();
-
-            for (int i=0; i<mLongListOfDaysSelected.size(); i++) {
-                //[0, 1, 2, 3, 4]
-                //[0, 2, 4]
-                //[1, 3]
-                int daySelected = mLongListOfDaysSelected.get(i);
-
-                if (mListOfDaysWithPopulatedRows.contains(daySelected)) {
-                    for (int k=0; k<mStatsForEachActivityList.size(); k++) {
-                        if (mStatsForEachActivityList.get(k).getUniqueIdTiedToTheSelectedActivity()==daySelected) {
-                            long primaryId = mStatsForEachActivityList.get(k).getStatsForActivityId();
-                            mStatsForEachActivity.setStatsForActivityId(primaryId);
-                        }
-                    }
-                }
-                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(daySelected);
-                mStatsForEachActivity.setActivity(mActivityString);
-                mStatsForEachActivity.setMetScore(mMetScore);
-                mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
-                mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
-
-                cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
-            }
+            cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
         }
     }
 
