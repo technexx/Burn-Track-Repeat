@@ -545,11 +545,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: "Overwrite" popUp should also come up when selecting "Selected day" when adding in Custom duration.
+  //Todo: Calories compared tab shows all future dates for calories expended (via bmr).
+      //Todo: Why not do Daily, Year-to-date, and Yearly?
   //Todo: Deleting all days doesn't clear green day color from activity-populated days until we refresh adapter some other way.
   //Todo: If we're accessing total daily time/calories from Timer via DayHolder, we need to make sure that gets updated when we add/edit/subtract activities in our Stats Fragment (not just get our total values from adding up StatsForEachActivity rows).
       //Todo: Alternatively, we nix DayHolder and just retrieve from StatsForEach.
   //Todo: For adding/editing multiple days, we'll need to cap the activity time for days w/ not enough time left, or figure out another option.
+  //Todo: Total calories row can be 1 more than addition of activities.
   //Todo: Option to add misc. calories burned?
   //Todo: Should we include a pounds gained/lost row?
       //Todo: May want to include a starting/current weight as well.
@@ -564,8 +566,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test dates from future years.
   //Todo: Test all daily saves in fragment.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
-  //Todo: Dot numbers a bit unaligned to the right.
-  //Todo: Can use separate classes for our globals in Main. Just use getters/setters and we can clear out/clean a bunch of stuff.
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Test all notifications.
   //Todo: Add disclaimer about accuracy, for entertainment purposes, not medical advice, etc. Should pop up on app start.
@@ -576,12 +576,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test everything 10x. Incl. round selection/replacement.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
-
-  //Todo: App Ideas:
-    //Todo: Mental illness onset game. Java/web based? Can convert from Android.
-        //Todo: "Stabilize the mind" model like Rebel, Inc.
-    //Todo: "A Day in the Life" - pick an age and get assigned random stats/locations/events.
-    //Todo: Mad Libs RPG/story (monkey's paw type interpretation of inserted adjectives).
 
   @Override
   public void onResume() {
