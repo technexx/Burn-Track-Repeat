@@ -13,7 +13,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp"
+        android:layout_marginTop="2dp"
         android:textSize="22sp">
     </TextView>
 
@@ -25,7 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginStart="20dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:textSize="20sp"
         android:textColor="@color/white"
         android:background="@null"
@@ -46,7 +46,7 @@
         app:layout_constraintTop_toBottomOf="@id/food_name_add_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="28dp"
+        android:layout_marginTop="16dp"
         android:textSize="22sp">
     </TextView>
 
@@ -57,7 +57,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/add_calories_consumed_header"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:textSize="24sp"
         android:textColor="@color/white"
         android:background="@null"
@@ -68,6 +68,30 @@
         android:hint="0"
         android:textColorHint="@color/light_grey">
     </EditText>
+
+    <TextView
+        android:id="@+id/add_or_edit_current_food_only_textView"
+        android:text="@string/current_day"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/confirm_calories_consumed_delete_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/add_or_edit_all_selected_foods_textView"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="20dp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/add_or_edit_all_selected_foods_textView"
+        android:text="@string/date_range"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@id/confirm_calories_consumed_add_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@id/add_or_edit_current_food_only_textView"
+        android:layout_marginEnd="8dp"
+        android:layout_marginBottom="20dp">
+    </TextView>
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/confirm_calories_consumed_add_button"

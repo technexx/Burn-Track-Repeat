@@ -545,6 +545,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Need sep. sorting menu for calories consumed + edit popUp option for multiple days.
   //Todo: Calories compared tab shows all future dates for calories expended (via bmr).
       //Todo: Why not do Daily, Year-to-date, and Yearly?
   //Todo: Deleting all days doesn't clear green day color from activity-populated days until we refresh adapter some other way.
