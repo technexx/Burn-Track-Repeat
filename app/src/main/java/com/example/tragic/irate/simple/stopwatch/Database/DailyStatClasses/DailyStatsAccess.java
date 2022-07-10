@@ -75,6 +75,10 @@ public class DailyStatsAccess {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
+    int mDatabaseListBeingQueried;
+    int ACTIVITY_LIST = 0;
+    int FOOD_LIST = 1;
+
     List<Integer> mLongListOfDaysSelected = new ArrayList<>();
     List<Integer> mListOfDaysWithPopulatedRows = new ArrayList<>();
     List<Integer> mListOfDaysWithEmptyRows = new ArrayList<>();
@@ -188,6 +192,9 @@ public class DailyStatsAccess {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedAndPopulatedDays);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedAndPopulatedDays);
             mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedAndPopulatedDays);
+
+            Log.i("testFood", "integer list of days received is " + integerListOfSelectedAndPopulatedDays);
+            Log.i("testFood", "entity list POPULATED size is " + mCaloriesForEachFoodList.size());
         } else {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
@@ -201,8 +208,6 @@ public class DailyStatsAccess {
 
         setFullListOfDaysFromCustomDateSelection(daySelected, 1);
         numberOfDaysSelected = 1;
-        Log.i("testInsert", "total list size is " + mLongListOfDaysSelected.size());
-
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -291,6 +296,10 @@ public class DailyStatsAccess {
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
         mListOfDaysWithEmptyRows.clear();
+
+        //Todo: We're using DAYHOLDER'S size as a conditional for populated/empty days. If keeping our On.Conflict.REPLACE logic, we need separate populations for each entity list. We need to do this for all duration queries, even on the ones we don't add multiple rows on, because our INSERT logic depends on the populated list (even if it's just one entry).
+
+        //Todo: Should we query both activity and food on each calendar date click, or on tab switch? At the moment, we do BOTH on date click.
         for (int i=0; i<calendarDayList.size(); i++) {
             int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
 
@@ -310,6 +319,10 @@ public class DailyStatsAccess {
         numberOfDaysSelected = calendarDayList.size();
 
         Log.i("testInsert", "total list size is " + mLongListOfDaysSelected.size());
+    }
+
+    public void setDatabaseListBeingQueried(int typeOfList) {
+        this.mDatabaseListBeingQueried = typeOfList;
     }
 
     private void setFullListOfDaysFromCustomDateSelection(int firstDay, int sizeOfList) {
@@ -607,10 +620,6 @@ public class DailyStatsAccess {
         }
     }
 
-    public void assignStatsForEachActivityEntityForSinglePosition(int position) {
-        mStatsForEachActivity = mStatsForEachActivityList.get(position);
-    }
-
     public boolean getDoesActivityExistsInDatabaseForSelectedDay () {
         return doesActivityExistsInDatabaseForSelectedDay;
     }
@@ -884,26 +893,28 @@ public class DailyStatsAccess {
         mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
     }
 
+    public void setTotalFoodStringListForSelectedDuration() {
+        totalFoodStringListForSelectedDuration.clear();
+
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
+        }
+    }
+
     public List<String> getTotalFoodStringListForSelectedDuration() {
         return totalFoodStringListForSelectedDuration;
     }
 
-    public List<Double> getTotalCaloriesConsumedListForSelectedDuration() {
-        return totalCaloriesConsumedListForSelectedDuration;
-    }
-
-    public void setTotalCaloriesConsumedStatsForSelectedDayToArrayLists() {
-        clearCaloriesForEachFoodListArrayLists();
+    public void setTotalCaloriesConsumedListForSelectedDuration() {
+        totalCaloriesConsumedListForSelectedDuration.clear();
 
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
             totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
         }
     }
 
-    public void clearCaloriesForEachFoodListArrayLists() {
-        totalFoodStringListForSelectedDuration.clear();
-        totalCaloriesConsumedListForSelectedDuration.clear();
+    public List<Double> getTotalCaloriesConsumedListForSelectedDuration() {
+        return totalCaloriesConsumedListForSelectedDuration;
     }
 
     public double getTotalCaloriesConsumedForSelectedDuration() {

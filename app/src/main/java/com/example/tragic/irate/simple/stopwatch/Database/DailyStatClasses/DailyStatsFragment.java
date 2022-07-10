@@ -180,6 +180,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int ADDING_ACTIVITY = 0;
     int EDITING_ACTIVITY = 1;
 
+    int ACTIVITY_LIST = 0;
+    int FOOD_LIST = 1;
+
     View caloriesConsumedAddAndEditView;
     PopupWindow caloriesConsumedAddAndEditPopUpWindow;
     EditText typeOfFoodEditText;
@@ -471,7 +474,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
             dailyStatsAdapter.notifyDataSetChanged();
 
-            dailyStatsAccess.setTotalCaloriesConsumedStatsForSelectedDayToArrayLists();
+            dailyStatsAccess.setTotalFoodStringListForSelectedDuration();
+            dailyStatsAccess.setTotalCaloriesConsumedListForSelectedDuration();
             caloriesConsumedAdapter.notifyDataSetChanged();
 
             setTotalActivityStatsFooterTextViews();
@@ -1426,11 +1430,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         dailyStatsRecyclerView.setVisibility(View.VISIBLE);
                         totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
                         editTdeeStatsButton.setEnabled(true);
+                        sendDatabaseListBeingQueriedToStatsAccessClass(ACTIVITY_LIST);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
                         totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
                         editTdeeStatsButton.setEnabled(true);
+                        sendDatabaseListBeingQueriedToStatsAccessClass(FOOD_LIST);
                         break;
                     case 2:
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
@@ -1456,6 +1462,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             }
         });
+    }
+
+    private void sendDatabaseListBeingQueriedToStatsAccessClass(int listBeingQueried) {
+        dailyStatsAccess.setDatabaseListBeingQueried(listBeingQueried);
     }
 
     private void setDefaultCalorieTabViewsForFirstTab() {
