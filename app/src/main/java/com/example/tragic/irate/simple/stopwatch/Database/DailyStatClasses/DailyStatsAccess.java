@@ -79,15 +79,19 @@ public class DailyStatsAccess {
     int ACTIVITY_LIST = 0;
     int FOOD_LIST = 1;
 
-    List<Integer> mLongListOfDaysSelected = new ArrayList<>();
-    List<Integer> mListOfDaysWithPopulatedRows = new ArrayList<>();
-    List<Integer> mListOfDaysWithEmptyRows = new ArrayList<>();
+    List<Integer> mLongListOfActivityDaysSelected;
+    List<Integer> mListOfActivityDaysWithPopulatedRows;
+    List<Integer> mListOfActivityDaysWithEmptyRows;
+
+    List<Integer> mLongListOfFoodDaysSelected;
+    List<Integer> mListOfFoodDaysWithPopulatedRows;
+    List<Integer> mListOfFoodDaysWithEmptyRows;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
         instantiateDailyStatsDatabase();
         instantiateEntitiesAndTheirLists();
-        instantiateArrayListsOfTotalStatsForSelectedDurations();
+        instantiateArrayLists();
         instantiateMiscellaneousClasses();
     }
 
@@ -187,24 +191,28 @@ public class DailyStatsAccess {
         return mStatsForEachActivityList;
     }
 
-    public void setAllDayAndStatListObjects(List<Integer> integerListOfSelectedAndPopulatedDays) {
-        if (integerListOfSelectedAndPopulatedDays.size()>0) {
-            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfSelectedAndPopulatedDays);
-            mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfSelectedAndPopulatedDays);
-            mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfSelectedAndPopulatedDays);
-
-            Log.i("testFood", "integer list of days received is " + integerListOfSelectedAndPopulatedDays);
-            Log.i("testFood", "entity list POPULATED size is " + mCaloriesForEachFoodList.size());
+    public void setActivityListsForDatabaseObjects(List<Integer> integerListOfDaysSelected) {
+        if (integerListOfDaysSelected.size()>0) {
+            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfDaysSelected);
+            mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfDaysSelected);
         } else {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
+        }
+    }
+
+    public void setFoodListsForDatabaseObjects(List<Integer> integerListOfDaysSelected) {
+        if (integerListOfDaysSelected.size()>0) {
+            mCaloriesForEachFoodList = assignCaloriesForEachFoodListBySortMode(integerListOfDaysSelected);
+        } else {
             mCaloriesForEachFoodList = new ArrayList<>();
         }
     }
 
     public void setAllDayAndStatListsForSingleDay(int daySelected) {
         List<Integer> singleItemList = Collections.singletonList(daySelected);
-        setAllDayAndStatListObjects(singleItemList);
+        setActivityListsForDatabaseObjects(singleItemList);
+        setFoodListsForDatabaseObjects(singleItemList);
 
         setFullListOfDaysFromCustomDateSelection(daySelected, 1);
         numberOfDaysSelected = 1;
@@ -212,7 +220,7 @@ public class DailyStatsAccess {
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> populatedDaysOfWeekList = new ArrayList<>();
-        mLongListOfDaysSelected = new ArrayList<>();
+        mLongListOfActivityDaysSelected = new ArrayList<>();
 
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         int lastDayOfDuration = firstDayOfDuration + 6;
@@ -230,7 +238,8 @@ public class DailyStatsAccess {
             }
         }
 
-        setAllDayAndStatListObjects(populatedDaysOfWeekList);
+        setActivityListsForDatabaseObjects(populatedDaysOfWeekList);
+        setFoodListsForDatabaseObjects(populatedDaysOfWeekList);
 
         numberOfDaysSelected = 7;
     }
@@ -252,7 +261,8 @@ public class DailyStatsAccess {
             }
         }
 
-        setAllDayAndStatListObjects(populatedDaysOfMonthList);
+        setActivityListsForDatabaseObjects(populatedDaysOfMonthList);
+        setFoodListsForDatabaseObjects(populatedDaysOfMonthList);
 
         numberOfDaysSelected = numberOfDaysInMonth;
     }
@@ -274,7 +284,8 @@ public class DailyStatsAccess {
             }
         }
 
-        setAllDayAndStatListObjects(populatedDaysOfYearList);
+        setActivityListsForDatabaseObjects(populatedDaysOfYearList);
+        setFoodListsForDatabaseObjects(populatedDaysOfYearList);
 
         numberOfDaysSelected = daysInYear;
     }
@@ -295,11 +306,11 @@ public class DailyStatsAccess {
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
-        mListOfDaysWithEmptyRows.clear();
+        mListOfActivityDaysWithEmptyRows.clear();
 
         //Todo: We're using DAYHOLDER'S size as a conditional for populated/empty days. If keeping our On.Conflict.REPLACE logic, we need separate populations for each entity list. We need to do this for all duration queries, even on the ones we don't add multiple rows on, because our INSERT logic depends on the populated list (even if it's just one entry).
 
-        //Todo: Should we query both activity and food on each calendar date click, or on tab switch? At the moment, we do BOTH on date click.
+        //Todo: We need to both lists on date change, if only because calorie comparison tab requires both updated lists.
         for (int i=0; i<calendarDayList.size(); i++) {
             int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
 
@@ -310,7 +321,8 @@ public class DailyStatsAccess {
             }
         }
 
-        setAllDayAndStatListObjects(populatedCustomDayList);
+        setActivityListsForDatabaseObjects(populatedCustomDayList);
+        setFoodListsForDatabaseObjects(populatedCustomDayList);
 
         setFullListOfDaysFromCustomDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
         setListOfDaysWithPopulatedRows(populatedCustomDayList);
@@ -318,7 +330,7 @@ public class DailyStatsAccess {
 
         numberOfDaysSelected = calendarDayList.size();
 
-        Log.i("testInsert", "total list size is " + mLongListOfDaysSelected.size());
+        Log.i("testInsert", "total list size is " + mLongListOfActivityDaysSelected.size());
     }
 
     public void setDatabaseListBeingQueried(int typeOfList) {
@@ -326,23 +338,23 @@ public class DailyStatsAccess {
     }
 
     private void setFullListOfDaysFromCustomDateSelection(int firstDay, int sizeOfList) {
-        mLongListOfDaysSelected.clear();
+        mLongListOfActivityDaysSelected.clear();
 
         for (int i=0; i<sizeOfList; i++) {
-            mLongListOfDaysSelected.add(firstDay + i);
+            mLongListOfActivityDaysSelected.add(firstDay + i);
         }
     }
 
     private List<Integer> getIntegerListOfDaysSelected() {
-        return mLongListOfDaysSelected;
+        return mLongListOfActivityDaysSelected;
     }
 
     private void setListOfDaysWithPopulatedRows(List<Integer> listToAdd) {
-        this.mListOfDaysWithPopulatedRows = listToAdd;
+        this.mListOfActivityDaysWithPopulatedRows = listToAdd;
     }
 
     private void setListOfDaysWithEmptyRows(List<Integer> listToAdd) {
-        this.mListOfDaysWithEmptyRows = listToAdd;
+        this.mListOfActivityDaysWithEmptyRows = listToAdd;
     }
 
     public void convertToStringAndSetSingleDay(int day) {
@@ -486,12 +498,12 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(long setTime, double caloriesBurned) {
-        for (int i=0; i<mLongListOfDaysSelected.size(); i++) {
+        for (int i=0; i<mLongListOfActivityDaysSelected.size(); i++) {
 
             mStatsForEachActivity = new StatsForEachActivity();
-            int daySelected = mLongListOfDaysSelected.get(i);
+            int daySelected = mLongListOfActivityDaysSelected.get(i);
 
-            if (mListOfDaysWithPopulatedRows.contains(daySelected)) {
+            if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
                 for (int k=0; k<mStatsForEachActivityList.size(); k++) {
                     if (mStatsForEachActivityList.get(k).getUniqueIdTiedToTheSelectedActivity()==daySelected) {
                         long primaryId = mStatsForEachActivityList.get(k).getStatsForActivityId();
@@ -836,11 +848,11 @@ public class DailyStatsAccess {
     }
 
     public void insertCaloriesAndEachFoodIntoDatabase() {
-        for (int i=0; i<mLongListOfDaysSelected.size(); i++) {
+        for (int i=0; i<mLongListOfActivityDaysSelected.size(); i++) {
             mCaloriesForEachFood = new CaloriesForEachFood();
-            int daySelected = mLongListOfDaysSelected.get(i);
+            int daySelected = mLongListOfActivityDaysSelected.get(i);
 
-            if (mListOfDaysWithPopulatedRows.contains(daySelected)) {
+            if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
                 for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {
                     if (mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood()==daySelected) {
                         long primaryId = mCaloriesForEachFoodList.get(k).getCaloriesForEachFoodId();
@@ -951,13 +963,21 @@ public class DailyStatsAccess {
         mCaloriesForEachFoodList = new ArrayList<>();
     }
 
-    private void instantiateArrayListsOfTotalStatsForSelectedDurations() {
+    private void instantiateArrayLists() {
         totalActivitiesListForSelectedDuration = new ArrayList<>();
         totalSetTimeListForEachActivityForSelectedDuration = new ArrayList<>();
         totalCaloriesBurnedListForEachActivityForSelectedDuration = new ArrayList<>();
 
         totalFoodStringListForSelectedDuration = new ArrayList<>();
         totalCaloriesConsumedListForSelectedDuration = new ArrayList<>();
+
+        mLongListOfActivityDaysSelected = new ArrayList<>();
+        mListOfActivityDaysWithPopulatedRows = new ArrayList<>();
+        mListOfActivityDaysWithEmptyRows = new ArrayList<>();
+
+        mLongListOfFoodDaysSelected = new ArrayList<>();
+        mListOfFoodDaysWithPopulatedRows = new ArrayList<>();
+        mListOfFoodDaysWithEmptyRows = new ArrayList<>();
     }
 
     private void instantiateMiscellaneousClasses() {
