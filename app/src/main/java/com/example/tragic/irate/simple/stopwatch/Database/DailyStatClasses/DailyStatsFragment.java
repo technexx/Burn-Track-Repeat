@@ -337,14 +337,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         addOrEditActivitiesForCurrentDayOnlyTextView.setOnClickListener(v-> {
             SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = SINGLE_DAY;
-            setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(true);
+            setSingleDaydAddOrEditBooleanInStatsAccess(true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
         });
 
         addOrEditActivitiesForAllSelectedDaysTextView.setOnClickListener(v-> {
             SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
-            setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(false);
+            setSingleDaydAddOrEditBooleanInStatsAccess(false);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, false);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, true);
         });
@@ -385,11 +385,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         addOrEditFoodForCurrentDayOnlyTextView.setOnClickListener(v-> {
+            SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = SINGLE_DAY;
+            setSingleDaydAddOrEditBooleanInStatsAccess(true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForCurrentDayOnlyTextView, true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForAllSelectedDaysTextView, false);
         });
 
         addOrEditFoodForAllSelectedDaysTextView.setOnClickListener(v-> {
+            SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
+            setSingleDaydAddOrEditBooleanInStatsAccess(true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForCurrentDayOnlyTextView, false);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForAllSelectedDaysTextView, true);
         });
@@ -822,7 +826,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void setSingleOrMultipleDayAddOrEditBooleanInStatsAccess(boolean singleDay) {
+    private void setSingleDaydAddOrEditBooleanInStatsAccess(boolean singleDay) {
         dailyStatsAccess.setAddingOrEditingSingleDayBoolean(singleDay);
     }
 
