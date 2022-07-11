@@ -99,7 +99,8 @@
     <string name="day_total_header">Daily</string>
     <string name="weekly_total_header">Weekly</string>
     <string name="monthly_total_header">Monthly</string>
-    <string name="yearly_total_header">Year-to-date</string>
+    <string name="year_to_date_header">Year-to-date</string>
+    <string name="yearly_total_header">Yearly</string>
     <string name="custom_total_header">Custom</string>
     <string name="daily_set_time">Sets:</string>
     <string name="daily_break_time">Breaks:</string>

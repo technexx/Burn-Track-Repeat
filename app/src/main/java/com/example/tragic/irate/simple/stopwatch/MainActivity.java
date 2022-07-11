@@ -547,6 +547,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Calories compared tab shows all future dates for calories expended (via bmr).
       //Todo: Why not do Daily, Year-to-date, and Yearly?
+      //Todo: Can also just add year-to-date in addition to yearly.
   //Todo: Deleting all days doesn't clear green day color from activity-populated days until we refresh adapter some other way.
   //Todo: If we're accessing total daily time/calories from Timer via DayHolder, we need to make sure that gets updated when we add/edit/subtract activities in our Stats Fragment (not just get our total values from adding up StatsForEachActivity rows).
       //Todo: Alternatively, we nix DayHolder and just retrieve from StatsForEach.

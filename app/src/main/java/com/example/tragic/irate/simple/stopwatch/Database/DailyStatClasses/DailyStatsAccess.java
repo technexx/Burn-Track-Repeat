@@ -280,10 +280,16 @@ public class DailyStatsAccess {
         logIntegerAndEntityDayLists();
     }
 
-    public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
+    public void setAllDayAndStatListsForYearFromDatabase(int daysInYear, boolean yearToDate) {
         int firstDayOfDuration = 1;
-//        int lastDayOfDuration = getCurrentDayOfYear();
-        int lastDayOfDuration = daysInYear;
+        int lastDayOfDuration;
+
+        if (yearToDate) {
+            lastDayOfDuration = getCurrentDayOfYear();
+        } else {
+            lastDayOfDuration = daysInYear;
+        }
+
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
@@ -333,25 +339,6 @@ public class DailyStatsAccess {
         numberOfDaysSelected = calendarDayList.size();
 
         logIntegerAndEntityDayLists();
-    }
-
-    private void logIntegerAndEntityDayLists() {
-        Log.i("testList", "total activity list is " + mLongListOfActivityDaysSelected);
-        Log.i("testList", "populated activity list is " + mListOfActivityDaysWithPopulatedRows);
-        Log.i("testList", "unpopulated activity list is " + mListOfActivityDaysWithEmptyRows);
-
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            Log.i("testList", "mStats activities in list are " + mStatsForEachActivityList.get(i).getActivity());
-        }
-        Log.i("testList", "mStats activities list  size is " + mStatsForEachActivityList.size());
-
-//        Log.i("testList", "total food list is " + mLongListOfFoodDaysSelected);
-//        Log.i("testList", "populated food list is " + mListOfFoodDaysWithPopulatedRows);
-//        Log.i("testList", "unpopulated food list is " + mListOfFoodDaysWithEmptyRows);
-    }
-
-    public void setDatabaseListBeingQueried(int typeOfList) {
-        this.mDatabaseListBeingQueried = typeOfList;
     }
 
     private void setFullListOfActivityDaysFromDateSelection(int firstDay, int sizeOfList) {
@@ -1049,6 +1036,29 @@ public class DailyStatsAccess {
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         return simpleDateFormat.format(calendar.getTime());
     }
+
+    private void logEntityLists() {
+        Log.i("testList", "mStats list size is " + mCaloriesForEachFoodList.size());
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            Log.i("testList", "mFood foods in list are " + mCaloriesForEachFoodList.get(i).getTypeOfFood());
+        }
+
+        Log.i("testList", "mFood list size is " + mStatsForEachActivityList.size());
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            Log.i("testList", "mStats activities in list are " + mStatsForEachActivityList.get(i).getActivity());
+        }
+    }
+
+    private void logIntegerAndEntityDayLists() {
+        Log.i("testList", "total activity list is " + mLongListOfActivityDaysSelected);
+        Log.i("testList", "populated activity list is " + mListOfActivityDaysWithPopulatedRows);
+        Log.i("testList", "unpopulated activity list is " + mListOfActivityDaysWithEmptyRows);
+
+        Log.i("testList", "total food list is " + mLongListOfFoodDaysSelected);
+        Log.i("testList", "populated food list is " + mListOfFoodDaysWithPopulatedRows);
+        Log.i("testList", "unpopulated food list is " + mListOfFoodDaysWithEmptyRows);
+    }
+
 
     private void logSetTimeValues() {
         Log.i("testCals", "total assigned set is " + totalSetTimeForSelectedDuration);

@@ -120,8 +120,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int DAILY_STATS = 0;
     int WEEKLY_STATS = 1;
     int MONTHLY_STATS = 2;
-    int YEARLY_STATS = 3;
-    int CUSTOM_STATS = 4;
+    int YEAR_TO_DATE_STATS = 3;
+    int YEARLY_STATS = 4;
+    int CUSTOM_STATS = 5;
     boolean numberOfDaysWithActivitiesHasChanged;
 
     List<CalendarDay> customCalendarDayList;
@@ -179,9 +180,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     int ADDING_ACTIVITY = 0;
     int EDITING_ACTIVITY = 1;
-
-    int ACTIVITY_LIST = 0;
-    int FOOD_LIST = 1;
 
     View caloriesConsumedAddAndEditView;
     PopupWindow caloriesConsumedAddAndEditPopUpWindow;
@@ -502,8 +500,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==MONTHLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForMonth((calendar.get(Calendar.DAY_OF_MONTH)), calendar.getActualMaximum(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
         }
+        if (mode==YEAR_TO_DATE_STATS) {
+            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR), true);
+        }
         if (mode==YEARLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR));
+            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR), false);
         }
         if (mode==CUSTOM_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, calendar.get(Calendar.DAY_OF_YEAR));
@@ -533,6 +534,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         if (mode==MONTHLY_STATS) {
             totalStatsHeaderTextView.setText(R.string.monthly_total_header);
+            convertAndSetDateRangeStringOnTextView();
+        }
+        if (mode==YEAR_TO_DATE_STATS) {
+            totalStatsHeaderTextView.setText(R.string.year_to_date_header);
             convertAndSetDateRangeStringOnTextView();
         }
         if (mode==YEARLY_STATS) {
@@ -596,7 +601,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
         if (directionOfIteration==ITERATING_ACTIVITY_STATS_UP) {
-            if (currentStatDurationMode<4) {
+            if (currentStatDurationMode<5) {
                 currentStatDurationMode++;
             } else {
                 currentStatDurationMode=0;
@@ -605,7 +610,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (currentStatDurationMode>0) {
                 currentStatDurationMode--;
             } else {
-                currentStatDurationMode=4;
+                currentStatDurationMode=5;
             }
         }
     }
@@ -1430,13 +1435,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         dailyStatsRecyclerView.setVisibility(View.VISIBLE);
                         totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
                         editTdeeStatsButton.setEnabled(true);
-                        sendDatabaseListBeingQueriedToStatsAccessClass(ACTIVITY_LIST);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
                         totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
                         editTdeeStatsButton.setEnabled(true);
-                        sendDatabaseListBeingQueriedToStatsAccessClass(FOOD_LIST);
                         break;
                     case 2:
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
@@ -1462,10 +1465,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             }
         });
-    }
-
-    private void sendDatabaseListBeingQueriedToStatsAccessClass(int listBeingQueried) {
-        dailyStatsAccess.setDatabaseListBeingQueried(listBeingQueried);
     }
 
     private void setDefaultCalorieTabViewsForFirstTab() {
