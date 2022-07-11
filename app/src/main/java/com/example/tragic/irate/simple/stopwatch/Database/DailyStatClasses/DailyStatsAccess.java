@@ -327,6 +327,17 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = calendarDayList.size();
+
+        logIntegerDayLists();
+    }
+
+    private void logIntegerDayLists() {
+        Log.i("testList", "total activity list is " + mLongListOfActivityDaysSelected);
+        Log.i("testList", "populated activity list is " + mListOfActivityDaysWithPopulatedRows);
+        Log.i("testList", "unpopulated activity list is " + mListOfActivityDaysWithEmptyRows);
+        Log.i("testList", "total food list is " + mLongListOfFoodDaysSelected);
+        Log.i("testList", "populated food list is " + mListOfFoodDaysWithPopulatedRows);
+        Log.i("testList", "unpopulated food list is " + mListOfFoodDaysWithEmptyRows);
     }
 
     public void setDatabaseListBeingQueried(int typeOfList) {
