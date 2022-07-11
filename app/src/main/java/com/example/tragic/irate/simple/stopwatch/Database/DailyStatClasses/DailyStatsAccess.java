@@ -214,7 +214,7 @@ public class DailyStatsAccess {
         setActivityListsForDatabaseObjects(singleItemList);
         setFoodListsForDatabaseObjects(singleItemList);
 
-        setFullListOfDaysFromCustomDateSelection(daySelected, 1);
+        setFullListOfActivityDaysFromDateSelection(daySelected, 1);
         numberOfDaysSelected = 1;
     }
 
@@ -306,43 +306,76 @@ public class DailyStatsAccess {
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
-        mListOfActivityDaysWithEmptyRows.clear();
+        //Todo: For current Insertion logic, these all need to go in each duration method.
+        clearFullListOfActivityDays();
+        clearFullListOfFoodFays();
 
-        //Todo: We're using DAYHOLDER'S size as a conditional for populated/empty days. If keeping our On.Conflict.REPLACE logic, we need separate populations for each entity list. We need to do this for all duration queries, even on the ones we don't add multiple rows on, because our INSERT logic depends on the populated list (even if it's just one entry).
+        setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
+        setFullListOfFoodDaysFromDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
 
-        //Todo: We need to both lists on date change, if only because calorie comparison tab requires both updated lists.
+        clearPopulateAndUnpopulatedActivityLists();
+        clearPopulatedAndUnpopulatedFoodLists();
+
         for (int i=0; i<calendarDayList.size(); i++) {
             int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
-
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse+i).size()!=0) {
-                populatedCustomDayList.add(dayFromList);
-            } else {
-                unPopulatedCustomDayList.add(dayFromList);
-            }
+            setPopulatedAndEmptyListsOfActivityDays(dayFromList);
+            setPopulatedAndEmptyListsOfFoodDays(dayFromList);
         }
 
         setActivityListsForDatabaseObjects(populatedCustomDayList);
         setFoodListsForDatabaseObjects(populatedCustomDayList);
 
-        setFullListOfDaysFromCustomDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
-        setListOfDaysWithPopulatedRows(populatedCustomDayList);
-        setListOfDaysWithEmptyRows(unPopulatedCustomDayList);
-
         numberOfDaysSelected = calendarDayList.size();
-
-        Log.i("testInsert", "total list size is " + mLongListOfActivityDaysSelected.size());
     }
 
     public void setDatabaseListBeingQueried(int typeOfList) {
         this.mDatabaseListBeingQueried = typeOfList;
     }
-
-    private void setFullListOfDaysFromCustomDateSelection(int firstDay, int sizeOfList) {
-        mLongListOfActivityDaysSelected.clear();
-
+    //Todo: We need to both lists on date change, if only because calorie comparison tab requires both updated lists.
+    private void setFullListOfActivityDaysFromDateSelection(int firstDay, int sizeOfList) {
         for (int i=0; i<sizeOfList; i++) {
             mLongListOfActivityDaysSelected.add(firstDay + i);
         }
+    }
+
+    private void setFullListOfFoodDaysFromDateSelection(int firstDay, int sizeOfList) {
+        for (int i=0; i<sizeOfList; i++) {
+            mLongListOfFoodDaysSelected.add(firstDay + i);
+        }
+    }
+
+    private void clearFullListOfActivityDays() {
+        mLongListOfActivityDaysSelected.clear();
+    }
+
+    private void clearFullListOfFoodFays() {
+        mLongListOfFoodDaysSelected.clear();
+    }
+
+    private void setPopulatedAndEmptyListsOfActivityDays(int dayToCheck) {
+        if (cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayToCheck).size()!=0) {
+            mListOfActivityDaysWithPopulatedRows.add(dayToCheck);
+        } else {
+            mListOfActivityDaysWithEmptyRows.add(dayToCheck);
+        }
+    }
+
+    private void setPopulatedAndEmptyListsOfFoodDays(int dayToCheck) {
+        if (cyclesDatabase.cyclesDao().loadCaloriesForEachFoodForSpecificDay(dayToCheck).size()!=0) {
+            mListOfFoodDaysWithPopulatedRows.add(dayToCheck);
+        } else {
+            mListOfFoodDaysWithEmptyRows.add(dayToCheck);
+        }
+    }
+
+    private void clearPopulateAndUnpopulatedActivityLists() {
+        mListOfActivityDaysWithPopulatedRows.clear();
+        mListOfActivityDaysWithEmptyRows.clear();
+    }
+
+    private void clearPopulatedAndUnpopulatedFoodLists() {
+        mListOfFoodDaysWithPopulatedRows.clear();
+        mListOfFoodDaysWithEmptyRows.clear();
     }
 
     private List<Integer> getIntegerListOfDaysSelected() {
