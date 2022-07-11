@@ -215,11 +215,15 @@ public class DailyStatsAccess {
         setFullListOfActivityDaysFromDateSelection(daySelected, 1);
         setFullListOfFoodDaysFromDateSelection(daySelected, 1);
 
+        setPopulatedAndEmptyListsOfActivityDays(daySelected);
+        setPopulatedAndEmptyListsOfFoodDays(daySelected);
+
         List<Integer> singleItemList = Collections.singletonList(daySelected);
         setActivityListsForDatabaseObjects(singleItemList);
         setFoodListsForDatabaseObjects(singleItemList);
 
         numberOfDaysSelected = 1;
+        logIntegerDayLists();
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -248,6 +252,7 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(populatedDaysOfWeekList);
 
         numberOfDaysSelected = 7;
+        logIntegerDayLists();
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -274,6 +279,7 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = numberOfDaysInMonth;
+        logIntegerDayLists();
     }
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
@@ -303,6 +309,8 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(populatedDaysOfYearList);
 
         numberOfDaysSelected = daysInYear;
+
+        logIntegerDayLists();
     }
 
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
