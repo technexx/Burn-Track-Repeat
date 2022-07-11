@@ -210,31 +210,37 @@ public class DailyStatsAccess {
     }
 
     public void setAllDayAndStatListsForSingleDay(int daySelected) {
+        clearAllActivityAndFoodIntegerDayLists();
+
+        setFullListOfActivityDaysFromDateSelection(daySelected, 1);
+        setFullListOfFoodDaysFromDateSelection(daySelected, 1);
+
         List<Integer> singleItemList = Collections.singletonList(daySelected);
         setActivityListsForDatabaseObjects(singleItemList);
         setFoodListsForDatabaseObjects(singleItemList);
 
-        setFullListOfActivityDaysFromDateSelection(daySelected, 1);
         numberOfDaysSelected = 1;
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         List<Integer> populatedDaysOfWeekList = new ArrayList<>();
-        mLongListOfActivityDaysSelected = new ArrayList<>();
 
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         int lastDayOfDuration = firstDayOfDuration + 6;
-        //Aggregated is used for database IDs only. Anything fetched from calendar should still fall w/ in standard year.
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
+        clearAllActivityAndFoodIntegerDayLists();
+
+        setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, 7);
+        setFullListOfFoodDaysFromDateSelection(firstAggregatedDayOfYearToUse, 7);
+
         for (int i=0; i<7; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
-                //If we have day 1 of year, but days 7 of week (when years cross over), value of firstAggregatedDay can be <0. This will ensure only days of week of current year are added. Done for month below as well.
-                if (firstAggregatedDayOfYearToUse+i > 0) {
-                    populatedDaysOfWeekList.add(firstAggregatedDayOfYearToUse + i);
-                }
+            if (firstAggregatedDayOfYearToUse + i > 0 ) {
+                int dayFromList = (firstAggregatedDayOfYearToUse + i);
+                setPopulatedAndEmptyListsOfActivityDays(dayFromList);
+                setPopulatedAndEmptyListsOfFoodDays(dayFromList);
             }
         }
 
@@ -245,24 +251,27 @@ public class DailyStatsAccess {
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
-        List<Integer> populatedDaysOfMonthList = new ArrayList<>();
-
         int firstDayOfDuration = dayOfYear - (dayOfMonth-1);
         int lastDayOfDuration = firstDayOfDuration + (numberOfDaysInMonth-1);
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
+        clearAllActivityAndFoodIntegerDayLists();
+
+        setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, numberOfDaysInMonth);
+        setFullListOfFoodDaysFromDateSelection(firstAggregatedDayOfYearToUse, numberOfDaysInMonth);
+
         for (int i=0; i<numberOfDaysInMonth; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse + i).size()!=0) {
-                if (firstAggregatedDayOfYearToUse + i >0 ) {
-                    populatedDaysOfMonthList.add(firstAggregatedDayOfYearToUse + i);
-                }
+            if (firstAggregatedDayOfYearToUse + i > 0 ) {
+                int dayFromList = (firstAggregatedDayOfYearToUse + i);
+                setPopulatedAndEmptyListsOfActivityDays(dayFromList);
+                setPopulatedAndEmptyListsOfFoodDays(dayFromList);
             }
         }
 
-        setActivityListsForDatabaseObjects(populatedDaysOfMonthList);
-        setFoodListsForDatabaseObjects(populatedDaysOfMonthList);
+        setActivityListsForDatabaseObjects(mListOfActivityDaysWithPopulatedRows);
+        setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = numberOfDaysInMonth;
     }
@@ -277,10 +286,16 @@ public class DailyStatsAccess {
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
-        //If days exists in database, add it to list of days in year list.
+        clearAllActivityAndFoodIntegerDayLists();
+
+        setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, daysInYear);
+        setFullListOfFoodDaysFromDateSelection(firstAggregatedDayOfYearToUse, daysInYear);
+
         for (int i=0; i<daysInYear; i++) {
-            if (cyclesDatabase.cyclesDao().loadSingleDay(firstAggregatedDayOfYearToUse+i).size()!=0) {
-                populatedDaysOfYearList.add(firstAggregatedDayOfYearToUse+i);
+            if (firstAggregatedDayOfYearToUse + i > 0 ) {
+                int dayFromList = (firstAggregatedDayOfYearToUse + i);
+                setPopulatedAndEmptyListsOfActivityDays(dayFromList);
+                setPopulatedAndEmptyListsOfFoodDays(dayFromList);
             }
         }
 
@@ -291,30 +306,16 @@ public class DailyStatsAccess {
     }
 
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
-        List<Integer> populatedCustomDayList = new ArrayList<>();
-        List<Integer> unPopulatedCustomDayList = new ArrayList<>();
-
-        int firstDayOfDuration = dayOfYear;
-        int lastDayOfDuration = dayOfYear;
+        int firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
+        int lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
         int firstAggregatedDayOfYearToUse = dayOfYear + valueToAddToStartingDurationDayForFutureYears();
-
-        if (calendarDayList.size()>0) {
-            firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
-            lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
-            firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
-        }
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
-        //Todo: For current Insertion logic, these all need to go in each duration method.
-        clearFullListOfActivityDays();
-        clearFullListOfFoodFays();
+        clearAllActivityAndFoodIntegerDayLists();
 
         setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
         setFullListOfFoodDaysFromDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
-
-        clearPopulateAndUnpopulatedActivityLists();
-        clearPopulatedAndUnpopulatedFoodLists();
 
         for (int i=0; i<calendarDayList.size(); i++) {
             int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
@@ -322,8 +323,8 @@ public class DailyStatsAccess {
             setPopulatedAndEmptyListsOfFoodDays(dayFromList);
         }
 
-        setActivityListsForDatabaseObjects(populatedCustomDayList);
-        setFoodListsForDatabaseObjects(populatedCustomDayList);
+        setActivityListsForDatabaseObjects(mListOfActivityDaysWithPopulatedRows);
+        setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = calendarDayList.size();
     }
@@ -331,7 +332,7 @@ public class DailyStatsAccess {
     public void setDatabaseListBeingQueried(int typeOfList) {
         this.mDatabaseListBeingQueried = typeOfList;
     }
-    //Todo: We need to both lists on date change, if only because calorie comparison tab requires both updated lists.
+
     private void setFullListOfActivityDaysFromDateSelection(int firstDay, int sizeOfList) {
         for (int i=0; i<sizeOfList; i++) {
             mLongListOfActivityDaysSelected.add(firstDay + i);
@@ -382,12 +383,11 @@ public class DailyStatsAccess {
         return mLongListOfActivityDaysSelected;
     }
 
-    private void setListOfDaysWithPopulatedRows(List<Integer> listToAdd) {
-        this.mListOfActivityDaysWithPopulatedRows = listToAdd;
-    }
-
-    private void setListOfDaysWithEmptyRows(List<Integer> listToAdd) {
-        this.mListOfActivityDaysWithEmptyRows = listToAdd;
+    private void clearAllActivityAndFoodIntegerDayLists () {
+        clearFullListOfActivityDays();
+        clearFullListOfFoodFays();
+        clearPopulateAndUnpopulatedActivityLists();
+        clearPopulatedAndUnpopulatedFoodLists();
     }
 
     public void convertToStringAndSetSingleDay(int day) {
