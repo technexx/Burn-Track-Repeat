@@ -223,12 +223,10 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(singleItemList);
 
         numberOfDaysSelected = 1;
-        logIntegerDayLists();
+        logIntegerAndEntityDayLists();
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
-        List<Integer> populatedDaysOfWeekList = new ArrayList<>();
-
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         int lastDayOfDuration = firstDayOfDuration + 6;
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
@@ -248,11 +246,11 @@ public class DailyStatsAccess {
             }
         }
 
-        setActivityListsForDatabaseObjects(populatedDaysOfWeekList);
-        setFoodListsForDatabaseObjects(populatedDaysOfWeekList);
+        setActivityListsForDatabaseObjects(mListOfActivityDaysWithPopulatedRows);
+        setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = 7;
-        logIntegerDayLists();
+        logIntegerAndEntityDayLists();
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -279,12 +277,10 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = numberOfDaysInMonth;
-        logIntegerDayLists();
+        logIntegerAndEntityDayLists();
     }
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear) {
-        List<Integer> populatedDaysOfYearList = new ArrayList<>();
-
         int firstDayOfDuration = 1;
 //        int lastDayOfDuration = getCurrentDayOfYear();
         int lastDayOfDuration = daysInYear;
@@ -305,12 +301,12 @@ public class DailyStatsAccess {
             }
         }
 
-        setActivityListsForDatabaseObjects(populatedDaysOfYearList);
-        setFoodListsForDatabaseObjects(populatedDaysOfYearList);
+        setActivityListsForDatabaseObjects(mListOfActivityDaysWithPopulatedRows);
+        setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = daysInYear;
 
-        logIntegerDayLists();
+        logIntegerAndEntityDayLists();
     }
 
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
@@ -336,16 +332,22 @@ public class DailyStatsAccess {
 
         numberOfDaysSelected = calendarDayList.size();
 
-        logIntegerDayLists();
+        logIntegerAndEntityDayLists();
     }
 
-    private void logIntegerDayLists() {
+    private void logIntegerAndEntityDayLists() {
         Log.i("testList", "total activity list is " + mLongListOfActivityDaysSelected);
         Log.i("testList", "populated activity list is " + mListOfActivityDaysWithPopulatedRows);
         Log.i("testList", "unpopulated activity list is " + mListOfActivityDaysWithEmptyRows);
-        Log.i("testList", "total food list is " + mLongListOfFoodDaysSelected);
-        Log.i("testList", "populated food list is " + mListOfFoodDaysWithPopulatedRows);
-        Log.i("testList", "unpopulated food list is " + mListOfFoodDaysWithEmptyRows);
+
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            Log.i("testList", "mStats activities in list are " + mStatsForEachActivityList.get(i).getActivity());
+        }
+        Log.i("testList", "mStats activities list  size is " + mStatsForEachActivityList.size());
+
+//        Log.i("testList", "total food list is " + mLongListOfFoodDaysSelected);
+//        Log.i("testList", "populated food list is " + mListOfFoodDaysWithPopulatedRows);
+//        Log.i("testList", "unpopulated food list is " + mListOfFoodDaysWithEmptyRows);
     }
 
     public void setDatabaseListBeingQueried(int typeOfList) {
