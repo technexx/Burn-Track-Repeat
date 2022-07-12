@@ -471,8 +471,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.clearStatsForEachActivityArrayLists();
 
             dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-            dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
-            dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
+            dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
+            dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
             dailyStatsAdapter.notifyDataSetChanged();
 
             dailyStatsAccess.setTotalFoodStringListForSelectedDuration();
@@ -716,10 +716,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
             setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
 
-            long setTime = dailyStatsAccess.getTotalSetTimeVariableForDayHolder();
-            double caloriesBurned = dailyStatsAccess.getTotalCaloriesVariableForDayHolder();
-
-            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(setTime, caloriesBurned);
+            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(newActivityTime, newCaloriesBurned);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -759,8 +756,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setDayHolderTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
         dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-        dailyStatsAccess.setTotalSetTimeVariableForDayHolder();
-        dailyStatsAccess.setTotalCaloriesVariableForDayHolder();
+        dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
+        dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
     }
 
     private void populateActivityEditPopUpWithNewRow() {

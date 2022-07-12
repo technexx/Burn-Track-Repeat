@@ -617,8 +617,6 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesBurnedForSelectedDays(long setTime, double caloriesBurned) {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
-        Log.i("testInsert", "single day boolean is " + mAddingOrEditingSingleDay);
-
         if (mAddingOrEditingSingleDay) {
             listToPullDaysFrom = Collections.singletonList(mDaySelectedFromCalendar);
         } else {
@@ -629,29 +627,16 @@ public class DailyStatsAccess {
             mDayHolder = new DayHolder();
             int daySelected = listToPullDaysFrom.get(i);
 
-            if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
-                for (int k=0; k<mDayHolderList.size(); k++) {
-                    if (mDayHolderList.get(k).getDayId()==daySelected) {
-                        mDayHolder.setDayId(daySelected);
-                    }
-                }
-            }
-
-            mDayHolder.setDayId(mDaySelectedFromCalendar);
+            mDayHolder.setDayId(daySelected);
             mDayHolder.setTotalSetTime(setTime);
             mDayHolder.setTotalCaloriesBurned(caloriesBurned);
 
             cyclesDatabase.cyclesDao().insertDay(mDayHolder);
-
-            if (mDayHolderList.size()>0) {
-                Log.i("testInsert", "dayHolder day Ids are " + mDayHolderList.get(i).getDayId());
-            }
         }
     }
 
     public void setAddingOrEditingSingleDayBoolean(boolean singleDay) {
         this.mAddingOrEditingSingleDay = singleDay;
-        Log.i("testInsert", "single day boolean being set is "+ mAddingOrEditingSingleDay);
     }
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
@@ -798,11 +783,11 @@ public class DailyStatsAccess {
         return false;
     }
 
-    public long getTotalSetTimeVariableForDayHolder() {
+    public long getTotalSetTimeVariableForSelectedDuration() {
         return totalSetTimeForSelectedDuration;
     }
 
-    public void setTotalSetTimeVariableForDayHolder() {
+    public void setTotalSetTimeVariableForSelectedDuration() {
         long valueToReturn = 0;
 
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
@@ -812,11 +797,11 @@ public class DailyStatsAccess {
         totalSetTimeForSelectedDuration = valueToReturn;
     }
 
-    public double getTotalCaloriesVariableForDayHolder() {
+    public double getTotalCaloriesVariableForSelectedDuration() {
         return totalCaloriesForSelectedDuration;
     }
 
-    public void setTotalCaloriesVariableForDayHolder() {
+    public void setTotalCaloriesVariableForSelectedDuration() {
         double valueToReturn = 0;
 
         for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
@@ -832,6 +817,7 @@ public class DailyStatsAccess {
         for (int i=0; i<mDayHolderList.size(); i++) {
             valueToReturn += mDayHolderList.get(i).getTotalSetTime();
         }
+
         return valueToReturn;
     }
 
