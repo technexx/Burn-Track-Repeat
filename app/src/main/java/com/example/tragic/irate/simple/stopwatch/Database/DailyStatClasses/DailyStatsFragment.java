@@ -246,6 +246,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
+            dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
+
             daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
             customCalendarDayList = Collections.singletonList(daySelectedAsACalendarDayObject);
 
@@ -266,6 +268,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     customCalendarDayList = Collections.singletonList(date);
 
                     daySelectedFromCalendar = aggregateDayIdFromCalendar();
+                    dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
                     daySelectedAsACalendarDayObject = date;
 
                     calendarDateChangeLogic();
@@ -292,6 +295,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     calendar.set(daySelectedAsACalendarDayObject.getYear(), daySelectedAsACalendarDayObject.getMonth()-1, daySelectedAsACalendarDayObject.getDay());
 
                     daySelectedFromCalendar = aggregateDayIdFromCalendar();
+                    dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
 
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -515,6 +519,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             numberOfDaysWithActivitiesHasChanged = false;
         }
 
+        dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
+
+        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
+
+        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
+        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
+
         setListsOfDayHolderAndStatsPrimaryIds();
     }
 
@@ -671,7 +682,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setLocalActivityStringVariable(activityToAdd);
             dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
 
-            if (currentStatDurationMode==DAILY_STATS) {
+            if (currentStatDurationMode!=CUSTOM_STATS) {
                 dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
 
                 getActivity().runOnUiThread(()-> {
@@ -775,6 +786,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
+
+        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
+
+        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
+        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
     }
 
     private void launchActivityEditPopUpWithEditTextValuesSet(int position) {
@@ -785,6 +801,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setActivityEditPopUpEditTexts(timeToEditLongValue);
         setActivityEditPopUpTimeRemainingTextView();
         toggleCancelOrDeleteButtonInEditPopUpTextView(EDITING_ACTIVITY);
+
+        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
 
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
@@ -1076,6 +1094,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void onAddingFood() {
         typeOfFoodEditText.requestFocus();
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.cancel);
+
+        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
+
+        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
+        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
+
         caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
@@ -1126,6 +1150,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedEditText.setText(caloriesAsString);
 
         typeOfFoodEditText.requestFocus();
+
+        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
+
         caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 

@@ -49,6 +49,7 @@ public class DailyStatsAccess {
     long totalAggregateTimeForSelectedDuration;
     double totalAggregateCaloriesForSelectedDuration;
 
+    int mDaySelectedFromCalendar;
     int numberOfDaysSelected;
     boolean mAddingOrEditingSingleDay = true;
 
@@ -74,10 +75,6 @@ public class DailyStatsAccess {
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
-
-    int mDatabaseListBeingQueried;
-    int ACTIVITY_LIST = 0;
-    int FOOD_LIST = 1;
 
     List<Integer> mLongListOfActivityDaysSelected;
     List<Integer> mListOfActivityDaysWithPopulatedRows;
@@ -341,6 +338,10 @@ public class DailyStatsAccess {
         logIntegerAndEntityDayLists();
     }
 
+    public void setDaySelectedFromCalendar(int daySelected) {
+        this.mDaySelectedFromCalendar = daySelected;
+    }
+
     private void setFullListOfActivityDaysFromDateSelection(int firstDay, int sizeOfList) {
         for (int i=0; i<sizeOfList; i++) {
             mLongListOfActivityDaysSelected.add(firstDay + i);
@@ -387,7 +388,7 @@ public class DailyStatsAccess {
         mListOfFoodDaysWithEmptyRows.clear();
     }
 
-    private List<Integer> getIntegerListOfDaysSelected() {
+    private List<Integer> getIntegerListOfActivityDaysSelected() {
         return mLongListOfActivityDaysSelected;
     }
 
@@ -491,6 +492,7 @@ public class DailyStatsAccess {
     }
 
     public long getTotalSetTimeFromDayHolderEntity() {
+        Log.i("testTime", "dayHolder time is " + mDayHolder.getTotalSetTime());
         return mDayHolder.getTotalSetTime();
     }
 
@@ -539,10 +541,18 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(long setTime, double caloriesBurned) {
-        for (int i=0; i<mLongListOfActivityDaysSelected.size(); i++) {
+        List<Integer> listToPullDaysFrom = new ArrayList<>();
+
+        if (mAddingOrEditingSingleDay) {
+            listToPullDaysFrom = Collections.singletonList(mDaySelectedFromCalendar);
+        } else {
+            listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
+        }
+
+        for (int i=0; i<listToPullDaysFrom.size(); i++) {
 
             mStatsForEachActivity = new StatsForEachActivity();
-            int daySelected = mLongListOfActivityDaysSelected.get(i);
+            int daySelected = listToPullDaysFrom.get(i);
 
             if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
                 for (int k=0; k<mStatsForEachActivityList.size(); k++) {
@@ -607,6 +617,7 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesBurnedForSelectedDays(int daySelected, long setTime, double caloriesBurned) {
         mDayHolder = new DayHolder();
 
+        //Todo: Defaulting to true w/ out button switches.
         if (mAddingOrEditingSingleDay) {
             mDayHolder.setDayId(daySelected);
             mDayHolder.setTotalSetTime(setTime);
@@ -614,14 +625,24 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertDay(mDayHolder);
         } else {
-            List<Integer> listOfSequentialDaysToInsert = getIntegerListOfDaysSelected();
+            List<Integer> listOfSequentialDaysToInsert = new ArrayList<>(getIntegerListOfActivityDaysSelected());
+            Log.i("testInsert", "seq day list size is " + listOfSequentialDaysToInsert.size());
 
+            //Todo: This will need to be overridden if duplicate, same as StatsForEach.
             for (int i=0; i<listOfSequentialDaysToInsert.size(); i++) {
                 mDayHolder.setDayId(listOfSequentialDaysToInsert.get(i));
                 mDayHolder.setTotalSetTime(setTime);
                 mDayHolder.setTotalCaloriesBurned(caloriesBurned);
 
+                Log.i("testInsert", "inserting " + setTime + " for dayID " + listOfSequentialDaysToInsert.get(i));
+
                 cyclesDatabase.cyclesDao().insertDay(mDayHolder);
+            }
+
+            List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(listOfSequentialDaysToInsert);
+            Log.i("testInsert", "fetched dayHolder list size is " + dayHolderList.size());
+            for (int k=0; k<dayHolderList.size(); k++) {
+                Log.i("testInsert", "times for day " + listOfSequentialDaysToInsert.get(k) + " are " + dayHolderList.get(k).getTotalSetTime());
             }
         }
     }
@@ -889,9 +910,17 @@ public class DailyStatsAccess {
     }
 
     public void insertCaloriesAndEachFoodIntoDatabase() {
-        for (int i=0; i<mLongListOfActivityDaysSelected.size(); i++) {
+        List<Integer> listToPullDaysFrom = new ArrayList<>();
+
+        if (mAddingOrEditingSingleDay) {
+            listToPullDaysFrom = Collections.singletonList(mDaySelectedFromCalendar);
+        } else {
+            listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
+        }
+
+        for (int i=0; i<listToPullDaysFrom.size(); i++) {
             mCaloriesForEachFood = new CaloriesForEachFood();
-            int daySelected = mLongListOfActivityDaysSelected.get(i);
+            int daySelected = listToPullDaysFrom.get(i);
 
             if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
                 for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {

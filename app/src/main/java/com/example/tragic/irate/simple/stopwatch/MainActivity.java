@@ -545,21 +545,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Calories compared tab shows all future dates for calories expended (via bmr).
-      //Todo: Why not do Daily, Year-to-date, and Yearly?
-      //Todo: Can also just add year-to-date in addition to yearly.
+  //Todo: Activity auto adds for weekly/monthly/yearly with no daily/multiple buttons.
+  //Todo: Timer pulling weekly stats for activity.
+      //Todo: Need minutes->hours conversion as well (e.g. 10 hours shows as 600 minutes).
   //Todo: Deleting all days doesn't clear green day color from activity-populated days until we refresh adapter some other way.
-  //Todo: If we're accessing total daily time/calories from Timer via DayHolder, we need to make sure that gets updated when we add/edit/subtract activities in our Stats Fragment (not just get our total values from adding up StatsForEachActivity rows).
-      //Todo: Alternatively, we nix DayHolder and just retrieve from StatsForEach.
   //Todo: For adding/editing multiple days, we'll need to cap the activity time for days w/ not enough time left, or figure out another option.
   //Todo: Total calories row can be 1 more than addition of activities.
-  //Todo: Option to add misc. calories burned?
-  //Todo: Should we include a pounds gained/lost row?
-      //Todo: May want to include a starting/current weight as well.
-      //Todo: Should we move this and calories compared into the separate expanded popUp?
-  //Todo: Can still have tdee option if user doesn't want to track specific activities.
+  //Todo: Option to add misc. calories burned (e.g. user tracks their own).
+  //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
+  //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
 
-  //Todo: Unchanged color settings will not have their color "selected" within popUp Settings menu.
+  //Todo: If we're accessing total daily time/calories from Timer via DayHolder, we need to make sure that gets updated when we add/edit/subtract activities in our Stats Fragment (not just get our total values from adding up StatsForEachActivity rows).
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
@@ -3700,9 +3696,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
-
-    logSelectedCyclePositionAndItsValues("Timer Launch");
-    logAllCyclePositionsAndTheirValues("Timer Launch");
   }
 
   private String getCurrentDateAsSlashFormattedString() {
