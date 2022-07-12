@@ -3649,13 +3649,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.notifyDataSetChanged();
     }
 
-    if (isNewCycle) {
-      saveAddedOrEditedCycleASyncRunnable();
-    } else {
-      retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-    }
-
     AsyncTask.execute(()-> {
+      if (isNewCycle) {
+        saveAddedOrEditedCycleASyncRunnable();
+      } else {
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      }
+
       if (cycleLaunchedFromEditPopUp) {
         if (addTDEEfirstMainTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
