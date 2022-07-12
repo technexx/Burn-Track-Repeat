@@ -614,41 +614,44 @@ public class DailyStatsAccess {
         }
     }
 
-    public void insertTotalTimesAndCaloriesBurnedForSelectedDays(int daySelected, long setTime, double caloriesBurned) {
-        mDayHolder = new DayHolder();
+    public void insertTotalTimesAndCaloriesBurnedForSelectedDays(long setTime, double caloriesBurned) {
+        List<Integer> listToPullDaysFrom = new ArrayList<>();
 
-        //Todo: Defaulting to true w/ out button switches.
+        Log.i("testInsert", "single day boolean is " + mAddingOrEditingSingleDay);
+
         if (mAddingOrEditingSingleDay) {
-            mDayHolder.setDayId(daySelected);
+            listToPullDaysFrom = Collections.singletonList(mDaySelectedFromCalendar);
+        } else {
+            listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
+        }
+
+        for (int i=0; i<listToPullDaysFrom.size(); i++) {
+            mDayHolder = new DayHolder();
+            int daySelected = listToPullDaysFrom.get(i);
+
+            if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
+                for (int k=0; k<mDayHolderList.size(); k++) {
+                    if (mDayHolderList.get(k).getDayId()==daySelected) {
+                        mDayHolder.setDayId(daySelected);
+                    }
+                }
+            }
+
+            mDayHolder.setDayId(mDaySelectedFromCalendar);
             mDayHolder.setTotalSetTime(setTime);
             mDayHolder.setTotalCaloriesBurned(caloriesBurned);
 
             cyclesDatabase.cyclesDao().insertDay(mDayHolder);
-        } else {
-            List<Integer> listOfSequentialDaysToInsert = new ArrayList<>(getIntegerListOfActivityDaysSelected());
-            Log.i("testInsert", "seq day list size is " + listOfSequentialDaysToInsert.size());
 
-            //Todo: This will need to be overridden if duplicate, same as StatsForEach.
-            for (int i=0; i<listOfSequentialDaysToInsert.size(); i++) {
-                mDayHolder.setDayId(listOfSequentialDaysToInsert.get(i));
-                mDayHolder.setTotalSetTime(setTime);
-                mDayHolder.setTotalCaloriesBurned(caloriesBurned);
-
-                Log.i("testInsert", "inserting " + setTime + " for dayID " + listOfSequentialDaysToInsert.get(i));
-
-                cyclesDatabase.cyclesDao().insertDay(mDayHolder);
-            }
-
-            List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(listOfSequentialDaysToInsert);
-            Log.i("testInsert", "fetched dayHolder list size is " + dayHolderList.size());
-            for (int k=0; k<dayHolderList.size(); k++) {
-                Log.i("testInsert", "times for day " + listOfSequentialDaysToInsert.get(k) + " are " + dayHolderList.get(k).getTotalSetTime());
+            if (mDayHolderList.size()>0) {
+                Log.i("testInsert", "dayHolder day Ids are " + mDayHolderList.get(i).getDayId());
             }
         }
     }
 
     public void setAddingOrEditingSingleDayBoolean(boolean singleDay) {
         this.mAddingOrEditingSingleDay = singleDay;
+        Log.i("testInsert", "single day boolean being set is "+ mAddingOrEditingSingleDay);
     }
 
     public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {

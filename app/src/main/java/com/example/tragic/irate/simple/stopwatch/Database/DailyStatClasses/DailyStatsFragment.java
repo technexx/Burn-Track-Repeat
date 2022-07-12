@@ -342,14 +342,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         addOrEditActivitiesForCurrentDayOnlyTextView.setOnClickListener(v-> {
             SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = SINGLE_DAY;
-            setSingleDaydAddOrEditBooleanInStatsAccess(true);
+            dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
         });
 
         addOrEditActivitiesForAllSelectedDaysTextView.setOnClickListener(v-> {
             SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
-            setSingleDaydAddOrEditBooleanInStatsAccess(false);
+            dailyStatsAccess.setAddingOrEditingSingleDayBoolean(false);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, false);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, true);
         });
@@ -365,7 +365,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             } else {
                 displayPopUpFoMultipleAddOrEditConfirmation();
             }
-
         });
 
         confirmMultipleAddOrEditButton.setOnClickListener(v-> {
@@ -391,14 +390,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         addOrEditFoodForCurrentDayOnlyTextView.setOnClickListener(v-> {
             SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = SINGLE_DAY;
-            setSingleDaydAddOrEditBooleanInStatsAccess(true);
+            dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForCurrentDayOnlyTextView, true);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForAllSelectedDaysTextView, false);
         });
 
         addOrEditFoodForAllSelectedDaysTextView.setOnClickListener(v-> {
             SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
-            setSingleDaydAddOrEditBooleanInStatsAccess(true);
+            dailyStatsAccess.setAddingOrEditingSingleDayBoolean(false);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForCurrentDayOnlyTextView, false);
             setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForAllSelectedDaysTextView, true);
         });
@@ -520,11 +519,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
-
-        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
-
-        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
-        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
 
         setListsOfDayHolderAndStatsPrimaryIds();
     }
@@ -725,7 +719,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long setTime = dailyStatsAccess.getTotalSetTimeVariableForDayHolder();
             double caloriesBurned = dailyStatsAccess.getTotalCaloriesVariableForDayHolder();
 
-            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(daySelectedFromCalendar, setTime, caloriesBurned);
+            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(setTime, caloriesBurned);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -851,10 +845,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             textView.setAlpha(0.3f);
             textView.setTypeface(Typeface.DEFAULT);
         }
-    }
-
-    private void setSingleDaydAddOrEditBooleanInStatsAccess(boolean singleDay) {
-        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(singleDay);
     }
 
     private long newActivityTimeFromEditText(int addingOrEditingActivity) {
@@ -1094,8 +1084,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void onAddingFood() {
         typeOfFoodEditText.requestFocus();
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.cancel);
-
-        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
 
         setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
         setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
