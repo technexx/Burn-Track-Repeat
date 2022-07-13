@@ -80,6 +80,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.Daily
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
@@ -117,6 +118,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View mainView;
   View actionBarView;
   Calendar calendar;
+  LongToStringConverters longToStringConverters;
 
   ImageButton fab;
   ImageButton stopWatchLaunchButton;
@@ -545,14 +547,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Add activity in Stats Frag animation seems to have stopped.
   //Todo: "Time remaining" when adding activity can be 1 second off from activity total.
-  //Todo: Some issues w/ activity stats textView iterations in Timer.
-  //Todo: Timer pulling weekly stats for activity.
-      //Todo: Need minutes->hours conversion as well (e.g. 10 hours shows as 600 minutes).
-  //Todo: For adding/editing multiple days, we'll need to cap the activity time for days w/ not enough time left, or figure out another option.
-  //Todo: ProgressBar not showing for Timer.
   //Todo: Total calories row can be 1 more than addition of activities.
+  //Todo: Some issues w/ activity stats textView iterations in Timer.
+  //Todo: Need minutes-> hours conversion in Timer (e.g. 10 hours shows as 600 minutes).
   //Todo: Option to add misc. calories burned (e.g. user tracks their own).
   //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
   //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
@@ -1368,6 +1366,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     changeSettingsValues = new ChangeSettingsValues();
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
     dailyStatsAccess = new DailyStatsAccess(getApplicationContext());
+    longToStringConverters = new LongToStringConverters();
 
     mHandler = new Handler();
     mSavingCycleHandler = new Handler();
@@ -3868,11 +3867,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
     }
-
-//    if (mode == 3) {
-//      totalWorkTimeForCurrentDayInMillis = dailyStatsAccess.getTotalWorkTimeFromDayHolderEntity();
-//      totalRestTimeForCurrentDayInMillis = dailyStatsAccess.getTotalRestTimeFromDayHolderEntity();
-//    }
   }
 
   private void setCyclesCompletedTextView() {
@@ -3902,7 +3896,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
 
     dailyTotalTimeForSinglefirstMainTextViewHeader.setText(R.string.total_daily_time_for_single_activity);
-    dailyTotalTimeForSinglefirstMainTextView.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis)));
+    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertSecondsForStatDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis));
 
     dailyTotalCaloriesForSinglefirstMainTextViewHeader.setText(R.string.total_daily_calories_for_single_activity);
     dailyTotalCaloriesForSinglefirstMainTextView.setText(formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
@@ -4079,8 +4073,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-
-
   private Runnable infinityRunnableForSets() {
     return new Runnable() {
       @Override
@@ -4139,13 +4131,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setInitialTextSizeForRounds(setMillis);
     syncTimerTextViewStringsForBeginningOfRounds();
 
-    Log.i("testProg", "prog bar value from obj animator before timer start is " + objectAnimator.getAnimatedValue());
-
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
-        Log.i("testProg", "prog bar value from obj animator is " + objectAnimator.getAnimatedValue());
-
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));

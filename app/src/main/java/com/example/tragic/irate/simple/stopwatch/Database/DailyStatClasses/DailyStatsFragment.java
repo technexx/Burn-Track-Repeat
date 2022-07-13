@@ -682,6 +682,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateActivityEditPopUpWithNewRow();
                 });
             }
+            toggleEditingForMultipleDaysTextViews();
         });
     }
 
@@ -732,6 +733,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void activityEditItemSelected(int position) {
         this.mPositionToEdit = position;
         launchActivityEditPopUpWithEditTextValuesSet(position);
+        toggleEditingForMultipleDaysTextViews();
     }
 
     private void editActivityStatsInDatabase() {
@@ -762,8 +764,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         activityInEditPopUpTextView.setText(activityToAdd);
         zeroOutActivityEditPopUpEditTexts();
-
-        toggleEditingForMultipleDaysTextViews();
     }
 
     private void replaceActivityAddPopUpWithEmptyEditPopUp() {
@@ -773,11 +773,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         toggleCancelOrDeleteButtonInEditPopUpTextView(ADDING_ACTIVITY);
 
         tdeeEditTextHours.requestFocus();
-        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
+
+        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0));
 
         dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
-
-        toggleEditingForMultipleDaysTextViews();
     }
 
     private void toggleEditingForMultipleDaysTextViews() {
@@ -1354,6 +1353,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 .commit();
     }
 
+    private void instantiateActivityAdditionSpinnersAndAdapters() {
+        tdeeCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_category_spinner_layout, tdeeChosenActivitySpinnerValues.category_list);
+        tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
+
+        tdeeSubCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_sub_category_spinner_layout);
+        tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+
+        tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
+    }
+
     private void instantiateAddPopUpViews() {
         addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_stats_fragment, null);
         addTdeePopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
@@ -1376,21 +1386,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private void instantiateActivityAdditionSpinnersAndAdapters() {
-        tdeeCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_category_spinner_layout, tdeeChosenActivitySpinnerValues.category_list);
-        tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
-
-        tdeeSubCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_sub_category_spinner_layout);
-        tdeeSubCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        tdee_sub_category_spinner.setAdapter(tdeeSubCategoryAdapter);
-    }
-
     private void instantiateActivityEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+
         editActivityPopUpLayout = tdeeEditView.findViewById(R.id.edit_activity_popUp_layout);
 
         activityInEditPopUpTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
