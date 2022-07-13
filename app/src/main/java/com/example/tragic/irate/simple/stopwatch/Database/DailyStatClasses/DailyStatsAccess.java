@@ -627,6 +627,8 @@ public class DailyStatsAccess {
             mDayHolder = new DayHolder();
             int daySelected = listToPullDaysFrom.get(i);
 
+
+
             mDayHolder.setDayId(daySelected);
             mDayHolder.setTotalSetTime(setTime);
             mDayHolder.setTotalCaloriesBurned(caloriesBurned);

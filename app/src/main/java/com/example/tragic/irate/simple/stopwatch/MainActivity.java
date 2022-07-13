@@ -545,10 +545,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: ProgressBar not showing for Timer.
   //Todo: Activity auto adds for weekly/monthly/yearly with no daily/multiple buttons.
   //Todo: Timer pulling weekly stats for activity.
       //Todo: Need minutes->hours conversion as well (e.g. 10 hours shows as 600 minutes).
-  //Todo: Deleting all days doesn't clear green day color from activity-populated days until we refresh adapter some other way.
   //Todo: For adding/editing multiple days, we'll need to cap the activity time for days w/ not enough time left, or figure out another option.
   //Todo: Total calories row can be 1 more than addition of activities.
   //Todo: Option to add misc. calories burned (e.g. user tracks their own).
