@@ -546,6 +546,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: ProgressBar not showing for Timer.
+  //Todo: Some issues w/ activity stats textView iterations in Timer.
   //Todo: Activity auto adds for weekly/monthly/yearly with no daily/multiple buttons.
   //Todo: Timer pulling weekly stats for activity.
       //Todo: Need minutes->hours conversion as well (e.g. 10 hours shows as 600 minutes).
@@ -1378,6 +1379,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
     objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+    Log.i("testProg", "prog bar value on activity launch is " + objectAnimator.getAnimatedValue());
+
 
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
@@ -3615,8 +3618,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTimerLaunchViews(cycleLaunchedFromEditPopUp);
 
     AsyncTask.execute(()-> {
-      if (cycleLaunchedFromEditPopUp) {
+      if (isNewCycle) {
         saveAddedOrEditedCycleASyncRunnable();
+      } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
@@ -4074,54 +4078,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void instantiateAndStartObjectAnimator(long duration) {
-    if (mode==1) {
-      objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
-      objectAnimator.setInterpolator(new LinearInterpolator());
-      objectAnimator.setDuration(duration);
-      objectAnimator.start();
-    }
-    if (mode==3) {
-      objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
-      objectAnimatorPom.setInterpolator(new LinearInterpolator());
-      objectAnimatorPom.setDuration(duration);
-      objectAnimatorPom.start();
-    }
-  }
 
-  private void startObjectAnimatorAndTotalCycleTimeCounters() {
-    switch (mode) {
-      case 1:
-        if (typeOfRound.get(currentRound).equals(1)) {
-          if (currentProgressBarValue==maxProgress) {
-            timerIsPaused = false;
-            instantiateAndStartObjectAnimator(setMillis);
-          } else {
-            setMillis = setMillisUntilFinished;
-            if (objectAnimator != null) objectAnimator.resume();
-          }
-        } else if (typeOfRound.get(currentRound).equals(3)) {
-          if (currentProgressBarValue==maxProgress) {
-            timerIsPaused = false;
-            instantiateAndStartObjectAnimator(breakMillis);
-          } else {
-            breakMillis = breakMillisUntilFinished;
-            if (objectAnimator != null) objectAnimator.resume();
-          }
-        }
-        break;
-      case 3:
-        if (currentProgressBarValue==maxProgress){
-          timerIsPaused = false;
-          pomMillis = pomValuesTime.get(pomDotCounter);
-          instantiateAndStartObjectAnimator(pomMillis);
-        } else {
-          pomMillis = pomMillisUntilFinished;
-          if (objectAnimatorPom != null) objectAnimatorPom.resume();
-        }
-        break;
-    }
-  }
 
   private Runnable infinityRunnableForSets() {
     return new Runnable() {
@@ -4181,6 +4138,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setInitialTextSizeForRounds(setMillis);
     syncTimerTextViewStringsForBeginningOfRounds();
 
+    Log.i("testProg", "prog bar value before timer start is " + currentProgressBarValue);
+    Log.i("testProg", "prog bar value from obj animator before timer start is " + objectAnimator.getAnimatedValue());
+
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
@@ -4188,6 +4148,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
         if (setMillis < 500) timerDisabled = true;
+
+        Log.i("testProg", "prog bar value from obj animator is " + objectAnimator.getAnimatedValue());
+        Log.i("testProg", "prog bar value is " + currentProgressBarValue);
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         updateStatsInSyncWithMainTimer(timerRunnableDelay);
@@ -4590,7 +4553,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void pauseAndResumeTimer(int pausing) {
     if (!timerDisabled) {
-
       if (!timerEnded) {
         if (pausing == PAUSING_TIMER) {
           timerIsPaused = true;
@@ -4649,6 +4611,56 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         resetTimer();
       }
+    }
+  }
+
+  private void startObjectAnimatorAndTotalCycleTimeCounters() {
+    switch (mode) {
+      case 1:
+        if (typeOfRound.get(currentRound).equals(1)) {
+          if (currentProgressBarValue==maxProgress) {
+            Log.i("testProg", "maxProgress is " + maxProgress);
+            timerIsPaused = false;
+            instantiateAndStartObjectAnimator(setMillis);
+          } else {
+            setMillis = setMillisUntilFinished;
+            if (objectAnimator != null) objectAnimator.resume();
+          }
+        } else if (typeOfRound.get(currentRound).equals(3)) {
+          if (currentProgressBarValue==maxProgress) {
+            timerIsPaused = false;
+            instantiateAndStartObjectAnimator(breakMillis);
+          } else {
+            breakMillis = breakMillisUntilFinished;
+            if (objectAnimator != null) objectAnimator.resume();
+          }
+        }
+        break;
+      case 3:
+        if (currentProgressBarValue==maxProgress){
+          timerIsPaused = false;
+          pomMillis = pomValuesTime.get(pomDotCounter);
+          instantiateAndStartObjectAnimator(pomMillis);
+        } else {
+          pomMillis = pomMillisUntilFinished;
+          if (objectAnimatorPom != null) objectAnimatorPom.resume();
+        }
+        break;
+    }
+  }
+
+  private void instantiateAndStartObjectAnimator(long duration) {
+    if (mode==1) {
+      objectAnimator = ObjectAnimator.ofInt(progressBar, "progress",  10000, 5000);
+      objectAnimator.setInterpolator(new LinearInterpolator());
+      objectAnimator.setDuration(30000);
+      objectAnimator.start();
+    }
+    if (mode==3) {
+      objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
+      objectAnimatorPom.setInterpolator(new LinearInterpolator());
+      objectAnimatorPom.setDuration(duration);
+      objectAnimatorPom.start();
     }
   }
 
