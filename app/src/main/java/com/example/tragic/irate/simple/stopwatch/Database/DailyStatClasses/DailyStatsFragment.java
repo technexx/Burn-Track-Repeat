@@ -525,8 +525,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setStatDurationViews(int mode) {
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
-        toggleSingleOrMultipleDayInsertionTextViewVisibilities(true);
-        toggleSingleOrMultipleFoodInsertionTextViewVisibilities(true);
         setEditActivityPopUpButtonsLayoutParams(false);
 
         if (mode==DAILY_STATS) {
@@ -553,9 +551,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
             convertAndSetDateRangeStringOnTextView();
-            toggleSingleOrMultipleDayInsertionTextViewVisibilities(false);
-            toggleSingleOrMultipleFoodInsertionTextViewVisibilities(false);
-            setEditActivityPopUpButtonsLayoutParams(true);
         }
 
         calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
@@ -767,6 +762,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         activityInEditPopUpTextView.setText(activityToAdd);
         zeroOutActivityEditPopUpEditTexts();
+
+        toggleEditingForMultipleDaysTextViews();
     }
 
     private void replaceActivityAddPopUpWithEmptyEditPopUp() {
@@ -780,8 +777,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
 
-        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
-        setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
+        toggleEditingForMultipleDaysTextViews();
+    }
+
+    private void toggleEditingForMultipleDaysTextViews() {
+        if (currentStatDurationMode==CUSTOM_STATS && dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+            setEditActivityPopUpButtonsLayoutParams(true);
+            toggleSingleOrMultipleDayInsertionTextViewVisibilities(true);
+            toggleSingleOrMultipleFoodInsertionTextViewVisibilities(true);
+            toggleUnassignedTimeTextViewVisibility (false);
+
+            setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
+            setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
+        } else {
+            setEditActivityPopUpButtonsLayoutParams(false);
+            toggleSingleOrMultipleDayInsertionTextViewVisibilities(false);
+            toggleSingleOrMultipleFoodInsertionTextViewVisibilities(false);
+            toggleUnassignedTimeTextViewVisibility (true);
+        }
     }
 
     private void launchActivityEditPopUpWithEditTextValuesSet(int position) {
@@ -814,23 +827,31 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void toggleSingleOrMultipleDayInsertionTextViewVisibilities(boolean areInvisible) {
-        if (areInvisible) {
-            addOrEditActivitiesForCurrentDayOnlyTextView.setVisibility(View.GONE);
-            addOrEditActivitiesForAllSelectedDaysTextView.setVisibility(View.GONE);
-        } else {
+    private void toggleSingleOrMultipleDayInsertionTextViewVisibilities(boolean isVisible) {
+        if (isVisible) {
             addOrEditActivitiesForCurrentDayOnlyTextView.setVisibility(View.VISIBLE);
             addOrEditActivitiesForAllSelectedDaysTextView.setVisibility(View.VISIBLE);
+        } else {
+            addOrEditActivitiesForCurrentDayOnlyTextView.setVisibility(View.GONE);
+            addOrEditActivitiesForAllSelectedDaysTextView.setVisibility(View.GONE);
         }
     }
 
-    private void toggleSingleOrMultipleFoodInsertionTextViewVisibilities(boolean areInvisible) {
-        if (areInvisible) {
-            addOrEditFoodForCurrentDayOnlyTextView.setVisibility(View.GONE);
-            addOrEditFoodForAllSelectedDaysTextView.setVisibility(View.GONE);
-        } else {
+    private void toggleSingleOrMultipleFoodInsertionTextViewVisibilities(boolean isVisible) {
+        if (isVisible) {
             addOrEditFoodForCurrentDayOnlyTextView.setVisibility(View.VISIBLE);
             addOrEditFoodForAllSelectedDaysTextView.setVisibility(View.VISIBLE);
+        } else {
+            addOrEditFoodForCurrentDayOnlyTextView.setVisibility(View.GONE);
+            addOrEditFoodForAllSelectedDaysTextView.setVisibility(View.GONE);
+        }
+    }
+
+    private void toggleUnassignedTimeTextViewVisibility(boolean isVisible) {
+        if (isVisible) {
+            unassignedTimeInEditPopUpTextView.setVisibility(View.VISIBLE);
+        } else {
+            unassignedTimeInEditPopUpTextView.setVisibility(View.GONE);
         }
     }
 
@@ -881,8 +902,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         numberOfDaysWithActivitiesHasChanged = true;
 
         AsyncTask.execute(() -> {
-//            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
-//            dailyStatsAccess.assignStatsForEachActivityEntityForSinglePosition(position);
             dailyStatsAccess.deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(position);
 
             populateListsAndTextViewsFromEntityListsInDatabase();

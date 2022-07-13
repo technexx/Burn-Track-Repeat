@@ -545,12 +545,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: ProgressBar not showing for Timer.
+  //Todo: Add activity in Stats Frag animation seems to have stopped.
+  //Todo: "Time remaining" when adding activity can be 1 second off from activity total.
   //Todo: Some issues w/ activity stats textView iterations in Timer.
-  //Todo: Activity auto adds for weekly/monthly/yearly with no daily/multiple buttons.
   //Todo: Timer pulling weekly stats for activity.
       //Todo: Need minutes->hours conversion as well (e.g. 10 hours shows as 600 minutes).
   //Todo: For adding/editing multiple days, we'll need to cap the activity time for days w/ not enough time left, or figure out another option.
+  //Todo: ProgressBar not showing for Timer.
   //Todo: Total calories row can be 1 more than addition of activities.
   //Todo: Option to add misc. calories burned (e.g. user tracks their own).
   //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
@@ -1377,8 +1378,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles = new Cycles();
     pomCycles = new PomCycles();
 
-    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
-    objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", (int) maxProgress, 0);
+    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress",  maxProgress, 0);
+    objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
     Log.i("testProg", "prog bar value on activity launch is " + objectAnimator.getAnimatedValue());
 
 
@@ -4138,26 +4139,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setInitialTextSizeForRounds(setMillis);
     syncTimerTextViewStringsForBeginningOfRounds();
 
-    Log.i("testProg", "prog bar value before timer start is " + currentProgressBarValue);
     Log.i("testProg", "prog bar value from obj animator before timer start is " + objectAnimator.getAnimatedValue());
 
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
+        Log.i("testProg", "prog bar value from obj animator is " + objectAnimator.getAnimatedValue());
+
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
         if (setMillis < 500) timerDisabled = true;
-
-        Log.i("testProg", "prog bar value from obj animator is " + objectAnimator.getAnimatedValue());
-        Log.i("testProg", "prog bar value is " + currentProgressBarValue);
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         updateStatsInSyncWithMainTimer(timerRunnableDelay);
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis);
         dotDraws.reDraw();
-        setNotificationValues();;
+        setNotificationValues();
       }
 
       @Override
@@ -4619,7 +4618,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
           if (currentProgressBarValue==maxProgress) {
-            Log.i("testProg", "maxProgress is " + maxProgress);
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(setMillis);
           } else {
@@ -4651,9 +4649,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void instantiateAndStartObjectAnimator(long duration) {
     if (mode==1) {
-      objectAnimator = ObjectAnimator.ofInt(progressBar, "progress",  10000, 5000);
+      objectAnimator = ObjectAnimator.ofInt(progressBar, "progress",maxProgress, 0);
       objectAnimator.setInterpolator(new LinearInterpolator());
-      objectAnimator.setDuration(30000);
+      objectAnimator.setDuration(duration);
       objectAnimator.start();
     }
     if (mode==3) {
@@ -4768,7 +4766,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void getTimerVariablesForEachMode() {
     if (mode==1) {
-      currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 0);
+      currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 10000);
       timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
       positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
       timerIsPaused = sharedPreferences.getBoolean("modeOneTimerPaused", false);
@@ -4777,7 +4775,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode==3) {
-      currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 0);
+      currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 10000);
       timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
       positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
       timerIsPaused = sharedPreferences.getBoolean("modeThreeTimerPaused", false);

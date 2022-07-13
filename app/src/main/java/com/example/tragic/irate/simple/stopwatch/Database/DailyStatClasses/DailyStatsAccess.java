@@ -338,6 +338,10 @@ public class DailyStatsAccess {
         logIntegerAndEntityDayLists();
     }
 
+    public int getNumberOfDaysSelected() {
+        return numberOfDaysSelected;
+    }
+
     public void setDaySelectedFromCalendar(int daySelected) {
         this.mDaySelectedFromCalendar = daySelected;
     }
@@ -785,10 +789,6 @@ public class DailyStatsAccess {
         return false;
     }
 
-    public long getTotalSetTimeVariableForSelectedDuration() {
-        return totalSetTimeForSelectedDuration;
-    }
-
     public void setTotalSetTimeVariableForSelectedDuration() {
         long valueToReturn = 0;
 
@@ -797,10 +797,6 @@ public class DailyStatsAccess {
         }
 
         totalSetTimeForSelectedDuration = valueToReturn;
-    }
-
-    public double getTotalCaloriesVariableForSelectedDuration() {
-        return totalCaloriesForSelectedDuration;
     }
 
     public void setTotalCaloriesVariableForSelectedDuration() {
