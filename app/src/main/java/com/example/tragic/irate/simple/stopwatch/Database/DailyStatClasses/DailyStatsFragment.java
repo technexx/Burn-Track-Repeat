@@ -741,12 +741,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
             double newCaloriesBurned = newCaloriesBurned();
 
+            //Todo: Need to update DayHolder.
             dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDays(mPositionToEdit, newActivityTime, newCaloriesBurned);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
+                tdeeEditPopUpWindow.dismiss();
             });
         });
     }

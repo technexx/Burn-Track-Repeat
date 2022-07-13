@@ -547,6 +547,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Editing activity while timer is active will get that value overriden by the old one being used/saved in timer.
+  //Todo: DayHolder not updating on Edit.
+
   //Todo: "Time remaining" when adding activity can be 1 second off from activity total.
   //Todo: Total calories row can be 1 more than addition of activities.
   //Todo: Some issues w/ activity stats textView iterations in Timer.
@@ -554,6 +557,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Option to add misc. calories burned (e.g. user tracks their own).
   //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
   //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
+  //Todo: Current day in calendar should have be colored black.
 
   //Todo: If we're accessing total daily time/calories from Timer via DayHolder, we need to make sure that gets updated when we add/edit/subtract activities in our Stats Fragment (not just get our total values from adding up StatsForEachActivity rows).
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
