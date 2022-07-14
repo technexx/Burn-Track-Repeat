@@ -392,10 +392,6 @@ public class DailyStatsAccess {
         mListOfFoodDaysWithEmptyRows.clear();
     }
 
-    private List<Integer> getIntegerListOfActivityDaysSelected() {
-        return mLongListOfActivityDaysSelected;
-    }
-
     private void clearAllActivityAndFoodIntegerDayLists () {
         clearFullListOfActivityDays();
         clearFullListOfFoodFays();
@@ -636,8 +632,13 @@ public class DailyStatsAccess {
         }
     }
 
-    public void setDayHolderEntityFromPosition(int position) {
-        mDayHolder = mDayHolderList.get(position);
+    public void setDayHolderEntityFromStatsForEachActivityDaySelection(int daySelected) {
+        for (int i=0; i<mDayHolderList.size(); i++) {
+            if (mDayHolderList.get(i).getDayId()==daySelected) {
+                mDayHolder = mDayHolderList.get(i);
+                return;
+            }
+        }
     }
 
     public void updateTotalTimesAndCaloriesForSelectedDay(long setTime, double caloriesBurned) {
@@ -797,6 +798,8 @@ public class DailyStatsAccess {
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
         }
+
+        Log.i("testUpdate", "set time LIST total being set is " + totalSetTimeForSelectedDuration);
 
         totalSetTimeForSelectedDuration = valueToReturn;
     }

@@ -751,7 +751,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         numberOfDaysWithActivitiesHasChanged = true;
     }
 
-
+    //Todo: This collection runs in populateLists...() and should update the aggregate list.
     private void setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
         dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
         dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
@@ -774,6 +774,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
             dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
+            Log.i("testUpdate", "set time BEFORE is " + dailyStatsAccess.getTotalSetTimeForSelectedDuration());
+            Log.i("testUpdate", "calories BEFORE are " + dailyStatsAccess.getTotalCalorieBurnedForSelectedDuration());
+
             long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
             double newCaloriesBurned = newCaloriesBurned();
 
@@ -781,10 +784,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
+            //Todo: These should be getting set from above.
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalSetTimeForSelectedDuration();
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCalorieBurnedForSelectedDuration();
 
-            dailyStatsAccess.setDayHolderEntityFromPosition(mPositionToEdit);
+            Log.i("testUpdate", "set time AFTER is " + totalSetTimeFromAllActivities);
+            Log.i("testUpdate", "calories AFTER are " + totalCaloriesBurnedFromAllActivities);
+
+            //Todo: Need the DayHolder instance tied to StatsForEach's uniqueId fetched, not the same position we've retrieved it from.
+            dailyStatsAccess.setDayHolderEntityFromStatsForEachActivityDaySelection(mPositionToEdit);
             dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
             populateListsAndTextViewsFromEntityListsInDatabase();

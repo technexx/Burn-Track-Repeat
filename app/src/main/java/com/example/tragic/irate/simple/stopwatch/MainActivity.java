@@ -547,6 +547,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: DayHolder doesn't keep up when editing an activity.
   //Todo: Toast + return if food already exists, or allow a duplicate. Do not want to overwrite automatically as it currently does.
 
   //Todo: "Time remaining" when adding activity can be 1 second off from activity total.
