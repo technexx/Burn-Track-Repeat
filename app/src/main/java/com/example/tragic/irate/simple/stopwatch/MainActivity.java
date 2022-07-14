@@ -1965,12 +1965,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setAndUpdateDayHolderValuesInDatabase() {
     dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-
-    dailyStatsAccess.setTotalSetTimeFromDayHolderEntity(totalSetTimeForCurrentDayInMillis);
-    dailyStatsAccess.setTotalBreakTimeFromDayHolderEntity(totalBreakTimeForCurrentDayInMillis);
-    dailyStatsAccess.setTotalCaloriesBurnedFromDayHolderEntity(totalCaloriesBurnedForCurrentDay);
-
-    dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase();
+    dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay );
   }
 
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
@@ -1984,12 +1979,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
-    dailyStatsAccess.setStringForSelectedActivityInStatsForEachActivityEntity(dailyStatsAccess.getActivityString());
-    dailyStatsAccess.setTotalSetTimeForSelectedActivity(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    dailyStatsAccess.setTotalBreakTimeForSelectedActivity(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-    dailyStatsAccess.setTotalCaloriesBurnedForSelectedActivity(totalCaloriesBurnedForSpecificActivityForCurrentDay);
-
-    dailyStatsAccess.updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable();
+    dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 
   private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
@@ -2458,6 +2448,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTypeOFMenu(int menuType) {
     mMenuType = menuType;
   }
+
   private void launchGlobalSettingsFragment() {
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
       mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentInFromLeft);

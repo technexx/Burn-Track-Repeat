@@ -745,14 +745,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
             double newCaloriesBurned = newCaloriesBurned();
 
-            dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(mPositionToEdit, newActivityTime, newCaloriesBurned);
+            dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
+            dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(newActivityTime, newCaloriesBurned);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalSetTimeForSelectedDuration();
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCalorieBurnedForSelectedDuration();
 
-            dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(mPositionToEdit, totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
+            dailyStatsAccess.setDayHolderEntityFromPosition(mPositionToEdit);
+            dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 

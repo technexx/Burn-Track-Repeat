@@ -491,33 +491,16 @@ public class DailyStatsAccess {
         this.mOldDayHolderId = oldId;
     }
 
-    public void setTotalSetTimeFromDayHolderEntity(long totalSetTime) {
-        mDayHolder.setTotalSetTime(totalSetTime);
-    }
-
     public long getTotalSetTimeFromDayHolderEntity() {
-        Log.i("testTime", "dayHolder time is " + mDayHolder.getTotalSetTime());
         return mDayHolder.getTotalSetTime();
-    }
-
-    public void setTotalBreakTimeFromDayHolderEntity(long totalBreakTime) {
-        mDayHolder.setTotalBreakTime(totalBreakTime);
     }
 
     public long getTotalBreakTimeFromDayHolderEntity() {
         return mDayHolder.getTotalBreakTime();
     }
 
-    public void setTotalCaloriesBurnedFromDayHolderEntity(double totalCaloriesBurned) {
-        mDayHolder.setTotalCaloriesBurned(totalCaloriesBurned);
-    }
-
     public double getTotalCaloriesBurnedFromDayHolderEntity() {
         return mDayHolder.getTotalCaloriesBurned();
-    }
-
-    public void updateTotalTimesAndCaloriesBurnedForCurrentDayFromDatabase() {
-        cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }
 
     public void deleteMultipleDayHolderEntries(List<Long> listOfEntries) {
@@ -580,6 +563,17 @@ public class DailyStatsAccess {
         }
     }
 
+    public void setStatsForEachActivityEntityFromPosition(int position) {
+        mStatsForEachActivity = mStatsForEachActivityList.get(position);
+    }
+
+    public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(long setTime, double caloriesBurned) {
+        mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+        cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+    }
+
     public void deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(int position) {
         if (mAddingOrEditingSingleDay) {
             mStatsForEachActivity = mStatsForEachActivityList.get(position);
@@ -594,14 +588,6 @@ public class DailyStatsAccess {
                 }
             }
         }
-    }
-
-    public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(int position, long setTime, double caloriesBurned) {
-        mStatsForEachActivity = mStatsForEachActivityList.get(position);
-        mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
-        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
-
-        cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
 
     public void insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(int daySelected) {
@@ -642,8 +628,11 @@ public class DailyStatsAccess {
         }
     }
 
-    public void updateTotalTimesAndCaloriesForSelectedDay(int position, long setTime, double caloriesBurned) {
+    public void setDayHolderEntityFromPosition(int position) {
         mDayHolder = mDayHolderList.get(position);
+    }
+
+    public void updateTotalTimesAndCaloriesForSelectedDay(long setTime, double caloriesBurned) {
         mDayHolder.setTotalSetTime(setTime);
         mDayHolder.setTotalCaloriesBurned(caloriesBurned);
 
@@ -652,10 +641,6 @@ public class DailyStatsAccess {
 
     public void setAddingOrEditingSingleDayBoolean(boolean singleDay) {
         this.mAddingOrEditingSingleDay = singleDay;
-    }
-
-    public void updateTotalTimesAndCaloriesBurnedForSpecificActivityOnSpecificDayRunnable() {
-        cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
 
     //Used by MainActivity.
@@ -717,24 +702,12 @@ public class DailyStatsAccess {
         this.mActivityString = activityString;
     }
 
-    public String getActivityString() {
-        return mActivityString;
-    }
-
-    public void setStringForSelectedActivityInStatsForEachActivityEntity(String activity) {
-        mStatsForEachActivity.setActivity(activity);
-    }
-
     public void setTotalSetTimeForSelectedActivity(long totalSetTime) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(totalSetTime);
     }
 
     public long getTotalSetTimeForSelectedActivity() {
         return mStatsForEachActivity.getTotalSetTimeForEachActivity();
-    }
-
-    public void setTotalBreakTimeForSelectedActivity(long totalBreakTime) {
-        mStatsForEachActivity.setTotalBreakTimeForEachActivity(totalBreakTime);
     }
 
     public long getTotalBreakTimeForSelectedActivity() {
@@ -747,10 +720,6 @@ public class DailyStatsAccess {
 
     public double getMetScoreForSelectedActivity() {
         return mStatsForEachActivity.getMetScore();
-    }
-
-    public void setTotalCaloriesBurnedForSelectedActivity(double totalCaloriesBurned) {
-        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(totalCaloriesBurned);
     }
 
     public double getTotalCaloriesBurnedForSelectedActivity() {
