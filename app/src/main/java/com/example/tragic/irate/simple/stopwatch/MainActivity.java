@@ -547,8 +547,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Editing activity while timer is active will get that value overriden by the old one being used/saved in timer.
-  //Todo: DayHolder not updating on Edit.
+  //Todo: Toast + return if food already exists, or allow a duplicate. Do not want to overwrite automatically as it currently does.
 
   //Todo: "Time remaining" when adding activity can be 1 second off from activity total.
   //Todo: Total calories row can be 1 more than addition of activities.

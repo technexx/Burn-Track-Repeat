@@ -948,7 +948,10 @@ public class DailyStatsAccess {
 
             if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
                 for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {
-                    if (mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood()==daySelected) {
+                    long uniqueIdToCheck = mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood();
+                    String foodStringToCheck = mCaloriesForEachFoodList.get(k).getTypeOfFood();
+
+                    if (uniqueIdToCheck==daySelected && foodStringToCheck.equalsIgnoreCase(mFoodString)) {
                         long primaryId = mCaloriesForEachFoodList.get(k).getCaloriesForEachFoodId();
                         mCaloriesForEachFood.setCaloriesForEachFoodId(primaryId);
                     }
@@ -989,6 +992,10 @@ public class DailyStatsAccess {
 
     public void setFoodString(String food) {
         this.mFoodString = food;
+    }
+
+    public String getFoodString() {
+        return mFoodString;
     }
 
     public void setCaloriesInFoodItem(double calories) {
