@@ -560,7 +560,10 @@ public class DailyStatsAccess {
 
             if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
                 for (int k=0; k<mStatsForEachActivityList.size(); k++) {
-                    if (mStatsForEachActivityList.get(k).getUniqueIdTiedToTheSelectedActivity()==daySelected) {
+                    long uniqueIdToCheck = mStatsForEachActivityList.get(k).getUniqueIdTiedToTheSelectedActivity();
+                    String activityToCheck = mStatsForEachActivityList.get(k).getActivity();
+
+                    if (uniqueIdToCheck==daySelected && activityToCheck.equalsIgnoreCase(mActivityString)) {
                         long primaryId = mStatsForEachActivityList.get(k).getStatsForActivityId();
                         mStatsForEachActivity.setStatsForActivityId(primaryId);
                     }
@@ -710,15 +713,15 @@ public class DailyStatsAccess {
         return mOldActivityPositionInListForCurrentDay;
     }
 
-    public void setLocalActivityStringVariable(String activityString) {
+    public void setActivityString(String activityString) {
         this.mActivityString = activityString;
     }
 
-    public String getActivityStringFromSpinner() {
+    public String getActivityString() {
         return mActivityString;
     }
 
-    public void setActivityStringForSelectedActivityInStatsForEachActivityEntity(String activity) {
+    public void setStringForSelectedActivityInStatsForEachActivityEntity(String activity) {
         mStatsForEachActivity.setActivity(activity);
     }
 

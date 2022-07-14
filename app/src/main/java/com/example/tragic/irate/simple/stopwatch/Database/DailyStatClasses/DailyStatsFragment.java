@@ -666,8 +666,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         AsyncTask.execute(()-> {
             String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
-            dailyStatsAccess.setLocalActivityStringVariable(activityToAdd);
+            dailyStatsAccess.setActivityString(activityToAdd);
+            //Todo: If we don't access our spinners, no MET value will be set.
             dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
+            Log.i("testCals", "met score SET is " + retrieveMetScoreFromSubCategoryPosition());
 
             if (currentStatDurationMode!=CUSTOM_STATS) {
                 dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
@@ -693,7 +695,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    //Todo: Adding any activity overwrites the first.
     private void addActivityStatsInDatabase() {
         long newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
         double newCaloriesBurned = newCaloriesBurned();
@@ -875,6 +876,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    private double newCaloriesBurned() {
+        int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
+        long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity);
+
+        double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
+        double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
+        double newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
+
+        Log.i("testCals", "met score is " + retrievedMetScore);
+        Log.i("testCals", "activity time is " + newActivityTimeToUse);
+        Log.i("testCals", "calories burned are " + newCaloriesForActivity);
+
+        return newCaloriesForActivity;
+    }
+
     private long newActivityTimeFromEditText(int addingOrEditingActivity) {
         long timeSetInEditText = getMillisValueToSaveFromEditTextString();
         long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
@@ -888,17 +904,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         timeSetInEditText = cappedActivityTimeInMillis(timeSetInEditText, remainingDailyTime);
 
         return timeSetInEditText;
-    }
-
-    private double newCaloriesBurned() {
-        int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
-        long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity);
-
-        double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
-        double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
-        double newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
-
-        return newCaloriesForActivity;
     }
 
     private long cappedActivityTimeInMillis(long activityTime, long remainingTime) {
