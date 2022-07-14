@@ -567,6 +567,14 @@ public class DailyStatsAccess {
         mStatsForEachActivity = mStatsForEachActivityList.get(position);
     }
 
+    public void setMetScoreFromSpinner(double metScore) {
+        this.mMetScore = metScore;
+    }
+
+    public void setMetScoreFromDatabaseList(int position) {
+        mMetScore = mStatsForEachActivityList.get(position).getMetScore();
+    }
+
     public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(long setTime, double caloriesBurned) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
@@ -714,12 +722,8 @@ public class DailyStatsAccess {
         return mStatsForEachActivity.getTotalBreakTimeForEachActivity();
     }
 
-    public void setLocalMetScoreVariable(double metScore) {
-        this.mMetScore = metScore;
-    }
-
-    public double getMetScoreForSelectedActivity() {
-        return mStatsForEachActivity.getMetScore();
+    public double getMetScore() {
+        return mMetScore;
     }
 
     public double getTotalCaloriesBurnedForSelectedActivity() {

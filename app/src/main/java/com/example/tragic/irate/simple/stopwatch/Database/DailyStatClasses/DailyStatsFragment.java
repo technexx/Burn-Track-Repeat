@@ -667,8 +667,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
             dailyStatsAccess.setActivityString(activityToAdd);
-            //Todo: If we don't access our spinners, no MET value will be set.
-            dailyStatsAccess.setLocalMetScoreVariable(retrieveMetScoreFromSubCategoryPosition());
+            //Todo: If we don't access our spinners, no MET value will be set. Issue when this executes from edit position.
+            dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
             Log.i("testCals", "met score SET is " + retrieveMetScoreFromSubCategoryPosition());
 
             if (currentStatDurationMode!=CUSTOM_STATS) {
@@ -693,6 +693,28 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         } else {
             showToastIfNoneActive("Activity exists!");
         }
+    }
+
+    private void populateActivityEditPopUpWithNewRow() {
+        replaceActivityAddPopUpWithEmptyEditPopUp();
+
+        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+
+        activityInEditPopUpTextView.setText(activityToAdd);
+        zeroOutActivityEditPopUpEditTexts();
+    }
+
+    private void replaceActivityAddPopUpWithEmptyEditPopUp() {
+        addTdeePopUpWindow.dismiss();
+
+        setActivityEditPopUpTimeRemainingTextView();
+        toggleCancelOrDeleteButtonInEditPopUpTextView(ADDING_ACTIVITY);
+
+        tdeeEditTextHours.requestFocus();
+
+        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0));
+
+        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
     }
 
     private void addActivityStatsInDatabase() {
@@ -729,6 +751,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         numberOfDaysWithActivitiesHasChanged = true;
     }
 
+
+    private void setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
+        dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
+        dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
+        dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
+    }
+
     private void displayPopUpForMultipleAddOrEditConfirmation() {
         confirmEditPopUpWindow.showAsDropDown(bottomOfRecyclerViewAnchor);
     }
@@ -742,10 +771,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
+            dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
+            dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
+
             long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
             double newCaloriesBurned = newCaloriesBurned();
 
-            dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
             dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(newActivityTime, newCaloriesBurned);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
@@ -765,34 +796,49 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private void setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
-        dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-        dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
-        dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
+    private double newCaloriesBurned() {
+        int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
+        long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity);
+
+        double retrievedMetScore = dailyStatsAccess.getMetScore();
+        double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
+        double newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
+
+        return newCaloriesForActivity;
     }
 
-    private void populateActivityEditPopUpWithNewRow() {
-        replaceActivityAddPopUpWithEmptyEditPopUp();
+    private long newActivityTimeFromEditText(int addingOrEditingActivity) {
+        long timeSetInEditText = getMillisValueToSaveFromEditTextString();
+        long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
+        long timeInEditedRow = 0;
 
-        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+        if (addingOrEditingActivity==EDITING_ACTIVITY) {
+            timeInEditedRow = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(mPositionToEdit);
+        }
 
-        activityInEditPopUpTextView.setText(activityToAdd);
-        zeroOutActivityEditPopUpEditTexts();
+        remainingDailyTime += timeInEditedRow;
+        timeSetInEditText = cappedActivityTimeInMillis(timeSetInEditText, remainingDailyTime);
+
+        return timeSetInEditText;
     }
 
-    private void replaceActivityAddPopUpWithEmptyEditPopUp() {
-        addTdeePopUpWindow.dismiss();
-
-        setActivityEditPopUpTimeRemainingTextView();
-        toggleCancelOrDeleteButtonInEditPopUpTextView(ADDING_ACTIVITY);
-
-        tdeeEditTextHours.requestFocus();
-
-        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0));
-
-        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
+    private long cappedActivityTimeInMillis(long activityTime, long remainingTime) {
+        if (activityTime>remainingTime) {
+            activityTime = remainingTime;
+        }
+        return activityTime;
     }
 
+    private double retrieveMetScoreFromSubCategoryPosition() {
+        String[] valueArray = tdeeChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
+        double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
+        return preRoundedMet;
+    }
+
+    private void setMetScoreTextViewInAddTdeePopUp() {
+        metScore = retrieveMetScoreFromSubCategoryPosition();
+        metScoreTextView.setText(getString(R.string.met_score_single_line, String.valueOf(metScore)));
+    }
     private void toggleEditingForMultipleDaysTextViews() {
         if (currentStatDurationMode==CUSTOM_STATS && dailyStatsAccess.getNumberOfDaysSelected() > 1) {
             setEditActivityPopUpButtonsLayoutParams(true);
@@ -878,43 +924,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private double newCaloriesBurned() {
-        int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
-        long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity);
-
-        double retrievedMetScore = dailyStatsAccess.getMetScoreForSelectedActivity();
-        double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
-        double newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
-
-        Log.i("testCals", "met score is " + retrievedMetScore);
-        Log.i("testCals", "activity time is " + newActivityTimeToUse);
-        Log.i("testCals", "calories burned are " + newCaloriesForActivity);
-
-        return newCaloriesForActivity;
-    }
-
-    private long newActivityTimeFromEditText(int addingOrEditingActivity) {
-        long timeSetInEditText = getMillisValueToSaveFromEditTextString();
-        long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
-        long timeInEditedRow = 0;
-
-        if (addingOrEditingActivity==EDITING_ACTIVITY) {
-            timeInEditedRow = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(mPositionToEdit);
-        }
-
-        remainingDailyTime += timeInEditedRow;
-        timeSetInEditText = cappedActivityTimeInMillis(timeSetInEditText, remainingDailyTime);
-
-        return timeSetInEditText;
-    }
-
-    private long cappedActivityTimeInMillis(long activityTime, long remainingTime) {
-        if (activityTime>remainingTime) {
-            activityTime = remainingTime;
-        }
-        return activityTime;
-    }
-
     private void deleteActivityFromStats(int position) {
         numberOfDaysWithActivitiesHasChanged = true;
 
@@ -952,12 +961,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setEditTextsToZeroIfEmpty(tdeeEditTextHours);
         setEditTextsToZeroIfEmpty(tdeeEditTextMinutes);
         setEditTextsToZeroIfEmpty(tdeeEditTextSeconds);
-    }
-
-    private void setEditTextsToEmptyIfAtZero(EditText editText) {
-        if (editText.getText().toString().equals("00")) {
-            editText.setText("");
-        }
     }
 
     private void setEditTextsToZeroIfEmpty(EditText editText) {
@@ -1093,17 +1096,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         setMetScoreTextViewInAddTdeePopUp();
         setThirdMainTextViewInAddTdeePopUp();
-    }
-
-    private void setMetScoreTextViewInAddTdeePopUp() {
-        metScore = retrieveMetScoreFromSubCategoryPosition();
-        metScoreTextView.setText(getString(R.string.met_score_single_line, String.valueOf(metScore)));
-    }
-
-    private double retrieveMetScoreFromSubCategoryPosition() {
-        String[] valueArray = tdeeChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
-        double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
-        return preRoundedMet;
     }
 
     private void setThirdMainTextViewInAddTdeePopUp() {

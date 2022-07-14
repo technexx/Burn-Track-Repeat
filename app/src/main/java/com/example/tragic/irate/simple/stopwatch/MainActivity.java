@@ -3681,7 +3681,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
-        dailyStatsAccess.setLocalMetScoreVariable(metScore);
+        dailyStatsAccess.setMetScoreFromSpinner(metScore);
 
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
