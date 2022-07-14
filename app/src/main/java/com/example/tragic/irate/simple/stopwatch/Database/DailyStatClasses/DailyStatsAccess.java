@@ -593,7 +593,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public void updateTotalTimesAndCaloriesForEachActivityForSelectedDays(int position, long setTime, double caloriesBurned) {
+    public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(int position, long setTime, double caloriesBurned) {
         mStatsForEachActivity = mStatsForEachActivityList.get(position);
         mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
@@ -631,14 +631,20 @@ public class DailyStatsAccess {
             mDayHolder = new DayHolder();
             int daySelected = listToPullDaysFrom.get(i);
 
-
-
             mDayHolder.setDayId(daySelected);
             mDayHolder.setTotalSetTime(setTime);
             mDayHolder.setTotalCaloriesBurned(caloriesBurned);
 
             cyclesDatabase.cyclesDao().insertDay(mDayHolder);
         }
+    }
+
+    public void updateTotalTimesAndCaloriesForSelectedDay(int position, long setTime, double caloriesBurned) {
+        mDayHolder = mDayHolderList.get(position);
+        mDayHolder.setTotalSetTime(setTime);
+        mDayHolder.setTotalCaloriesBurned(caloriesBurned);
+
+        cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }
 
     public void setAddingOrEditingSingleDayBoolean(boolean singleDay) {
@@ -756,6 +762,26 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
     }
 
+    public long getTotalActivityTimeForSingleDay(int day) {
+        long valueToReturn = 0;
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day) {
+                valueToReturn += mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
+            }
+        }
+        return valueToReturn;
+    }
+
+    public double getTotalCaloriesBurnedForSingleDay(int day) {
+        long valueToReturn = 0;
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day) {
+                valueToReturn += mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
+            }
+        }
+        return valueToReturn;
+    }
+
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
 
@@ -799,6 +825,10 @@ public class DailyStatsAccess {
         totalSetTimeForSelectedDuration = valueToReturn;
     }
 
+    public long getTotalSetTimeForSelectedDuration() {
+        return totalSetTimeForSelectedDuration;
+    }
+
     public void setTotalCaloriesVariableForSelectedDuration() {
         double valueToReturn = 0;
 
@@ -807,6 +837,10 @@ public class DailyStatsAccess {
         }
 
         totalCaloriesForSelectedDuration = valueToReturn;
+    }
+
+    public double getTotalCalorieBurnedForSelectedDuration() {
+        return totalCaloriesForSelectedDuration;
     }
 
     public long getTotalSetTimeFromDayHolderList() {
