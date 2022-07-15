@@ -545,11 +545,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  boolean statsHaveBeenEdited;
+
   Toast mToast;
 
-  //Todo: DayHolder doesn't keep up when editing an activity.
-  //Todo: Toast + return if food already exists, or allow a duplicate. Do not want to overwrite automatically as it currently does.
-
+  //Todo: Editing stats w/ active timer causes issues. Recent edit of activity did not affect total daily time.
+  //Todo: Also, timer launch defaults to Insert, which we do not want if the activity has already been added via Stats.
   //Todo: "Time remaining" when adding activity can be 1 second off from activity total.
   //Todo: Total calories row can be 1 more than addition of activities.
   //Todo: Some issues w/ activity stats textView iterations in Timer.
@@ -730,6 +731,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     else if (resumingOrResetting==RESETTING_CYCLE_FROM_ADAPTER){
       resumeOrResetCycleFromAdapterList(RESETTING_CYCLE_FROM_ADAPTER);
     }
+  }
+
+  public void setStatsHaveBeenEditedBoolean(boolean haveBeenEdited) {
+    this.statsHaveBeenEdited = haveBeenEdited;
   }
 
   @Override
@@ -1966,7 +1971,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setAndUpdateDayHolderValuesInDatabase() {
     dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-    dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay );
+    dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
+    Log.i("testDb", "Runnable is saving total set time as " + totalSetTimeForCurrentDayInMillis);
   }
 
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
@@ -2961,15 +2967,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
       AsyncTask.execute(()-> {
-        dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-        dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
-
-        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
-
+//        dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+//        dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
+//
+//        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+//        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
+//
         dailyStatsAccess.setActivityPositionInListForCurrentDay();
+//
+//        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
-        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+        retrieveStatsForTimerOnResumptionAfterEditing();
 
        runOnUiThread(()->{
          displayCycleOrDailyTotals();
@@ -3628,6 +3636,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  //Todo: In RESUME option for active cycle, have conditional that re-fetches values if stats have been edited.
   private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
     if (workoutTime.size()==0) {
       showToastIfNoneActive("Cycle cannot be empty!");
@@ -3672,6 +3681,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
         dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
 
         dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
@@ -3685,6 +3695,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.setMetScoreFromSpinner(metScore);
 
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
 
@@ -3695,6 +3706,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
+  }
+
+  private void retrieveStatsForTimerOnResumptionAfterEditing() {
+    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+    //Todo: This only sets mStats list, not the entity which we pull values from in assign()... below.
+    //Todo: May be a function of our auto save runnable.
+    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+
+    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
+    assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
   }
 
   private String getCurrentDateAsSlashFormattedString() {
@@ -3713,6 +3734,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForCurrentDayInMillis = 0;
       totalBreakTimeForCurrentDayInMillis = 0;
       totalCaloriesBurnedForCurrentDay = 0;
+      Log.i("testTime", "day returns as not existing and values set to 0");
     } else {
       calendar = Calendar.getInstance(Locale.getDefault());
       dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
@@ -3724,6 +3746,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
       totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
+      Log.i("testTime", "day returns as existing");
+      Log.i("testTime", "set time retrieved is " + totalSetTimeForCurrentDayInMillis);
     }
   }
 

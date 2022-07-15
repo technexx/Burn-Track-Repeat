@@ -632,10 +632,12 @@ public class DailyStatsAccess {
         }
     }
 
+    //Todo: Doing weird math.
     public void setDayHolderEntityFromStatsForEachActivityDaySelection(int daySelected) {
         for (int i=0; i<mDayHolderList.size(); i++) {
             if (mDayHolderList.get(i).getDayId()==daySelected) {
                 mDayHolder = mDayHolderList.get(i);
+                Log.i("testdb", "day selected is " + daySelected + " and dayHolder time is " + mDayHolder.getTotalSetTime()/1000/60);
                 return;
             }
         }
@@ -709,10 +711,6 @@ public class DailyStatsAccess {
 
     public void setActivityString(String activityString) {
         this.mActivityString = activityString;
-    }
-
-    public void setTotalSetTimeForSelectedActivity(long totalSetTime) {
-        mStatsForEachActivity.setTotalSetTimeForEachActivity(totalSetTime);
     }
 
     public long getTotalSetTimeForSelectedActivity() {
@@ -797,9 +795,8 @@ public class DailyStatsAccess {
 
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
+            Log.i("testdb", "activity times being added are " + totalSetTimeListForEachActivityForSelectedDuration.get(i)/1000/60);
         }
-
-        Log.i("testUpdate", "set time LIST total being set is " + totalSetTimeForSelectedDuration);
 
         totalSetTimeForSelectedDuration = valueToReturn;
     }
@@ -922,17 +919,18 @@ public class DailyStatsAccess {
             mCaloriesForEachFood = new CaloriesForEachFood();
             int daySelected = listToPullDaysFrom.get(i);
 
-            if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
-                for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {
-                    long uniqueIdToCheck = mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood();
-                    String foodStringToCheck = mCaloriesForEachFoodList.get(k).getTypeOfFood();
-
-                    if (uniqueIdToCheck==daySelected && foodStringToCheck.equalsIgnoreCase(mFoodString)) {
-                        long primaryId = mCaloriesForEachFoodList.get(k).getCaloriesForEachFoodId();
-                        mCaloriesForEachFood.setCaloriesForEachFoodId(primaryId);
-                    }
-                }
-            }
+            //This overwrites row if food String exists.
+//            if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
+//                for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {
+//                    long uniqueIdToCheck = mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood();
+//                    String foodStringToCheck = mCaloriesForEachFoodList.get(k).getTypeOfFood();
+//
+//                    if (uniqueIdToCheck==daySelected && foodStringToCheck.equalsIgnoreCase(mFoodString)) {
+//                        long primaryId = mCaloriesForEachFoodList.get(k).getCaloriesForEachFoodId();
+//                        mCaloriesForEachFood.setCaloriesForEachFoodId(primaryId);
+//                    }
+//                }
+//            }
 
             mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
             mCaloriesForEachFood.setTypeOfFood(mFoodString);

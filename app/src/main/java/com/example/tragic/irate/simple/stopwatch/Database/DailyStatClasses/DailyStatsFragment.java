@@ -467,24 +467,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
+        dailyStatsAccess.clearStatsForEachActivityArrayLists();
+        setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
+
+        dailyStatsAccess.setTotalFoodStringListForSelectedDuration();
+        dailyStatsAccess.setTotalCaloriesConsumedListForSelectedDuration();
+
+        dailyStatsAccess.setAggregateDailyTime();
+        dailyStatsAccess.setUnassignedTotalCalories();
+
+        dailyStatsAccess.setAggregateDailyCalories();
+        dailyStatsAccess.setUnassignedDailyTotalTime();
+
         getActivity().runOnUiThread(()-> {
-            dailyStatsAccess.clearStatsForEachActivityArrayLists();
 
-            setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
             dailyStatsAdapter.notifyDataSetChanged();
-
-            dailyStatsAccess.setTotalFoodStringListForSelectedDuration();
-            dailyStatsAccess.setTotalCaloriesConsumedListForSelectedDuration();
             caloriesConsumedAdapter.notifyDataSetChanged();
 
             setTotalActivityStatsFooterTextViews();
-
-            dailyStatsAccess.setAggregateDailyTime();
-            dailyStatsAccess.setUnassignedTotalCalories();
-
-            dailyStatsAccess.setAggregateDailyCalories();
-            dailyStatsAccess.setUnassignedDailyTotalTime();
-
             setTotalCaloriesConsumedFooterTextViews();
 
             setTotalCaloriesComparedTextViews();
@@ -667,7 +667,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
             dailyStatsAccess.setActivityString(activityToAdd);
-            //Todo: If we don't access our spinners, no MET value will be set. Issue when this executes from edit position.
             dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
             Log.i("testCals", "met score SET is " + retrieveMetScoreFromSubCategoryPosition());
 
@@ -751,7 +750,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         numberOfDaysWithActivitiesHasChanged = true;
     }
 
-    //Todo: This collection runs in populateLists...() and should update the aggregate list.
     private void setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
         dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
         dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
@@ -774,9 +772,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
             dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
-            Log.i("testUpdate", "set time BEFORE is " + dailyStatsAccess.getTotalSetTimeForSelectedDuration());
-            Log.i("testUpdate", "calories BEFORE are " + dailyStatsAccess.getTotalCalorieBurnedForSelectedDuration());
-
             long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
             double newCaloriesBurned = newCaloriesBurned();
 
@@ -784,18 +779,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
-            //Todo: These should be getting set from above.
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalSetTimeForSelectedDuration();
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCalorieBurnedForSelectedDuration();
 
-            Log.i("testUpdate", "set time AFTER is " + totalSetTimeFromAllActivities);
-            Log.i("testUpdate", "calories AFTER are " + totalCaloriesBurnedFromAllActivities);
+            Log.i("testdb", "total aggregate for activity after save is " + totalSetTimeFromAllActivities/1000/60);
 
-            //Todo: Need the DayHolder instance tied to StatsForEach's uniqueId fetched, not the same position we've retrieved it from.
-            dailyStatsAccess.setDayHolderEntityFromStatsForEachActivityDaySelection(mPositionToEdit);
+            dailyStatsAccess.setDayHolderEntityFromStatsForEachActivityDaySelection(daySelectedFromCalendar);
             dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
+
+            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
+            long totalSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
+            Log.i("testdb", "daily total after save is " + totalSetTime/1000/60);
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
