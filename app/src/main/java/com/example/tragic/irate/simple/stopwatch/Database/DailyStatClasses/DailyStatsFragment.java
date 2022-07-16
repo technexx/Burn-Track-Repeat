@@ -668,7 +668,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.setActivityString(activityToAdd);
             dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
-            Log.i("testCals", "met score SET is " + retrieveMetScoreFromSubCategoryPosition());
 
             if (currentStatDurationMode!=CUSTOM_STATS) {
                 dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();

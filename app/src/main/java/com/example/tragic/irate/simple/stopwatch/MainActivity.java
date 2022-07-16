@@ -549,7 +549,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Editing stats w/ active timer causes issues. Recent edit of activity did not affect total daily time.
   //Todo: Also, timer launch defaults to Insert, which we do not want if the activity has already been added via Stats.
   //Todo: "Time remaining" when adding activity can be 1 second off from activity total.
   //Todo: Total calories row can be 1 more than addition of activities.
@@ -1972,7 +1971,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setAndUpdateDayHolderValuesInDatabase() {
     dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
     dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
-    Log.i("testDb", "Runnable is saving total set time as " + totalSetTimeForCurrentDayInMillis);
   }
 
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
@@ -2967,15 +2965,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
       AsyncTask.execute(()-> {
-//        dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-//        dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
-//
-//        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-//        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
-//
         dailyStatsAccess.setActivityPositionInListForCurrentDay();
-//
-//        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
         retrieveStatsForTimerOnResumptionAfterEditing();
 
@@ -3001,6 +2991,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       resetTimer();
     }
+  }
+
+  //Todo: After edit in active cycle: Daily total displays correctly, aingle activites does not. Going back to fragment displays the old activity time and the NEW daily time.
+  private void retrieveStatsForTimerOnResumptionAfterEditing() {
+    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+    dailyStatsAccess.assignStatsForEachActivityInstanceForSelectedDay(dayOfYear);
+
+//    dailyStatsAccess.setDayHolderListForSingleDayFromDatabase(dayOfYear);
+//    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+
+    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
+    assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
   }
 
   private String retrieveTimerValueString() {
@@ -3636,7 +3638,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  //Todo: In RESUME option for active cycle, have conditional that re-fetches values if stats have been edited.
   private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
     if (workoutTime.size()==0) {
       showToastIfNoneActive("Cycle cannot be empty!");
@@ -3706,16 +3707,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
-  }
-
-  private void retrieveStatsForTimerOnResumptionAfterEditing() {
-    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-    //Todo: This only sets mStats list, not the entity which we pull values from in assign()... below.
-    //Todo: May be a function of our auto save runnable.
-    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-
-    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
-    assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
   }
 
   private String getCurrentDateAsSlashFormattedString() {

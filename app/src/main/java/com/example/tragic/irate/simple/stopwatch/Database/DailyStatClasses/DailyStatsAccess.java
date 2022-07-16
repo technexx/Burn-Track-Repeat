@@ -165,6 +165,17 @@ public class DailyStatsAccess {
         }
     }
 
+    public void assignStatsForEachActivityInstanceForSelectedDay(int daySelected) {
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
+
+        if (statsForEachActivityList.size()>0) {
+            mStatsForEachActivity = statsForEachActivityList.get(0);
+        } else {
+            mStatsForEachActivity = new StatsForEachActivity();
+        }
+        Log.i("testStats", "mStats instance time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
+    }
+
     public void checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(int daySelected) {
         doesDayExistInDatabase = false;
 
@@ -632,7 +643,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: Doing weird math.
     public void setDayHolderEntityFromStatsForEachActivityDaySelection(int daySelected) {
         for (int i=0; i<mDayHolderList.size(); i++) {
             if (mDayHolderList.get(i).getDayId()==daySelected) {
@@ -652,6 +662,10 @@ public class DailyStatsAccess {
 
     public void setAddingOrEditingSingleDayBoolean(boolean singleDay) {
         this.mAddingOrEditingSingleDay = singleDay;
+    }
+
+    public void setDayHolderListForSingleDayFromDatabase(int dayToRetrieve) {
+        mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
     }
 
     //Used by MainActivity.
