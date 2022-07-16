@@ -549,11 +549,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Also, timer launch defaults to Insert, which we do not want if the activity has already been added via Stats.
   //Todo: "Time remaining" when adding activity can be 1 second off from activity total.
   //Todo: Total calories row can be 1 more than addition of activities.
   //Todo: Some issues w/ activity stats textView iterations in Timer.
-  //Todo: Need minutes-> hours conversion in Timer (e.g. 10 hours shows as 600 minutes).
   //Todo: Option to add misc. calories burned (e.g. user tracks their own).
   //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
   //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
@@ -1565,11 +1563,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyTotalCaloriesTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_calories_textView_header);
     dailyTotalCaloriesTextView = timerPopUpView.findViewById(R.id.daily_total_calories_textView);
 
+    dailyTotalTimeTextViewHeader.setText(R.string.total_daily_time);
+    dailyTotalCaloriesTextViewHeader.setText(R.string.total_daily_calories);
+
     dailyTotalTimeForSinglefirstMainTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_time_for_single_activity_textView_header);
     dailyTotalTimeForSinglefirstMainTextView = timerPopUpView.findViewById(R.id.daily_total_time_for_single_activity_textView);
     dailyTotalCaloriesForSinglefirstMainTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_calories_for_single_activity_textView_header);
     dailyTotalCaloriesForSinglefirstMainTextView = timerPopUpView.findViewById(R.id.daily_total_calories_for_single_activity_textView);
 
+    dailyTotalTimeForSinglefirstMainTextViewHeader.setText(R.string.total_daily_time_for_single_activity);
+    dailyTotalCaloriesForSinglefirstMainTextViewHeader.setText(R.string.total_daily_calories_for_single_activity);
 
     laps_completed_textView = stopWatchPopUpView.findViewById(R.id.laps_completed_textView);
 
@@ -2974,8 +2977,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
          setCyclesCompletedTextView();
          toggleCycleTimeTextViewSizes(trackActivityWithinCycle);
 
-         setTotalDailyTimeAndCaloriesValuesToTextViews();
-         setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
+         setAllActivityTimesAndCaloriesToTextViews();
 
          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
        });
@@ -2993,13 +2995,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: After edit in active cycle: Daily total displays correctly, aingle activites does not. Going back to fragment displays the old activity time and the NEW daily time.
   private void retrieveStatsForTimerOnResumptionAfterEditing() {
     dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
     dailyStatsAccess.assignStatsForEachActivityInstanceForSelectedDay(dayOfYear);
-
-//    dailyStatsAccess.setDayHolderListForSingleDayFromDatabase(dayOfYear);
-//    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
 
     assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
@@ -3680,7 +3678,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (trackActivityWithinCycle) {
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+        //Todo: This is unnecessary. Method above, if list is not empty, means that our day exists in db.
         dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
+        //Todo: Can probably consolidate this and assignDayHolderInstanceForSelectedDay().
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
@@ -3894,22 +3894,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setTotalDailyTimeAndCaloriesValuesToTextViews() {
-    dailyTotalTimeTextViewHeader.setText(R.string.total_daily_time);
-    dailyTotalTimeTextView.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalSetTimeForCurrentDayInMillis)));
+  private void setTotalDailyTimeToTextView() {
+    dailyTotalTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(totalSetTimeForCurrentDayInMillis));
+  }
 
-    dailyTotalCaloriesTextViewHeader.setText(R.string.total_daily_calories);
+  private void setTotalDailyCaloriesToTextView() {
     dailyTotalCaloriesTextView.setText(formatCalorieString(totalCaloriesBurnedForCurrentDay));
   }
 
-  private void setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews() {
-    dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
-
-    dailyTotalTimeForSinglefirstMainTextViewHeader.setText(R.string.total_daily_time_for_single_activity);
+  private void setTotalActivityTimeToTextView() {
     dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertSecondsForStatDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+  }
 
-    dailyTotalCaloriesForSinglefirstMainTextViewHeader.setText(R.string.total_daily_calories_for_single_activity);
+  private void setTotalActivityCaloriesToTextView() {
     dailyTotalCaloriesForSinglefirstMainTextView.setText(formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
+  }
+
+  private void setAllActivityTimesAndCaloriesToTextViews() {
+    setTotalDailyTimeToTextView();
+    setTotalDailyCaloriesToTextView();
+    setTotalActivityTimeToTextView();
+    setTotalActivityCaloriesToTextView();
+    dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
   }
 
   private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
@@ -4046,11 +4052,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void updateStatsInSyncWithMainTimer(int millisTickValue) {
-    if (delayBeforeTimerBeginsSyncingWithTotalTimeStats>0) {
-      delayBeforeTimerBeginsSyncingWithTotalTimeStats -= millisTickValue;
-    } else {
-      updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-    }
+    updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+
+//    if (delayBeforeTimerBeginsSyncingWithTotalTimeStats>0) {
+//      delayBeforeTimerBeginsSyncingWithTotalTimeStats -= millisTickValue;
+//    } else {
+//      updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+//    }
   }
 
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
@@ -4059,9 +4067,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (hasTimerTextViewChanged()) {
       timerTextViewStringTwo = (String) timeLeft.getText();
       displayCycleOrDailyTotals();
-      setTotalDailyTimeAndCaloriesValuesToTextViews();
-      setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
+      setTotalDailyTimeToTextView();
+      setTotalActivityTimeToTextView();
     }
+
+    setTotalDailyCaloriesToTextView();
+    setTotalActivityCaloriesToTextView();
   }
 
   private boolean hasTimerTextViewChanged() {
@@ -4078,8 +4089,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setTotalCycleTimeValuesToTextView();
       setCyclesCompletedTextView();
     } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-      setTotalDailyTimeAndCaloriesValuesToTextViews();
-      setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
+      setAllActivityTimesAndCaloriesToTextViews();
     }
   }
 
@@ -4147,6 +4157,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
+
         if (setMillis < 500) timerDisabled = true;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
@@ -4155,6 +4166,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis);
         dotDraws.reDraw();
         setNotificationValues();
+
+        logTotalDailyStats();
+//        logTotalActivityStats();
       }
 
       @Override
@@ -4978,8 +4992,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalCaloriesForSinglefirstMainTextViewHeader.setVisibility(View.VISIBLE);
       dailyTotalCaloriesForSinglefirstMainTextView.setVisibility(View.VISIBLE);
 
-      setTotalDailyTimeAndCaloriesValuesToTextViews();
-      setTotalDailyTimeAndCaloriesForSingleActivityValuesToTextViews();
+      setAllActivityTimesAndCaloriesToTextViews();
     }
   }
 
@@ -5157,13 +5170,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logTotalDailyStats() {
     Log.i("testTimes", "set time for DAY is " + totalSetTimeForCurrentDayInMillis);
-    Log.i("testTimes", "calories for DAY are " + totalCaloriesBurnedForCurrentDay);
+//    Log.i("testTimes", "calories for DAY are " + formatCalorieString(totalCaloriesBurnedForCurrentDay));
   }
 
   private void logTotalActivityStats() {
-    Log.i("testTimes", "selected activity set time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    Log.i("testTimes", "selected activity break time is " + totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-    Log.i("testTimes", "selected activity calories are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
+    Log.i("testTimes", "selected activity set time in millis is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    Log.i("testTimes", "selected activity set time in seconds is " + totalSetTimeForSpecificActivityForCurrentDayInMillis/1000);
+//    Log.i("testTimes", "selected activity calories are " + formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
   private void logCalorieIterations() {
