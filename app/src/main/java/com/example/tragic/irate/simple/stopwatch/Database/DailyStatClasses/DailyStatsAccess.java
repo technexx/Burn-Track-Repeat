@@ -10,6 +10,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.Ca
 import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CaloriesForEachFood;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.text.SimpleDateFormat;
@@ -83,6 +84,8 @@ public class DailyStatsAccess {
     List<Integer> mLongListOfFoodDaysSelected;
     List<Integer> mListOfFoodDaysWithPopulatedRows;
     List<Integer> mListOfFoodDaysWithEmptyRows;
+
+    LongToStringConverters longToStringConverters = new LongToStringConverters();
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -753,24 +756,33 @@ public class DailyStatsAccess {
 
     public long getTotalActivityTimeForSingleDay(int day) {
         long valueToReturn = 0;
+
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day) {
                 valueToReturn += mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
             }
         }
+//        Log.i("testTotal", "aggregated activity time for dayHolder is " +  (valueToReturn));
+
         return valueToReturn;
     }
 
     public double getTotalCaloriesBurnedForSingleDay(int day) {
-        long valueToReturn = 0;
+        double valueToReturn = 0;
+
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day) {
                 valueToReturn += mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
+                Log.i("testTotal", "individual activity calories for dayHolder in Insertion are " +  mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
             }
         }
+
+        Log.i("testTotal", "aggregated activity calories for dayHolder are " +  valueToReturn);
+
         return valueToReturn;
     }
 
+    //Todo: These are the lists pulled by recyclerView.
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
 
@@ -779,7 +791,11 @@ public class DailyStatsAccess {
                 if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
                     totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+                    //Todo: Precise values are pulled here.
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+
+                    Log.i("testTotal", "individual activity calories for dayHolder in Retrieval are " +  mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+
                 } else {
                     totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedCaloriesFromExistingAndRepeatingPositions(i));
@@ -843,6 +859,7 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
+    //Todo: This pull lags a few behind our aggregate from setTotalActivityStatsForSelectedDaysToArrayLists(). DayHolder insertion seems to round down, while StatsForEach keeps full decimal value.
     public double getTotalCaloriesBurnedFromDayHolderList() {
         double valueToReturn = 0;
 

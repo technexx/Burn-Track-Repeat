@@ -8,13 +8,40 @@ import java.text.DecimalFormat;
 
 public class LongToStringConverters {
 
-    public String convertMillisToHourBasedString(long millis) {
+    public String convertMillisToHourBasedStringForTimer(long millis) {
         DecimalFormat dfOneZero = new DecimalFormat("0");
         DecimalFormat dfTwoZeros = new DecimalFormat("00");
 
         long seconds= 0;
 
         seconds = millis/999;
+        long minutes = 0;
+        long hours = 0;
+
+        if (seconds >=60) {
+            minutes = seconds / 60;
+            seconds = seconds % 60;
+        }
+
+        if (minutes>=60) {
+            hours = minutes/60;
+            minutes = minutes % 60;
+        }
+
+        if (hours==0) {
+            return dfOneZero.format(minutes) + ":" + dfTwoZeros.format(seconds);
+        } else {
+            return dfOneZero.format(hours) + ":" + dfTwoZeros.format(minutes) + ":" + dfTwoZeros.format(seconds);
+        }
+    }
+
+    public String convertMillisToHourBasedStringForRecyclerView(long millis) {
+        DecimalFormat dfOneZero = new DecimalFormat("0");
+        DecimalFormat dfTwoZeros = new DecimalFormat("00");
+
+        long seconds= 0;
+
+        seconds = millis/1000;
         long minutes = 0;
         long hours = 0;
 

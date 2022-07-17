@@ -550,6 +550,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Total calories row can be a bit off from total.
+      //Todo: DayHolder rounds calories down - StatsForEach does not.
+      //Todo: Adding an hour of activity DISPLAYS a few more seconds. Likely due to /999 divisor.
   //Todo: Change date highlight color in Custom mode to indicate that it can be manipulated.
   //Todo: Option to add misc. calories burned (e.g. user tracks their own).
   //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
@@ -3892,7 +3894,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForTimer(totalSetTimeForCurrentDayInMillis));
     logTotalActivityStats();
   }
 
@@ -3901,7 +3903,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalActivityTimeToTextView() {
-    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertMillisToHourBasedStringForTimer(totalSetTimeForSpecificActivityForCurrentDayInMillis));
   }
 
   private void setTotalActivityCaloriesToTextView() {
@@ -4059,7 +4061,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //    }
   }
 
-  //Todo: Seems to be an issue of display skipping over on first second. Not because of conditional here though.
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
     timerTextViewStringOne = (String) timeLeft.getText();
 
@@ -4144,7 +4145,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: At end of cycle, last bit of time does not get to add itself to total (e.g. 5000 -> 6000 will end at 5950 and not push last second over). Current String conversion is meant to for Stats - we have it set for hours conversion.
   private void startSetTimer() {
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
     long initialMillisValue = setMillis;
@@ -5178,7 +5178,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logTotalActivityStats() {
     Log.i("testTimes", "selected activity set time in millis is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    Log.i("testTimes", "selected activity set time in converted seconds is " + longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+    Log.i("testTimes", "selected activity set time in converted seconds is " + longToStringConverters.convertMillisToHourBasedStringForTimer(totalSetTimeForSpecificActivityForCurrentDayInMillis));
 //    Log.i("testTimes", "selected activity calories are " + formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 

@@ -626,7 +626,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setTotalActivityStatsFooterTextViews() {
-        String totalSetTime = longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
+        String totalSetTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
         dailyStatsTotalSetTimeTextView.setText(totalSetTime);
@@ -740,6 +740,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
+            logTotalDayHolderTimesAndCalories();
+            logTotalActivityTimesAndCalories();
+
             getActivity().runOnUiThread(()-> {
                 showToastIfNoneActive("Saved!");
                 tdeeEditPopUpWindow.dismiss();
@@ -781,8 +784,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalSetTimeForSelectedDuration();
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCalorieBurnedForSelectedDuration();
 
-            Log.i("testdb", "total aggregate for activity after save is " + totalSetTimeFromAllActivities/1000/60);
-
             dailyStatsAccess.setDayHolderEntityFromStatsForEachActivityDaySelection(daySelectedFromCalendar);
             dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
@@ -790,11 +791,32 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
             long totalSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
-            Log.i("testdb", "daily total after save is " + totalSetTime/1000/60);
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
                 tdeeEditPopUpWindow.dismiss();
+            });
+        });
+    }
+
+    private void deleteActivityFromStats(int position) {
+        numberOfDaysWithActivitiesHasChanged = true;
+
+        AsyncTask.execute(() -> {
+            dailyStatsAccess.deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(position);
+
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            //Todo: Just added this. We may want to consolidate w/ Insertion.
+            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForSingleDay(daySelectedFromCalendar);
+            double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForSingleDay(daySelectedFromCalendar);
+
+            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
+
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
             });
         });
     }
@@ -875,7 +897,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setActivityEditPopUpTimeRemainingTextView() {
-        String timeLeftInDay = longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getUnassignedDailyTotalTime());
+        String timeLeftInDay = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getUnassignedDailyTotalTime());
         String timeLeftInDayConcatString = getString(R.string.day_time_remaining, timeLeftInDay);
         unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
     }
@@ -925,20 +947,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             textView.setAlpha(0.3f);
             textView.setTypeface(Typeface.DEFAULT);
         }
-    }
-
-    private void deleteActivityFromStats(int position) {
-        numberOfDaysWithActivitiesHasChanged = true;
-
-        AsyncTask.execute(() -> {
-            dailyStatsAccess.deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(position);
-
-            populateListsAndTextViewsFromEntityListsInDatabase();
-
-            getActivity().runOnUiThread(()-> {
-                Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-            });
-        });
     }
 
     private void zeroOutActivityEditPopUpEditTexts() {
@@ -1270,13 +1278,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private double calculateCaloriesBurnedPerSecond(double metValue) {
         return calculateCaloriesBurnedPerMinute(metValue) / 60;
-    }
-
-    private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
-        DecimalFormat df = new DecimalFormat("#");
-        String truncatedCalorieString = df.format(caloriesToRound);
-
-        return Double.parseDouble(truncatedCalorieString);
     }
 
     private void calendarMinimizationLogic(boolean restoreOnly) {
@@ -1626,7 +1627,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void logTotalDayHolderTimesAndCalories() {
-        Log.i("testTotal", "DayHolder set time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
+        Log.i("testTotal", "DayHolder set time is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
         Log.i("testTotal", "DayHolder calories burned are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
     }
 
@@ -1641,13 +1642,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalTime += activityTimeList.get(i);
             totalCalories += caloriesBurnedList.get(i);
         }
-        Log.i("testTotal", "Activity Stats set time is " + longToStringConverters.convertMillisToHourBasedString(totalTime));
-        Log.i("testTotal", "Activity Stats calories are" + formatCalorieString(totalCalories));
+        Log.i("testTotal", "Activity Stats set time is " + (totalTime));
+        Log.i("testTotal", "Activity Stats calories are " + (totalCalories));
     }
 
     private void logUnassignedAndAggregatesTimesAndCalories() {
-        Log.i("testTotal", "unassigned time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getUnassignedDailyTotalTime()));
-        Log.i("testTotal", "aggregate time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getAggregateDailyTime()));
+        Log.i("testTotal", "unassigned time is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getUnassignedDailyTotalTime()));
+        Log.i("testTotal", "aggregate time is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getAggregateDailyTime()));
         Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
         Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
     }
@@ -1659,8 +1660,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         newActivityTime = cappedActivityTimeInMillis(newActivityTime, remainingDailyTime);
 
-        Log.i("testTime", "new time is " + longToStringConverters.convertMillisToHourBasedString(newActivityTime));
-        Log.i("testTime", "remaining time is " + longToStringConverters.convertMillisToHourBasedString(remainingDailyTime));
-        Log.i("testTime", "time in edited row is " + longToStringConverters.convertMillisToHourBasedString(timeInEditedRow));
+        Log.i("testTime", "new time is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(newActivityTime));
+        Log.i("testTime", "remaining time is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(remainingDailyTime));
+        Log.i("testTime", "time in edited row is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(timeInEditedRow));
     }
 }
