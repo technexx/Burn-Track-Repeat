@@ -549,9 +549,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: "Time remaining" when adding activity can be 1 second off from activity total.
   //Todo: Total calories row can be 1 more than addition of activities.
-  //Todo: Some issues w/ activity stats textView iterations in Timer.
   //Todo: Option to add misc. calories burned (e.g. user tracks their own).
   //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
   //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
@@ -1952,8 +1950,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else {
           mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
         }
-
-        logTotalDailyStats();
       }
     };
   };
@@ -3895,7 +3891,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertSecondsForStatDisplay(totalSetTimeForCurrentDayInMillis));
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis, 999));
+    logTotalActivityStats();
   }
 
   private void setTotalDailyCaloriesToTextView() {
@@ -3903,7 +3900,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalActivityTimeToTextView() {
-    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertSecondsForStatDisplay(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis, 999));
   }
 
   private void setTotalActivityCaloriesToTextView() {
@@ -4061,6 +4058,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //    }
   }
 
+  //Todo: Seems to be an issue of display skipping over on first second. Not because of conditional here though.
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
     timerTextViewStringOne = (String) timeLeft.getText();
 
@@ -4145,6 +4143,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  //Todo: At end of cycle, last bit of time does not get to add itself to total (e.g. 5000 -> 6000 will end at 5950 and not push last second over). Current String conversion is meant to for Stats - we have it set for hours conversion.
   private void startSetTimer() {
     boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
     long initialMillisValue = setMillis;
@@ -4167,7 +4166,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.reDraw();
         setNotificationValues();
 
-        logTotalDailyStats();
+//        logTotalDailyStats();
 //        logTotalActivityStats();
       }
 
@@ -4330,6 +4329,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void globalNextRoundLogic() {
+//    updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+    setAllActivityTimesAndCaloriesToTextViews();
+
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
     currentProgressBarValue = 10000;
@@ -5175,7 +5177,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logTotalActivityStats() {
     Log.i("testTimes", "selected activity set time in millis is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    Log.i("testTimes", "selected activity set time in seconds is " + totalSetTimeForSpecificActivityForCurrentDayInMillis/1000);
+    Log.i("testTimes", "selected activity set time in converted seconds is " + longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis, 999));
 //    Log.i("testTimes", "selected activity calories are " + formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
