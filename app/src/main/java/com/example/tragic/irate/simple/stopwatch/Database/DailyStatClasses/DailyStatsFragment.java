@@ -1625,12 +1625,29 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         mToast.show();
     }
 
-    private void logTotalStatRows() {
-        Log.i("testTotal", "assigned time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
+    private void logTotalDayHolderTimesAndCalories() {
+        Log.i("testTotal", "DayHolder set time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
+        Log.i("testTotal", "DayHolder calories burned are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
+    }
+
+    private void logTotalActivityTimesAndCalories() {
+        long totalTime = 0;
+        double totalCalories = 0;
+
+        List<Long> activityTimeList = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration();
+        List<Double> caloriesBurnedList = dailyStatsAccess.getTotalCaloriesBurnedListForEachActivityForSelectedDuration();
+
+        for (int i=0; i<activityTimeList.size(); i++) {
+            totalTime += activityTimeList.get(i);
+            totalCalories += caloriesBurnedList.get(i);
+        }
+        Log.i("testTotal", "Activity Stats set time is " + longToStringConverters.convertMillisToHourBasedString(totalTime));
+        Log.i("testTotal", "Activity Stats calories are" + formatCalorieString(totalCalories));
+    }
+
+    private void logUnassignedAndAggregatesTimesAndCalories() {
         Log.i("testTotal", "unassigned time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getUnassignedDailyTotalTime()));
         Log.i("testTotal", "aggregate time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getAggregateDailyTime()));
-
-        Log.i("testTotal", "assigned calories are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
         Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
         Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
     }
