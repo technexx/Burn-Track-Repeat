@@ -8,13 +8,13 @@ import java.text.DecimalFormat;
 
 public class LongToStringConverters {
 
-    public String convertMillisToHourBasedString(long millis, long divider) {
+    public String convertMillisToHourBasedString(long millis) {
         DecimalFormat dfOneZero = new DecimalFormat("0");
         DecimalFormat dfTwoZeros = new DecimalFormat("00");
 
         long seconds= 0;
 
-        seconds = millis/1000;
+        seconds = millis/999;
         long minutes = 0;
         long hours = 0;
 

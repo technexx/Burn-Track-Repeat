@@ -626,7 +626,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setTotalActivityStatsFooterTextViews() {
-        String totalSetTime = longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getTotalSetTimeFromDayHolderList(), 1000);
+        String totalSetTime = longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
 
         dailyStatsTotalSetTimeTextView.setText(totalSetTime);
@@ -875,7 +875,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setActivityEditPopUpTimeRemainingTextView() {
-        String timeLeftInDay = longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getUnassignedDailyTotalTime(), 1000);
+        String timeLeftInDay = longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getUnassignedDailyTotalTime());
         String timeLeftInDayConcatString = getString(R.string.day_time_remaining, timeLeftInDay);
         unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
     }
@@ -1626,9 +1626,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void logTotalStatRows() {
-//        Log.i("testTotal", "assigned time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
-//        Log.i("testTotal", "unassigned time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getUnassignedDailyTotalTime()));
-//        Log.i("testTotal", "aggregate time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getAggregateDailyTime()));
+        Log.i("testTotal", "assigned time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
+        Log.i("testTotal", "unassigned time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getUnassignedDailyTotalTime()));
+        Log.i("testTotal", "aggregate time is " + longToStringConverters.convertMillisToHourBasedString(dailyStatsAccess.getAggregateDailyTime()));
 
         Log.i("testTotal", "assigned calories are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
         Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
@@ -1642,8 +1642,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         newActivityTime = cappedActivityTimeInMillis(newActivityTime, remainingDailyTime);
 
-//        Log.i("testTime", "new time is " + longToStringConverters.convertMillisToHourBasedString(newActivityTime));
-//        Log.i("testTime", "remaining time is " + longToStringConverters.convertMillisToHourBasedString(remainingDailyTime));
-//        Log.i("testTime", "time in edited row is " + longToStringConverters.convertMillisToHourBasedString(timeInEditedRow));
+        Log.i("testTime", "new time is " + longToStringConverters.convertMillisToHourBasedString(newActivityTime));
+        Log.i("testTime", "remaining time is " + longToStringConverters.convertMillisToHourBasedString(remainingDailyTime));
+        Log.i("testTime", "time in edited row is " + longToStringConverters.convertMillisToHourBasedString(timeInEditedRow));
     }
 }

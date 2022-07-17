@@ -549,7 +549,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Total calories row can be 1 more than addition of activities.
+  //Todo: Total calories row can be a bit off from total.
+  //Todo: Change date highlight color in Custom mode to indicate that it can be manipulated.
   //Todo: Option to add misc. calories burned (e.g. user tracks their own).
   //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
   //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
@@ -3891,7 +3892,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis, 999));
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
     logTotalActivityStats();
   }
 
@@ -3900,7 +3901,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalActivityTimeToTextView() {
-    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis, 999));
+    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
   }
 
   private void setTotalActivityCaloriesToTextView() {
@@ -5177,7 +5178,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logTotalActivityStats() {
     Log.i("testTimes", "selected activity set time in millis is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    Log.i("testTimes", "selected activity set time in converted seconds is " + longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis, 999));
+    Log.i("testTimes", "selected activity set time in converted seconds is " + longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
 //    Log.i("testTimes", "selected activity calories are " + formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
