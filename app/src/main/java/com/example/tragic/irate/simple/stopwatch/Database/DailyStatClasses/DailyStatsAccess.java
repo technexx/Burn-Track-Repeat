@@ -762,7 +762,6 @@ public class DailyStatsAccess {
                 valueToReturn += mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
             }
         }
-//        Log.i("testTotal", "aggregated activity time for dayHolder is " +  (valueToReturn));
 
         return valueToReturn;
     }
@@ -773,11 +772,28 @@ public class DailyStatsAccess {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day) {
                 valueToReturn += mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
-                Log.i("testTotal", "individual activity calories for dayHolder in Insertion are " +  mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
             }
         }
 
-        Log.i("testTotal", "aggregated activity calories for dayHolder are " +  valueToReturn);
+        return valueToReturn;
+    }
+
+    public long getTotalActivityTimeForSelectedDuration() {
+        long valueToReturn = 0;
+
+        for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
+            valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
+        }
+
+        return valueToReturn;
+    }
+
+    public double getTotalCaloriesBurnedForSelectedDuration() {
+        double valueToReturn = 0;
+
+        for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
+            valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
+        }
 
         return valueToReturn;
     }
@@ -786,12 +802,17 @@ public class DailyStatsAccess {
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
 
+        //Todo: These need to be rounded first.
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getActivity()!=null) {
                 if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
+
+
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
                     totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
-                    totalCaloriesBurnedListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+
+                    double caloriesToAdd = roundDownCalories(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+                    totalCaloriesBurnedListForEachActivityForSelectedDuration.add(caloriesToAdd);
 
                     Log.i("testTotal", "individual activity calories for dayHolder in Retrieval are " +  mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
 
@@ -801,17 +822,10 @@ public class DailyStatsAccess {
                 }
             }
         }
-        Log.i("testTotal", "rounded value is " + getRoundedTotalOfCaloriesForRecyclerViewDisplay());
     }
 
-    private double getRoundedTotalOfCaloriesForRecyclerViewDisplay() {
-        double valueToReturn = 0;
-
-        for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
-            valueToReturn += Math.ceil(totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i));
-        }
-
-        return valueToReturn;
+    private double roundDownCalories(double calories) {
+        return Math.floor(calories);
     }
 
     public void clearStatsForEachActivityArrayLists() {
@@ -929,7 +943,7 @@ public class DailyStatsAccess {
     }
 
     private double combinedCaloriesFromExistingAndRepeatingPositions(int position) {
-        double iteratingValue = mStatsForEachActivityList.get(position).getTotalCaloriesBurnedForEachActivity();
+        double iteratingValue = roundDownCalories(mStatsForEachActivityList.get(position).getTotalCaloriesBurnedForEachActivity());
         double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDuration.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }

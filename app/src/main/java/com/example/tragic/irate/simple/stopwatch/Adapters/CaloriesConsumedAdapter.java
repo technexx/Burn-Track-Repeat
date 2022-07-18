@@ -16,6 +16,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.R;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -255,6 +256,7 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     private String formatCalorieString(double calories) {
         DecimalFormat df = new DecimalFormat("#");
+        df.setRoundingMode(RoundingMode.DOWN);
         return df.format(calories);
     }
 }

@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
 import android.graphics.Typeface;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.R;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.List;
 
@@ -197,8 +199,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
         mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
         mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(mSetTimes.get(position-1)));
-        //Todo: String conversion here needs to be in sync w/ footer in Fragment. These round based on Math.Round (nearest to upper or lower).
         mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+
+        Log.i("testTotal", "adapter value is " + mCaloriesBurned.get(position-1));
+        Log.i("testTotal", "adapter string value is " + formatCalorieString(mCaloriesBurned.get(position-1)));
     }
 
     private void setHolderViewTextStyles(int textStyle) {
@@ -265,6 +269,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     private String formatCalorieString(double calories) {
         DecimalFormat df = new DecimalFormat("#");
+        df.setRoundingMode(RoundingMode.DOWN);
         return df.format(calories);
     }
 }

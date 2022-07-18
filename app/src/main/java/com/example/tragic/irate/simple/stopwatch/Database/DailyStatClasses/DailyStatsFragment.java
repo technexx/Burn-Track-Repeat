@@ -524,7 +524,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setStatDurationViews(int mode) {
         setEditActivityPopUpButtonsLayoutParams(false);
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
-//        calendarView.setSelectionColor(ContextCompat.getColor(getContext(), R.color.light_grey));
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
@@ -549,7 +548,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==CUSTOM_STATS) {
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
-//            calendarView.setSelectionColor(ContextCompat.getColor(getContext(), R.color.teal));
             convertAndSetDateRangeStringOnTextView();
         }
 
@@ -628,8 +626,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setTotalActivityStatsFooterTextViews() {
-        String totalSetTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTotalSetTimeFromDayHolderList());
-        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
+        String totalSetTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTotalActivityTimeForSelectedDuration());
+        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
 
         dailyStatsTotalSetTimeTextView.setText(totalSetTime);
         dailyStatsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
@@ -1251,6 +1249,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private String formatCalorieString(double calories) {
         DecimalFormat df = new DecimalFormat("#.##");
+        df.setRoundingMode(RoundingMode.DOWN);
         return df.format(calories);
     }
 
