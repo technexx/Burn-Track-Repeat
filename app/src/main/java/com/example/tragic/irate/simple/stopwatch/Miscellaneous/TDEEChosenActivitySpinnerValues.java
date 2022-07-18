@@ -30,6 +30,7 @@ public class TDEEChosenActivitySpinnerValues {
     String[] walking;
     String[] water;
     String[] winter;
+    String[] custom;
 
     String[] bicycling_values;
     String[] conditioning_values;
@@ -73,6 +74,7 @@ public class TDEEChosenActivitySpinnerValues {
         category_list.add(mContext.getString(R.string.walking));
         category_list.add(mContext.getString(R.string.water));
         category_list.add(mContext.getString(R.string.winter));
+        category_list.add(mContext.getString(R.string.custom_activity));
     }
 
     private void populateSubCategoryLists() {

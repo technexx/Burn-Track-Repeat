@@ -132,9 +132,29 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View dailyStatsExpandedView ;
     PopupWindow dailyStatsExpandedPopUpWindow;
 
+    PopupWindow addTdeePopUpWindow;
+    View addTDEEPopUpView;
+
+    Spinner tdee_category_spinner;
+    Spinner tdee_sub_category_spinner;
+    ArrayAdapter<String> tdeeCategoryAdapter;
+    ArrayAdapter<String> tdeeSubCategoryAdapter;
+
+    TextView caloriesBurnedInTdeeAdditionTextView;
+    TextView metScoreTextView;
+    Button confirmActivityAddition;
+
     View tdeeEditView;
     View popUpAnchorBottom;
     PopupWindow tdeeEditPopUpWindow;
+
+    PopupWindow customActivityPopUpWindow;
+    View customActivityPopUpView;
+
+    EditText addCustomActivityEditText;
+    EditText addCustomCaloriesEditText;
+    TextView addCustomCaloriesPerHourTextView;
+    TextView addCustomCaloriesPerMinuteTextView;
 
     ConstraintLayout editActivityPopUpLayout;
     View confirmEditView;
@@ -166,17 +186,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int MULTIPLE_DAYS = 1;
     int SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT;
 
-    PopupWindow addTdeePopUpWindow;
-    View addTDEEPopUpView;
-
-    Spinner tdee_category_spinner;
-    Spinner tdee_sub_category_spinner;
-    ArrayAdapter<String> tdeeCategoryAdapter;
-    ArrayAdapter<String> tdeeSubCategoryAdapter;
-
-    TextView caloriesBurnedInTdeeAdditionTextView;
-    TextView metScoreTextView;
-    Button confirmActivityAddition;
 
     int ADDING_ACTIVITY = 0;
     int EDITING_ACTIVITY = 1;
@@ -1065,7 +1074,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                tdeeCategorySpinnerTouchActions();
+                ArrayList<String> spinnerList = tdeeChosenActivitySpinnerValues.category_list;
+                int lastPosition = spinnerList.size() - 1;
+
+                if (position != lastPosition) {
+                    tdeeCategorySpinnerTouchActions();
+                } else {
+                    addTdeePopUpWindow.dismiss();
+                    customActivityPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0));
+                    addCustomActivityEditText.requestFocus();
+                }
             }
 
             @Override
@@ -1402,6 +1420,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
         tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+
+        customActivityPopUpView = inflater.inflate(R.layout.custom_activity_popup_layout, null);
+        customActivityPopUpWindow = new PopupWindow(customActivityPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
+
+        addCustomActivityEditText = customActivityPopUpView.findViewById(R.id.add_custom_activity_edit_text);
+        addCustomCaloriesEditText = customActivityPopUpView.findViewById(R.id.add_custom_calories_edit_text);
+        addCustomCaloriesPerHourTextView = customActivityPopUpView.findViewById(R.id.add_custom_calories_edit_text_per_hour_textView);
+        addCustomCaloriesPerMinuteTextView = customActivityPopUpView.findViewById(R.id.add_custom_calories_edit_text_per_minute_textView);
+
+        addCustomCaloriesPerHourTextView.setText(R.string.per_hour);
+        addCustomCaloriesPerMinuteTextView.setText(R.string.per_minute);
 
         editActivityPopUpLayout = tdeeEditView.findViewById(R.id.edit_activity_popUp_layout);
 

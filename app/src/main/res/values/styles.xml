@@ -82,6 +82,11 @@
         <item name="android:textColor">@color/white</item>
     </style>
 
+    <style name="CustomActivityAdditionPopUpTheme">
+        <item name="android:textSize">24sp</item>
+        <item name="android:textColor">@color/white</item>
+    </style>
+
     <style name="calorieComparisonTheme">
         <item name="android:textSize">20sp</item>
     </style>

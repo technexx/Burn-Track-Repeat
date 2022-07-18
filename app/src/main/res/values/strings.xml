@@ -119,6 +119,9 @@
     <string name="set_time_text_header">Time</string>
     <string name="calories_burned_text_header">Calories</string>
 
+    <string name="per_hour">Per hour</string>
+    <string name="per_minute">Per minute</string>
+
     <string name="current_day">Selected day</string>
     <string name="date_range">Date range</string>
 
@@ -246,6 +249,7 @@
     <string name="walking">Walking</string>
     <string name="water">Water Activities</string>
     <string name="winter">Winter Activities</string>
+    <string name="custom_activity">CUSTOM</string>
 
     <string name="about_tdee">\"TDEE\" stands for \"Total Daily Energy Expenditure,\" which is a fancy way of counting how many calories you burn each day.\n\n\"BMR\" stands for \"Basal Metabolic Rate,\" and represents how many calories you burn while doing absolutely nothing (e.g. sitting motionless, sleeping).\n\nThis calculator will show your BMR based upon your physical composition, and approximate your TDEE based on your level of daily activity.</string>
 
