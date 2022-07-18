@@ -522,8 +522,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setStatDurationViews(int mode) {
-        calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
         setEditActivityPopUpButtonsLayoutParams(false);
+        calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
+//        calendarView.setSelectionColor(ContextCompat.getColor(getContext(), R.color.light_grey));
 
         if (mode==DAILY_STATS) {
             totalStatsHeaderTextView.setText(R.string.day_total_header);
@@ -548,6 +549,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==CUSTOM_STATS) {
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
+//            calendarView.setSelectionColor(ContextCompat.getColor(getContext(), R.color.teal));
             convertAndSetDateRangeStringOnTextView();
         }
 
@@ -739,10 +741,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
-
-//            logTotalDayHolderTimesAndCalories();
-//            logTotalActivityTimesAndCalories();
-
 
             getActivity().runOnUiThread(()-> {
                 showToastIfNoneActive("Saved!");
