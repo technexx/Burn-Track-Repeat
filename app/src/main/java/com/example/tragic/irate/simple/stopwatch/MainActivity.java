@@ -549,9 +549,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Total calories row can be a bit off from total.
-      //Todo: DayHolder rounds calories down - StatsForEach does not.
-      //Todo: Adding an hour of activity DISPLAYS a few more seconds. Likely due to /999 divisor.
   //Todo: Change date highlight color in Custom mode to indicate that it can be manipulated.
   //Todo: Option to add misc. calories burned (e.g. user tracks their own).
   //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.

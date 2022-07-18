@@ -782,7 +782,7 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    //Todo: These are the lists pulled by recyclerView.
+    // These are the lists pulled by recyclerView.
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
 
@@ -791,7 +791,6 @@ public class DailyStatsAccess {
                 if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
                     totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
-                    //Todo: Precise values are pulled here.
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
 
                     Log.i("testTotal", "individual activity calories for dayHolder in Retrieval are " +  mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
@@ -802,6 +801,17 @@ public class DailyStatsAccess {
                 }
             }
         }
+        Log.i("testTotal", "rounded value is " + getRoundedTotalOfCaloriesForRecyclerViewDisplay());
+    }
+
+    private double getRoundedTotalOfCaloriesForRecyclerViewDisplay() {
+        double valueToReturn = 0;
+
+        for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
+            valueToReturn += Math.ceil(totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i));
+        }
+
+        return valueToReturn;
     }
 
     public void clearStatsForEachActivityArrayLists() {
@@ -859,7 +869,6 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    //Todo: This pull lags a few behind our aggregate from setTotalActivityStatsForSelectedDaysToArrayLists(). DayHolder insertion seems to round down, while StatsForEach keeps full decimal value.
     public double getTotalCaloriesBurnedFromDayHolderList() {
         double valueToReturn = 0;
 

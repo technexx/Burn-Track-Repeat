@@ -4,6 +4,7 @@ import android.util.Log;
 
 import com.google.gson.internal.$Gson$Preconditions;
 
+import java.math.RoundingMode;
 import java.text.DecimalFormat;
 
 public class LongToStringConverters {
@@ -11,6 +12,8 @@ public class LongToStringConverters {
     public String convertMillisToHourBasedStringForTimer(long millis) {
         DecimalFormat dfOneZero = new DecimalFormat("0");
         DecimalFormat dfTwoZeros = new DecimalFormat("00");
+        dfOneZero.setRoundingMode(RoundingMode.DOWN);
+        dfTwoZeros.setRoundingMode(RoundingMode.DOWN);
 
         long seconds= 0;
 
@@ -38,6 +41,8 @@ public class LongToStringConverters {
     public String convertMillisToHourBasedStringForRecyclerView(long millis) {
         DecimalFormat dfOneZero = new DecimalFormat("0");
         DecimalFormat dfTwoZeros = new DecimalFormat("00");
+        dfOneZero.setRoundingMode(RoundingMode.DOWN);
+        dfTwoZeros.setRoundingMode(RoundingMode.DOWN);
 
         long seconds= 0;
 

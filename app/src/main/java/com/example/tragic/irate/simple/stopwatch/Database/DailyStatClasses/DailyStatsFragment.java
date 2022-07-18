@@ -740,8 +740,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
-            logTotalDayHolderTimesAndCalories();
-            logTotalActivityTimesAndCalories();
+//            logTotalDayHolderTimesAndCalories();
+//            logTotalActivityTimesAndCalories();
+
 
             getActivity().runOnUiThread(()-> {
                 showToastIfNoneActive("Saved!");

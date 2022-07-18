@@ -195,9 +195,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (position==mItemCount-1 && mEditModeIsActive) {
             return;
         }
-        //Todo: String conversion here needs to be in sync w/ footer in Fragment.
         mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
         mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(mSetTimes.get(position-1)));
+        //Todo: String conversion here needs to be in sync w/ footer in Fragment. These round based on Math.Round (nearest to upper or lower).
         mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
     }
 
