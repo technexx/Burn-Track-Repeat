@@ -14,7 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp">
+        android:layout_marginTop="2dp">
     </TextView>
 
     <EditText
@@ -24,7 +24,7 @@
         app:layout_constraintTop_toBottomOf="@id/add_custom_activity_textView_header"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:textColor="@color/white"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
@@ -32,6 +32,7 @@
         android:maxLines="2"
         android:minWidth="50dp"
         android:maxWidth="175dp"
+        android:textSize="20sp"
         android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
         android:textColorHint="@color/light_grey">
     </EditText>
@@ -54,7 +55,7 @@
         app:layout_constraintTop_toBottomOf="@id/add_custom_calories_textView_Header"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="4dp"
         android:textColor="@color/white"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
@@ -84,7 +85,43 @@
         app:layout_constraintStart_toEndOf="@id/add_custom_calories_edit_text_per_minute_textView"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="12dp"
-        android:textSize="16sp">
+        android:textSize="18sp">
     </TextView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/confirm_custom_activity_addition"
+        android:text="@string/confirm"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginBottom="4dp"
+        android:layout_marginStart="4dp"
+        android:backgroundTint="@color/Gray"
+        android:textColor="@color/white"
+        android:textSize="18sp"
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/cancel_custom_activity_addition"
+        android:text="@string/cancel"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginBottom="4dp"
+        android:layout_marginEnd="4dp"
+        android:backgroundTint="@color/Gray"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

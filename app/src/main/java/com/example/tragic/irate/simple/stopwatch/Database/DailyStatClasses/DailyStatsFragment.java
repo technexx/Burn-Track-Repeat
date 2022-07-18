@@ -155,6 +155,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     EditText addCustomCaloriesEditText;
     TextView addCustomCaloriesPerHourTextView;
     TextView addCustomCaloriesPerMinuteTextView;
+    Button confirmCustomActivityAddition;
+    Button cancelCustomActivityAddition;
 
     ConstraintLayout editActivityPopUpLayout;
     View confirmEditView;
@@ -186,9 +188,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int MULTIPLE_DAYS = 1;
     int SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT;
 
-
     int ADDING_ACTIVITY = 0;
     int EDITING_ACTIVITY = 1;
+
+    int CUSTOM_ACTIVITY_CALORIES_FORMULA;
+    int CALORIES_PER_HOUR = 0;
+    int CALORIES_PER_MINUTE = 1;
 
     View caloriesConsumedAddAndEditView;
     PopupWindow caloriesConsumedAddAndEditPopUpWindow;
@@ -336,6 +341,26 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityAddition.setOnClickListener(v-> {
             setNewActivityVariablesAndCheckIfActivityExists(SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT);
+        });
+
+        addCustomCaloriesPerHourTextView.setOnClickListener(v->{
+            CUSTOM_ACTIVITY_CALORIES_FORMULA = CALORIES_PER_HOUR;
+            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerHourTextView, true);
+            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, false);
+        });
+
+        addCustomCaloriesPerMinuteTextView.setOnClickListener(v-> {
+            CUSTOM_ACTIVITY_CALORIES_FORMULA = CALORIES_PER_MINUTE;
+            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerHourTextView, false);
+            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, true);
+        });
+
+        confirmCustomActivityAddition.setOnClickListener(v-> {
+
+        });
+
+        cancelCustomActivityAddition.setOnClickListener(v-> {
+
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
@@ -796,7 +821,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
-            long totalSetTime = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
@@ -1428,6 +1452,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addCustomCaloriesEditText = customActivityPopUpView.findViewById(R.id.add_custom_calories_edit_text);
         addCustomCaloriesPerHourTextView = customActivityPopUpView.findViewById(R.id.add_custom_calories_edit_text_per_hour_textView);
         addCustomCaloriesPerMinuteTextView = customActivityPopUpView.findViewById(R.id.add_custom_calories_edit_text_per_minute_textView);
+        confirmCustomActivityAddition = customActivityPopUpView.findViewById(R.id.confirm_calories_consumed_add_button);
+        cancelCustomActivityAddition = customActivityPopUpView.findViewById(R.id.cancel_custom_activity_addition);
 
         addCustomCaloriesPerHourTextView.setText(R.string.per_hour);
         addCustomCaloriesPerMinuteTextView.setText(R.string.per_minute);
