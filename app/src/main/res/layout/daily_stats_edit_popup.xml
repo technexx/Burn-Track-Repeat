@@ -12,11 +12,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="@id/edit_text_layout"
-        app:layout_constraintEnd_toEndOf="@id/edit_text_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="12dp"
-        android:textSize="24sp"
-        android:maxWidth="300dp">
+        android:textSize="22sp"
+        android:maxWidth="375dp">
     </TextView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
