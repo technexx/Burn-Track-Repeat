@@ -327,6 +327,18 @@
         </TextView>
 
         <TextView
+            android:id="@+id/total_weight_difference_compared_header"
+            android:text="@string/difference_weight"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_calories_difference_compared_header"
+            android:layout_marginStart="2dp"
+            android:layout_marginTop="6dp"
+            android:textSize="24sp">
+        </TextView>
+
+        <TextView
             android:id="@+id/total_consumed_calories_compared"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -382,6 +394,18 @@
             app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_activities"
             android:layout_marginEnd="2dp"
             android:layout_marginTop="48dp"
+            android:textSize="24sp"
+            android:textStyle="bold">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_weight_difference_compared"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_calories_difference_compared"
+            android:layout_marginEnd="2dp"
+            android:layout_marginTop="6dp"
             android:textSize="24sp"
             android:textStyle="bold">
         </TextView>

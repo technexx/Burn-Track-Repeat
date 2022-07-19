@@ -549,9 +549,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Option to add misc. calories burned (e.g. user tracks their own).
   //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
   //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
+  //Todo: Also option for base "calories consumed."
 
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
@@ -563,6 +563,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test all notifications.
   //Todo: Add disclaimer about accuracy, for entertainment purposes, not medical advice, etc. Should pop up on app start.
 
+  //Todo: Finish custom activity implementation.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.

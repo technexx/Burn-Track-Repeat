@@ -209,6 +209,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView totalExpendedCaloriesComparedBmr;
     TextView totalExpendedCaloriesComparedActivities;
     TextView totalCaloriesDifferenceCompared;
+    TextView totalWeightDifferenceCompared;
 
     int ADDING_FOOD = 0;
     int EDITING_FOOD = 1;
@@ -669,7 +670,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
 
         dailyStatsTotalSetTimeTextView.setText(totalSetTime);
-        dailyStatsTotalCaloriesBurnedTextView.setText(formatCalorieStringWithoutDecimals(totalCaloriesBurned));
+        dailyStatsTotalCaloriesBurnedTextView.setText(formatDoubleToStringWithoutDecimals(totalCaloriesBurned));
     }
 
     private int aggregateDayIdFromCalendar() {
@@ -929,8 +930,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long hours = getHoursFromMillisValue(activityTime);
             valueToReturn = caloriesEntered * hours;
         }
-
-        Log.i("testCals", "value to return is " + valueToReturn);
 
         return valueToReturn;
     }
@@ -1242,8 +1241,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setThirdMainTextViewInAddTdeePopUp() {
-        String caloriesBurnedPerMinute = formatCalorieString(calculateCaloriesBurnedPerMinute(metScore));
-        String caloriesBurnedPerHour = formatCalorieString(calculateCaloriesBurnedPerMinute(metScore) * 60);
+        String caloriesBurnedPerMinute = formatDoubleToStringWithDecimals(calculateCaloriesBurnedPerMinute(metScore));
+        String caloriesBurnedPerHour = formatDoubleToStringWithDecimals(calculateCaloriesBurnedPerMinute(metScore) * 60);
 
         caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.two_line_concat, getString(R.string.calories_burned_per_minute, caloriesBurnedPerMinute), getString(R.string.calories_burned_per_hour, caloriesBurnedPerHour)));
     }
@@ -1300,7 +1299,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
         String foodString = dailyStatsAccess.getTotalFoodStringListForSelectedDuration().get(position);
         double caloriesInFood = dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration().get(position);
-        String caloriesAsString = formatCalorieStringWithoutDecimals(caloriesInFood);
+        String caloriesAsString = formatDoubleToStringWithoutDecimals(caloriesInFood);
 
         typeOfFoodEditText.setText(foodString);
         caloriesConsumedEditText.setText(caloriesAsString);
@@ -1341,7 +1340,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setTotalCaloriesConsumedFooterTextViews() {
-        foodStatsTotalCaloriesConsumedTextView.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
+        foodStatsTotalCaloriesConsumedTextView.setText(formatDoubleToStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
     }
 
     private void setTotalCaloriesComparedTextViews() {
@@ -1350,18 +1349,23 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double caloriesExpendedFromBmr = dailyStatsAccess.getUnassignedDailyCalories();
         double totalCaloriesExpended = caloriesExpendedFromActivities + caloriesExpendedFromBmr;
         double caloriesDifference = Math.abs(totalCaloriesExpended - caloriesConsumed);
+        double poundDifference = calculateWeightDifferenceFromCalories(caloriesDifference);
 
-        totalConsumedCaloriesCompared.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
+        totalConsumedCaloriesCompared.setText(formatDoubleToStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
 
-        totalExpendedCaloriesCompared.setText(formatCalorieStringWithoutDecimals(totalCaloriesExpended));
-        totalExpendedCaloriesComparedBmr.setText(formatCalorieStringWithoutDecimals(dailyStatsAccess.getUnassignedDailyCalories()));
-        totalExpendedCaloriesComparedActivities.setText(formatCalorieStringWithoutDecimals(caloriesExpendedFromActivities));
+        totalExpendedCaloriesCompared.setText(formatDoubleToStringWithoutDecimals(totalCaloriesExpended));
+        totalExpendedCaloriesComparedBmr.setText(formatDoubleToStringWithoutDecimals(dailyStatsAccess.getUnassignedDailyCalories()));
+        totalExpendedCaloriesComparedActivities.setText(formatDoubleToStringWithoutDecimals(caloriesExpendedFromActivities));
 
         String signToUse = getPlusOrMinusSignForDoubleDifference(caloriesConsumed, totalCaloriesExpended);
         int colorToUse = getTextColorForDoubleDifference(signToUse);
 
-        totalCaloriesDifferenceCompared.setText(getString(R.string.double_placeholder, signToUse, formatCalorieStringWithoutDecimals(caloriesDifference)));
+        totalCaloriesDifferenceCompared.setText(getString(R.string.double_placeholder, signToUse, formatDoubleToStringWithoutDecimals(caloriesDifference)));
         totalCaloriesDifferenceCompared.setTextColor(ContextCompat.getColor(getContext(), colorToUse));
+
+        String poundDifferenceString = formatDoubleToStringWithDecimals(poundDifference);
+        totalWeightDifferenceCompared.setText(getString(R.string.double_placeholder, signToUse, poundDifferenceString));
+        totalWeightDifferenceCompared.setTextColor(ContextCompat.getColor(getContext(), colorToUse));
     }
 
     private String getPlusOrMinusSignForDoubleDifference(double firstValue, double secondValue) {
@@ -1382,13 +1386,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private String formatCalorieString(double calories) {
+    private double calculateWeightDifferenceFromCalories(double calories) {
+        return calories/3500;
+    }
+
+    private String formatDoubleToStringWithDecimals(double calories) {
         DecimalFormat df = new DecimalFormat("#.##");
         df.setRoundingMode(RoundingMode.DOWN);
         return df.format(calories);
     }
 
-    private String formatCalorieStringWithoutDecimals(double calories) {
+    private String formatDoubleToStringWithoutDecimals(double calories) {
         DecimalFormat df = new DecimalFormat("#");
         df.setRoundingMode(RoundingMode.DOWN);
         return df.format(calories);
@@ -1613,6 +1621,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalExpendedCaloriesComparedBmr = mRoot.findViewById(R.id.total_expended_calories_compared_bmr);
         totalExpendedCaloriesComparedActivities = mRoot.findViewById(R.id.total_expended_calories_compared_activities);
         totalCaloriesDifferenceCompared = mRoot.findViewById(R.id.total_calories_difference_compared);
+        totalWeightDifferenceCompared = mRoot.findViewById(R.id.total_weight_difference_compared);
     }
 
     private void instantiateCalorieTabLayoutListenerAndViews() {

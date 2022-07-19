@@ -16,6 +16,7 @@ public class StatsForEachActivity {
     long totalBreakTimeForEachActivity;
     double metScore;
     double caloriesPerHour;
+
     double totalCaloriesBurnedForEachActivity;
 
     public long getStatsForActivityId() {
