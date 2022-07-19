@@ -772,12 +772,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double newCaloriesBurned = 0;
 
         newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
-        newCaloriesBurned = newCaloriesBurned(areWeAddingACustomActivity);
 
-        if (customActivity) {
+        if (!customActivity) {
+            newCaloriesBurned = calculateCaloriesForSpinnerActivity();
+        } else {
             String activityString = addCustomActivityEditText.getText().toString();
             dailyStatsAccess.setActivityString(activityString);
+
+            newCaloriesBurned = calculateCaloriesForCustomActivity(newActivityTime);
         }
+
+        Log.i("testCals", "calories burned are " + newCaloriesBurned);
 
         if (newActivityTime<=0) {
             getActivity().runOnUiThread(()-> {
@@ -835,7 +840,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
             long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
-            double newCaloriesBurned = newCaloriesBurned(areWeAddingACustomActivity);
+            double newCaloriesBurned = calculateCaloriesForSpinnerActivity();
 
             dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(newActivityTime, newCaloriesBurned);
 
@@ -880,24 +885,43 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private double newCaloriesBurned(boolean customActivity) {
+    private double calculateCaloriesForSpinnerActivity() {
         int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
         long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity);
 
         double newCaloriesForActivity = 0;
 
-        if (!customActivity) {
-            double retrievedMetScore = dailyStatsAccess.getMetScore();
-            double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
-            newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
-        } else {
-            String editTextCalories = addCustomCaloriesEditText.getText().toString();
-            newCaloriesForActivity = Double.parseDouble(editTextCalories);
-        }
+        double retrievedMetScore = dailyStatsAccess.getMetScore();
+        double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
+        newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
 
         return newCaloriesForActivity;
     }
 
+    private double calculateCaloriesForCustomActivity(long activityTime) {
+        double valueToReturn = 0;
+
+        String editTextCalories = addCustomCaloriesEditText.getText().toString();
+        double caloriesEntered = Double.parseDouble(editTextCalories);
+
+        long minutesToMultiplyBy = getMinutesFromMillisValue(activityTime);
+
+        if (CUSTOM_ACTIVITY_CALORIES_FORMULA == CALORIES_PER_MINUTE) {
+            valueToReturn = caloriesEntered * minutesToMultiplyBy;
+        }
+
+        if (CUSTOM_ACTIVITY_CALORIES_FORMULA == CALORIES_PER_HOUR) {
+            valueToReturn = caloriesEntered * minutesToMultiplyBy / 60;
+        }
+
+        Log.i("testCals", "value to return is " + valueToReturn);
+
+        return valueToReturn;
+    }
+
+    private long getMinutesFromMillisValue(long millis) {
+        return (millis/1000) / 60;
+    }
 
     private long newActivityTimeFromEditText(int addingOrEditingActivity) {
         long timeSetInEditText = getMillisValueToSaveFromEditTextString();
