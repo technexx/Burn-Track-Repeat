@@ -1348,6 +1348,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double caloriesExpendedFromActivities = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
         double caloriesExpendedFromBmr = dailyStatsAccess.getUnassignedDailyCalories();
         double totalCaloriesExpended = caloriesExpendedFromActivities + caloriesExpendedFromBmr;
+
         double caloriesDifference = Math.abs(totalCaloriesExpended - caloriesConsumed);
         double poundDifference = calculateWeightDifferenceFromCalories(caloriesDifference);
         double kilogramDifference = poundDifference * 0.45;

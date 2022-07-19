@@ -549,7 +549,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Should we include a pounds gained/lost row? Just as a calories -> lb conversion.
+  //Todo: No difference in year-to-date/yearly in calorie consumption (and probably in other 2 tabs)
   //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
   //Todo: Also option for base "calories consumed."
 

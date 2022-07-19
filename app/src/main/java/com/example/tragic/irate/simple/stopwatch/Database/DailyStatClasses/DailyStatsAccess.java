@@ -235,7 +235,6 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(singleItemList);
 
         numberOfDaysSelected = 1;
-        logIntegerAndEntityDayLists();
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
@@ -262,7 +261,6 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = 7;
-        logIntegerAndEntityDayLists();
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
@@ -289,7 +287,6 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = numberOfDaysInMonth;
-        logIntegerAndEntityDayLists();
     }
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear, boolean yearToDate) {
@@ -298,8 +295,10 @@ public class DailyStatsAccess {
 
         if (yearToDate) {
             lastDayOfDuration = getCurrentDayOfYear();
+            numberOfDaysSelected = getCurrentDayOfYear();
         } else {
             lastDayOfDuration = daysInYear;
+            numberOfDaysSelected = daysInYear;
         }
 
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
@@ -321,10 +320,6 @@ public class DailyStatsAccess {
 
         setActivityListsForDatabaseObjects(mListOfActivityDaysWithPopulatedRows);
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
-
-        numberOfDaysSelected = daysInYear;
-
-        logIntegerAndEntityDayLists();
     }
 
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
@@ -350,7 +345,6 @@ public class DailyStatsAccess {
 
         numberOfDaysSelected = calendarDayList.size();
 
-        logIntegerAndEntityDayLists();
     }
 
     public int getNumberOfDaysSelected() {
@@ -912,6 +906,7 @@ public class DailyStatsAccess {
         for (int i=0; i<mDayHolderList.size(); i++) {
             valueToReturn += mDayHolderList.get(i).getTotalCaloriesBurned();
         }
+
         return valueToReturn;
     }
 
