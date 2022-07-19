@@ -1350,6 +1350,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double totalCaloriesExpended = caloriesExpendedFromActivities + caloriesExpendedFromBmr;
         double caloriesDifference = Math.abs(totalCaloriesExpended - caloriesConsumed);
         double poundDifference = calculateWeightDifferenceFromCalories(caloriesDifference);
+        double kilogramDifference = poundDifference * 0.45;
 
         totalConsumedCaloriesCompared.setText(formatDoubleToStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
 
@@ -1360,11 +1361,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String signToUse = getPlusOrMinusSignForDoubleDifference(caloriesConsumed, totalCaloriesExpended);
         int colorToUse = getTextColorForDoubleDifference(signToUse);
 
+        String calorieDifferenceString = formatDoubleToStringWithoutDecimals(caloriesDifference);
         totalCaloriesDifferenceCompared.setText(getString(R.string.double_placeholder, signToUse, formatDoubleToStringWithoutDecimals(caloriesDifference)));
         totalCaloriesDifferenceCompared.setTextColor(ContextCompat.getColor(getContext(), colorToUse));
 
         String poundDifferenceString = formatDoubleToStringWithDecimals(poundDifference);
-        totalWeightDifferenceCompared.setText(getString(R.string.double_placeholder, signToUse, poundDifferenceString));
+        String kilogramDifferenceString = formatDoubleToStringWithDecimals(kilogramDifference);
+        String concatWeightDifference = getString(R.string.four_strings_slash_divided, signToUse, poundDifferenceString, signToUse, kilogramDifferenceString);
+
+        totalWeightDifferenceCompared.setText(concatWeightDifference);
         totalWeightDifferenceCompared.setTextColor(ContextCompat.getColor(getContext(), colorToUse));
     }
 
