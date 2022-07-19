@@ -155,8 +155,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     EditText addCustomCaloriesEditText;
     TextView addCustomCaloriesPerHourTextView;
     TextView addCustomCaloriesPerMinuteTextView;
-    Button confirmCustomActivityAddition;
-    Button cancelCustomActivityAddition;
+    Button confirmCustomActivityValues;
+    Button cancelCustomActivityValues;
 
     ConstraintLayout editActivityPopUpLayout;
     View confirmEditView;
@@ -191,6 +191,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int ADDING_ACTIVITY = 0;
     int EDITING_ACTIVITY = 1;
 
+    boolean areWeAddingACustomActivity;
     int CUSTOM_ACTIVITY_CALORIES_FORMULA;
     int CALORIES_PER_HOUR = 0;
     int CALORIES_PER_MINUTE = 1;
@@ -340,7 +341,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityAddition.setOnClickListener(v-> {
-            setNewActivityVariablesAndCheckIfActivityExists(SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT);
+            areWeAddingACustomActivity = false;
+            setNewActivityVariablesAndCheckIfActivityExists(false);
         });
 
         addCustomCaloriesPerHourTextView.setOnClickListener(v->{
@@ -355,12 +357,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, true);
         });
 
-        confirmCustomActivityAddition.setOnClickListener(v-> {
+        confirmCustomActivityValues.setOnClickListener(v-> {
+            areWeAddingACustomActivity = true;
+            customActivityPopUpWindow.dismiss();
+            setNewActivityVariablesAndCheckIfActivityExists(true);
 
         });
 
-        cancelCustomActivityAddition.setOnClickListener(v-> {
-
+        cancelCustomActivityValues.setOnClickListener(v-> {
+            customActivityPopUpWindow.dismiss();
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
@@ -391,10 +396,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
             if (unassignedTimeInEditPopUpTextView.getVisibility()==View.VISIBLE) {
                 if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
-                    addActivityStatsInDatabase();
+                    addActivityStatsInDatabase(areWeAddingACustomActivity);
                 }
                 if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
-                    editActivityStatsInDatabase();
+                    editActivityStatsInDatabase(areWeAddingACustomActivity);
                 }
             } else {
                 displayPopUpForMultipleAddOrEditConfirmation();
@@ -403,10 +408,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmMultipleAddOrEditButton.setOnClickListener(v-> {
             if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
-                addActivityStatsInDatabase();
+                addActivityStatsInDatabase(areWeAddingACustomActivity);
             }
             if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
-                editActivityStatsInDatabase();
+                editActivityStatsInDatabase(areWeAddingACustomActivity);
             }
             confirmEditPopUpWindow.dismiss();
         });
@@ -696,12 +701,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addTdeePopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
-    private void setNewActivityVariablesAndCheckIfActivityExists(int numberOfDaysToAdd) {
+    private void setNewActivityVariablesAndCheckIfActivityExists(boolean customActivity) {
         AsyncTask.execute(()-> {
-            String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+            String activityToAdd = "";
+
+            if (!customActivity) {
+                activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+
+                dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
+            } else {
+                activityToAdd = addCustomActivityEditText.getText().toString();
+            }
 
             dailyStatsAccess.setActivityString(activityToAdd);
-            dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
 
             if (currentStatDurationMode!=CUSTOM_STATS) {
                 dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
@@ -721,7 +733,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void launchEditPopUpIfActivityDoesNotExistAndToastIfItDoes(boolean activityExists) {
         if (!activityExists) {
             populateActivityEditPopUpWithNewRow();
-            addTdeePopUpWindow.dismiss();
+            if (addTdeePopUpWindow.isShowing()) {
+                addTdeePopUpWindow.dismiss();
+            }
+            if (customActivityPopUpWindow.isShowing()) {
+                customActivityPopUpWindow.dismiss();
+            }
         } else {
             showToastIfNoneActive("Activity exists!");
         }
@@ -730,7 +747,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void populateActivityEditPopUpWithNewRow() {
         replaceActivityAddPopUpWithEmptyEditPopUp();
 
-        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+//        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+        String activityToAdd = dailyStatsAccess.getActivityString();
 
         activityInEditPopUpTextView.setText(activityToAdd);
         zeroOutActivityEditPopUpEditTexts();
@@ -749,9 +767,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
     }
 
-    private void addActivityStatsInDatabase() {
-        long newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
-        double newCaloriesBurned = newCaloriesBurned();
+    private void addActivityStatsInDatabase(boolean customActivity) {
+        long newActivityTime = 0;
+        double newCaloriesBurned = 0;
+
+        newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
+        newCaloriesBurned = newCaloriesBurned(areWeAddingACustomActivity);
+
+        if (customActivity) {
+            String activityString = addCustomActivityEditText.getText().toString();
+            dailyStatsAccess.setActivityString(activityString);
+        }
 
         if (newActivityTime<=0) {
             getActivity().runOnUiThread(()-> {
@@ -760,8 +786,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
+        long finalNewActivityTime = newActivityTime;
+        double finalNewCaloriesBurned = newCaloriesBurned;
+
         AsyncTask.execute(()-> {
-            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSelectedDays(newActivityTime, newCaloriesBurned);
+            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSelectedDays(finalNewActivityTime, finalNewCaloriesBurned);
 
             setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
             setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
@@ -800,13 +829,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         toggleEditingForMultipleDaysTextViews();
     }
 
-    private void editActivityStatsInDatabase() {
+    private void editActivityStatsInDatabase(boolean customActivity) {
         AsyncTask.execute(()-> {
             dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
             dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
             long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
-            double newCaloriesBurned = newCaloriesBurned();
+            double newCaloriesBurned = newCaloriesBurned(areWeAddingACustomActivity);
 
             dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(newActivityTime, newCaloriesBurned);
 
@@ -851,16 +880,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private double newCaloriesBurned() {
+    private double newCaloriesBurned(boolean customActivity) {
         int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
         long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity);
 
-        double retrievedMetScore = dailyStatsAccess.getMetScore();
-        double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
-        double newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
+        double newCaloriesForActivity = 0;
+
+        if (!customActivity) {
+            double retrievedMetScore = dailyStatsAccess.getMetScore();
+            double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
+            newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
+        } else {
+            String editTextCalories = addCustomCaloriesEditText.getText().toString();
+            newCaloriesForActivity = Double.parseDouble(editTextCalories);
+        }
 
         return newCaloriesForActivity;
     }
+
 
     private long newActivityTimeFromEditText(int addingOrEditingActivity) {
         long timeSetInEditText = getMillisValueToSaveFromEditTextString();
@@ -1107,6 +1144,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     addTdeePopUpWindow.dismiss();
                     customActivityPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0));
                     addCustomActivityEditText.requestFocus();
+
+                    tdee_category_spinner.setSelection(0);
+                    tdee_sub_category_spinner.setSelection(0);
                 }
             }
 
@@ -1452,8 +1492,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         addCustomCaloriesEditText = customActivityPopUpView.findViewById(R.id.add_custom_calories_edit_text);
         addCustomCaloriesPerHourTextView = customActivityPopUpView.findViewById(R.id.add_custom_calories_edit_text_per_hour_textView);
         addCustomCaloriesPerMinuteTextView = customActivityPopUpView.findViewById(R.id.add_custom_calories_edit_text_per_minute_textView);
-        confirmCustomActivityAddition = customActivityPopUpView.findViewById(R.id.confirm_calories_consumed_add_button);
-        cancelCustomActivityAddition = customActivityPopUpView.findViewById(R.id.cancel_custom_activity_addition);
+        confirmCustomActivityValues = customActivityPopUpView.findViewById(R.id.confirm_custom_activity_values);
+        cancelCustomActivityValues = customActivityPopUpView.findViewById(R.id.cancel_custom_activity_values);
 
         addCustomCaloriesPerHourTextView.setText(R.string.per_hour);
         addCustomCaloriesPerMinuteTextView.setText(R.string.per_minute);

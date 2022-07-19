@@ -730,6 +730,10 @@ public class DailyStatsAccess {
         this.mActivityString = activityString;
     }
 
+    public String getActivityString() {
+        return mActivityString;
+    }
+
     public long getTotalSetTimeForSelectedActivity() {
         return mStatsForEachActivity.getTotalSetTimeForEachActivity();
     }

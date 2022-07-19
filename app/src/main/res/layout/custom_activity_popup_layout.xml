@@ -30,8 +30,8 @@
         android:textCursorDrawable="@drawable/edit_text_cursor"
         android:maxLength="75"
         android:maxLines="2"
-        android:minWidth="50dp"
-        android:maxWidth="175dp"
+        android:minWidth="75dp"
+        android:maxWidth="300dp"
         android:textSize="20sp"
         android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
         android:textColorHint="@color/light_grey">
@@ -61,6 +61,8 @@
         android:textCursorDrawable="@drawable/edit_text_cursor"
         android:singleLine="true"
         android:maxLength="3"
+        android:minWidth="75dp"
+        android:maxWidth="175dp"
         android:inputType="number"
         android:hint="0"
         android:textColorHint="@color/light_grey">
@@ -89,7 +91,7 @@
     </TextView>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/confirm_custom_activity_addition"
+        android:id="@+id/confirm_custom_activity_values"
         android:text="@string/confirm"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
@@ -99,7 +101,7 @@
         android:layout_marginStart="4dp"
         android:backgroundTint="@color/Gray"
         android:textColor="@color/white"
-        android:textSize="18sp"
+        android:textSize="16sp"
         app:cornerRadius="10dp"
         app:rippleColor="#33AAAAAA"
         app:strokeColor="@color/white"
@@ -107,7 +109,7 @@
     </com.google.android.material.button.MaterialButton>
 
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/cancel_custom_activity_addition"
+        android:id="@+id/cancel_custom_activity_values"
         android:text="@string/cancel"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
