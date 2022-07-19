@@ -68,6 +68,7 @@ public class DailyStatsAccess {
 
     String mActivityString = "";
     double mMetScore;
+    double mCaloriesBurnedPerHour;
     int mActivitySortMode = 1;
 
     String mFoodString = "";
@@ -528,6 +529,7 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
             mStatsForEachActivity.setActivity(mActivityString);
             mStatsForEachActivity.setMetScore(mMetScore);
+            mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
 
             mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
             mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
@@ -566,6 +568,7 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(daySelected);
             mStatsForEachActivity.setActivity(mActivityString);
             mStatsForEachActivity.setMetScore(mMetScore);
+            mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
             mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
             mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
@@ -585,9 +588,22 @@ public class DailyStatsAccess {
         mMetScore = mStatsForEachActivityList.get(position).getMetScore();
     }
 
+    public void setCaloriesBurnedPerHourVariable(double calories) {
+        this.mCaloriesBurnedPerHour = calories;
+    }
+
+    public double getCaloriesBurnedPerHourVariable() {
+        return mCaloriesBurnedPerHour;
+    }
+
+    public double getCaloriesBurnedPerHourForSelectedDay() {
+        return mStatsForEachActivity.getCaloriesPerHour();
+    }
+
     public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(long setTime, double caloriesBurned) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+        mStatsForEachActivity.setActivity(mActivityString);
 
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
@@ -730,8 +746,12 @@ public class DailyStatsAccess {
         this.mActivityString = activityString;
     }
 
-    public String getActivityString() {
+    public String getActivityStringVariable() {
         return mActivityString;
+    }
+
+    public String getActivityStringFromSelectedActivity() {
+        return mStatsForEachActivity.getActivity();
     }
 
     public long getTotalSetTimeForSelectedActivity() {
