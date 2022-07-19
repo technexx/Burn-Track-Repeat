@@ -698,6 +698,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onAddingActivity(int position) {
+        toggleEditingForMultipleDaysTextViews();
+        setDefaultCustomActivityAdditionViews();
         addTdeePopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
@@ -726,7 +728,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateActivityEditPopUpWithNewRow();
                 });
             }
-            toggleEditingForMultipleDaysTextViews();
         });
     }
 
@@ -832,6 +833,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         this.mPositionToEdit = position;
         launchActivityEditPopUpWithEditTextValuesSet(position);
         toggleEditingForMultipleDaysTextViews();
+        setDefaultCustomActivityAdditionViews();
     }
 
     private void editActivityStatsInDatabase(boolean customActivity) {
@@ -955,6 +957,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         metScore = retrieveMetScoreFromSubCategoryPosition();
         metScoreTextView.setText(getString(R.string.met_score_single_line, String.valueOf(metScore)));
     }
+
     private void toggleEditingForMultipleDaysTextViews() {
         if (currentStatDurationMode==CUSTOM_STATS && dailyStatsAccess.getNumberOfDaysSelected() > 1) {
             setEditActivityPopUpButtonsLayoutParams(true);
@@ -970,6 +973,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             toggleSingleOrMultipleFoodInsertionTextViewVisibilities(false);
             toggleUnassignedTimeTextViewVisibility (true);
         }
+    }
+
+    private void setDefaultCustomActivityAdditionViews() {
+        addCustomActivityEditText.setText("");
+        addCustomCaloriesEditText.setText("");
+        CUSTOM_ACTIVITY_CALORIES_FORMULA = CALORIES_PER_HOUR;
+        setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerHourTextView, true);
+        setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, false);
     }
 
     private void launchActivityEditPopUpWithEditTextValuesSet(int position) {

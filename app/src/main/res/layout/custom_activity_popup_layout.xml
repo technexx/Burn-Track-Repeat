@@ -73,19 +73,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/add_custom_calories_edit_text"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/add_custom_calories_edit_text_per_hour_textView"
+        app:layout_constraintStart_toEndOf="@id/add_custom_calories_edit_text_per_hour_textView"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="12dp"
-        android:textSize="16sp">
+        android:textSize="18sp">
     </TextView>
 
     <TextView
         android:id="@+id/add_custom_calories_edit_text_per_hour_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/add_custom_calories_edit_text_per_minute_textView"
         app:layout_constraintTop_toBottomOf="@id/add_custom_calories_edit_text"
-        app:layout_constraintStart_toEndOf="@id/add_custom_calories_edit_text_per_minute_textView"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="12dp"
         android:textSize="18sp">
     </TextView>
@@ -96,9 +96,9 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginBottom="4dp"
-        android:layout_marginStart="4dp"
+        android:layout_marginEnd="4dp"
         android:backgroundTint="@color/Gray"
         android:textColor="@color/white"
         android:textSize="16sp"
@@ -114,9 +114,9 @@
         android:layout_width="wrap_content"
         android:layout_height="50dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginBottom="4dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginStart="4dp"
         android:backgroundTint="@color/Gray"
         android:textColor="@color/white"
         android:textSize="16sp"
