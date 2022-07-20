@@ -31,6 +31,7 @@ public class tdeeSettingsFragment extends Fragment {
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
+    Toast mToast;
 
     Button imperialSettingButton;
     Button metricSettingButton;
@@ -57,9 +58,8 @@ public class tdeeSettingsFragment extends Fragment {
     int WEIGHT = 1;
     int HEIGHT = 2;
 
+    double activityLevelMultiplier = 1;
     TextView bmrTextView;
-
-    Toast mToast;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tdee_settings_fragment_layout, container, false);
@@ -273,6 +273,7 @@ public class tdeeSettingsFragment extends Fragment {
             }
         }
 
+        caloriesBurned = Math.round((int) (caloriesBurned * activityLevelMultiplier));
         return caloriesBurned;
     }
 
@@ -296,14 +297,6 @@ public class tdeeSettingsFragment extends Fragment {
         }
 
         return getString(R.string.spinner_value, String.valueOf(spinnerValue), append);
-    }
-
-    private void populateAllSpinnerStringLists() {
-        populateGenderSpinnerStringList();
-        populateAgeSpinnerStringList();
-        populateWeightSpinnerStringList();
-        populateHeightSpinnerStringList();
-        populateActivityLevelList();
     }
 
     private void populateGenderSpinnerStringList() {
@@ -341,13 +334,61 @@ public class tdeeSettingsFragment extends Fragment {
         }
     }
 
-    private void populateActivityLevelList() {
+    private void populateActivityLevelStringList() {
         activityLevelList.add(getString(R.string.act_0));
         activityLevelList.add(getString(R.string.act_1));
         activityLevelList.add(getString(R.string.act_2));
         activityLevelList.add(getString(R.string.act_3));
         activityLevelList.add(getString(R.string.act_4));
         activityLevelList.add(getString(R.string.act_5));
+    }
+
+    private void setActivityLevelSpinnerListener() {
+        activity_level_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                setActivityLevelMultiplier(position);
+                Log.i("testAct", "multiplier is " + activityLevelMultiplier);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+    }
+
+    private void setActivityLevelMultiplier(int spinnerPositionSelected) {
+        switch (spinnerPositionSelected) {
+            case 0:
+                activityLevelMultiplier = 1;
+                break;
+            case 1:
+                activityLevelMultiplier = 1.2;
+                break;
+            case 2:
+                activityLevelMultiplier = 1.375;
+                break;
+            case 3:
+                activityLevelMultiplier = 1.55;
+                break;
+            case 4:
+                activityLevelMultiplier = 1.725;
+                break;
+            case 5:
+                activityLevelMultiplier = 1.9;
+                break;
+
+        }
+    }
+
+    private void populateAllSpinnerStringLists() {
+        populateGenderSpinnerStringList();
+        populateAgeSpinnerStringList();
+        populateWeightSpinnerStringList();
+        populateHeightSpinnerStringList();
+        populateActivityLevelStringList();
+        setActivityLevelSpinnerListener();
     }
 
     private void showToastIfNoneActive (String message){

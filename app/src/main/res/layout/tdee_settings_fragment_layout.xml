@@ -104,7 +104,6 @@
         app:layout_constraintTop_toBottomOf="@id/imperial_setting"
         android:layout_marginTop="18dp"
         android:layout_marginStart="175dp"
-        android:textSize="20sp"
         android:popupBackground="@color/black">
     </Spinner>
 
@@ -116,7 +115,6 @@
         app:layout_constraintTop_toBottomOf="@id/gender_text"
         android:layout_marginTop="20dp"
         android:layout_marginStart="175dp"
-        android:textSize="20sp"
         android:popupBackground="@color/black">
     </Spinner>
 
@@ -128,7 +126,6 @@
         app:layout_constraintTop_toBottomOf="@id/age_text"
         android:layout_marginTop="20dp"
         android:layout_marginStart="175dp"
-        android:textSize="20sp"
         android:popupBackground="@color/black">
     </Spinner>
 
@@ -140,7 +137,6 @@
         app:layout_constraintTop_toBottomOf="@id/weight_text"
         android:layout_marginTop="20dp"
         android:layout_marginStart="175dp"
-        android:textSize="20sp"
         android:popupBackground="@color/black">
     </Spinner>
 
@@ -149,10 +145,9 @@
         android:layout_width="195dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/height_spinner"
+        app:layout_constraintTop_toBottomOf="@id/height_text"
         android:layout_marginTop="20dp"
         android:layout_marginStart="175dp"
-        android:textSize="20sp"
         android:popupBackground="@color/black">
     </Spinner>
 
