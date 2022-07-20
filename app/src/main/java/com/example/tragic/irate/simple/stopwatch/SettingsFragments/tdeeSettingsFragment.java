@@ -59,6 +59,8 @@ public class tdeeSettingsFragment extends Fragment {
 
     TextView bmrTextView;
 
+    Toast mToast;
+
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tdee_settings_fragment_layout, container, false);
 
@@ -98,11 +100,13 @@ public class tdeeSettingsFragment extends Fragment {
         ageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         weightAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         heightAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        activityLevelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
         gender_spinner.setAdapter(genderAdapter);
         age_spinner.setAdapter(ageAdapter);
         weight_spinner.setAdapter(weightAdapter);
         height_spinner.setAdapter(heightAdapter);
+        activity_level_spinner.setAdapter(activityLevelAdapter);
 
         retrieveAndSetSpinnerValues(false);
         bmrTextView.setText(calculatedBMRString());
@@ -118,7 +122,7 @@ public class tdeeSettingsFragment extends Fragment {
         saveTdeeSettingsButton.setOnClickListener(v -> {
             saveSpinnerStatsToSharedPreferences(metricMode);
             bmrTextView.setText(calculatedBMRString());
-            Toast.makeText(getActivity(), "Updated", Toast.LENGTH_SHORT).show();
+            showToastIfNoneActive("Updated");
         });
 
         return root;
@@ -151,7 +155,6 @@ public class tdeeSettingsFragment extends Fragment {
         }
     }
 
-    //Todo: We should set a default bmr in settings, and use that in DailyStatsAccess if settings is not accessed, OR simply prompt before user begins.
     private void saveSpinnerStatsToSharedPreferences(boolean savingMetric) {
         if (savingMetric) {
             prefEdit.putInt("genderPositionMetric", gender_spinner.getSelectedItemPosition());
@@ -345,5 +348,13 @@ public class tdeeSettingsFragment extends Fragment {
         activityLevelList.add(getString(R.string.act_3));
         activityLevelList.add(getString(R.string.act_4));
         activityLevelList.add(getString(R.string.act_5));
+    }
+
+    private void showToastIfNoneActive (String message){
+        if (mToast != null) {
+            mToast.cancel();
+        }
+        mToast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
+        mToast.show();
     }
 }
