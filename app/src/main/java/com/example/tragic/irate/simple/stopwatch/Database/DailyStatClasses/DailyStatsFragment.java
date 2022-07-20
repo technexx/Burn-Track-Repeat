@@ -61,6 +61,8 @@ import java.util.Locale;
 public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, CaloriesConsumedAdapter.caloriesConsumedEdit, CaloriesConsumedAdapter.caloriesConsumedAddition {
 
     View mRoot;
+    SharedPreferences sharedPref;
+    SharedPreferences.Editor prefEdit;
     Calendar calendar;
     com.prolificinteractive.materialcalendarview.MaterialCalendarView calendarView;
     CalendarDayDecorator calendarDayDecorator;
@@ -223,6 +225,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     Toast mToast;
 
     boolean statsAreSimplified;
+    ConstraintLayout simplifiedStatsLayout;
     TextView simplifiedActivityLevelTextView;
     TextView simplifiedCaloriesBurnedTextView;
 
@@ -262,6 +265,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         instantiateExpansionPopUpViews();
         setValueCappingTextWatcherOnEditTexts();
         setTextWatchersOnActivityEditTexts();
+
+        statsAreSimplified = sharedPref.getBoolean("areStatsSimplified", false);
+        simplifiedStatsLogic(statsAreSimplified);
 
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
@@ -330,9 +336,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (!statsAreSimplified) {
                 dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
                 statsAreSimplified = true;
+                simplifiedStatsLogic(statsAreSimplified);
             } else {
                 dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
                 statsAreSimplified = false;
+                simplifiedStatsLogic(statsAreSimplified);
             }
         });
 
@@ -464,11 +472,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void simplifiedStatsLogic(boolean areSimplified) {
         if (!areSimplified) {
             editTdeeStatsButton.setEnabled(true);
-            editTdeeStatsButton.setAlpha(0.3f);
+            editTdeeStatsButton.setAlpha(1.0f);
+            editTdeeStatsButton.setEnabled(true);
+
+            dailyStatsRecyclerView.setVisibility(View.VISIBLE);
+            totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+            simplifiedStatsLayout.setVisibility(View.INVISIBLE);
         } else {
             editTdeeStatsButton.setEnabled(false);
-            editTdeeStatsButton.setAlpha(1.0f);
+            editTdeeStatsButton.setAlpha(0.3f);
+            editTdeeStatsButton.setEnabled(false);
+
+            dailyStatsRecyclerView.setVisibility(View.INVISIBLE);
+            totalActivityStatsValuesTextViewLayout.setVisibility(View.INVISIBLE);
+            simplifiedStatsLayout.setVisibility(View.VISIBLE);
         }
+
+        prefEdit.putBoolean("areStatsSimplified", statsAreSimplified);
+        prefEdit.apply();
     }
 
     public void scrollToBottomOfDailyStatsRecycler() {
@@ -1423,9 +1444,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private double calculateCaloriesBurnedPerMinute(double metValue) {
-        SharedPreferences sp = getContext().getSharedPreferences("pref", 0);
-        boolean metricMode = sp.getBoolean("metricMode", false);
-        int userWeight = sp.getInt("tdeeWeight,", 150);
+        sharedPref = getContext().getSharedPreferences("pref", 0);
+        boolean metricMode = sharedPref.getBoolean("metricMode", false);
+        int userWeight = sharedPref.getInt("tdeeWeight,", 150);
 
         double weightConversion = userWeight;
         if (!metricMode) {
@@ -1696,6 +1717,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateTextViewsAndMiscClasses() {
+        sharedPref = getContext().getSharedPreferences("pref", 0);
+        prefEdit = sharedPref.edit();
+
         tdeeChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getActivity());
         longToStringConverters = new LongToStringConverters();
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -1724,6 +1748,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalFoodStatsValuesTextViewLayoutParams = (ConstraintLayout.LayoutParams) totalFoodStatsValuesTextViewLayout.getLayoutParams();
         foodStatsTotalCaloriesConsumedTextView = mRoot.findViewById(R.id.total_food_stats_calories_consumed);
 
+        simplifiedStatsLayout = mRoot.findViewById(R.id.simplified_stats_layout);
         simplifiedActivityLevelTextView = mRoot.findViewById(R.id.simplified_activity_level_textView);
         simplifiedCaloriesBurnedTextView = mRoot.findViewById(R.id.simplified_calories_burned_textView);
 
