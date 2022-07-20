@@ -95,7 +95,7 @@
     <string name="expended_calories_activities">Activities:</string>
     <string name="difference_calories">Caloric Difference:</string>
     <string name="difference_weight">Lb/Kg Difference: </string>
-    <string name="four_strings_slash_divided">%1$s %2$s / %3$s %4$s</string>
+    <string name="four_strings_slash_divided">%1$s %2$s/%3$s %4$s</string>
 
     <string name="daily_stats_string">%1$s\n%2$s</string>
     <string name="day_total_header">Daily</string>
@@ -213,7 +213,7 @@
     <string name="age">Age:</string>
     <string name="weight">Weight:</string>
     <string name="height">Height:</string>
-    <string name="activity">Activity Level:</string>
+    <string name="activity_level">Activity Level:</string>
 
     <string name="male">Male</string>
     <string name="female">Female</string>

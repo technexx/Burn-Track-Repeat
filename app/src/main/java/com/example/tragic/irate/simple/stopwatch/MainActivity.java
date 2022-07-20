@@ -549,10 +549,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: No difference in year-to-date/yearly in calorie consumption (and probably in other 2 tabs)
   //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
+      //Todo: Add Activity Level to Settings since that is where BMR comes from, anyway.
   //Todo: Also option for base "calories consumed."
 
+  //Todo: Both Imperial and Metric highlighted on first opening of TDEE settings - also default lb/kg values far apart.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).

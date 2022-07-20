@@ -40,16 +40,19 @@ public class tdeeSettingsFragment extends Fragment {
     Spinner age_spinner;
     Spinner weight_spinner;
     Spinner height_spinner;
+    Spinner activity_level_spinner;
 
     List<String> genderList;
     List<String> ageList;
     List<String> weightList;
     List<String> heightList;
+    List<String> activityLevelList;
 
     ArrayAdapter<String> genderAdapter;
     ArrayAdapter<String> ageAdapter;
     ArrayAdapter<String> weightAdapter;
     ArrayAdapter<String> heightAdapter;
+    ArrayAdapter<String> activityLevelAdapter;
 
     int WEIGHT = 1;
     int HEIGHT = 2;
@@ -66,6 +69,7 @@ public class tdeeSettingsFragment extends Fragment {
         age_spinner = root.findViewById(R.id.age_spinner);
         weight_spinner = root.findViewById(R.id.weight_spinner);
         height_spinner = root.findViewById(R.id.height_spinner);
+        activity_level_spinner = root.findViewById(R.id.activity_level_spinner);
         bmrTextView = root.findViewById(R.id.bmr);
 
         imperialSettingButton = root.findViewById(R.id.imperial_setting);
@@ -80,6 +84,7 @@ public class tdeeSettingsFragment extends Fragment {
         ageList = new ArrayList<>();
         weightList = new ArrayList<>();
         heightList = new ArrayList<>();
+        activityLevelList = new ArrayList<>();
 
         populateAllSpinnerStringLists();
 
@@ -87,6 +92,7 @@ public class tdeeSettingsFragment extends Fragment {
         ageAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, ageList);
         weightAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, weightList);
         heightAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, heightList);
+        activityLevelAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, activityLevelList);
 
         genderAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         ageAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -175,17 +181,20 @@ public class tdeeSettingsFragment extends Fragment {
         int agePosition;
         int weightPosition;
         int heightPosition;
+        int activityLevelPosition;
 
         if (selectingMetric) {
             genderPosition = sharedPreferences.getInt("genderPositionMetric", 0);
             agePosition = sharedPreferences.getInt("agePositionMetric", 0);
             weightPosition = sharedPreferences.getInt("weightPositionMetric", 0);
             heightPosition = sharedPreferences.getInt("heightPositionMetric", 0);
+            activityLevelPosition = sharedPreferences.getInt("activityLevelPositionMetric", 0);
         } else {
             genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
             agePosition = sharedPreferences.getInt("agePositionImperial", 0);
             weightPosition = sharedPreferences.getInt("weightPositionImperial", 0);
-            heightPosition = sharedPreferences.getInt("weightPositionImperial", 0);
+            heightPosition = sharedPreferences.getInt("heightPositionImperial", 0);
+            activityLevelPosition = sharedPreferences.getInt("activityLevelPositionImperial", 0);
         }
 
 //        gender_spinner.setSelection(genderPosition);
@@ -291,6 +300,7 @@ public class tdeeSettingsFragment extends Fragment {
         populateAgeSpinnerStringList();
         populateWeightSpinnerStringList();
         populateHeightSpinnerStringList();
+        populateActivityLevelList();
     }
 
     private void populateGenderSpinnerStringList() {
@@ -322,17 +332,18 @@ public class tdeeSettingsFragment extends Fragment {
                 heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
             }
         } else {
-            //200 -> 100
             for (int i = 48; i < 100; i++) {
                 heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
             }
         }
     }
 
-    private void logIntegerConvertedSpinnerValues() {
-        Log.i("testSpinner", "Age spinner is " + getIntegerValueFromFullSpinnerString(age_spinner));
-        Log.i("testSpinner", "Weight spinner is " + getIntegerValueFromFullSpinnerString(weight_spinner));
-        Log.i("testSpinner", "Height spinner is " + getIntegerValueFromFullSpinnerString(height_spinner));
-
+    private void populateActivityLevelList() {
+        activityLevelList.add(getString(R.string.act_0));
+        activityLevelList.add(getString(R.string.act_1));
+        activityLevelList.add(getString(R.string.act_2));
+        activityLevelList.add(getString(R.string.act_3));
+        activityLevelList.add(getString(R.string.act_4));
+        activityLevelList.add(getString(R.string.act_5));
     }
 }

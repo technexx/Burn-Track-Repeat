@@ -84,6 +84,18 @@
         android:textSize="20sp">
     </TextView>
 
+    <TextView
+        android:id="@+id/activity_level_text"
+        android:text="@string/activity_level"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/height_text"
+        app:layout_constraintEnd_toStartOf="parent"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="4dp"
+        android:textSize="20sp">
+    </TextView>
+
     <Spinner
         android:id="@+id/gender_spinner"
         android:layout_width="195dp"
@@ -132,13 +144,25 @@
         android:popupBackground="@color/black">
     </Spinner>
 
+    <Spinner
+        android:id="@+id/activity_level_spinner"
+        android:layout_width="195dp"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/height_spinner"
+        android:layout_marginTop="20dp"
+        android:layout_marginStart="175dp"
+        android:textSize="20sp"
+        android:popupBackground="@color/black">
+    </Spinner>
+
     <TextView
         android:id="@+id/bmr_text"
         android:text="@string/bmr"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/height_text"
+        app:layout_constraintTop_toBottomOf="@id/activity_level_text"
         android:layout_marginTop="32dp"
         android:layout_marginStart="4dp"
         android:textSize="24sp">
@@ -149,7 +173,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/height_text"
+        app:layout_constraintTop_toBottomOf="@id/activity_level_text"
         android:layout_marginTop="32dp"
         android:layout_marginStart="175dp"
         android:textSize="24sp">
