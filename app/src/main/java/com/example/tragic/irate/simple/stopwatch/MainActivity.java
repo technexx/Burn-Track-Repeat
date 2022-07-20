@@ -553,7 +553,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Add Activity Level to Settings since that is where BMR comes from, anyway.
   //Todo: Also option for base "calories consumed."
 
-  //Todo: Both Imperial and Metric highlighted on first opening of TDEE settings - also default lb/kg values far apart.
+  //Todo: assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() will b0rk for custom activities.
+  //Todo: Setting Tdee stuff should be clear/offer a prompt.
+  //Todo: Green/Red for cal diff may want to reverse colors.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).

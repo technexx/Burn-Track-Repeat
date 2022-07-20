@@ -712,6 +712,7 @@ public class DailyStatsAccess {
         if (doesActivityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
         } else if (mStatsForEachActivityList.size()>0) {
+            //Todo: This will b0rk for our custom activities.
             //Fetches most recent db insertion as a reference to the new row that was just saved.
             int mostRecentEntryPosition = mStatsForEachActivityList.size()-1;
             mStatsForEachActivity = mStatsForEachActivityList.get(mostRecentEntryPosition);

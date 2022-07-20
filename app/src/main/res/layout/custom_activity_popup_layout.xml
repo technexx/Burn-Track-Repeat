@@ -25,6 +25,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="4dp"
+        android:gravity="center_horizontal"
         android:textColor="@color/white"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
@@ -56,6 +57,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="4dp"
+        android:gravity="center_horizontal"
         android:textColor="@color/white"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
@@ -64,7 +66,6 @@
         android:minWidth="75dp"
         android:maxWidth="175dp"
         android:inputType="number"
-        android:hint="0"
         android:textColorHint="@color/light_grey">
     </EditText>
 

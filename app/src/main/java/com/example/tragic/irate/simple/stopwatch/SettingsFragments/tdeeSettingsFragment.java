@@ -111,6 +111,9 @@ public class tdeeSettingsFragment extends Fragment {
 
         bmrTextView.setText(calculatedBMRString());
 
+        imperialSettingButton.setAlpha(1.0f);
+        metricSettingButton.setAlpha(0.5f);
+
         imperialSettingButton.setOnClickListener(v -> {
             toggleMetricAndImperial(false);
         });

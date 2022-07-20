@@ -220,8 +220,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int selectedTdeeSubCategoryPosition;
     double metScore;
 
-    ImageButton exitExpansionImageButton;
     Toast mToast;
+    boolean statsAreSimplified;
 
     @Override
     public void onDestroy() {
@@ -324,13 +324,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         dailyStatsExpandedButton.setOnClickListener(v-> {
-            dailyStatsExpandedPopUpWindow.showAsDropDown(calendarView);
-
-            calendarMinimizationLogic(true);
-        });
-
-        exitExpansionImageButton.setOnClickListener(v-> {
-            dailyStatsExpandedPopUpWindow.dismiss();
+            if (!statsAreSimplified) {
+                dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
+                statsAreSimplified = true;
+            } else {
+                dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
+                statsAreSimplified = false;
+            }
         });
 
         activityStatsDurationSwitcherButtonLeft.setOnClickListener(v-> {
@@ -1756,7 +1756,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateExpansionPopUpViews() {
-        exitExpansionImageButton = mRoot.findViewById(R.id.daily_stats_expanded_button);
         dailyStatsExpandedView = inflater.inflate(R.layout.daily_stats_expanded_popup, null);
         dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(420), false);
         dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
