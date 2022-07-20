@@ -221,7 +221,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     double metScore;
 
     Toast mToast;
+
     boolean statsAreSimplified;
+    TextView simplifiedActivityLevelTextView;
+    TextView simplifiedCaloriesBurnedTextView;
 
     @Override
     public void onDestroy() {
@@ -455,6 +458,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    //Todo: Visibilities. Set textViews in same methods we do recyclerView stuff.
+    private void simplifiedStatsLogic(boolean areSimplified) {
+        if (!areSimplified) {
+            editTdeeStatsButton.setEnabled(true);
+            editTdeeStatsButton.setAlpha(0.3f);
+        } else {
+            editTdeeStatsButton.setEnabled(false);
+            editTdeeStatsButton.setAlpha(1.0f);
+        }
     }
 
     public void scrollToBottomOfDailyStatsRecycler() {
@@ -1709,6 +1723,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalFoodStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_food_stats_values_textView_layout);
         totalFoodStatsValuesTextViewLayoutParams = (ConstraintLayout.LayoutParams) totalFoodStatsValuesTextViewLayout.getLayoutParams();
         foodStatsTotalCaloriesConsumedTextView = mRoot.findViewById(R.id.total_food_stats_calories_consumed);
+
+        simplifiedActivityLevelTextView = mRoot.findViewById(R.id.simplified_activity_level_textView);
+        simplifiedCaloriesBurnedTextView = mRoot.findViewById(R.id.simplified_calories_burned_textView);
 
         calendarDayDecorator = new CalendarDayDecorator(getContext());
         calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());

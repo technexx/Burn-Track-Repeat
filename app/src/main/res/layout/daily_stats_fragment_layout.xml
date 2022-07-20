@@ -73,6 +73,59 @@
             android:textSize="18sp"
             android:textColor="@color/test_blue">
         </TextView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/simplified_stats_layout"
+        android:layout_width="match_parent"
+        android:layout_height="275dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_stats_total_header_layout">
+
+        <TextView
+            android:id="@+id/simplified_activity_level_header"
+            android:text="@string/activity_level"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="8dp"
+            android:textSize="26sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/simplified_activity_level_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toEndOf="@id/simplified_activity_level_header"
+            android:layout_marginTop="8dp"
+            android:textSize="26sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/simplified_calories_burned_header"
+            android:text="@string/calories_burned_header"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/simplified_activity_level_header"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginStart="4dp"
+            android:layout_marginTop="32dp"
+            android:textSize="26sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/simplified_calories_burned_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/simplified_activity_level_textView"
+            app:layout_constraintStart_toEndOf="@id/simplified_activity_level_header"
+            android:layout_marginTop="32dp"
+            android:textSize="26sp">
+        </TextView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
