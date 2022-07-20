@@ -58,7 +58,6 @@ public class tdeeSettingsFragment extends Fragment {
     int WEIGHT = 1;
     int HEIGHT = 2;
 
-    double activityLevelMultiplier = 1;
     TextView bmrTextView;
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
@@ -109,6 +108,7 @@ public class tdeeSettingsFragment extends Fragment {
         activity_level_spinner.setAdapter(activityLevelAdapter);
 
         retrieveAndSetSpinnerValues(false);
+
         bmrTextView.setText(calculatedBMRString());
 
         imperialSettingButton.setOnClickListener(v -> {
@@ -126,10 +126,6 @@ public class tdeeSettingsFragment extends Fragment {
         });
 
         return root;
-    }
-
-    private String calculatedBMRString() {
-        return getString(R.string.bmr_value, String.valueOf(calculateBMR()));
     }
 
     private void toggleMetricAndImperial(boolean selectingMetric) {
@@ -161,11 +157,13 @@ public class tdeeSettingsFragment extends Fragment {
             prefEdit.putInt("agePositionMetric", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionMetric", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionMetric", height_spinner.getSelectedItemPosition());
+            prefEdit.putInt("activityLevelPositionMetric", activity_level_spinner.getSelectedItemPosition());
         } else {
             prefEdit.putInt("genderPositionImperial", gender_spinner.getSelectedItemPosition());
             prefEdit.putInt("agePositionImperial", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionImperial", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionImperial", height_spinner.getSelectedItemPosition());
+            prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
         }
 
         prefEdit.putInt("savedBmr", calculateBMR());
@@ -175,6 +173,7 @@ public class tdeeSettingsFragment extends Fragment {
         prefEdit.putInt("tdeeAge", getIntegerValueFromFullSpinnerString(age_spinner));
         prefEdit.putInt("tdeeWeight", getIntegerValueFromFullSpinnerString(weight_spinner));
         prefEdit.putInt("tdeeHeight", getIntegerValueFromFullSpinnerString(height_spinner));
+        prefEdit.putInt("activityLevelPosition", activity_level_spinner.getSelectedItemPosition());
 
         prefEdit.apply();
     }
@@ -184,26 +183,26 @@ public class tdeeSettingsFragment extends Fragment {
         int agePosition;
         int weightPosition;
         int heightPosition;
-        int activityLevelPosition;
 
         if (selectingMetric) {
             genderPosition = sharedPreferences.getInt("genderPositionMetric", 0);
             agePosition = sharedPreferences.getInt("agePositionMetric", 0);
             weightPosition = sharedPreferences.getInt("weightPositionMetric", 0);
             heightPosition = sharedPreferences.getInt("heightPositionMetric", 0);
-            activityLevelPosition = sharedPreferences.getInt("activityLevelPositionMetric", 0);
         } else {
             genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
             agePosition = sharedPreferences.getInt("agePositionImperial", 0);
             weightPosition = sharedPreferences.getInt("weightPositionImperial", 0);
             heightPosition = sharedPreferences.getInt("heightPositionImperial", 0);
-            activityLevelPosition = sharedPreferences.getInt("activityLevelPositionImperial", 0);
         }
 
 //        gender_spinner.setSelection(genderPosition);
 //        age_spinner.setSelection(agePosition);
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
+
+        int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 0);
+        activity_level_spinner.setSelection(activityLevelPosition);
     }
 
     private int getIntegerValueFromFullSpinnerString(Spinner spinner) {
@@ -233,6 +232,10 @@ public class tdeeSettingsFragment extends Fragment {
     private void refreshWeightAndHeightSpinnerAdapters() {
         weightAdapter.notifyDataSetChanged();
         heightAdapter.notifyDataSetChanged();
+    }
+
+    private String calculatedBMRString() {
+        return getString(R.string.bmr_value, String.valueOf(calculateBMR()));
     }
 
     private int calculateBMR() {
@@ -273,7 +276,13 @@ public class tdeeSettingsFragment extends Fragment {
             }
         }
 
+        int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 0);
+        double activityLevelMultiplier = setActivityLevelMultiplier(activityLevelPosition);
+
         caloriesBurned = Math.round((int) (caloriesBurned * activityLevelMultiplier));
+
+        Log.i("testAct", "position is " + activityLevelPosition);
+
         return caloriesBurned;
     }
 
@@ -347,8 +356,7 @@ public class tdeeSettingsFragment extends Fragment {
         activity_level_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                setActivityLevelMultiplier(position);
-                Log.i("testAct", "multiplier is " + activityLevelMultiplier);
+                bmrTextView.setText(calculatedBMRString());
             }
 
             @Override
@@ -358,28 +366,32 @@ public class tdeeSettingsFragment extends Fragment {
         });
     }
 
-    private void setActivityLevelMultiplier(int spinnerPositionSelected) {
+    private double setActivityLevelMultiplier(int spinnerPositionSelected) {
+        double multiplierToReturn = 0;
+
         switch (spinnerPositionSelected) {
             case 0:
-                activityLevelMultiplier = 1;
+                multiplierToReturn = 1;
                 break;
             case 1:
-                activityLevelMultiplier = 1.2;
+                multiplierToReturn = 1.2;
                 break;
             case 2:
-                activityLevelMultiplier = 1.375;
+                multiplierToReturn = 1.375;
                 break;
             case 3:
-                activityLevelMultiplier = 1.55;
+                multiplierToReturn = 1.55;
                 break;
             case 4:
-                activityLevelMultiplier = 1.725;
+                multiplierToReturn = 1.725;
                 break;
             case 5:
-                activityLevelMultiplier = 1.9;
+                multiplierToReturn = 1.9;
                 break;
 
         }
+
+        return multiplierToReturn;
     }
 
     private void populateAllSpinnerStringLists() {

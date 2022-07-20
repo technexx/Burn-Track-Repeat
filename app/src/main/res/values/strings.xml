@@ -95,7 +95,6 @@
     <string name="expended_calories_activities">Activities:</string>
     <string name="difference_calories">Caloric Difference:</string>
     <string name="difference_weight">Lb/Kg Difference: </string>
-    <string name="four_strings_slash_divided">%1$s %2$s/%3$s %4$s</string>
 
     <string name="daily_stats_string">%1$s\n%2$s</string>
     <string name="day_total_header">Daily</string>
@@ -131,7 +130,8 @@
     <string name="food_portion_header">Portion</string>
     <string name="calories_header">Calories</string>
 
-    <string name="double_placeholder">%1$s %2$s</string>
+    <string name="double_placeholder">%1$s%2$s</string>
+    <string name="four_strings_slash_divided">%1$s%2$s / %3$s%4$s</string>
     <string name="day_time_remaining">%1$s remaining</string>
 
     <string name="note_total">%1$s - On %2$s\nRound %3$s of %4$s\n%5$s </string>
