@@ -506,7 +506,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         int activityLevelPosition = sharedPref.getInt("activityLevelPosition", 0);
 
         String activityLevelString = sharedPref.getString("activityLevelString", getString(R.string.act_0));
-        //Todo: This doesn't update from activity level.
         double caloriesExpended = dailyStatsAccess.getUnassignedDailyCalories();
 
         simplifiedActivityLevelTextView.setText(activityLevelString);

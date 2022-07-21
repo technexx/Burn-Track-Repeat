@@ -549,8 +549,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Should have general "level of activity" tdee option if user doesn't want to track specific activities.
-      //Todo: Add Activity Level to Settings since that is where BMR comes from, anyway.
   //Todo: Also option for base "calories consumed."
 
   //Todo: assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() will b0rk for custom activities.

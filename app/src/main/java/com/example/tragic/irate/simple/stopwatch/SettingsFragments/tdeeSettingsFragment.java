@@ -172,6 +172,8 @@ public class tdeeSettingsFragment extends Fragment {
         prefEdit.putInt("savedBmr", calculateBMR());
         prefEdit.putBoolean("metricMode", metricMode);
 
+        Log.i("testBmr", "bmr from settings class is " + calculateBMR());
+
         prefEdit.putString("tdeeGender", getStringValueFromSpinner(gender_spinner));
         prefEdit.putInt("tdeeAge", getIntegerValueFromFullSpinnerString(age_spinner));
         prefEdit.putInt("tdeeWeight", getIntegerValueFromFullSpinnerString(weight_spinner));
@@ -310,7 +312,7 @@ public class tdeeSettingsFragment extends Fragment {
             }
         }
 
-        int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 0);
+        int activityLevelPosition = activity_level_spinner.getSelectedItemPosition();
         double activityLevelMultiplier = setActivityLevelMultiplier(activityLevelPosition);
 
         caloriesBurned = Math.round((int) (caloriesBurned * activityLevelMultiplier));
