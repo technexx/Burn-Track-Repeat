@@ -945,9 +945,8 @@ public class DailyStatsAccess {
         return totalAggregateCaloriesForSelectedDuration;
     }
 
-    private int bmrCaloriesBurned() {
+    public int bmrCaloriesBurned() {
         int savedBmr = sharedPreferences.getInt("savedBmr", 0);
-        Log.i("testBmr", "bmr from access class is " + savedBmr);
         return savedBmr * numberOfDaysSelected;
     }
 
