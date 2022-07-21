@@ -233,7 +233,7 @@
     <string name="categoryHead">Activity</string>
     <string name="metHead">MET Score</string>
     <string name="hoursHead">Hours Spent</string>
-    <string name="calories_burned_header">Calories Burned</string>
+    <string name="calories_burned_header">Calories Burned:</string>
 
     <string name="bicycling">Bicycling</string>
     <string name="conditioning">Conditioning</string>

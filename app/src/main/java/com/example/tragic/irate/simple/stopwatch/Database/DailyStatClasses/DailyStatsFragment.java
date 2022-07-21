@@ -224,7 +224,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     Toast mToast;
 
-    boolean statsAreSimplified;
+    boolean areActivityStatsSimplified;
     ConstraintLayout simplifiedStatsLayout;
     TextView simplifiedActivityLevelTextView;
     TextView simplifiedCaloriesBurnedTextView;
@@ -266,8 +266,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setValueCappingTextWatcherOnEditTexts();
         setTextWatchersOnActivityEditTexts();
 
-        statsAreSimplified = sharedPref.getBoolean("areStatsSimplified", false);
-        simplifiedStatsLogic(statsAreSimplified);
+        areActivityStatsSimplified = sharedPref.getBoolean("areActivityStatsSimplified", false);
+        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
+        setSimplifiedViewTextViews();
 
         AsyncTask.execute(()-> {
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
@@ -333,14 +334,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         dailyStatsExpandedButton.setOnClickListener(v-> {
-            if (!statsAreSimplified) {
+            if (!areActivityStatsSimplified) {
                 dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
-                statsAreSimplified = true;
-                simplifiedStatsLogic(statsAreSimplified);
+                areActivityStatsSimplified = true;
+                toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
             } else {
                 dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
-                statsAreSimplified = false;
-                simplifiedStatsLogic(statsAreSimplified);
+                areActivityStatsSimplified = false;
+                toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
             }
         });
 
@@ -468,8 +469,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
-    //Todo: Visibilities. Set textViews in same methods we do recyclerView stuff.
-    private void simplifiedStatsLogic(boolean areSimplified) {
+    private void toggleSimplifiedStatViewsWithinActivityTab(boolean areSimplified) {
         if (!areSimplified) {
             editTdeeStatsButton.setEnabled(true);
             editTdeeStatsButton.setAlpha(1.0f);
@@ -488,8 +488,29 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             simplifiedStatsLayout.setVisibility(View.VISIBLE);
         }
 
-        prefEdit.putBoolean("areStatsSimplified", statsAreSimplified);
+        prefEdit.putBoolean("areActivityStatsSimplified", areActivityStatsSimplified);
         prefEdit.apply();
+    }
+
+    private void toggleSimplifiedStatViewsWithinTabSwitches(boolean tabIsOnActivities) {
+        if (tabIsOnActivities) {
+            dailyStatsExpandedButton.setVisibility(View.VISIBLE);
+            toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
+        } else {
+            dailyStatsExpandedButton.setVisibility(View.INVISIBLE);
+            simplifiedStatsLayout.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void setSimplifiedViewTextViews() {
+        int activityLevelPosition = sharedPref.getInt("activityLevelPosition", 0);
+
+        String activityLevelString = sharedPref.getString("activityLevelString", getString(R.string.act_0));
+        //Todo: This doesn't update from activity level.
+        double caloriesExpended = dailyStatsAccess.getUnassignedDailyCalories();
+
+        simplifiedActivityLevelTextView.setText(activityLevelString);
+        simplifiedCaloriesBurnedTextView.setText(formatDoubleToStringWithoutDecimals(caloriesExpended));
     }
 
     public void scrollToBottomOfDailyStatsRecycler() {
@@ -563,6 +584,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setTotalCaloriesConsumedFooterTextViews();
 
             setTotalCaloriesComparedTextViews();
+            setSimplifiedViewTextViews();
         });
     }
 
@@ -1676,15 +1698,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         dailyStatsRecyclerView.setVisibility(View.VISIBLE);
                         totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
                         editTdeeStatsButton.setEnabled(true);
+                        toggleSimplifiedStatViewsWithinTabSwitches(true);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
                         totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
                         editTdeeStatsButton.setEnabled(true);
+                        toggleSimplifiedStatViewsWithinTabSwitches(false);
                         break;
                     case 2:
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
                         editTdeeStatsButton.setEnabled(false);
+                        toggleSimplifiedStatViewsWithinTabSwitches(false);
                         break;
                 }
             }

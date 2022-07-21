@@ -176,7 +176,11 @@ public class tdeeSettingsFragment extends Fragment {
         prefEdit.putInt("tdeeAge", getIntegerValueFromFullSpinnerString(age_spinner));
         prefEdit.putInt("tdeeWeight", getIntegerValueFromFullSpinnerString(weight_spinner));
         prefEdit.putInt("tdeeHeight", getIntegerValueFromFullSpinnerString(height_spinner));
-        prefEdit.putInt("activityLevelPosition", activity_level_spinner.getSelectedItemPosition());
+
+        int activityLevelPosition = activity_level_spinner.getSelectedItemPosition();
+        String activityLevelString = getActivityLevelString(activityLevelPosition);
+        prefEdit.putInt("activityLevelPosition", activityLevelPosition);
+        prefEdit.putString("activityLevelString", activityLevelString);
 
         prefEdit.apply();
     }
@@ -206,6 +210,33 @@ public class tdeeSettingsFragment extends Fragment {
 
         int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 0);
         activity_level_spinner.setSelection(activityLevelPosition);
+    }
+
+    private String getActivityLevelString(int position) {
+        String stringToReturn = "";
+
+        switch (position) {
+            case 0:
+                stringToReturn = getString(R.string.act_0);
+                break;
+            case 1:
+                stringToReturn = getString(R.string.act_1);
+                break;
+            case 2:
+                stringToReturn = getString(R.string.act_2);
+                break;
+            case 3:
+                stringToReturn = getString(R.string.act_3);
+                break;
+            case 4:
+                stringToReturn = getString(R.string.act_4);
+                break;
+            case 5:
+                stringToReturn = getString(R.string.act_5);
+                break;
+        }
+
+        return stringToReturn;
     }
 
     private int getIntegerValueFromFullSpinnerString(Spinner spinner) {
@@ -283,8 +314,6 @@ public class tdeeSettingsFragment extends Fragment {
         double activityLevelMultiplier = setActivityLevelMultiplier(activityLevelPosition);
 
         caloriesBurned = Math.round((int) (caloriesBurned * activityLevelMultiplier));
-
-        Log.i("testAct", "position is " + activityLevelPosition);
 
         return caloriesBurned;
     }
