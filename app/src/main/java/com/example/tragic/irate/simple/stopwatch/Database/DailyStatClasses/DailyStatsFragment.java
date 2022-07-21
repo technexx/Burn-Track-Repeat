@@ -457,7 +457,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             calendarMinimizationLogic(false);
         });
 
-        //Todo: We don't want this to toggle on non-activity tabs.
         dailyStatsExpandedButton.setOnClickListener(v-> {
             if (!areActivityStatsSimplified) {
                 dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
@@ -484,6 +483,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (caloriesComparisonTabLayout.getSelectedTabPosition()==2) {
                 toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
             }
+
+            setTotalCaloriesComparedTextViews(areActivityStatsSimplified);
         });
 
         return root;
@@ -595,7 +596,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setTotalActivityStatsFooterTextViews();
             setTotalCaloriesConsumedFooterTextViews();
 
-            setTotalCaloriesComparedTextViews();
+            setTotalCaloriesComparedTextViews(areActivityStatsSimplified);
             setSimplifiedViewTextViews();
         });
     }
@@ -1411,11 +1412,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         foodStatsTotalCaloriesConsumedTextView.setText(formatDoubleToStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
     }
 
-    private void setTotalCaloriesComparedTextViews() {
+    private void setTotalCaloriesComparedTextViews(boolean statsAreSimplified) {
         double caloriesConsumed = dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration();
         double caloriesExpendedFromActivities = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
-        double caloriesExpendedFromBmr = dailyStatsAccess.getUnassignedDailyCalories();
-        double totalCaloriesExpended = caloriesExpendedFromActivities + caloriesExpendedFromBmr;
+        double unassignedCalories = dailyStatsAccess.getUnassignedDailyCalories();
+
+        double totalCaloriesExpended = 0;
+
+        if (!statsAreSimplified) {
+            totalCaloriesExpended = caloriesExpendedFromActivities + unassignedCalories;
+        } else {
+            totalCaloriesExpended = dailyStatsAccess.bmrCaloriesBurned();
+        }
 
         double caloriesDifference = Math.abs(totalCaloriesExpended - caloriesConsumed);
         double poundDifference = calculateWeightDifferenceFromCalories(caloriesDifference);
