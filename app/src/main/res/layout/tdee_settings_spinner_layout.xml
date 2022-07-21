@@ -4,5 +4,5 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintTop_toTopOf="parent"
-    android:textSize="22sp"
+    android:textSize="20sp"
     xmlns:android="http://schemas.android.com/apk/res/android" />

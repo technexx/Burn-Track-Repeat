@@ -13,8 +13,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/metric_setting"
-        android:backgroundTint="@color/Gray"
-        android:textColor="@color/white"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/blue_2"
         app:cornerRadius="10dp"
         app:rippleColor="#33AAAAAA"
         app:strokeColor="@color/white"
@@ -28,8 +28,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toEndOf="@id/imperial_setting"
         app:layout_constraintEnd_toEndOf="parent"
-        android:backgroundTint="@color/Gray"
-        android:textColor="@color/white"
+        android:backgroundTint="@color/black"
+        android:textColor="@color/blue_2"
         app:cornerRadius="10dp"
         app:rippleColor="#33AAAAAA"
         app:strokeColor="@color/white"
@@ -45,6 +45,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="18dp"
         android:layout_marginStart="4dp"
+        android:textStyle="bold"
         android:textSize="20sp">
     </TextView>
 
@@ -57,6 +58,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp"
         android:layout_marginStart="4dp"
+        android:textStyle="bold"
         android:textSize="20sp">
     </TextView>
 
@@ -69,6 +71,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp"
         android:layout_marginStart="4dp"
+        android:textStyle="bold"
         android:textSize="20sp">
     </TextView>
 
@@ -81,6 +84,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp"
         android:layout_marginStart="4dp"
+        android:textStyle="bold"
         android:textSize="20sp">
     </TextView>
 
@@ -93,6 +97,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="20dp"
         android:layout_marginStart="4dp"
+        android:textStyle="bold"
         android:textSize="20sp">
     </TextView>
 
@@ -160,6 +165,7 @@
         app:layout_constraintTop_toBottomOf="@id/activity_level_spinner"
         android:layout_marginTop="32dp"
         android:layout_marginStart="4dp"
+        android:textStyle="bold"
         android:textSize="24sp">
     </TextView>
 
@@ -182,7 +188,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/bmr"
         android:layout_marginTop="32dp"
-        android:textColor="@color/white"
+        android:textColor="@color/blue_2"
         app:cornerRadius="10dp"
         app:rippleColor="#33AAAAAA"
         app:strokeColor="@color/white"
