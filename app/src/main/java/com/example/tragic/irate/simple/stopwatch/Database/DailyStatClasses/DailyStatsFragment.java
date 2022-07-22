@@ -356,11 +356,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, false);
         });
 
-        addCustomCaloriesPerMinuteTextView.setOnClickListener(v-> {
-            CUSTOM_ACTIVITY_CALORIES_FORMULA = CALORIES_PER_MINUTE;
-            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerHourTextView, false);
-            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, true);
-        });
+//        addCustomCaloriesPerMinuteTextView.setOnClickListener(v-> {
+//            CUSTOM_ACTIVITY_CALORIES_FORMULA = CALORIES_PER_MINUTE;
+//            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerHourTextView, false);
+//            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, true);
+//        });
 
         confirmCustomActivityValues.setOnClickListener(v-> {
             areWeAddingACustomActivity = true;
@@ -824,7 +824,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void populateActivityEditPopUpWithNewRow() {
         replaceActivityAddPopUpWithEmptyEditPopUp();
 
-//        String activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
         String activityToAdd = dailyStatsAccess.getActivityStringVariable();
 
         activityInEditPopUpTextView.setText(activityToAdd);
@@ -847,6 +846,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void addActivityStatsInDatabase(boolean customActivity) {
         long newActivityTime = 0;
         double newCaloriesBurned = 0;
+        double caloriesBurnedPerHour;
 
         newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
 
@@ -857,10 +857,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             String activityString = addCustomActivityEditText.getText().toString();
             dailyStatsAccess.setActivityString(activityString);
 
-            newCaloriesBurned = calculateCaloriesForCustomActivity(newActivityTime);
-        }
+            newCaloriesBurned = calculateCaloriesForCustomActivityAddition(newActivityTime);
 
-        Log.i("testCals", "calories burned are " + newCaloriesBurned);
+            caloriesBurnedPerHour = Double.parseDouble(addCustomCaloriesEditText.getText().toString());
+            dailyStatsAccess.setCaloriesBurnedPerHourVariable(caloriesBurnedPerHour);
+        }
 
         if (newActivityTime<=0) {
             getActivity().runOnUiThread(()-> {
@@ -922,16 +923,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long newActivityTime = 0;
             double newCaloriesBurned = 0;
 
+            //Used for spinner and custom.
             newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
 
             if (!customActivity) {
                 dailyStatsAccess.setActivityString(dailyStatsAccess.getActivityStringFromSelectedActivity());
                 newCaloriesBurned = calculateCaloriesForSpinnerActivity();
             } else {
-                //Activity TextView needs an editText if we're going to allow editing.
-                dailyStatsAccess.setActivityString(addCustomActivityEditText.getText().toString());
-
-                newCaloriesBurned = calculateCaloriesForCustomActivity(newActivityTime);
+                double caloriesBurnedPerHour = dailyStatsAccess.getCaloriesBurnedPerHourForSelectedDay();
+                newCaloriesBurned = calculateCaloriesForCustomActivityEdit(newActivityTime, caloriesBurnedPerHour);
             }
 
             dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(newActivityTime, newCaloriesBurned);
@@ -989,16 +989,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return newCaloriesForActivity;
     }
 
-    private double calculateCaloriesForCustomActivity(long activityTime) {
+    private double calculateCaloriesForCustomActivityAddition(long activityTime) {
         double valueToReturn = 0;
 
         String editTextCalories = addCustomCaloriesEditText.getText().toString();
         double caloriesEntered = Double.parseDouble(editTextCalories);
 
-        if (CUSTOM_ACTIVITY_CALORIES_FORMULA == CALORIES_PER_MINUTE) {
-            long minutes = getMinutesFromMillisValue(activityTime);
-            valueToReturn = caloriesEntered * minutes;
-        }
+//        if (CUSTOM_ACTIVITY_CALORIES_FORMULA == CALORIES_PER_MINUTE) {
+//            long minutes = getMinutesFromMillisValue(activityTime);
+//            valueToReturn = caloriesEntered * minutes;
+//        }
 
         if (CUSTOM_ACTIVITY_CALORIES_FORMULA == CALORIES_PER_HOUR) {
             long hours = getHoursFromMillisValue(activityTime);
@@ -1014,6 +1014,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private long getHoursFromMillisValue(long millis) {
         return (millis/1000) / 60 / 60;
+    }
+
+    private double calculateCaloriesForCustomActivityEdit(long timeInMillis, double caloriesPerHour) {
+        long minutesInActivity = getMinutesFromMillisValue(timeInMillis);
+        double caloriesPerMinuteBurned = caloriesPerHour * 60;
+
+        return minutesInActivity * caloriesPerMinuteBurned;
+    }
+
+    private long getMillisFromSingleMinute() {
+        return 60 * 60 * 1000;
     }
 
     private long newActivityTimeFromEditText(int addingOrEditingActivity) {

@@ -14,6 +14,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:textStyle="bold"
         android:layout_marginTop="2dp">
     </TextView>
 
@@ -46,6 +47,7 @@
         app:layout_constraintTop_toBottomOf="@id/add_custom_activity_edit_text"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:textStyle="bold"
         android:layout_marginTop="16dp">
     </TextView>
 
