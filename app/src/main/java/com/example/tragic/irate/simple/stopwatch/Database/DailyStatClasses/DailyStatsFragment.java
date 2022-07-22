@@ -270,6 +270,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setTextWatchersOnActivityEditTexts();
 
         areActivityStatsSimplified = sharedPref.getBoolean("areActivityStatsSimplified", false);
+        toggleSimplifiedStatViewsWithoutTabs(areActivityStatsSimplified);
         toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
         setSimplifiedViewTextViews();
 
@@ -458,24 +459,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         dailyStatsExpandedButton.setOnClickListener(v-> {
-            if (!areActivityStatsSimplified) {
-                dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
-                areActivityStatsSimplified = true;
-
-                editTdeeStatsButton.setEnabled(true);
-                editTdeeStatsButton.setAlpha(1.0f);
-                editTdeeStatsButton.setEnabled(true);
-            } else {
-                dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
-                areActivityStatsSimplified = false;
-
-                editTdeeStatsButton.setEnabled(false);
-                editTdeeStatsButton.setAlpha(0.3f);
-                editTdeeStatsButton.setEnabled(false);
-            }
+            areActivityStatsSimplified = !areActivityStatsSimplified;
 
             prefEdit.putBoolean("areActivityStatsSimplified", areActivityStatsSimplified);
             prefEdit.apply();
+
+            toggleSimplifiedStatViewsWithoutTabs(areActivityStatsSimplified);
 
             if (caloriesComparisonTabLayout.getSelectedTabPosition()==0) {
                 toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
@@ -488,6 +477,22 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    private void toggleSimplifiedStatViewsWithoutTabs(boolean areSimplified) {
+        if (!areSimplified) {
+            dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
+
+            editTdeeStatsButton.setEnabled(true);
+            editTdeeStatsButton.setAlpha(1.0f);
+            editTdeeStatsButton.setEnabled(true);
+        } else {
+            dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
+
+            editTdeeStatsButton.setEnabled(false);
+            editTdeeStatsButton.setAlpha(0.3f);
+            editTdeeStatsButton.setEnabled(false);
+        }
     }
 
     private void toggleSimplifiedStatViewsWithinActivityTab(boolean areSimplified) {

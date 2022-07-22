@@ -549,21 +549,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() will b0rk for custom activities.
+  //Todo: Finish custom activity implementation.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
-  //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Test dates from future years.
   //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Check sizes on long aspect for all layouts + menus.
+
+  //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Test all notifications.
   //Todo: Add disclaimer about accuracy, for entertainment purposes, not medical advice, etc. Should pop up on app start.
 
-  //Todo: Finish custom activity implementation.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ emulator.
