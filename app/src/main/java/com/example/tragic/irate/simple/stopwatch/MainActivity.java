@@ -549,9 +549,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Also option for base "calories consumed."
-
   //Todo: assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay() will b0rk for custom activities.
+
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
@@ -1955,13 +1954,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void createNewListOfActivitiesIfDayHasChanged() {
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-    //If last used dayId does not match current day, re-query database for new instance of DayHolder. Otherwise, use current one saved in DailyStatsAccess.
+
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
-      dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
-      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-      dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+      //Inserting new row into database for new day. Update methods below pull that from current day and update.
+      dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+      dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
     }
   }
 
@@ -1979,6 +1978,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+    dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
@@ -3674,7 +3674,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
         //Todo: This is unnecessary. Method above, if list is not empty, means that our day exists in db.
         dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
-        //Todo: Can probably consolidate this and assignDayHolderInstanceForSelectedDay().
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
