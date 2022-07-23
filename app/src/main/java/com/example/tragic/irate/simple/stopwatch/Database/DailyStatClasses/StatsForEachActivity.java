@@ -17,7 +17,7 @@ public class StatsForEachActivity {
     double totalCaloriesBurnedForEachActivity;
     double metScore;
 
-    boolean customActivity;
+    public boolean customActivity;
     double caloriesPerHour;
 
 
@@ -93,11 +93,11 @@ public class StatsForEachActivity {
         this.caloriesPerHour = caloriesPerHour;
     }
 
-    public boolean isCustomActivity() {
+    public boolean getIsCustomActivity() {
         return customActivity;
     }
 
-    public void setCustomActivity(boolean customActivity) {
+    public void setIsCustomActivity(boolean customActivity) {
         this.customActivity = customActivity;
     }
 }

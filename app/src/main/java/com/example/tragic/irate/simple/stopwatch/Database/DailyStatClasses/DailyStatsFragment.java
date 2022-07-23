@@ -916,12 +916,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setDefaultCustomActivityAdditionViews();
     }
 
+    //Todo: Custom boolean returns false. We need to set it from the mStats instance.
     private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
             dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
-            Log.i("testCals", "edit custom activity boolean is " + dailyStatsAccess.getIsActivityCustomBoolean());
+            Log.i("testCals", "edit custom activity boolean is " + dailyStatsAccess.getIsActivityCustomBooleanLocalVariable());
 
             String newActivityString = "";
             long newActivityTime = 0;
@@ -930,7 +931,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             //Used for spinner and custom.
             newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
 
-            if (!dailyStatsAccess.getIsActivityCustomBoolean()) {
+            if (!dailyStatsAccess.getIsActivityCustomBooleanFromDatabaseInstance()) {
                 dailyStatsAccess.setActivityString(dailyStatsAccess.getActivityStringFromSelectedActivity());
                 newCaloriesBurned = calculateCaloriesForSpinnerActivity();
             } else {
@@ -1021,13 +1022,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private double calculateCaloriesForCustomActivityEdit(long timeInMillis, double caloriesPerHour) {
-        long minutesInActivity = getMinutesFromMillisValue(timeInMillis);
-        double caloriesPerMinuteBurned = caloriesPerHour * 60;
+        double hoursInActivity = getMinutesFromMillisValue(timeInMillis) / 60;
 
-        Log.i("testCals", "minutes retrieved are " + minutesInActivity);
-        Log.i("testCals", "cals burned per minute retrieved are " + caloriesPerMinuteBurned);
+        Log.i("testCals", "minutes retrieved are " + getMinutesFromMillisValue(timeInMillis));
+        Log.i("testCals", "hours retrieved are " + hoursInActivity);
+        Log.i("testCals", "cals burned are " + caloriesPerHour * hoursInActivity);
 
-        return minutesInActivity * caloriesPerMinuteBurned;
+        return caloriesPerHour * hoursInActivity;
     }
 
     private long newActivityTimeFromEditText(int addingOrEditingActivity) {

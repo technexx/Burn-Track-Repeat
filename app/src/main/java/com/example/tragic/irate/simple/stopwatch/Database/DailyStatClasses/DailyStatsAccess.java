@@ -524,7 +524,7 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setActivity(mActivityString);
             mStatsForEachActivity.setMetScore(mMetScore);
 
-            mStatsForEachActivity.setCustomActivity(mIsActivityCustom);
+            mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
             mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
 
             mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
@@ -568,7 +568,7 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
             mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
-            mStatsForEachActivity.setCustomActivity(mIsActivityCustom);
+            mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
         }
@@ -590,8 +590,12 @@ public class DailyStatsAccess {
         this.mIsActivityCustom = isCustom;
     }
 
-    public boolean getIsActivityCustomBoolean() {
+    public boolean getIsActivityCustomBooleanLocalVariable() {
         return mIsActivityCustom;
+    }
+
+    public boolean getIsActivityCustomBooleanFromDatabaseInstance() {
+        return mStatsForEachActivity.getIsCustomActivity();
     }
 
     public void setCaloriesBurnedPerHourVariable(double calories) {
