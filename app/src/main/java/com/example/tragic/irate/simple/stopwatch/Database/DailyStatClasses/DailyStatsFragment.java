@@ -916,7 +916,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setDefaultCustomActivityAdditionViews();
     }
 
-    //Todo: Custom boolean returns false. We need to set it from the mStats instance.
     private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
             dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
@@ -932,7 +931,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
 
             if (!dailyStatsAccess.getIsActivityCustomBooleanFromDatabaseInstance()) {
-                dailyStatsAccess.setActivityString(dailyStatsAccess.getActivityStringFromSelectedActivity());
+//                dailyStatsAccess.setActivityString(dailyStatsAccess.getActivityStringFromSelectedActivity());
                 newCaloriesBurned = calculateCaloriesForSpinnerActivity();
             } else {
                 double caloriesBurnedPerHour = dailyStatsAccess.getCaloriesBurnedPerHourForSelectedDay();
@@ -1022,7 +1021,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private double calculateCaloriesForCustomActivityEdit(long timeInMillis, double caloriesPerHour) {
-        double hoursInActivity = getMinutesFromMillisValue(timeInMillis) / 60;
+        double hourDivisor = 60;
+        double hoursInActivity = (double) getMinutesFromMillisValue(timeInMillis) / hourDivisor;
 
         Log.i("testCals", "minutes retrieved are " + getMinutesFromMillisValue(timeInMillis));
         Log.i("testCals", "hours retrieved are " + hoursInActivity);

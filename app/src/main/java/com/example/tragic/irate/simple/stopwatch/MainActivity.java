@@ -549,10 +549,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Finish custom activity implementation.
-
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
+  //Todo: "00" in stat time edit doesn't allow additional chars @ 2 max.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
