@@ -549,7 +549,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Set/Break time skipping a second somewhere.
+  //Todo: One sec still off on intitial few secs of infinity.
   //Todo: Cycles w/ out activity should make use of full width for round list in Main.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -4053,7 +4053,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerTextViewStringOne = (String) timeLeft.getText();
 
     if (hasTimerTextViewChanged()) {
-      timerTextViewStringTwo = (String) timeLeft.getText();
+//      timerTextViewStringTwo = (String) timeLeft.getText();
+      timerTextViewStringTwo = timerTextViewStringOne;
       displayCycleOrDailyTotals();
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
@@ -4155,9 +4156,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis);
         dotDraws.reDraw();
         setNotificationValues();
-
-//        logTotalDailyStats();
-//        logTotalActivityStats();
       }
 
       @Override
