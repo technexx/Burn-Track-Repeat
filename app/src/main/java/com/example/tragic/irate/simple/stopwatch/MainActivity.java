@@ -549,6 +549,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Set/Break time skipping a second somewhere.
+  //Todo: Cycles w/ out activity should make use of full width for round list in Main.
+
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
@@ -1709,13 +1712,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     slideDailyStatsFragmentInFromLeft.setDuration(600);
 
     slideDailyStatsFragmentOutFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_from_left);
-    slideDailyStatsFragmentOutFromLeft.setDuration(400);
+    slideDailyStatsFragmentOutFromLeft.setDuration(300);
 
     slideGlobalSettingsFragmentInFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_from_left);
     slideGlobalSettingsFragmentInFromLeft.setDuration(300);
 
     slideGlobalSettingsFragmentOutFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_from_left);
-    slideGlobalSettingsFragmentOutFromLeft.setDuration(400);
+    slideGlobalSettingsFragmentOutFromLeft.setDuration(300);
 
     slideGlobalSettingsFragmentOutFromLeft.setAnimationListener(new Animation.AnimationListener() {
       @Override
@@ -2453,7 +2456,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void launchGlobalSettingsFragment() {
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentInFromLeft);
+      mainActivityFragmentFrameLayout.startAnimation(slideGlobalSettingsFragmentInFromLeft);
       mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
       if (rootSettingsFragment !=null) {
@@ -4046,16 +4049,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
-  private void updateStatsInSyncWithMainTimer(int millisTickValue) {
-    updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-
-//    if (delayBeforeTimerBeginsSyncingWithTotalTimeStats>0) {
-//      delayBeforeTimerBeginsSyncingWithTotalTimeStats -= millisTickValue;
-//    } else {
-//      updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-//    }
-  }
-
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
     timerTextViewStringOne = (String) timeLeft.getText();
 
@@ -4096,6 +4089,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
         }
+
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
@@ -4156,7 +4150,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (setMillis < 500) timerDisabled = true;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-        updateStatsInSyncWithMainTimer(timerRunnableDelay);
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis);
         dotDraws.reDraw();
@@ -4188,7 +4182,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (breakMillis < 500) timerDisabled = true;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
-        updateStatsInSyncWithMainTimer(timerRunnableDelay);
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
         dotDraws.reDraw();
@@ -4218,7 +4212,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomMillis < 500) timerDisabled = true;
 
         iterateTotalTimesForSelectedCycle(timerRunnableDelay);
-        updateStatsInSyncWithMainTimer(timerRunnableDelay);
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
 
