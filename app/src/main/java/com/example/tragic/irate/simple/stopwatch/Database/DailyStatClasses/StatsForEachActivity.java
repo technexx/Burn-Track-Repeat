@@ -14,10 +14,12 @@ public class StatsForEachActivity {
     String activity;
     long totalSetTimeForEachActivity;
     long totalBreakTimeForEachActivity;
+    double totalCaloriesBurnedForEachActivity;
     double metScore;
+
+    boolean customActivity;
     double caloriesPerHour;
 
-    double totalCaloriesBurnedForEachActivity;
 
     public long getStatsForActivityId() {
         return statsForActivityId;
@@ -67,6 +69,14 @@ public class StatsForEachActivity {
         this.totalBreakTimeForEachActivity = totalBreakTimeForEachActivity;
     }
 
+    public double getTotalCaloriesBurnedForEachActivity() {
+        return totalCaloriesBurnedForEachActivity;
+    }
+
+    public void setTotalCaloriesBurnedForEachActivity(double totalCaloriesBurnedForEachActivity) {
+        this.totalCaloriesBurnedForEachActivity = totalCaloriesBurnedForEachActivity;
+    }
+
     public double getMetScore() {
         return metScore;
     }
@@ -83,11 +93,11 @@ public class StatsForEachActivity {
         this.caloriesPerHour = caloriesPerHour;
     }
 
-    public double getTotalCaloriesBurnedForEachActivity() {
-        return totalCaloriesBurnedForEachActivity;
+    public boolean isCustomActivity() {
+        return customActivity;
     }
 
-    public void setTotalCaloriesBurnedForEachActivity(double totalCaloriesBurnedForEachActivity) {
-        this.totalCaloriesBurnedForEachActivity = totalCaloriesBurnedForEachActivity;
+    public void setCustomActivity(boolean customActivity) {
+        this.customActivity = customActivity;
     }
 }

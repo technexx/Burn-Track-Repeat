@@ -68,7 +68,6 @@ public class DailyStatsAccess {
 
     String mActivityString = "";
     double mMetScore;
-    double mCaloriesBurnedPerHour;
     int mActivitySortMode = 1;
 
     String mFoodString = "";
@@ -86,7 +85,8 @@ public class DailyStatsAccess {
     List<Integer> mListOfFoodDaysWithPopulatedRows;
     List<Integer> mListOfFoodDaysWithEmptyRows;
 
-    LongToStringConverters longToStringConverters = new LongToStringConverters();
+    boolean mIsActivityCustom;
+    double mCaloriesBurnedPerHour;
 
     public DailyStatsAccess(Context context) {
         this.mContext = context;
@@ -523,6 +523,8 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
             mStatsForEachActivity.setActivity(mActivityString);
             mStatsForEachActivity.setMetScore(mMetScore);
+
+            mStatsForEachActivity.setCustomActivity(mIsActivityCustom);
             mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
 
             mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
@@ -562,9 +564,11 @@ public class DailyStatsAccess {
             mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(daySelected);
             mStatsForEachActivity.setActivity(mActivityString);
             mStatsForEachActivity.setMetScore(mMetScore);
-            mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
             mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
             mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+            mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
+            mStatsForEachActivity.setCustomActivity(mIsActivityCustom);
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
         }
@@ -580,6 +584,14 @@ public class DailyStatsAccess {
 
     public void setMetScoreFromDatabaseList(int position) {
         mMetScore = mStatsForEachActivityList.get(position).getMetScore();
+    }
+
+    public void setIsActivityCustomBoolean(boolean isCustom) {
+        this.mIsActivityCustom = isCustom;
+    }
+
+    public boolean getIsActivityCustomBoolean() {
+        return mIsActivityCustom;
     }
 
     public void setCaloriesBurnedPerHourVariable(double calories) {

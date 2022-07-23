@@ -522,7 +522,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   TextView caloriesBurnedInTdeeAdditionTextView;
   TextView metScoreTextView;
-  Button confirmActivityAddition;
+  Button confirmActivityAdditionValues;
 
   boolean metricMode;
   String userGender;
@@ -860,7 +860,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       addTdeePopUpWindow.showAsDropDown(testView);
     });
 
-    confirmActivityAddition.setOnClickListener(v-> {
+    confirmActivityAdditionValues.setOnClickListener(v-> {
       addTdeePopUpWindow.dismiss();
       toggleEditPopUpViewsForAddingActivity(true);
     });
@@ -1497,7 +1497,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void assignTdeePopUpLayoutClassesToTheirIds() {
     tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
     tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
-    confirmActivityAddition = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+    confirmActivityAdditionValues = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
     metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
     metScoreTextView.setVisibility(View.GONE);
     caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
@@ -1875,7 +1875,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setDefaultLayoutTexts() {
-    confirmActivityAddition.setText(R.string.okay);
+    confirmActivityAdditionValues.setText(R.string.okay);
     timerValueInEditPopUpTextView.setText("00:00");
     setTrackingDailyStatsHeaderTextView();
 
@@ -1960,6 +1960,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       //Inserting new row into database for new day. Update methods below pull that from current day and update.
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+      dailyStatsAccess.setIsActivityCustomBoolean(false);
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
     }
   }
@@ -3688,6 +3690,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dailyStatsAccess.setMetScoreFromSpinner(metScore);
 
+        dailyStatsAccess.setIsActivityCustomBoolean(false);
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
