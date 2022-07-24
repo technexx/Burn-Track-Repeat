@@ -3722,7 +3722,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForCurrentDayInMillis = 0;
       totalBreakTimeForCurrentDayInMillis = 0;
       totalCaloriesBurnedForCurrentDay = 0;
-      Log.i("testTime", "day returns as not existing and values set to 0");
     } else {
       calendar = Calendar.getInstance(Locale.getDefault());
       dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
@@ -3734,8 +3733,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
       totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
-      Log.i("testTime", "day returns as existing");
-      Log.i("testTime", "set time retrieved is " + totalSetTimeForCurrentDayInMillis);
     }
   }
 
@@ -3880,10 +3877,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
   }
 
+  //Todo: May not display after first timer second iterates up, causing sync issue.
+  //Todo: On some quick pause/resumes, sometimes total set/break time will skip one ahead as well.
+  //Todo: setMillis and totalSetMillis are not iterating 100% equally. This is likely the issue w/ the lack of sync being seemingly random.
   private void setTotalCycleTimeValuesToTextView() {
     if (mode==1) {
-      total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-      total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+      total_set_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
+      total_break_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleBreakTimeInMillis)));
+
+      Log.i("testTime", "set millis is " + setMillis);
+      Log.i("testTime", "total time millis is " + totalCycleSetTimeInMillis);
+      Log.i("testTime", "total divided time millis is " + dividedMillisForTimerDisplay(totalCycleSetTimeInMillis));
+      Log.i("testTime", "divided total string time is " + convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
     }
     if (mode==3) {
       total_set_time.setText(convertSeconds(totalCycleWorkTimeInMillis/1000));
@@ -3893,7 +3898,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setTotalDailyTimeToTextView() {
     dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForTimer(totalSetTimeForCurrentDayInMillis));
-    logTotalActivityStats();
   }
 
   private void setTotalDailyCaloriesToTextView() {
@@ -4055,6 +4059,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (hasTimerTextViewChanged()) {
 //      timerTextViewStringTwo = (String) timeLeft.getText();
       timerTextViewStringTwo = timerTextViewStringOne;
+
       displayCycleOrDailyTotals();
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
@@ -4093,6 +4098,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
 
+        //Todo: Don't use timerRunnableDelay on this. Despite it being 50ms, it won't iterate entirely in sync. Instead, iterate the times directly within this runnable. That should keep it sync'd w/ timeleft's text.
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         timeLeft.setText(convertSeconds(setMillis/1000));
 
