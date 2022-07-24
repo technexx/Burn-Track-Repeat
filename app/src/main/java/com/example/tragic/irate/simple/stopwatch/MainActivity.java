@@ -549,6 +549,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Cycle title not always saving / showing different String on edit, even after app restart.
+  //Todo: Removal of activity not working - activity is back after exiting timer. Same w/ adding activity.
   //Todo: Cycles w/ out activity should make use of full width for round list in Main.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.

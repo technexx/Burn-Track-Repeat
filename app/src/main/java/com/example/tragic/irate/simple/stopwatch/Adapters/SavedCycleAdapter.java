@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -198,9 +199,16 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (mTdeeActivityExistsInCycleList.get(position)) {
       workoutHolder.tdeeToggle.setText(mWorkoutActivityString.get(position));
       workoutHolder.tdeeToggle.setEnabled(true);
+
+      workoutHolder.workoutNameLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
+      workoutHolder.workoutCyclesLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
+
     } else {
       workoutHolder.tdeeToggle.setText("");
       workoutHolder.tdeeToggle.setEnabled(false);
+
+      workoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
+      workoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
 
     workoutHolder.fullView.setOnClickListener(v -> {
@@ -372,14 +380,20 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public TextView resetCycle;
     public TextView tdeeToggle;
 
+    ConstraintLayout.LayoutParams workoutNameLayoutParams;
+    ConstraintLayout.LayoutParams workoutCyclesLayoutParams;
+
     @SuppressLint("ResourceAsColor")
     public WorkoutHolder(@NonNull View itemView) {
-      super(itemView) ;
+      super(itemView);
       fullView = itemView;
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
       tdeeToggle = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
+
+      workoutNameLayoutParams = (ConstraintLayout.LayoutParams) workoutName.getLayoutParams();
+      workoutCyclesLayoutParams = (ConstraintLayout.LayoutParams) workOutCycle.getLayoutParams();
     }
   }
 
