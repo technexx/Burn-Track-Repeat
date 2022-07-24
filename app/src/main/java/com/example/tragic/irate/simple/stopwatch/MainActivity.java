@@ -549,7 +549,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: One sec still off on intitial few secs of infinity.
   //Todo: Cycles w/ out activity should make use of full width for round list in Main.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -3877,16 +3876,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
   }
 
-  //Todo: May not display after first timer second iterates up, causing sync issue.
-  //Todo: On some quick pause/resumes, sometimes total set/break time will skip one ahead as well.
-  //Todo: setMillis and totalSetMillis are not iterating 100% equally. This is likely the issue w/ the lack of sync being seemingly random.
+  //Todo: We need to round total times either down or up after every round.
   private void setTotalCycleTimeValuesToTextView() {
     if (mode==1) {
-      total_set_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
-      total_break_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleBreakTimeInMillis)));
+//      total_set_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
+//      total_break_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleBreakTimeInMillis)));
+
+      total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+      total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
 
       Log.i("testTime", "set millis is " + setMillis);
-      Log.i("testTime", "total time millis is " + totalCycleSetTimeInMillis);
+      Log.i("testTime", "total set time millis is " + totalCycleSetTimeInMillis);
       Log.i("testTime", "total divided time millis is " + dividedMillisForTimerDisplay(totalCycleSetTimeInMillis));
       Log.i("testTime", "divided total string time is " + convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
     }
@@ -4029,6 +4029,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
     totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
 
+    Log.i("testTime", "rounded down total set time is " + totalCycleSetTimeInMillis);
+
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
   }
@@ -4096,9 +4098,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           textSizeIncreased = true;
         }
 
-        setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+//        setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+        setMillis += timerRunnableDelay;
 
-        //Todo: Don't use timerRunnableDelay on this. Despite it being 50ms, it won't iterate entirely in sync. Instead, iterate the times directly within this runnable. That should keep it sync'd w/ timeleft's text.
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         timeLeft.setText(convertSeconds(setMillis/1000));
 
@@ -4123,7 +4125,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
           textSizeIncreased = true;
         }
-        breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+//        breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+        breakMillis += timerRunnableDelay;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         timeLeft.setText(convertSeconds(breakMillis/1000));
@@ -4323,7 +4326,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void globalNextRoundLogic() {
-//    updateDailyStatTextViewsIfTimerHasAlsoUpdated();
     setAllActivityTimesAndCaloriesToTextViews();
 
     progressBar.startAnimation(fadeProgressOut);
