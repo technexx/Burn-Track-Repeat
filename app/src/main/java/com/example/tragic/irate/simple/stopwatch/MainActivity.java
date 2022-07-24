@@ -3668,10 +3668,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle);
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
+      }
 
-        if (cycleHasActivityAssigned) {
-          retrieveCycleActivityPositionAndMetScoreFromCycleList();
-        }
+      if (cycleHasActivityAssigned) {
+        retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
 
       if (trackActivityWithinCycle) {
