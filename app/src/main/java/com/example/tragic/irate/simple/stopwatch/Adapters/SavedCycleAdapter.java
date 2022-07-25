@@ -65,8 +65,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int SET_COLOR;
   int BREAK_COLOR;
 
-  boolean isTdeeModeActiveForCurrentPosition;
-
   int mPositionToToggle;
 
   public void changeColorSetting(int typeOFRound, int settingNumber) {
@@ -143,9 +141,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public void modifyActiveTdeeModeToggleList(int positionToToggle) {
     if (mActiveTdeeModeBooleanList.get(positionToToggle)) {
       mActiveTdeeModeBooleanList.set(positionToToggle, false);
-      isTdeeModeActiveForCurrentPosition = false;
     } else {
-      isTdeeModeActiveForCurrentPosition = true;
       mActiveTdeeModeBooleanList.set(positionToToggle, true);
     }
   }
@@ -163,6 +159,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mPositionToToggle = position;
   }
 
+  public List<Boolean> getActiveTdeeModeBooleanList() {
+    return mActiveTdeeModeBooleanList;
+  }
+
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -177,8 +177,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //Used to store highlighted positions that we callback to Main to delete.
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
-
-    Log.i("testToggle", "boolean is in adapter is " + mActiveTdeeModeBooleanList);
 
     workoutHolder.tdeeToggle.setOnClickListener(v-> {
       if (!mActiveCycle) {

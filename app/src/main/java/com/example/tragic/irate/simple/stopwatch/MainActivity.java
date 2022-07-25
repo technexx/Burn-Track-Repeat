@@ -553,7 +553,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Cycle title not always saving / showing different String on edit, even after app restart.
-  //Todo: Removal of activity not working - activity is back after exiting timer. Same w/ adding activity.
   //Todo: Cycles w/ out activity should make use of full width for round list in Main.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -2223,8 +2222,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
       }
 
-      Log.i("testToggle", "boolean is in MAIN is " + tdeeIsBeingTrackedInCycleList);
-
       savedCycleAdapter.notifyDataSetChanged();
     }
     if (mode==3 || forAllModes) {
@@ -3700,7 +3697,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
 
-
       if (!isNewCycle) {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
@@ -3788,14 +3784,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
-        cycles.setCurrentlyTrackingCycle(true);
+        cycles.setCurrentlyTrackingCycle(savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle));
       } else {
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeSubCatPosition(0);
         cycles.setTdeeValuePosition(0);
         cycles.setActivityString(getString(R.string.add_activity));
-        cycles.setCurrentlyTrackingCycle(false);
       }
       if (!workoutString.equals("")) {
         cycles.setWorkoutRounds(workoutString);
@@ -3834,9 +3829,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    AsyncTask.execute(()->{
-      queryAndSortAllCyclesFromDatabase();
-    });
     runOnUiThread(()-> {
       cycle_title_textView.setText(cycleTitle);
     });
