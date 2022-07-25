@@ -817,6 +817,7 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
+    //Todo: Stats Frag access this for daily total, while Main uses getTotalSetTimeFromDayHolderEntity().
     public long getTotalActivityTimeForSelectedDuration() {
         long valueToReturn = 0;
 

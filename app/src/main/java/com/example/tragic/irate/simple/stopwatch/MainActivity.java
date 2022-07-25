@@ -552,6 +552,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Deleting day in Stats Frag causes issues w/ timer (likely active, need to replicate).
   //Todo: Cycle title not always saving / showing different String on edit, even after app restart.
   //Todo: Cycles w/ out activity should make use of full width for round list in Main.
 
@@ -1973,7 +1974,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Reset/Resume issue for specific activities.
   private void setAndUpdateDayHolderValuesInDatabase() {
     dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
     dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
@@ -3732,6 +3732,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       calendar = Calendar.getInstance(Locale.getDefault());
       dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+
 
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
