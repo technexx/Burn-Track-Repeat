@@ -745,7 +745,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onCycleClick(int position) {
     isNewCycle = false;
     positionOfSelectedCycle = position;
+    cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
     trackActivityWithinCycle = savedCycleAdapter.retrieveActiveTdeeModeBoolean(position);
+
+    if (cycleHasActivityAssigned) {
+      setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+      retrieveCycleActivityPositionAndMetScoreFromCycleList();
+    }
 
     populateCycleAdapterArrayList();
 
@@ -1970,9 +1976,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Reset/Resume issue for specific activities.
   private void setAndUpdateDayHolderValuesInDatabase() {
     dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
     dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
+
+    Log.i("testSave", "saving for day " + dayOfYear);
+    Log.i("testSave", "saving set time of " + totalSetTimeForCurrentDayInMillis);
   }
 
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
@@ -1988,6 +1998,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
+
+    Log.i("testSave", "saving activity time of " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
@@ -2241,6 +2253,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     positionOfSelectedCycle = (receivedHighlightPositions.get(0));
     cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
     toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
+
+    if (cycleHasActivityAssigned) {
+      setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+      retrieveCycleActivityPositionAndMetScoreFromCycleList();
+    }
 
     String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
     setTdeeSpinnersToDefaultValues();
@@ -3627,6 +3644,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (isNewCycle) {
         saveAddedOrEditedCycleASyncRunnable();
       } else {
+        setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
@@ -3656,12 +3674,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     AsyncTask.execute(()-> {
-      if (isNewCycle) {
-        saveAddedOrEditedCycleASyncRunnable();
-      } else {
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-      }
-
       if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
         if (addTDEEfirstMainTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
@@ -3675,14 +3687,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle);
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
-
-
       }
 
-      if (cycleHasActivityAssigned) {
-        //Todo: We can pull this before launch. That way it will not overwrite an edit to the activity.
-        retrieveCycleActivityPositionAndMetScoreFromCycleList();
-      } else {
+      if (!cycleHasActivityAssigned) {
         tdeeActivityExistsInCycleList.set(positionOfSelectedCycle, false);
         tdeeIsBeingTrackedInCycleList.set(positionOfSelectedCycle, false);
       }
@@ -3709,6 +3716,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
       }
+
+
+      if (!isNewCycle) {
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      }
+
+      saveAddedOrEditedCycleASyncRunnable();
 
       runOnUiThread(new Runnable() {
         @Override
@@ -3850,10 +3864,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
   }
 
+  private void setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(int position) {
+    if (mode==1) cycles = cyclesList.get(position);
+    if (mode==3) pomCycles = pomCyclesList.get(position);
+  }
+
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
     if (mode == 1) {
-      cycles = cyclesList.get(positionOfSelectedCycle);
-
       totalCycleSetTimeInMillis = cycles.getTotalSetTime();
       totalCycleBreakTimeInMillis = cycles.getTotalBreakTime();
 
@@ -3861,8 +3878,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode == 3) {
-      pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-
       totalCycleWorkTimeInMillis = pomCycles.getTotalWorkTime();
       totalCycleRestTimeInMillis = pomCycles.getTotalRestTime();
 
@@ -5057,6 +5072,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
   }
+
+
 
   private void setMetScoreTextViewInAddTdeePopUp() {
     metScore = retrieveMetScoreFromSubCategoryPosition();

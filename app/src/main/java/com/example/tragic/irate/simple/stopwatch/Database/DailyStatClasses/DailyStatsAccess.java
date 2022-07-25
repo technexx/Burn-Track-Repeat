@@ -171,7 +171,7 @@ public class DailyStatsAccess {
     }
 
     public void setDoesDayExistInDatabaseBoolean() {
-        doesActivityExistsInDatabaseForSelectedDay = mDayHolderList.size() > 0;
+        doesDayExistInDatabase = mDayHolderList.size() > 0;
     }
 
     public void assignStatsForEachActivityInstanceForSelectedDay(int daySelected) {
