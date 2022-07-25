@@ -309,6 +309,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean consolidateRoundAdapterLists;
   int roundSelectedPosition;
 
+  int CYCLE_LAUNCHED_FROM_RECYCLER_VIEW = 0;
+  int CYCLES_LAUNCHED_FROM_EDIT_POPUP = 1;
+
   PopupWindow timerPopUpWindow;
   View timerPopUpView;
   PopupWindow stopWatchPopUpWindow;
@@ -748,11 +751,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==1) {
       savedCycleAdapter.removeActiveCycleLayout();
-      launchTimerCycle(false);
+      launchTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
     }
     if (mode==3) {
       savedPomCycleAdapter.removeActiveCycleLayout();
-      launchPomTimerCycle(false);
+      launchPomTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
     }
   }
 
@@ -906,7 +909,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (mode==1) cycles = cyclesList.get(positionOfSelectedCycle);
       if (mode==3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-      clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
 
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
@@ -1016,10 +1018,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     buttonToLaunchTimerFromEditPopUp.setOnClickListener(v-> {
       if (mode==1) {
-        launchTimerCycle(true);
+        launchTimerCycle(CYCLES_LAUNCHED_FROM_EDIT_POPUP);
       }
       if (mode==3) {
-        launchPomTimerCycle(true);
+        launchPomTimerCycle(CYCLES_LAUNCHED_FROM_EDIT_POPUP);
       }
     });
 
@@ -3573,15 +3575,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setTimerLaunchViews(boolean cycleLaunchedFromEditPopUp) {
+  private void setTimerLaunchViews(int typeOfLaunch) {
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
     setViewsAndColorsToPreventTearingInEditPopUp(true);
 
-    if (cycleLaunchedFromEditPopUp) {
+    if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
+
       if (cycleNameEdit.getText().toString().isEmpty()) {
         cycleTitle = getCurrentDateAsFullTextString();
-      } else {
+      }
+
+      if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
         cycleTitle = cycleNameEdit.getText().toString();
       }
     }
@@ -3610,13 +3615,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
-  private void launchPomTimerCycle(boolean cycleLaunchedFromEditPopUp) {
+  private void launchPomTimerCycle(int typeOfLaunch) {
     if (pomValuesTime.size()==0) {
       showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
 
-    setTimerLaunchViews(cycleLaunchedFromEditPopUp);
+    setTimerLaunchViews(typeOfLaunch);
 
     AsyncTask.execute(()-> {
       if (isNewCycle) {
@@ -3634,13 +3639,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  private void launchTimerCycle(boolean cycleLaunchedFromEditPopUp) {
+  private void launchTimerCycle(int typeOfLaunch) {
     if (workoutTime.size()==0) {
       showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
 
-    setTimerLaunchViews(cycleLaunchedFromEditPopUp);
+    setTimerLaunchViews(typeOfLaunch);
 
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
@@ -3657,7 +3662,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
-      if (cycleLaunchedFromEditPopUp) {
+      if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
         if (addTDEEfirstMainTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
           trackActivityWithinCycle = false;
@@ -3665,19 +3670,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleHasActivityAssigned = true;
           trackActivityWithinCycle = true;
         }
-      } else {
+      }
+
+      if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle);
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
+
+
       }
 
       if (cycleHasActivityAssigned) {
+        //Todo: We can pull this before launch. That way it will not overwrite an edit to the activity.
         retrieveCycleActivityPositionAndMetScoreFromCycleList();
+      } else {
+        tdeeActivityExistsInCycleList.set(positionOfSelectedCycle, false);
+        tdeeIsBeingTrackedInCycleList.set(positionOfSelectedCycle, false);
       }
 
       if (trackActivityWithinCycle) {
         dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-        //Todo: This is unnecessary. Method above, if list is not empty, means that our day exists in db.
-        dailyStatsAccess.checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(dayOfYear);
+        dailyStatsAccess.setDoesDayExistInDatabaseBoolean();
         dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
         assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
@@ -3691,8 +3703,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
         dailyStatsAccess.setMetScoreFromSpinner(metScore);
-
         dailyStatsAccess.setIsActivityCustomBoolean(false);
+
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
         assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
@@ -3858,15 +3870,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void retrieveCycleActivityPositionAndMetScoreFromCycleList() {
-    cycles = cyclesList.get(positionOfSelectedCycle);
-
-    selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
-    selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
-
-    metScore = retrieveMetScoreFromSubCategoryPosition();
-  }
-
   private void retrieveTotalDailySetAndBreakTimes() {
     if (mode == 1) {
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
@@ -3878,7 +3881,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
   }
 
-  //Todo: We need to round total times either down or up after every round.
   private void setTotalCycleTimeValuesToTextView() {
     if (mode==1) {
 //      total_set_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
@@ -5044,6 +5046,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTdeeSpinnersToDefaultValues() {
     tdee_category_spinner.setSelection(cycles.getTdeeCatPosition());
     tdee_sub_category_spinner.setSelection(cycles.getTdeeSubCatPosition());
+  }
+
+  private void retrieveCycleActivityPositionAndMetScoreFromCycleList() {
+    cycles = cyclesList.get(positionOfSelectedCycle);
+
+    //Todo: Retrieves 0 on editing cycle.
+    selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
+    selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
+
+    metScore = retrieveMetScoreFromSubCategoryPosition();
   }
 
   private void setMetScoreTextViewInAddTdeePopUp() {

@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.util.Log;
 
@@ -160,13 +161,17 @@ public class DailyStatsAccess {
     }
 
     public void assignDayHolderInstanceForSelectedDay(int daySelected) {
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
+        mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
 
-        if (dayHolderList.size()>0) {
-            mDayHolder = dayHolderList.get(0);
+        if (mDayHolderList.size()>0) {
+            mDayHolder = mDayHolderList.get(0);
         } else {
             mDayHolder = new DayHolder();
         }
+    }
+
+    public void setDoesDayExistInDatabaseBoolean() {
+        doesActivityExistsInDatabaseForSelectedDay = mDayHolderList.size() > 0;
     }
 
     public void assignStatsForEachActivityInstanceForSelectedDay(int daySelected) {
