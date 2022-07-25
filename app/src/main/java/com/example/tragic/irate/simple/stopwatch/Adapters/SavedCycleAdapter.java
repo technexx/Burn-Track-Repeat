@@ -13,6 +13,7 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -176,6 +177,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //Used to store highlighted positions that we callback to Main to delete.
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
+
+    Log.i("testToggle", "boolean is in adapter is " + mActiveTdeeModeBooleanList);
 
     workoutHolder.tdeeToggle.setOnClickListener(v-> {
       if (!mActiveCycle) {

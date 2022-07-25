@@ -2211,17 +2211,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       typeOfRoundArray.clear();
       workoutTitleArray.clear();
       workoutActivityStringArray.clear();
-      tdeeIsBeingTrackedInCycleList.clear();
       tdeeActivityExistsInCycleList.clear();
+      tdeeIsBeingTrackedInCycleList.clear();
 
       for (int i=0; i<cyclesList.size(); i++) {
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         workoutTitleArray.add(cyclesList.get(i).getTitle());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
-        tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
+        tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
       }
+
+      Log.i("testToggle", "boolean is in MAIN is " + tdeeIsBeingTrackedInCycleList);
+
       savedCycleAdapter.notifyDataSetChanged();
     }
     if (mode==3 || forAllModes) {
@@ -3623,12 +3626,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTimerLaunchViews(typeOfLaunch);
 
     AsyncTask.execute(()-> {
-      if (isNewCycle) {
-        saveAddedOrEditedCycleASyncRunnable();
-      } else {
-        setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-      }
+      setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+      retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+
+      saveAddedOrEditedCycleASyncRunnable();
 
       runOnUiThread(new Runnable() {
         @Override
