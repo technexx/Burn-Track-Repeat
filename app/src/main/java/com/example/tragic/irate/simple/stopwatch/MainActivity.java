@@ -896,8 +896,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setViewsAndColorsToPreventTearingInEditPopUp(false);
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-
-      logTotalDailyStats();
     });
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
@@ -1980,9 +1978,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setAndUpdateDayHolderValuesInDatabase() {
     dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
     dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
-
-    Log.i("testSave", "saving for day " + dayOfYear);
-    Log.i("testSave", "saving set time of " + totalSetTimeForCurrentDayInMillis);
   }
 
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
@@ -1998,8 +1993,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
-
-    Log.i("testSave", "saving activity time of " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
@@ -2981,13 +2974,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       progressBar.setProgress(currentProgressBarValue);
       timeLeft.setText(retrieveTimerValueString());
 
-      trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
       toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
       AsyncTask.execute(()-> {
         dailyStatsAccess.setActivityPositionInListForCurrentDay();
-
-        retrieveStatsForTimerOnResumptionAfterEditing();
 
        runOnUiThread(()->{
          displayCycleOrDailyTotals();
@@ -3010,14 +3000,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       resetTimer();
     }
-  }
-
-  private void retrieveStatsForTimerOnResumptionAfterEditing() {
-    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-    dailyStatsAccess.assignStatsForEachActivityInstanceForSelectedDay(dayOfYear);
-
-    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
-    assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
   }
 
   private String retrieveTimerValueString() {
