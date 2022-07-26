@@ -1994,6 +1994,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
   }
 
+  //Todo: We get this repeating through our save runnable above when timer not running.
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
     int currentActivityPosition = dailyStatsAccess.getActivityPosition();
     int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
@@ -2003,7 +2004,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-    dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
+    dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
@@ -2043,7 +2044,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void fabLogic() {
-    //Todo: If pressed and edit popUp does not show (e.g. in highlight mode), it will stay disabled.
 //    fab.setEnabled(false);
     buttonToLaunchTimerFromEditPopUp.setEnabled(true);
     cycleTitle = "";
@@ -3665,7 +3665,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //        tdeeIsBeingTrackedInCycleList.set(positionOfSelectedCycle, false);
 //      }
 
-      if (trackActivityWithinCycle) {
+
+      if (cycleHasActivityAssigned) {
         queryAllStatsEntitiesAndAssignTheirValuesToObjects();
       }
 
@@ -3702,6 +3703,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
+  private void queryAllStatsEntitiesAndAssignTheirValuesToObjects() {
+    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+    dailyStatsAccess.setDoesDayExistInDatabaseBoolean();
+    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
+
+    dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
+
+    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+    dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
+    dailyStatsAccess.setActivityPositionInListForCurrentDay();
+    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+
+    dailyStatsAccess.setMetScoreFromSpinner(metScore);
+    dailyStatsAccess.setIsActivityCustomBoolean(false);
+
+    dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+    assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+  }
+
   private void setTimerLaunchViews(int typeOfLaunch) {
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
@@ -3723,29 +3746,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void queryAllStatsEntitiesAndAssignTheirValuesToObjects() {
-    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-    dailyStatsAccess.setDoesDayExistInDatabaseBoolean();
-    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
-
-    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
-
-    dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
-
-    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-    dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
-    dailyStatsAccess.setActivityPositionInListForCurrentDay();
-
-    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-
-    dailyStatsAccess.setMetScoreFromSpinner(metScore);
-    dailyStatsAccess.setIsActivityCustomBoolean(false);
-
-    dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
-
-    assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-  }
-
   private String getCurrentDateAsSlashFormattedString() {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
     calendar = Calendar.getInstance(Locale.getDefault());
@@ -3758,6 +3758,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() {
+    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+
     if (!dailyStatsAccess.getDoesDayExistInDatabase()) {
       totalSetTimeForCurrentDayInMillis = 0;
       totalBreakTimeForCurrentDayInMillis = 0;
@@ -3765,8 +3767,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       calendar = Calendar.getInstance(Locale.getDefault());
       dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-      dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-
 
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
@@ -3793,6 +3793,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
       totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
     }
+
+//    Log.i("testActivity", "does activity exist boolean is " + dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay());
+//    Log.i("testActivity", "set time for activity pulled is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void getInstancesOfCyclesAndPomCyclesListsFromDatabase() {

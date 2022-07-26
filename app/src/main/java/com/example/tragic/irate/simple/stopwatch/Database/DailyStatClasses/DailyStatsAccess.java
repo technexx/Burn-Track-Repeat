@@ -168,36 +168,13 @@ public class DailyStatsAccess {
         } else {
             mDayHolder = new DayHolder();
         }
+
+//        Log.i("testActivity", "mDayHolder list size is " + mDayHolderList.size());
+
     }
 
     public void setDoesDayExistInDatabaseBoolean() {
         doesDayExistInDatabase = mDayHolderList.size() > 0;
-    }
-
-    public void assignStatsForEachActivityInstanceForSelectedDay(int daySelected) {
-        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
-
-        if (statsForEachActivityList.size()>0) {
-            mStatsForEachActivity = statsForEachActivityList.get(0);
-        } else {
-            mStatsForEachActivity = new StatsForEachActivity();
-        }
-        Log.i("testStats", "mStats instance time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
-    }
-
-    public void checkIfDayAlreadyExistsInDatabaseAndSetBooleanForIt(int daySelected) {
-        doesDayExistInDatabase = false;
-
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
-        int dayHolderSize = dayHolderList.size();
-
-        for (int i=0; i<dayHolderSize; i++) {
-            long dayThatExistsInDatabase = dayHolderList.get(i).getDayId();
-            if (daySelected==dayThatExistsInDatabase) {
-                doesDayExistInDatabase = true;
-                return;
-            }
-        }
     }
 
     public List<DayHolder> getDayHolderList() {
@@ -521,6 +498,17 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
     }
 
+    public void setDoesActivityExistsForSpecificDayBoolean() {
+        doesActivityExistsInDatabaseForSelectedDay = false;
+
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
+                doesActivityExistsInDatabaseForSelectedDay = true;
+                return;
+            }
+        }
+    }
+
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
         if (!doesActivityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = new StatsForEachActivity();
@@ -697,31 +685,18 @@ public class DailyStatsAccess {
         this.mAddingOrEditingSingleDay = singleDay;
     }
 
-    public void setDayHolderListForSingleDayFromDatabase(int dayToRetrieve) {
-        mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(dayToRetrieve);
-    }
-
-    //Used by MainActivity.
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
     }
 
-    public void checkIfActivityExistsForSpecificDayAndSetBooleanForIt() {
-        doesActivityExistsInDatabaseForSelectedDay = false;
-
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
-                doesActivityExistsInDatabaseForSelectedDay = true;
-                return;
-            }
-        }
-    }
-
     public void setActivityPositionInListForCurrentDay() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            Log.i("testActivity", "mStats activity list is " + mStatsForEachActivityList.get(i).getActivity());
             if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
+                //Todo: First added cycle gets position 1 here, should be 0.
                 activityPositionInListForCurrentDay = i;
+                Log.i("testActivity", "activity list position set is " + activityPositionInListForCurrentDay);
                 return;
             }
         }
@@ -731,13 +706,22 @@ public class DailyStatsAccess {
         //New database pull to account for most recent insertion.
         if (doesActivityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
+            Log.i("testActivity", "mStats instance is from single position of " + activityPositionInListForCurrentDay);
         } else if (mStatsForEachActivityList.size()>0) {
             //Fetches most recent db insertion as a reference to the new row that was just saved.
             int mostRecentEntryPosition = mStatsForEachActivityList.size()-1;
             mStatsForEachActivity = mStatsForEachActivityList.get(mostRecentEntryPosition);
+            Log.i("testActivity", "mStats instance is from most recent position of " + activityPositionInListForCurrentDay);
         } else {
             mStatsForEachActivity = new StatsForEachActivity();
+            Log.i("testActivity", "mStats is new");
         }
+
+//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+//            Log.i("testActivity", "mStats activity list is " + mStatsForEachActivityList.get(i).getActivity());
+//        }
+//        Log.i("testActivity", "mStats instance activity is " + mStatsForEachActivity.getActivity());
+//        Log.i("testActivity", "mStats instance set time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
     }
 
     public boolean getDoesActivityExistsInDatabaseForSelectedDay () {

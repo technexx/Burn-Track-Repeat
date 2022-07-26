@@ -804,7 +804,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setActivityString(activityToAdd);
 
             if (currentStatDurationMode!=CUSTOM_STATS) {
-                dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
+                dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
 
                 getActivity().runOnUiThread(()-> {
                     launchEditPopUpIfActivityDoesNotExistAndToastIfItDoes(dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay());
