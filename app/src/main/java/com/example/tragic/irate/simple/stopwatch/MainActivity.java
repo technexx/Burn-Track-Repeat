@@ -909,8 +909,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
 
+    //Todo: Removed this.
     editCyclesPopupWindow.setOnDismissListener(() -> {
-      editCyclesPopUpDismissalLogic();
+//      editCyclesPopUpDismissalLogic();
 
       setViewsAndColorsToPreventTearingInEditPopUp(false);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -925,7 +926,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) cycles = cyclesList.get(positionOfSelectedCycle);
       if (mode==3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
 
-      clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
+//      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+
+      Log.i("testSave", "cycle rounds retrieved from instance are " + cycles.getWorkoutRounds());
 
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
@@ -1642,7 +1645,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
-        clearAndRepopulateCycleAdapterListsFromDatabaseObject(true);
+        clearAndRepopulateCycleAdapterListsFromDatabaseList(true);
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
 
         setDefaultUserSettings();
@@ -2127,7 +2130,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
       }
       runOnUiThread(()->{
-        clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
+        clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
       });
     }
 
@@ -2140,9 +2143,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       runOnUiThread(()->{
-        clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
+        clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
       });
     }
+    Log.i("testSave", "query and sort called!");
   }
 
   private View.OnClickListener statsSortOptionListener() {
@@ -2217,8 +2221,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortStatsByLeastCaloriesTextView.setOnClickListener(statsSortOptionListener());
   }
 
-  //Todo: None of this is being called or saved!
-  private void clearAndRepopulateCycleAdapterListsFromDatabaseObject(boolean forAllModes) {
+  private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
     if (mode==1 || forAllModes) {
       workoutCyclesArray.clear();
       typeOfRoundArray.clear();
@@ -2234,10 +2237,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
-
-        Log.i("testSave", "cycleList titles are in clear/repopulate adapter are" + cyclesList.get(i).getTitle());
-        Log.i("testSave", "cycleList cycles in clear/repopulate adapter are " + cyclesList.get(i).getWorkoutRounds());
-
       }
 
       savedCycleAdapter.notifyDataSetChanged();
@@ -2680,8 +2679,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (currentlyEditingACycle) {
         ResumeOrResetCycle(RESETTING_CYCLE_FROM_ADAPTER);
       }
+
+      //This already executes when timer is launched.
       AsyncTask.execute(()-> {
         saveAddedOrEditedCycleASyncRunnable();
+        queryAndSortAllCyclesFromDatabase();
       });
 
       roundIsEdited = false;
@@ -3568,7 +3570,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (workoutCyclesArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
           String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
-//          String[] fetchedRoundTitles = workoutTitleArray.get(positionOfSelectedCycle).split(" - ");
 
           for (int i=0; i<fetchedRounds.length; i++) {
             workoutTime.add(Integer.parseInt(fetchedRounds[i]));
@@ -3597,44 +3598,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setTimerLaunchViews(int typeOfLaunch) {
-    makeCycleAdapterVisible = true;
-    timerPopUpIsVisible = true;
-    setViewsAndColorsToPreventTearingInEditPopUp(true);
-
-    if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
-      if (cycleNameEdit.getText().toString().isEmpty()) {
-        cycleTitle = getCurrentDateAsFullTextString();
-      } else {
-        cycleTitle = cycleNameEdit.getText().toString();
-      }
-    }
-
-    cycle_title_textView.setText(cycleTitle);
-
-    if (savedPomCycleAdapter.isCycleActive()) {
-      savedPomCycleAdapter.removeActiveCycleLayout();
-      savedPomCycleAdapter.notifyDataSetChanged();
-    }
-  }
-
-  private void setTimerLaunchLogic(boolean trackingActivity) {
-    displayCycleOrDailyTotals();
-    toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
-
-    retrieveTotalDailySetAndBreakTimes();
-    displayCycleOrDailyTotals();
-    roundDownAllTotalTimeValuesToEnsureSyncing();
-
-    resetTimer();
-
-    if (editCyclesPopupWindow.isShowing()) {
-      editCyclesPopupWindow.dismiss();
-    }
-
-    timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-  }
-
   private void launchPomTimerCycle(int typeOfLaunch) {
     if (pomValuesTime.size()==0) {
       showToastIfNoneActive("Cycle cannot be empty!");
@@ -3648,6 +3611,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
 
       saveAddedOrEditedCycleASyncRunnable();
+      queryAndSortAllCyclesFromDatabase();
 
       runOnUiThread(new Runnable() {
         @Override
@@ -3704,6 +3668,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       saveAddedOrEditedCycleASyncRunnable();
+      queryAndSortAllCyclesFromDatabase();
 
       runOnUiThread(new Runnable() {
         @Override
@@ -3712,6 +3677,44 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
+  }
+
+  private void setTimerLaunchLogic(boolean trackingActivity) {
+    displayCycleOrDailyTotals();
+    toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
+
+    retrieveTotalDailySetAndBreakTimes();
+    displayCycleOrDailyTotals();
+    roundDownAllTotalTimeValuesToEnsureSyncing();
+
+    resetTimer();
+
+    if (editCyclesPopupWindow.isShowing()) {
+      editCyclesPopupWindow.dismiss();
+    }
+
+    timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+  }
+
+  private void setTimerLaunchViews(int typeOfLaunch) {
+    makeCycleAdapterVisible = true;
+    timerPopUpIsVisible = true;
+    setViewsAndColorsToPreventTearingInEditPopUp(true);
+
+    if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
+      if (cycleNameEdit.getText().toString().isEmpty()) {
+        cycleTitle = getCurrentDateAsFullTextString();
+      } else {
+        cycleTitle = cycleNameEdit.getText().toString();
+      }
+    }
+
+    cycle_title_textView.setText(cycleTitle);
+
+    if (savedPomCycleAdapter.isCycleActive()) {
+      savedPomCycleAdapter.removeActiveCycleLayout();
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
   }
 
   private void queryAllStatsEntitiesAndAssignTheirValuesToObjects() {
@@ -3832,6 +3835,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTitle(cycleTitle);
 
         Log.i("testSave", "cycle title saved in launch is " + cycleTitle);
+        Log.i("testSave", "workout rounds saved in launch is " + workoutString);
       }
     }
     if (mode==3) {
