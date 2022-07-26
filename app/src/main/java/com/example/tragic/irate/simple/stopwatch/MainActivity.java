@@ -552,6 +552,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Highlight sticking for activity again. Don't remove our queryAndSortAllCyclesFromDatabase() method though.
+      //Todo: Get toggle stat from adapter on timer launch and save that. Retrieve w/ everything else coming back.
   //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities.
   //Todo: Cycle title not always saving / showing different String on edit, even after app restart.
   //Todo: Cycles w/ out activity should make use of full width for round list in Main.
@@ -2149,6 +2151,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testSave", "query and sort called!");
   }
 
+  private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
+    if (mode==1 || forAllModes) {
+      workoutCyclesArray.clear();
+      typeOfRoundArray.clear();
+      workoutTitleArray.clear();
+      workoutActivityStringArray.clear();
+      tdeeActivityExistsInCycleList.clear();
+      tdeeIsBeingTrackedInCycleList.clear();
+
+      for (int i=0; i<cyclesList.size(); i++) {
+        workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
+        workoutTitleArray.add(cyclesList.get(i).getTitle());
+        typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+        workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
+        tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
+        tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
+
+        Log.i("testToggle", "state saved retrieved for cycle list is " + tdeeIsBeingTrackedInCycleList.get(i));
+      }
+
+      savedCycleAdapter.notifyDataSetChanged();
+    }
+    if (mode==3 || forAllModes) {
+      pomArray.clear();
+      pomTitleArray.clear();
+      for (int i=0; i<pomCyclesList.size(); i++) {
+        pomArray.add(pomCyclesList.get(i).getFullCycle());
+        pomTitleArray.add(pomCyclesList.get(i).getTitle());
+      }
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
+  }
+
   private View.OnClickListener statsSortOptionListener() {
     return view -> {
       TextView textView = (TextView) view;
@@ -2219,37 +2254,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortStatsByLeastTimeTextView.setOnClickListener(statsSortOptionListener());
     sortStatsByMostCaloriesTextView.setOnClickListener(statsSortOptionListener());
     sortStatsByLeastCaloriesTextView.setOnClickListener(statsSortOptionListener());
-  }
-
-  private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
-    if (mode==1 || forAllModes) {
-      workoutCyclesArray.clear();
-      typeOfRoundArray.clear();
-      workoutTitleArray.clear();
-      workoutActivityStringArray.clear();
-      tdeeActivityExistsInCycleList.clear();
-      tdeeIsBeingTrackedInCycleList.clear();
-
-      for (int i=0; i<cyclesList.size(); i++) {
-        workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
-        workoutTitleArray.add(cyclesList.get(i).getTitle());
-        typeOfRoundArray.add(cyclesList.get(i).getRoundType());
-        workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
-        tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
-        tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
-      }
-
-      savedCycleAdapter.notifyDataSetChanged();
-    }
-    if (mode==3 || forAllModes) {
-      pomArray.clear();
-      pomTitleArray.clear();
-      for (int i=0; i<pomCyclesList.size(); i++) {
-        pomArray.add(pomCyclesList.get(i).getFullCycle());
-        pomTitleArray.add(pomCyclesList.get(i).getTitle());
-      }
-      savedPomCycleAdapter.notifyDataSetChanged();
-    }
   }
 
   private void editHighlightedCycleLogic() {
@@ -3586,7 +3590,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValuesTime.clear();
         if (pomArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
-//          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
+
+          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
 
           /////---------Testing pom round iterations---------------/////////
 //          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
@@ -3789,6 +3794,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void getInstancesOfCyclesAndPomCyclesListsFromDatabase() {
+    if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+    if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+  }
+
+  private void setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(int position) {
+    if (mode==1) cycles = cyclesList.get(position);
+    if (mode==3) pomCycles = pomCyclesList.get(position);
+  }
+
   private void saveAddedOrEditedCycleASyncRunnable() {
     Gson gson = new Gson();
     workoutString = "";
@@ -3813,7 +3828,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
-        cycles.setCurrentlyTrackingCycle(savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle));
+
+        boolean trackingToggle = (savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle));
+        cycles.setCurrentlyTrackingCycle(trackingToggle);
+
+        Log.i("testToggle", "state saved for selected cycle is " + trackingToggle);
       } else {
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
@@ -3864,16 +3883,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  private void getInstancesOfCyclesAndPomCyclesListsFromDatabase() {
-    if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-    if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-  }
-
-  private void setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(int position) {
-    if (mode==1) cycles = cyclesList.get(position);
-    if (mode==3) pomCycles = pomCyclesList.get(position);
-  }
-
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
     if (mode == 1) {
       totalCycleSetTimeInMillis = cycles.getTotalSetTime();
@@ -3903,9 +3912,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setTotalCycleTimeValuesToTextView() {
     if (mode==1) {
-//      total_set_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
-//      total_break_time.setText(convertSeconds(dividedMillisForTimerDisplay(totalCycleBreakTimeInMillis)));
-
       total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
       total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
 
