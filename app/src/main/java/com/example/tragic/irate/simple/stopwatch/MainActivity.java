@@ -2007,7 +2007,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
-    //Todo: Upon adding new activity, we save to previous one.
+    //Todo: Upon adding new activity, we save to previous one. All 3 are added, so it's a matter of positioning.
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
 
     Log.i("testActivity", "time being saved via Main is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
@@ -3718,13 +3718,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
-    dailyStatsAccess.setActivityPositionInListForCurrentDay();
-    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+
+//    dailyStatsAccess.setActivityPositionInListForCurrentDay();
+//    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
     dailyStatsAccess.setMetScoreFromSpinner(metScore);
     dailyStatsAccess.setIsActivityCustomBoolean(false);
 
     dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+    /////////////////Added//////////////////
+    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+    dailyStatsAccess.setActivityPositionInListForCurrentDay();
+    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+    //////////////////////////////////////////
 
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
   }
