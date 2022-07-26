@@ -226,6 +226,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     double metScore;
 
     Toast mToast;
+    boolean mHaveStatsBeenChanged = false;
 
     boolean areActivityStatsSimplified;
     ConstraintLayout simplifiedStatsLayout;
@@ -475,6 +476,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    public void setHaveStatsBeenChangedBoolean(boolean haveStatsChanged) {
+        mHaveStatsBeenChanged = haveStatsChanged;
+    }
+
+    public boolean getHaveStatsBeenChangedBoolean() {
+        return mHaveStatsBeenChanged;
     }
 
     private void toggleSimplifiedStatViewsWithoutTabs(boolean areSimplified) {
@@ -896,6 +905,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         numberOfDaysWithActivitiesHasChanged = true;
+
+        setHaveStatsBeenChangedBoolean(true);
     }
 
     private void setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
@@ -957,6 +968,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 tdeeEditPopUpWindow.dismiss();
             });
         });
+
+        setHaveStatsBeenChangedBoolean(true);
     }
 
     private void deleteActivityFromStats(int position) {
@@ -978,6 +991,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
             });
         });
+
+        setHaveStatsBeenChangedBoolean(true);
     }
 
     private double calculateCaloriesForSpinnerActivity() {

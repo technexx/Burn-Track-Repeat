@@ -159,10 +159,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mPositionToToggle = position;
   }
 
-  public List<Boolean> getActiveTdeeModeBooleanList() {
-    return mActiveTdeeModeBooleanList;
-  }
-
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

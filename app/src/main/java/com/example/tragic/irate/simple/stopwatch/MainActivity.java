@@ -552,7 +552,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities.
   //Todo: Deleting day in Stats Frag causes issues w/ timer (likely active, need to replicate).
+      //Todo: Resolve how we deal w/ active timers while editing stats (if we choose to allow it).
   //Todo: Cycle title not always saving / showing different String on edit, even after app restart.
   //Todo: Cycles w/ out activity should make use of full width for round list in Main.
 
@@ -622,6 +624,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (dailyStatsFragment.isVisible()) {
         mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentOutFromLeft);
+
+
+        if (dailyStatsFragment.getHaveStatsBeenChangedBoolean()) {
+          AsyncTask.execute(()-> {
+            queryAllStatsEntitiesAndAssignTheirValuesToObjects();
+
+            dailyStatsFragment.setHaveStatsBeenChangedBoolean(false);
+            Log.i("testUpdate", "re-query!");
+          });
+
+        }
       }
 
       setTypeOFMenu(DEFAULT_MENU);
@@ -2522,6 +2535,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
     dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+
+    dailyStatsFragment.setHaveStatsBeenChangedBoolean(true);
   }
 
   private void deleteDailyStatsForAllDays() {
@@ -2531,6 +2546,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
     dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
 
+    dailyStatsFragment.setHaveStatsBeenChangedBoolean(true);
   }
 
   private boolean areAllDaysEmptyOfActivities(List<StatsForEachActivity> statsForEachActivityList) {
@@ -3675,26 +3691,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       if (trackActivityWithinCycle) {
-        dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-        dailyStatsAccess.setDoesDayExistInDatabaseBoolean();
-        dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
-
-        assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
-
-        dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
-
-        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-        dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
-        dailyStatsAccess.setActivityPositionInListForCurrentDay();
-
-        dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-
-        dailyStatsAccess.setMetScoreFromSpinner(metScore);
-        dailyStatsAccess.setIsActivityCustomBoolean(false);
-
-        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
-
-        assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+        queryAllStatsEntitiesAndAssignTheirValuesToObjects();
       }
 
       if (!isNewCycle) {
@@ -3710,6 +3707,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
+  }
+
+  private void queryAllStatsEntitiesAndAssignTheirValuesToObjects() {
+    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+    dailyStatsAccess.setDoesDayExistInDatabaseBoolean();
+    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
+
+    dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
+
+    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+    dailyStatsAccess.checkIfActivityExistsForSpecificDayAndSetBooleanForIt();
+    dailyStatsAccess.setActivityPositionInListForCurrentDay();
+
+    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
+
+    dailyStatsAccess.setMetScoreFromSpinner(metScore);
+    dailyStatsAccess.setIsActivityCustomBoolean(false);
+
+    dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+    assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
   }
 
   private String getCurrentDateAsSlashFormattedString() {
@@ -5042,14 +5062,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void retrieveCycleActivityPositionAndMetScoreFromCycleList() {
     cycles = cyclesList.get(positionOfSelectedCycle);
 
-    //Todo: Retrieves 0 on editing cycle.
     selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
     selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
 
     metScore = retrieveMetScoreFromSubCategoryPosition();
   }
-
-
 
   private void setMetScoreTextViewInAddTdeePopUp() {
     metScore = retrieveMetScoreFromSubCategoryPosition();
