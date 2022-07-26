@@ -618,7 +618,6 @@ public class DailyStatsAccess {
     public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(long setTime, double caloriesBurned) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
-//        mStatsForEachActivity.setActivity(mActivityString);
 
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }

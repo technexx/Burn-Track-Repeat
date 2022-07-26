@@ -796,6 +796,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
             } else {
                 activityToAdd = addCustomActivityEditText.getText().toString();
+                if (activityToAdd.equalsIgnoreCase("")) {
+                    showToastIfNoneActive("Enter an activity!");
+                }
             }
 
             dailyStatsAccess.setActivityString(activityToAdd);
@@ -857,8 +860,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
 
-        Log.i("testCals", "add custom activity boolean is " + customActivity);
-
         if (!customActivity) {
             //Activity String is already set from our spinner popUp.
             newCaloriesBurned = calculateCaloriesForSpinnerActivity();
@@ -868,7 +869,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             newCaloriesBurned = calculateCaloriesForCustomActivityAddition(newActivityTime);
             caloriesBurnedPerHour = Double.parseDouble(addCustomCaloriesEditText.getText().toString());
-
 
             dailyStatsAccess.setCaloriesBurnedPerHourVariable(caloriesBurnedPerHour);
             dailyStatsAccess.setIsActivityCustomBoolean(true);

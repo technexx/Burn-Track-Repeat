@@ -552,11 +552,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Highlight sticking for activity again. Don't remove our queryAndSortAllCyclesFromDatabase() method though.
-      //Todo: Get toggle stat from adapter on timer launch and save that. Retrieve w/ everything else coming back.
   //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities.
   //Todo: Cycle title not always saving / showing different String on edit, even after app restart.
-  //Todo: Cycles w/ out activity should make use of full width for round list in Main.
+      //Todo: Cycle title intentionally does not show in timer for cycles w/ activities.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -911,9 +909,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
 
-    //Todo: Removed this.
     editCyclesPopupWindow.setOnDismissListener(() -> {
-//      editCyclesPopUpDismissalLogic();
+      editCyclesPopUpDismissalLogic();
 
       setViewsAndColorsToPreventTearingInEditPopUp(false);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -2046,7 +2043,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void fabLogic() {
-    fab.setEnabled(false);
+    //Todo: If pressed and edit popUp does not show (e.g. in highlight mode), it will stay disabled.
+//    fab.setEnabled(false);
     buttonToLaunchTimerFromEditPopUp.setEnabled(true);
     cycleTitle = "";
     cycleNameEdit.getText().clear();
@@ -2642,7 +2640,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void editCyclesPopUpDismissalLogic() {
     if (currentlyEditingACycle) {
-      saveCycleOnPopUpDismissIfEdited();
+//      saveCycleOnPopUpDismissIfEdited();
 
       if (mode==1) {
         savedCycleAdapter.removeHighlight();
@@ -3278,6 +3276,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomValuesTime.clear();
 
     pomStringListOfRoundValues.clear();
+
+    cycleRoundsAdapter.notifyDataSetChanged();
+    cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
   private void setAndCapTimerValues(int value) {
@@ -3659,10 +3660,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
       }
 
-      if (!cycleHasActivityAssigned) {
-        tdeeActivityExistsInCycleList.set(positionOfSelectedCycle, false);
-        tdeeIsBeingTrackedInCycleList.set(positionOfSelectedCycle, false);
-      }
+//      if (!cycleHasActivityAssigned) {
+//        tdeeActivityExistsInCycleList.set(positionOfSelectedCycle, false);
+//        tdeeIsBeingTrackedInCycleList.set(positionOfSelectedCycle, false);
+//      }
 
       if (trackActivityWithinCycle) {
         queryAllStatsEntitiesAndAssignTheirValuesToObjects();
@@ -3804,6 +3805,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) pomCycles = pomCyclesList.get(position);
   }
 
+  //Getting toggle stat from adapter on timer launch and saving that. Retrieve w/ everything else coming back.
   private void saveAddedOrEditedCycleASyncRunnable() {
     Gson gson = new Gson();
     workoutString = "";
@@ -3829,16 +3831,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
-        boolean trackingToggle = (savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle));
-        cycles.setCurrentlyTrackingCycle(trackingToggle);
+        if (!isNewCycle) {
+          boolean trackingToggle = (savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle));
+          cycles.setCurrentlyTrackingCycle(trackingToggle);
+        } else {
+          cycles.setCurrentlyTrackingCycle(true);
+        }
 
-        Log.i("testToggle", "state saved for selected cycle is " + trackingToggle);
       } else {
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeSubCatPosition(0);
-        cycles.setTdeeValuePosition(0);
         cycles.setActivityString(getString(R.string.add_activity));
+        cycles.setCurrentlyTrackingCycle(false);
       }
       if (!workoutString.equals("")) {
         cycles.setWorkoutRounds(workoutString);
