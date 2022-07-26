@@ -509,25 +509,6 @@ public class DailyStatsAccess {
         }
     }
 
-    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
-        if (!doesActivityExistsInDatabaseForSelectedDay) {
-            mStatsForEachActivity = new StatsForEachActivity();
-
-            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
-            mStatsForEachActivity.setActivity(mActivityString);
-            mStatsForEachActivity.setMetScore(mMetScore);
-
-            mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
-            mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
-
-            mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
-            mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
-            mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
-
-            cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
-        }
-    }
-
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(long setTime, double caloriesBurned) {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
@@ -606,6 +587,8 @@ public class DailyStatsAccess {
     public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(long setTime, double caloriesBurned) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+        Log.i("testActivity", "mStats activity for instance we're saving to is " + mStatsForEachActivity.getActivity());
 
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
@@ -692,11 +675,10 @@ public class DailyStatsAccess {
 
     public void setActivityPositionInListForCurrentDay() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            Log.i("testActivity", "mStats activity list is " + mStatsForEachActivityList.get(i).getActivity());
             if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
-                //Todo: First added cycle gets position 1 here, should be 0.
                 activityPositionInListForCurrentDay = i;
                 Log.i("testActivity", "activity list position set is " + activityPositionInListForCurrentDay);
+                Log.i("testActivity", "activity we set position from is " + mActivityString);
                 return;
             }
         }
@@ -717,11 +699,34 @@ public class DailyStatsAccess {
             Log.i("testActivity", "mStats is new");
         }
 
-//        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-//            Log.i("testActivity", "mStats activity list is " + mStatsForEachActivityList.get(i).getActivity());
-//        }
+
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            Log.i("testActivity", "mStats activity list is " + mStatsForEachActivityList.get(i).getActivity());
+        }
 //        Log.i("testActivity", "mStats instance activity is " + mStatsForEachActivity.getActivity());
 //        Log.i("testActivity", "mStats instance set time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
+    }
+
+
+    public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
+        if (!doesActivityExistsInDatabaseForSelectedDay) {
+            mStatsForEachActivity = new StatsForEachActivity();
+
+            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+            mStatsForEachActivity.setActivity(mActivityString);
+            mStatsForEachActivity.setMetScore(mMetScore);
+
+            mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
+            mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
+
+            mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
+            mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
+            mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
+
+            cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
+
+            Log.i("testActivity", "activity inserted with zero'd out stats!");
+        }
     }
 
     public boolean getDoesActivityExistsInDatabaseForSelectedDay () {

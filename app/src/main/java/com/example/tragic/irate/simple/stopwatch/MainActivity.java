@@ -2007,7 +2007,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
+    //Todo: Upon adding new activity, we save to previous one.
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
+
+    Log.i("testActivity", "time being saved via Main is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
@@ -3660,12 +3663,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
       }
 
-//      if (!cycleHasActivityAssigned) {
-//        tdeeActivityExistsInCycleList.set(positionOfSelectedCycle, false);
-//        tdeeIsBeingTrackedInCycleList.set(positionOfSelectedCycle, false);
-//      }
-
-
       if (cycleHasActivityAssigned) {
         queryAllStatsEntitiesAndAssignTheirValuesToObjects();
       }
@@ -3676,6 +3673,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromDatabase();
+
+
+
+      // Activities are assigned properly to each cycle.
+//      for (int i=0; i<cyclesList.size(); i++) {
+//        Log.i("testActivity", "activity list from database post timer launch is " + cyclesList.get(i).getActivityString());
+//      }
 
       runOnUiThread(new Runnable() {
         @Override
