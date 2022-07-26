@@ -553,8 +553,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities.
-  //Todo: Deleting day in Stats Frag causes issues w/ timer (likely active, need to replicate).
-      //Todo: Resolve how we deal w/ active timers while editing stats (if we choose to allow it).
   //Todo: Cycle title not always saving / showing different String on edit, even after app restart.
   //Todo: Cycles w/ out activity should make use of full width for round list in Main.
 
@@ -926,6 +924,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (mode==1) cycles = cyclesList.get(positionOfSelectedCycle);
       if (mode==3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+
+      clearAndRepopulateCycleAdapterListsFromDatabaseObject(false);
 
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
@@ -2217,6 +2217,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortStatsByLeastCaloriesTextView.setOnClickListener(statsSortOptionListener());
   }
 
+  //Todo: None of this is being called or saved!
   private void clearAndRepopulateCycleAdapterListsFromDatabaseObject(boolean forAllModes) {
     if (mode==1 || forAllModes) {
       workoutCyclesArray.clear();
@@ -2233,6 +2234,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
+
+        Log.i("testSave", "cycleList titles are in clear/repopulate adapter are" + cyclesList.get(i).getTitle());
+        Log.i("testSave", "cycleList cycles in clear/repopulate adapter are " + cyclesList.get(i).getWorkoutRounds());
+
       }
 
       savedCycleAdapter.notifyDataSetChanged();
@@ -2249,8 +2254,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void editHighlightedCycleLogic() {
-    cycleNameEdit.setText(cycleTitle);
-
     editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
     buttonToLaunchTimerFromEditPopUp.setEnabled(true);
     currentlyEditingACycle = true;
@@ -2268,6 +2271,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
     setTdeeSpinnersToDefaultValues();
     addTDEEfirstMainTextView.setText(tdeeString);
+
+    if (mode==1) cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
+    if (mode==3) cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
+
+    cycleNameEdit.setText(cycleTitle);
 
     logSelectedCyclePositionAndItsValues("Edit Highlighted Cycle");
     logAllCyclePositionsAndTheirValues("Edit Highlighted Cycle");
@@ -3560,6 +3568,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (workoutCyclesArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
           String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
+//          String[] fetchedRoundTitles = workoutTitleArray.get(positionOfSelectedCycle).split(" - ");
 
           for (int i=0; i<fetchedRounds.length; i++) {
             workoutTime.add(Integer.parseInt(fetchedRounds[i]));
@@ -3569,7 +3578,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
-          buttonToLaunchTimerFromEditPopUp.setEnabled(true);
         }
         break;
 
@@ -3577,8 +3585,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValuesTime.clear();
         if (pomArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
-          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
-          buttonToLaunchTimerFromEditPopUp.setEnabled(true);
+//          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
 
           /////---------Testing pom round iterations---------------/////////
 //          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
@@ -3596,15 +3603,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
-
       if (cycleNameEdit.getText().toString().isEmpty()) {
         cycleTitle = getCurrentDateAsFullTextString();
-      }
-
-      if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
+      } else {
         cycleTitle = cycleNameEdit.getText().toString();
       }
     }
+
     cycle_title_textView.setText(cycleTitle);
 
     if (savedPomCycleAdapter.isCycleActive()) {
@@ -3820,12 +3825,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setItemCount(workoutTime.size());
         if (isNewCycle) {
           cycles.setTimeAdded(System.currentTimeMillis());;
-          cycles.setTitle(cycleTitle);
           cyclesDatabase.cyclesDao().insertCycle(cycles);
         } else {
-          cycles.setTitle(cycleTitle);
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
+        cycles.setTitle(cycleTitle);
+
+        Log.i("testSave", "cycle title saved in launch is " + cycleTitle);
       }
     }
     if (mode==3) {
@@ -3841,12 +3847,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomCycles.setTimeAccessed(System.currentTimeMillis());
         if (isNewCycle) {
           pomCycles.setTimeAdded(System.currentTimeMillis());
-          pomCycles.setTitle(cycleTitle);
           cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
         } else {
-          pomCycles.setTitle(cycleTitle);
           cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         }
+        pomCycles.setTitle(cycleTitle);
       }
     }
 
