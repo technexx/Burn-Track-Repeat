@@ -673,7 +673,7 @@ public class DailyStatsAccess {
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
     }
 
-    //Todo: This executes during timer launch, but because the new activity is not inserted yet, we do not get a value for positional variable. Also why a previous activity's time gets overridden by lower/newer values.
+    // This was executing during timer launch, but because the new activity is not inserted yet, we do not get a value for positional variable. Also why a previous activity's time gets overridden by lower/newer values.
     public void setActivityPositionInListForCurrentDay() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {

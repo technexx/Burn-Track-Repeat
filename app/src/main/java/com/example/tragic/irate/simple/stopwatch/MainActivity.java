@@ -552,9 +552,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Editing title overwrites more than one cycle.
+  //Todo: Sometimes save runnable runs when timer is not active.
   //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities.
-  //Todo: Cycle title not always saving / showing different String on edit, even after app restart.
-      //Todo: Cycle title intentionally does not show in timer for cycles w/ activities.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -926,8 +926,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
 
 //      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-
-      Log.i("testSave", "cycle rounds retrieved from instance are " + cycles.getWorkoutRounds());
 
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
@@ -1994,7 +1992,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
   }
 
-  //Todo: We get this repeating through our save runnable above when timer not running.
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
     int currentActivityPosition = dailyStatsAccess.getActivityPosition();
     int oldActivityPosition = dailyStatsAccess.getOldActivityPosition();
@@ -2007,7 +2004,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
-    //Todo: Upon adding new activity, we save to previous one. All 3 are added, so it's a matter of positioning.
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
 
     Log.i("testActivity", "time being saved via Main is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
@@ -2149,7 +2145,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
       });
     }
-    Log.i("testSave", "query and sort called!");
   }
 
   private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
@@ -2163,13 +2158,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       for (int i=0; i<cyclesList.size(); i++) {
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
+        //Todo: title array does not update until timer is exited + cycle re-launched.
         workoutTitleArray.add(cyclesList.get(i).getTitle());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
-        Log.i("testToggle", "state saved retrieved for cycle list is " + tdeeIsBeingTrackedInCycleList.get(i));
+        Log.i("testTitle", "title array for cycle list is " + workoutTitleArray.get(i));
+//        Log.i("testToggle", "state saved retrieved for cycle list is " + tdeeIsBeingTrackedInCycleList.get(i));
       }
 
       savedCycleAdapter.notifyDataSetChanged();
@@ -3586,7 +3583,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           }
 
-          cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
+//          cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
         }
         break;
 
@@ -3649,6 +3646,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     AsyncTask.execute(()-> {
       if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
+        if (cycleNameEdit.getText().toString().isEmpty()) {
+          cycleTitle = getCurrentDateAsFullTextString();
+        } else {
+          cycleTitle = cycleNameEdit.getText().toString();
+        }
+
         if (addTDEEfirstMainTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
           trackActivityWithinCycle = false;
@@ -3673,13 +3676,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromDatabase();
-
-
-
-      // Activities are assigned properly to each cycle.
-//      for (int i=0; i<cyclesList.size(); i++) {
-//        Log.i("testActivity", "activity list from database post timer launch is " + cyclesList.get(i).getActivityString());
-//      }
 
       runOnUiThread(new Runnable() {
         @Override
@@ -3740,14 +3736,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
     setViewsAndColorsToPreventTearingInEditPopUp(true);
-
-    if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
-      if (cycleNameEdit.getText().toString().isEmpty()) {
-        cycleTitle = getCurrentDateAsFullTextString();
-      } else {
-        cycleTitle = cycleNameEdit.getText().toString();
-      }
-    }
 
     cycle_title_textView.setText(cycleTitle);
 
@@ -3864,16 +3852,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setRoundType(roundTypeString);
         cycles.setTimeAccessed(System.currentTimeMillis());
         cycles.setItemCount(workoutTime.size());
+        cycles.setTitle(cycleTitle);
+
         if (isNewCycle) {
           cycles.setTimeAdded(System.currentTimeMillis());;
           cyclesDatabase.cyclesDao().insertCycle(cycles);
         } else {
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
-        cycles.setTitle(cycleTitle);
 
-        Log.i("testSave", "cycle title saved in launch is " + cycleTitle);
-        Log.i("testSave", "workout rounds saved in launch is " + workoutString);
+        for (int i=0; i<cyclesList.size(); i++) {
+        }
       }
     }
     if (mode==3) {
