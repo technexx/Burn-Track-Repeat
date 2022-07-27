@@ -10,6 +10,7 @@
     <color name="purple_700">#FF3700B3</color>
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
+    <color name="light_teal">#80DEEA</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="circular_progress_default_progress">#bada55</color>
@@ -44,4 +45,6 @@
     <color name="yellow_2">#F0F4C3</color>
     <color name="teal">#00897B</color>
     <color name="orange">#F57C00</color>
+    <color name="test">#C51162</color>
+    <color name="test_2">#FF80AB</color>
 </resources>

@@ -552,6 +552,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Blank addition to Stats on cycle launch likely due to empty activity.
+      //Todo: Clicking on empty activity cycle is adding "mountain biking - general".
   //Todo: Editing title overwrites more than one cycle.
   //Todo: Sometimes save runnable runs when timer is not active.
   //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities.
