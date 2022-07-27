@@ -552,6 +552,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: May be dotDraws repeating somewhere, but we've got our point debugged.
+
   //Todo: Blank addition to Stats on cycle launch likely due to empty activity.
       //Todo: Clicking on empty activity cycle is adding "mountain biking - general".
   //Todo: Editing title overwrites more than one cycle.
@@ -2133,9 +2135,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       tdeeIsBeingTrackedInCycleList.clear();
 
       for (int i=0; i<cyclesList.size(); i++) {
-        workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
-        //Todo: title array does not update until timer is exited + cycle re-launched.
         workoutTitleArray.add(cyclesList.get(i).getTitle());
+
+        workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
@@ -3141,7 +3143,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
       }
       //If between rounds, post runnable for next round without starting timer or object animator.
-      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode());
+//      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode());
 
       prefEdit.putInt("savedProgressBarValueForModeOne", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeOne", timeLeft.getText().toString());
@@ -3156,7 +3158,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (isNewCycle) positionOfSelectedCycle = pomArray.size()-1;
         savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
       }
-      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode());
+//      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode());
 
       prefEdit.putInt("savedProgressBarValueForModeThree", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeThree", timeLeft.getText().toString());
@@ -3541,6 +3543,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
+  //Todo: Something re-draws/invalidates dotDraws class before populateTimerUI updates it lists. Must come from launchTimer() OR the resetTimer() executed in that.
   private void populateCycleAdapterArrayList() {
     switch (mode) {
       case 1:
@@ -3557,7 +3560,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           }
 
-//          cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
+          //Todo: This does it, but why isn't it called before?
+          ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+          dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
+
+          cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
         }
         break;
 
@@ -3642,6 +3649,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (cycleHasActivityAssigned) {
         queryAllStatsEntitiesAndAssignTheirValuesToObjects();
+        Log.i("testSave", "saving WITH activity assigned!");
+      } else {
+        Log.i("testSave", "saving WITHOUT activity assigned!");
       }
 
       if (!isNewCycle) {
@@ -4823,7 +4833,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     beginTimerForNextRound = true;
     cycles_completed_textView.setText(R.string.cycles_done);
 
-    dotDraws.resetDotAlpha();
+//    dotDraws.resetDotAlpha();
     toggleLayoutParamsForCyclesAndStopwatch();
     setCyclesCompletedTextView();
 
@@ -4838,6 +4848,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
@@ -4875,12 +4886,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleCycleTimeTextViewSizes(false);
         break;
     }
+
+    dotDraws.resetDotAlpha();
   }
 
   private void resetTimer() {
     activeCycle = false;
     vibrator.cancel();
-    dotDraws.resetDotAlpha();
     if (timer != null) timer.cancel();
     if (endAnimation!=null) endAnimation.cancel();
     if (mediaPlayer.isPlaying()) {

@@ -244,25 +244,41 @@ public class DotDraws extends View {
 
         for (int i=0; i<mRoundTimes.size(); i++) {
           //If type 1 or 2 (sets), color is green. Otherwise, color is red.
-          if (mRoundType.get(i)==1 || mRoundType.get(i) ==2) mPaint.setColor(SET_COLOR); else mPaint.setColor(BREAK_COLOR);
+          if (mRoundType.get(i)==1 || mRoundType.get(i) ==2) {
+            mPaint.setColor(SET_COLOR);
+          } else {
+            mPaint.setColor(BREAK_COLOR);
+          }
           //if type 1 or 3 (counting down), dots are filled. Otherwise, they are hollow.
-          if (mRoundType.get(i)==1 || mRoundType.get(i)==3) setDotStyle(false); else setDotStyle(true);
+          if (mRoundType.get(i)==1 || mRoundType.get(i)==3) {
+            setDotStyle(false);
+          } else {
+            setDotStyle(true);
+          }
           //If the rounds remaining subtracted from our total rounds equals the position in its list we are drawing, fade that position (i.e. our current round).
           if (mRoundCount - mRoundsLeft == i) {
             //If we are in a "count up" round, also fade the text.
-            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) fadeDot(true); else fadeDot(false);
+            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) {
+              fadeDot(true);
+            } else {
+              fadeDot(false);
+            }
           }
           //if our remaining rounds added to our current position in the round list is less than the size of the list, mute that position's alpha (i.e. completed rounds).
           else if (mRoundsLeft + i < mRoundCount) {
             mPaint.setAlpha(105);
             //If position is a "count up" round, also mute the text's alpha.
-            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) mPaintText.setAlpha(105);
+            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) {
+              mPaintText.setAlpha(105);
+            }
           }
           else {
             //If neither of the previous conditions are true, retain a static full alpha value (i.e. an unreached round).
             mPaint.setAlpha(255);
             //If position is a "count up" round, also retain the text's full alpha value.
-            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) mPaintText.setAlpha(255);
+            if (mRoundType.get(i)==2 || mRoundType.get(i)==4) {
+              mPaintText.setAlpha(255);
+            }
           }
 
           if (mRoundTimes.size()<=8) {
