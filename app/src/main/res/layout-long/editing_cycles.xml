@@ -363,6 +363,7 @@
         android:textColor="@color/white"
         app:layout_constraintWidth_max="320dp"
         android:gravity="center_horizontal"
+        android:textStyle="bold"
         android:textSize="22sp">
     </TextView>
 
