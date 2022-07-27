@@ -557,6 +557,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Editing title overwrites more than one cycle.
   //Todo: Sometimes save runnable runs when timer is not active.
   //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities.
+  //Todo: White background tearing when launching stopwatch.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -2020,39 +2021,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void setTdeeSpinnerListeners() {
-    tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        tdeeCategorySpinnerTouchActions();
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
-      }
-    });
-
-    tdee_sub_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-      @Override
-      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        tdeeSubCategorySpinnerTouchActions();
-      }
-
-      @Override
-      public void onNothingSelected(AdapterView<?> parent) {
-      }
-    });
-  }
-
   private void fabLogic() {
-//    fab.setEnabled(false);
-    buttonToLaunchTimerFromEditPopUp.setEnabled(true);
-    cycleTitle = "";
     cycleNameEdit.getText().clear();
     isNewCycle = true;
 
     clearRoundAndCycleAdapterArrayLists();
-    editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
     setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     assignOldCycleValuesToCheckForChanges();
@@ -2062,6 +2035,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setTdeeSpinnersToDefaultValues();
     toggleEditPopUpViewsForAddingActivity(false);
+    editCyclesPopupWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
   private View.OnClickListener cyclesSortOptionListener() {
@@ -2258,7 +2232,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void editHighlightedCycleLogic() {
     editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
-    buttonToLaunchTimerFromEditPopUp.setEnabled(true);
     currentlyEditingACycle = true;
     isNewCycle = false;
 
@@ -2624,7 +2597,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     makeCycleAdapterVisible = false;
     timerPopUpIsVisible = false;
     beginTimerForNextRound = false;
-    buttonToLaunchTimerFromEditPopUp.setEnabled(false);
     reset.setVisibility(View.INVISIBLE);
     dotDraws.setMode(mode);
 
@@ -3688,6 +3660,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  private void setTimerLaunchViews(int typeOfLaunch) {
+    makeCycleAdapterVisible = true;
+    timerPopUpIsVisible = true;
+    setViewsAndColorsToPreventTearingInEditPopUp(true);
+
+    cycle_title_textView.setText(cycleTitle);
+
+    if (savedPomCycleAdapter.isCycleActive()) {
+      savedPomCycleAdapter.removeActiveCycleLayout();
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
+
+    if (editCyclesPopupWindow.isShowing()) {
+      editCyclesPopupWindow.dismiss();
+    }
+
+    timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+  }
+
   private void setTimerLaunchLogic(boolean trackingActivity) {
     displayCycleOrDailyTotals();
     toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
@@ -3697,12 +3688,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
     resetTimer();
-
-    if (editCyclesPopupWindow.isShowing()) {
-      editCyclesPopupWindow.dismiss();
-    }
-
-    timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
   private void queryAllStatsEntitiesAndAssignTheirValuesToObjects() {
@@ -3732,19 +3717,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //////////////////////////////////////////
 
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-  }
-
-  private void setTimerLaunchViews(int typeOfLaunch) {
-    makeCycleAdapterVisible = true;
-    timerPopUpIsVisible = true;
-    setViewsAndColorsToPreventTearingInEditPopUp(true);
-
-    cycle_title_textView.setText(cycleTitle);
-
-    if (savedPomCycleAdapter.isCycleActive()) {
-      savedPomCycleAdapter.removeActiveCycleLayout();
-      savedPomCycleAdapter.notifyDataSetChanged();
-    }
   }
 
   private String getCurrentDateAsSlashFormattedString() {
@@ -5110,6 +5082,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String caloriesBurnedPerHour = formatCalorieString(calculateCaloriesBurnedPerMinute(metScore) * 60);
 
     caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.two_line_concat, getString(R.string.calories_burned_per_minute, caloriesBurnedPerMinute), getString(R.string.calories_burned_per_hour, caloriesBurnedPerHour)));
+  }
+
+
+  private void setTdeeSpinnerListeners() {
+    tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        tdeeCategorySpinnerTouchActions();
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+      }
+    });
+
+    tdee_sub_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+      @Override
+      public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+        tdeeSubCategorySpinnerTouchActions();
+      }
+
+      @Override
+      public void onNothingSelected(AdapterView<?> parent) {
+      }
+    });
   }
 
   private void removeAllTimerSharedPreferences() {
