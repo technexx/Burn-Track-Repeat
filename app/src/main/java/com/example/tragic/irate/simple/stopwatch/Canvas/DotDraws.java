@@ -17,6 +17,7 @@ import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayout
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 
 public class DotDraws extends View {
   Context mContext;
@@ -117,12 +118,11 @@ public class DotDraws extends View {
   }
 
   //Updates list every time it is called w/ a String conversion of our long millis value.
-  public void updateWorkoutTimes(ArrayList<Integer> roundTimes, ArrayList<Integer> roundType) {
+  public void updateWorkoutTimes(ArrayList<String> roundTimes, ArrayList<Integer> roundType) {
     //Populates our String Array of round times from the Integer Array of values received from Timer class.
-    mRoundTimes = new ArrayList<>();
-    for (int i=0; i<roundTimes.size(); i++) mRoundTimes.add(convertSeconds(roundTimes.get(i)/1000));
-    //Sets our global mRoundType list to the one received from Timer class.
-    mRoundType = roundType;
+
+    this.mRoundTimes = roundTimes;
+    this.mRoundType = roundType;
     invalidate();
   }
 

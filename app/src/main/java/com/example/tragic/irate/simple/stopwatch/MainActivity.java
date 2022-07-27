@@ -3660,6 +3660,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  private void setTimerLaunchLogic(boolean trackingActivity) {
+    displayCycleOrDailyTotals();
+    toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
+
+    retrieveTotalDailySetAndBreakTimes();
+    displayCycleOrDailyTotals();
+    roundDownAllTotalTimeValuesToEnsureSyncing();
+
+    resetTimer();
+  }
+
   private void setTimerLaunchViews(int typeOfLaunch) {
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
@@ -3677,17 +3688,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-  }
-
-  private void setTimerLaunchLogic(boolean trackingActivity) {
-    displayCycleOrDailyTotals();
-    toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
-
-    retrieveTotalDailySetAndBreakTimes();
-    displayCycleOrDailyTotals();
-    roundDownAllTotalTimeValuesToEnsureSyncing();
-
-    resetTimer();
   }
 
   private void queryAllStatsEntitiesAndAssignTheirValuesToObjects() {
@@ -4121,7 +4121,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
-        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+        dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
         setNotificationValues();
         mHandler.postDelayed(this, timerRunnableDelay);
@@ -4148,12 +4149,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
-        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+
+        dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
         setNotificationValues();
         mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
+  }
+
+  private ArrayList<String> convertMillisIntegerListToTimerStringList(ArrayList<Integer> listToConvert) {
+    ArrayList<String> listToReturn = new ArrayList<>();
+
+    for (int i=0; i<listToConvert.size(); i++) {
+      listToReturn.add(convertSeconds(listToConvert.get(i)/1000));
+    }
+
+    return listToReturn;
   }
 
   private void startSetTimer() {
@@ -4823,7 +4836,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         startRounds = workoutTime.size();
         numberOfRoundsLeft = startRounds;
 
-        dotDraws.updateWorkoutTimes(workoutTime, typeOfRound);
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+        dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
+
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
 
         if (workoutTime.size()>0) {
