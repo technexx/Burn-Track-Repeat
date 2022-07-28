@@ -5,6 +5,7 @@ import android.graphics.Color;
 import android.graphics.Paint;
 import android.graphics.Typeface;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 
@@ -114,7 +115,6 @@ public class DotDraws extends View {
 
   public void updateWorkoutRoundCount(int roundCount, int roundsLeft) {
     this.mRoundCount = roundCount;  this.mRoundsLeft = roundsLeft;
-    invalidate();
   }
 
   //Updates list every time it is called w/ a String conversion of our long millis value.
@@ -123,14 +123,12 @@ public class DotDraws extends View {
 
     this.mRoundTimes = roundTimes;
     this.mRoundType = roundType;
-    invalidate();
   }
 
   public void pomDraw(int pomDotCounter, ArrayList<Integer> pomTime) {
     mPomTime = new ArrayList<>();
     for (int i=0; i<pomTime.size(); i++) mPomTime.add(convertSeconds(pomTime.get(i)/1000));
     this.mPomDotCounter = pomDotCounter;
-    invalidate();
   }
 
   public void reDraw() {
@@ -139,7 +137,6 @@ public class DotDraws extends View {
 
   public void resetDotAlpha() {
     mAlpha = 255; cycle = 0;
-    invalidate();
   }
 
   //Used to clear or filled dot for counting up/counting down.
@@ -233,6 +230,8 @@ public class DotDraws extends View {
 //      yRoundNumberTextPositionForOneOfTwoRows = dpConv(88);
 //      yRoundNumberTextPositionForSecondOfTwoRows = dpConv(160);
 //    }
+
+    Log.i("testDraw", "DotDraws is updating!");
 
     switch (mMode) {
       case 1:

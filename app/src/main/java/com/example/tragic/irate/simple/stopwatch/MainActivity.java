@@ -552,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Deletions in stats frag not working. This is again due to multiple repeats of same activity, and likely a result of stuff being added through Cycles/Timer, not Fragment.
+  //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
   //Todo: Adding 2:00:00 to stats frag shows as 2:00:07 in timer.
   //Todo: Sometimes save runnable runs when timer is not active.
   //Todo: White background tearing when launching stopwatch.
@@ -929,8 +929,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (mode==1) cycles = cyclesList.get(positionOfSelectedCycle);
       if (mode==3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
-
-//      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       clearRoundAndCycleAdapterArrayLists();
       populateCycleAdapterArrayList();
@@ -3694,10 +3692,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Not accessing correct day/activities for stat display.
-  //Todo: Still getting blank activity in fragment.
   private void queryAllStatsEntitiesAndAssignTheirValuesToObjects() {
-//    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
     dailyStatsAccess.setDoesDayExistInDatabaseBoolean(dayOfYear);
     dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
@@ -3727,8 +3722,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() {
-//    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-
     if (!dailyStatsAccess.getDoesDayExistInDatabase()) {
       totalSetTimeForCurrentDayInMillis = 0;
       totalBreakTimeForCurrentDayInMillis = 0;
@@ -3756,17 +3749,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-
-//    if (!dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
-//      totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
-//      totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
-//      totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
-//    } else {
-//
-//    }
-
-//    Log.i("testActivity", "does activity exist boolean is " + dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay());
-//    Log.i("testActivity", "set time for activity pulled is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(int position) {
@@ -4116,6 +4098,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
+        dotDraws.reDraw();
 
         setNotificationValues();
         mHandler.postDelayed(this, timerRunnableDelay);
@@ -4145,6 +4128,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
 
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
+        dotDraws.reDraw();
 
         setNotificationValues();
         mHandler.postDelayed(this, timerRunnableDelay);
@@ -4463,6 +4447,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
         dotDraws.resetDotAlpha();
+        dotDraws.reDraw();
 
         setMillis = 0;
         breakMillis = 0;
@@ -4522,6 +4507,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         dotDraws.pomDraw(pomDotCounter, pomValuesTime);
         dotDraws.resetDotAlpha();
+        dotDraws.reDraw();
 
         if (pomDotCounter<=7) {
           pomMillis = pomValuesTime.get(pomDotCounter);
@@ -4816,7 +4802,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     beginTimerForNextRound = true;
     cycles_completed_textView.setText(R.string.cycles_done);
 
-//    dotDraws.resetDotAlpha();
     toggleLayoutParamsForCyclesAndStopwatch();
     setCyclesCompletedTextView();
 
@@ -4833,8 +4818,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
 
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
-
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
+
+        Log.i("testDraw", "time list is " + workoutTime.size());
+        Log.i("testDraw", "type of round list is " + typeOfRound.size());
+        Log.i("testDraw", "round count is " + startRounds);
+
 
         if (workoutTime.size()>0) {
           switch (typeOfRound.get(0)) {
@@ -4863,7 +4852,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomValuesTime.size() > 0) {
           pomMillis = pomValuesTime.get(0);
           timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
+
           dotDraws.pomDraw(pomDotCounter,pomValuesTime);
+          dotDraws.reDraw();
+
           setInitialTextSizeForRounds(pomMillis);
         }
         toggleCycleTimeTextViewSizes(false);
