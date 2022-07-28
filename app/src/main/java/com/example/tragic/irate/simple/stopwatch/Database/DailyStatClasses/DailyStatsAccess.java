@@ -724,7 +724,7 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
 
-            Log.i("testActivity", "activity inserted with zero'd out stats!");
+            Log.i("testInsert", "activity inserted with zero'd out stats!");
         }
 
         Log.i("testInsert", "activity exists boolean is " + doesActivityExistsInDatabaseForSelectedDay);
@@ -782,7 +782,7 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
     }
 
-    public long getTotalActivityTimeForSingleDay(int day) {
+    public long getTotalActivityTimeForAllActivitiesOnASingleDay(int day) {
         long valueToReturn = 0;
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
@@ -794,7 +794,7 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    public double getTotalCaloriesBurnedForSingleDay(int day) {
+    public double getTotalCaloriesBurnedForAllActivitiesOnASingleDay(int day) {
         double valueToReturn = 0;
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {

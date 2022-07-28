@@ -891,8 +891,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
 
             //Multiple additions will always include daySelected.
-            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForSingleDay(daySelectedFromCalendar);
-            double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForSingleDay(daySelectedFromCalendar);
+            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASingleDay(daySelectedFromCalendar);
+            double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
             dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
@@ -980,8 +980,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
-            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForSingleDay(daySelectedFromCalendar);
-            double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForSingleDay(daySelectedFromCalendar);
+            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASingleDay(daySelectedFromCalendar);
+            double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
             dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 

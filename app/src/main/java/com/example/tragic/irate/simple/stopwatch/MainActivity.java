@@ -552,8 +552,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities. This is an issue especially when adding to stats frag updates that total but does NOT in Timer.
   //Todo: Deletions in stats frag not working. This is again due to multiple repeats of same activity, and likely a result of stuff being added through Cycles/Timer, not Fragment.
+  //Todo: Adding 2:00:00 to stats frag shows as 2:00:07 in timer.
   //Todo: Sometimes save runnable runs when timer is not active.
   //Todo: White background tearing when launching stopwatch.
   //Todo: populateCycleAdapterArrayList() needs to call dotdraws.updateWorkoutTimes() even tho it should call before the lists are accessed/
@@ -3629,7 +3629,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleTitle = cycleNameEdit.getText().toString();
         }
 
-        //Todo: Check and stop repeats.
         if (addTDEEfirstMainTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
           trackActivityWithinCycle = false;
