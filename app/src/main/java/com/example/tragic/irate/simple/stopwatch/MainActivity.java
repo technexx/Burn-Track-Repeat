@@ -560,6 +560,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Sometimes save runnable runs when timer is not active.
   //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities.
   //Todo: White background tearing when launching stopwatch.
+  //Todo: populateCycleAdapterArrayList() needs to call dotdraws.updateWorkoutTimes() even tho it should call before the lists are accessed/
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -764,8 +765,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
     trackActivityWithinCycle = savedCycleAdapter.retrieveActiveTdeeModeBoolean(position);
 
+    setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(position);
+
     if (cycleHasActivityAssigned) {
-      setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
@@ -912,6 +914,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setViewsAndColorsToPreventTearingInEditPopUp(false);
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+
+      logCyclesTitlesFromDatabase();
     });
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
@@ -2254,9 +2258,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
 
     cycleNameEdit.setText(cycleTitle);
-
-    logSelectedCyclePositionAndItsValues("Edit Highlighted Cycle");
-    logAllCyclePositionsAndTheirValues("Edit Highlighted Cycle");
   }
 
   private void populateRoundAdapterArraysForHighlightedCycle() {
@@ -3543,7 +3544,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
-  //Todo: Something re-draws/invalidates dotDraws class before populateTimerUI updates it lists. Must come from launchTimer() OR the resetTimer() executed in that.
   private void populateCycleAdapterArrayList() {
     switch (mode) {
       case 1:
@@ -3560,7 +3560,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           }
 
-          //Todo: This does it, but why isn't it called before?
           ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
@@ -3594,8 +3593,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTimerLaunchViews(typeOfLaunch);
 
     AsyncTask.execute(()-> {
-      setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
-      retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      if (!isNewCycle) {
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      }
 
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromDatabase();
@@ -3781,11 +3781,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //    Log.i("testActivity", "set time for activity pulled is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
-  private void getInstancesOfCyclesAndPomCyclesListsFromDatabase() {
-    if (mode==1) cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-    if (mode==3) pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-  }
-
   private void setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(int position) {
     if (mode==1) cycles = cyclesList.get(position);
     if (mode==3) pomCycles = pomCyclesList.get(position);
@@ -3838,6 +3833,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setItemCount(workoutTime.size());
         cycles.setTitle(cycleTitle);
 
+        Log.i("testTitle", "title being saved is " + cycleTitle);
+
         if (isNewCycle) {
           cycles.setTimeAdded(System.currentTimeMillis());;
           cyclesDatabase.cyclesDao().insertCycle(cycles);
@@ -3845,8 +3842,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
 
-        for (int i=0; i<cyclesList.size(); i++) {
-        }
       }
     }
     if (mode==3) {
@@ -5085,7 +5080,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void retrieveCycleActivityPositionAndMetScoreFromCycleList() {
-    cycles = cyclesList.get(positionOfSelectedCycle);
+//    cycles = cyclesList.get(positionOfSelectedCycle);
 
     selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
     selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
@@ -5161,27 +5156,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mToast.show();
   }
 
-  private void logSelectedCyclePositionAndItsValues(String location) {
-    AsyncTask.execute(()-> {
-      Log.i("testCycle", "position of selected cycle is " + positionOfSelectedCycle + " in " + location);
-      Log.i("testCycle", "activity string of selected cycle is " + cycles.getActivityString() + " in " + location);
-    });
-  }
-
-  private void logAllCyclePositionsAndTheirValues(String location) {
-    AsyncTask.execute(()-> {
-      List<Cycles> cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-
-      for (int i=0; i<cyclesList.size(); i++) {
-        Log.i("testCycle", "positions of cycle list are " + i  + " in " + location);
-      }
-
-      for (int i=0; i<cyclesList.size(); i++) {
-        Log.i("testCycle", "activity strings of cycle list are " + cyclesList.get(i).getActivityString()  + " in " + location);
-      }
-    });
-  }
-
   private void logCycleHighlights() {
     Log.i("testHighlight", "highlisted list is " + receivedHighlightPositions);
   }
@@ -5192,21 +5166,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void testHighlightDeletion(int cycleId) {
-    Log.i("testDelete", "cycle ID fetched is " + cycleId + " from cycle position " + positionOfSelectedCycle);
-
-    List<String> tempSetList = new ArrayList<>();
-    for (int i=0; i<cyclesList.size(); i++) {
-      tempSetList.add(cyclesList.get(i).getWorkoutRounds());
-    }
-
-    Log.i("testDelete", "size of fetched cycleList is " + cyclesList.size() + " with entries " + tempSetList);
-  }
-
-  private void logCyclesDatabase() {
+  private void logCyclesActivitiesFromDatabase() {
     AsyncTask.execute(()-> {
       for (int i=0; i<cyclesList.size(); i++) {
         Log.i("testCycleDb", "Activity String is " + cyclesList.get(i).getActivityString());
+      }
+    });
+  }
+
+  private void logCyclesTitlesFromDatabase() {
+    AsyncTask.execute(()-> {
+      for (int i=0; i<cyclesList.size(); i++) {
+        Log.i("testCycleDb", "Title String is " + cyclesList.get(i).getTitle());
       }
     });
   }
@@ -5234,25 +5205,5 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Log.i("testStatsDb", "For day " + listOfDays.get(i).getDayId() + " total set time is " + listOfDays.get(i).getTotalSetTime());
       }
     });
-  }
-
-  private void logTotalCycleTimes() {
-    Log.i("testTimes", "set time for CYCLE is " + totalCycleSetTimeInMillis);
-  }
-
-  private void logTotalDailyStats() {
-    Log.i("testTimes", "set time for DAY is " + totalSetTimeForCurrentDayInMillis);
-//    Log.i("testTimes", "calories for DAY are " + formatCalorieString(totalCaloriesBurnedForCurrentDay));
-  }
-
-  private void logTotalActivityStats() {
-    Log.i("testTimes", "selected activity set time in millis is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    Log.i("testTimes", "selected activity set time in converted seconds is " + longToStringConverters.convertMillisToHourBasedStringForTimer(totalSetTimeForSpecificActivityForCurrentDayInMillis));
-//    Log.i("testTimes", "selected activity calories are " + formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
-  }
-
-  private void logCalorieIterations() {
-    Log.i("testCalories", "total for day are " + totalCaloriesBurnedForCurrentDay);
-    Log.i("testCalories", "total for activity are " + totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 }
