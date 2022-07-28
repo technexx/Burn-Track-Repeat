@@ -3710,9 +3710,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
-    //Todo: If insertion of new activity (and starting 0 stats) happens above, we still need an updated retrieval of database. We are using a pre-newly-added-row entity + list instance.
-    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-    dailyStatsAccess.setActivityPositionInListForCurrentDay();
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
 
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
@@ -3753,18 +3750,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-    if (!dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
-      totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
-      totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
-      totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
-    } else {
-      totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
-      totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
-      totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
+    totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
+    totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
 
-      totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-      totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
-    }
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+
+//    if (!dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
+//      totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
+//      totalBreakTimeForSpecificActivityForCurrentDayInMillis = 0;
+//      totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
+//    } else {
+//
+//    }
 
 //    Log.i("testActivity", "does activity exist boolean is " + dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay());
 //    Log.i("testActivity", "set time for activity pulled is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);

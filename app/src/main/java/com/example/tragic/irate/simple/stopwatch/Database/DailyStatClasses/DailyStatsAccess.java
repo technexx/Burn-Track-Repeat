@@ -658,21 +658,8 @@ public class DailyStatsAccess {
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
-
-        Log.i("testInsert", "activity loaded after insert of zero'd out row is " + mStatsForEachActivityList.get(0).getActivity());
     }
 
-    // This was executing during timer launch, but because the new activity is not inserted yet, we do not get a value for positional variable. Also why a previous activity's time gets overridden by lower/newer values.
-    public void setActivityPositionInListForCurrentDay() {
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
-                activityPositionInListForCurrentDay = i;
-                Log.i("testInsert", "activity list position set is " + activityPositionInListForCurrentDay);
-                Log.i("testInsert", "activity we set position from is " + mActivityString);
-                return;
-            }
-        }
-    }
     public void setDoesActivityExistsForSpecificDayBoolean() {
         doesActivityExistsInDatabaseForSelectedDay = false;
 
@@ -703,8 +690,6 @@ public class DailyStatsAccess {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             Log.i("testActivity", "mStats activity list is " + mStatsForEachActivityList.get(i).getActivity());
         }
-//        Log.i("testActivity", "mStats instance activity is " + mStatsForEachActivity.getActivity());
-//        Log.i("testActivity", "mStats instance set time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
@@ -724,10 +709,38 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
 
+            loadAllActivitiesToStatsListForSpecificDay(selectedDay);
+            assignPositionOfRecentlyAddedRowToStatsEntity();
+
             Log.i("testInsert", "activity inserted with zero'd out stats!");
+            Log.i("testInsert", "activity retrieved is " + mStatsForEachActivity.getActivity());
+        } else {
+            setActivityPositionInListForCurrentDay();
+            assignPositionOfActivityListForRetrieveActivityToStatsEntity();
         }
 
         Log.i("testInsert", "activity exists boolean is " + doesActivityExistsInDatabaseForSelectedDay);
+    }
+
+    private void loadAllActivitiesToStatsListForSpecificDay(int daySelected) {
+        mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
+    }
+
+    private void assignPositionOfRecentlyAddedRowToStatsEntity() {
+        mStatsForEachActivity = mStatsForEachActivityList.get(mStatsForEachActivityList.size()-1);
+    }
+
+    private void assignPositionOfActivityListForRetrieveActivityToStatsEntity() {
+        mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
+    }
+
+    public void setActivityPositionInListForCurrentDay() {
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mActivityString.equals(mStatsForEachActivityList.get(i).getActivity())) {
+                activityPositionInListForCurrentDay = i;
+                return;
+            }
+        }
     }
 
     public boolean getDoesActivityExistsInDatabaseForSelectedDay () {
