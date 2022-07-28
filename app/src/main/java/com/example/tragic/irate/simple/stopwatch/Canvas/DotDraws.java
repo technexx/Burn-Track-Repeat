@@ -242,7 +242,7 @@ public class DotDraws extends View {
           encloseDots(xStartingEnclosurePositionForAllRows, xEndingEnclosurePositionForAllRows, yStartingEnclosurePositionWithTwoRows, yEndingEnclosurePositionWithTwoRows);
         }
 
-        for (int i=0; i<mRoundTimes.size(); i++) {
+        for (int i=0; i<mRoundType.size(); i++) {
           //If type 1 or 2 (sets), color is green. Otherwise, color is red.
           if (mRoundType.get(i)==1 || mRoundType.get(i) ==2) {
             mPaint.setColor(SET_COLOR);

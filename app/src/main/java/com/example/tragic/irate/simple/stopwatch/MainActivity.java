@@ -1987,13 +1987,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Inserting new row into database for new day. Update methods below pull that from current day and update.
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
-      dailyStatsAccess.setIsActivityCustomBoolean(false);
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
     }
   }
 
   private void setAndUpdateDayHolderValuesInDatabase() {
-    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+//    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
     dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
   }
 
@@ -2007,8 +2006,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
-    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
 
     Log.i("testActivity", "time being saved via Main is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
@@ -2978,7 +2975,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
       AsyncTask.execute(()-> {
-        dailyStatsAccess.setActivityPositionInListForCurrentDay();
+//        dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
 
        runOnUiThread(()->{
          displayCycleOrDailyTotals();
@@ -3691,28 +3688,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+
+    for (int i=0; i<dailyStatsAccess.getStatsForEachActivityList().size(); i++) {
+      Log.i("testListOfActivities", "mStats activity list is " + dailyStatsAccess.getStatsForEachActivityList().get(i).getActivity());
+    }
   }
 
+  //Todo: Not accessing correct day/activities for stat display.
+  //Todo: Still getting blank activity in fragment.
   private void queryAllStatsEntitiesAndAssignTheirValuesToObjects() {
-    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-    dailyStatsAccess.setDoesDayExistInDatabaseBoolean();
+//    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+    dailyStatsAccess.setDoesDayExistInDatabaseBoolean(dayOfYear);
     dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
     assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
 
     dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
+    dailyStatsAccess.setMetScoreFromSpinner(metScore);
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
-
-    dailyStatsAccess.setMetScoreFromSpinner(metScore);
-    dailyStatsAccess.setIsActivityCustomBoolean(false);
-
     dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
-    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+
+    dailyStatsAccess.setOldDayHolderId(dayOfYear);
   }
 
   private String getCurrentDateAsSlashFormattedString() {
@@ -3727,7 +3727,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() {
-    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+//    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
 
     if (!dailyStatsAccess.getDoesDayExistInDatabase()) {
       totalSetTimeForCurrentDayInMillis = 0;
