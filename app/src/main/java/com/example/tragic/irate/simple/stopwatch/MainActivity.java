@@ -552,13 +552,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: May be dotDraws repeating somewhere, but we've got our point debugged.
-
-  //Todo: Blank addition to Stats on cycle launch likely due to empty activity.
-      //Todo: Clicking on empty activity cycle is adding "mountain biking - general".
-  //Todo: Editing title overwrites more than one cycle.
+  //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities. This is an issue especially when adding to stats frag updates that total but does NOT in Timer.
+  //Todo: Deletions in stats frag not working. This is again due to multiple repeats of same activity, and likely a result of stuff being added through Cycles/Timer, not Fragment.
   //Todo: Sometimes save runnable runs when timer is not active.
-  //Todo: Main still gets DayHolder total from class, while Stats Frag gets the total from aggregated list of activities.
   //Todo: White background tearing when launching stopwatch.
   //Todo: populateCycleAdapterArrayList() needs to call dotdraws.updateWorkoutTimes() even tho it should call before the lists are accessed/
 
@@ -3633,6 +3629,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleTitle = cycleNameEdit.getText().toString();
         }
 
+        //Todo: Check and stop repeats.
         if (addTDEEfirstMainTextView.getText().equals(getString(R.string.add_activity))) {
           cycleHasActivityAssigned = false;
           trackActivityWithinCycle = false;
@@ -3649,9 +3646,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (cycleHasActivityAssigned) {
         queryAllStatsEntitiesAndAssignTheirValuesToObjects();
-        Log.i("testSave", "saving WITH activity assigned!");
-      } else {
-        Log.i("testSave", "saving WITHOUT activity assigned!");
       }
 
       if (!isNewCycle) {
@@ -3712,19 +3706,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
 
-//    dailyStatsAccess.setActivityPositionInListForCurrentDay();
-//    dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-
     dailyStatsAccess.setMetScoreFromSpinner(metScore);
     dailyStatsAccess.setIsActivityCustomBoolean(false);
 
     dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
-    /////////////////Added//////////////////
+    //Todo: If insertion of new activity (and starting 0 stats) happens above, we still need an updated retrieval of database. We are using a pre-newly-added-row entity + list instance.
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.setActivityPositionInListForCurrentDay();
     dailyStatsAccess.assignStatForEachActivityInstanceForSpecificActivityWithinSelectedDay();
-    //////////////////////////////////////////
 
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
   }
