@@ -552,11 +552,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: On dismissing + recalling Stats frag, a deleted activity can show up w/ 0/0.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
   //Todo: Adding 2:00:00 to stats frag shows as 2:00:07 in timer.
   //Todo: Sometimes save runnable runs when timer is not active.
   //Todo: White background tearing when launching stopwatch.
-  //Todo: populateCycleAdapterArrayList() needs to call dotdraws.updateWorkoutTimes() even tho it should call before the lists are accessed/
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -626,15 +626,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentOutFromLeft);
 
 
-        if (dailyStatsFragment.getHaveStatsBeenChangedBoolean()) {
-          AsyncTask.execute(()-> {
-            queryAllStatsEntitiesAndAssignTheirValuesToObjects();
-
-            dailyStatsFragment.setHaveStatsBeenChangedBoolean(false);
-            Log.i("testUpdate", "re-query!");
-          });
-
-        }
+        //Todo: This includes insertion method.
+//        if (dailyStatsFragment.getHaveStatsBeenChangedBoolean()) {
+//          AsyncTask.execute(()-> {
+//            insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
+//
+//            dailyStatsFragment.setHaveStatsBeenChangedBoolean(false);
+//            Log.i("testUpdate", "re-query!");
+//          });
+//
+//        }
       }
 
       setTypeOFMenu(DEFAULT_MENU);
@@ -3639,7 +3640,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       if (cycleHasActivityAssigned) {
-        queryAllStatsEntitiesAndAssignTheirValuesToObjects();
+        insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
       }
 
       if (!isNewCycle) {
@@ -3692,7 +3693,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void queryAllStatsEntitiesAndAssignTheirValuesToObjects() {
+  private void insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects() {
     dailyStatsAccess.setDoesDayExistInDatabaseBoolean(dayOfYear);
     dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
@@ -4837,8 +4838,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               timeLeft.setText(convertSeconds(((dividedMillisForTimerDisplay(breakMillis)))));
               setInitialTextSizeForRounds(breakMillis);
               break;
-            case 2:
-            case 4:
+            case 2: case 4:
               setMillis = 0;
               breakMillis = 0;
               timeLeft.setText("0");
