@@ -194,12 +194,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> savedEditPopUpArrayForSecondHeaderModeThree;
   ArrayList<String> savedEditPopUpArrayForThirdHeader;
 
-  TextView sortAlphaStart;
-  TextView sortAlphaEnd;
-  TextView sortRecent;
-  TextView sortNotRecent;
+  TextView sortCycleTitleAToZ;
+  TextView sortCycleTitleZtoA;
   TextView sortHigh;
   TextView sortLow;
+  TextView sortActivityTitleAtoZ;
+  TextView sortActivityTitleZToA;
 
   TextView sortStatsAToZTextView;
   TextView sortStatsZToATextView;
@@ -552,7 +552,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: On dismissing + recalling Stats frag, a deleted activity can show up w/ 0/0.
+  //Todo: Should have sort option for activity name in Cycles. Replace most/least recent.
+  //Todo: Slight difference between fragment total daily and timer.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
   //Todo: Adding 2:00:00 to stats frag shows as 2:00:07 in timer.
   //Todo: Sometimes save runnable runs when timer is not active.
@@ -624,18 +625,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (dailyStatsFragment.isVisible()) {
         mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentOutFromLeft);
-
-
-        //Todo: This includes insertion method.
-//        if (dailyStatsFragment.getHaveStatsBeenChangedBoolean()) {
-//          AsyncTask.execute(()-> {
-//            insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
-//
-//            dailyStatsFragment.setHaveStatsBeenChangedBoolean(false);
-//            Log.i("testUpdate", "re-query!");
-//          });
-//
-//        }
       }
 
       setTypeOFMenu(DEFAULT_MENU);
@@ -1617,12 +1606,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void assignSortPopUpLayoutClassesToTheirIds() {
-    sortAlphaStart = sortCyclePopupView.findViewById(R.id.sort_title_start);
-    sortAlphaEnd = sortCyclePopupView.findViewById(R.id.sort_title_end);
-    sortRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
-    sortNotRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
+    sortCycleTitleAToZ = sortCyclePopupView.findViewById(R.id.sort_title_start);
+    sortCycleTitleZtoA = sortCyclePopupView.findViewById(R.id.sort_title_end);;
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
+    sortActivityTitleAtoZ = sortCyclePopupView.findViewById(R.id.sort_activity_name_start);
+    sortActivityTitleZToA = sortCyclePopupView.findViewById(R.id.sort_activity_name_end);
 
     sortStatsAToZTextView = sortStatsPopupView.findViewById(R.id.sort_activity_name_start);
     sortStatsZToATextView = sortStatsPopupView.findViewById(R.id.sort_activity_name_end);
@@ -2040,12 +2029,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return view -> {
       TextView textButton = (TextView) view;
 
-      if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 1;
-      if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 2;
-      if (textButton.getText().toString().equals("Title: A - Z")) sortHolder = 3;
-      if (textButton.getText().toString().equals("Title: Z - A")) sortHolder = 4;
-      if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 5;
-      if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 6;
+      if (textButton.getText().toString().equals("Cycle Title: A - Z")) sortHolder = 1;
+      if (textButton.getText().toString().equals("Cycle Title: Z - A")) sortHolder = 2;
+      if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 3;
+      if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 4;
+      if (textButton.getText().toString().equals("Activity Title: A - Z")) sortHolder = 5;
+      if (textButton.getText().toString().equals("Activity Title: Z - A")) sortHolder = 6;
 
       if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
 
@@ -2068,39 +2057,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int colorToHighlight = getResources().getColor(R.color.test_highlight);
     switch (sortHolder) {
       case 1:
-        sortRecent.setBackgroundColor(colorToHighlight); break;
+        sortCycleTitleAToZ.setBackgroundColor(colorToHighlight); break;
       case 2:
-        sortNotRecent.setBackgroundColor(colorToHighlight); break;
+        sortCycleTitleZtoA.setBackgroundColor(colorToHighlight); break;
       case 3:
-        sortAlphaStart.setBackgroundColor(colorToHighlight); break;
-      case 4:
-        sortAlphaEnd.setBackgroundColor(colorToHighlight); break;
-      case 5:
         sortHigh.setBackgroundColor(colorToHighlight); break;
-      case 6:
+      case 4:
         sortLow.setBackgroundColor(colorToHighlight); break;
+      case 5:
+        sortActivityTitleAtoZ.setBackgroundColor(colorToHighlight); break;
+      case 6:
+        sortActivityTitleZToA.setBackgroundColor(colorToHighlight); break;
     }
   }
 
   private void unHighlightSortTextViews() {
     int noHighlight = Color.TRANSPARENT;
-    sortAlphaStart.setBackgroundColor(noHighlight);
-    sortAlphaEnd.setBackgroundColor(noHighlight);
-    sortRecent.setBackgroundColor(noHighlight);
-    sortNotRecent.setBackgroundColor(noHighlight);
+    sortCycleTitleAToZ.setBackgroundColor(noHighlight);
+    sortCycleTitleZtoA.setBackgroundColor(noHighlight);
     sortHigh.setBackgroundColor(noHighlight);
     sortLow.setBackgroundColor(noHighlight);
+    sortActivityTitleAtoZ.setBackgroundColor(noHighlight);
+    sortActivityTitleZToA.setBackgroundColor(noHighlight);
   }
 
   private void queryAndSortAllCyclesFromDatabase() {
     if (mode==1) {
       switch (sortMode) {
-        case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostRecent(); break;
-        case 2: cyclesList = cyclesDatabase.cyclesDao().loadCycleLeastRecent(); break;
-        case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
-        case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
-        case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
-        case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
+        case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
+        case 2: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
+        case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
+        case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
       }
       runOnUiThread(()->{
         clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
@@ -2213,12 +2200,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setAllSortTextViewsOntoClickListeners() {
-    sortRecent.setOnClickListener(cyclesSortOptionListener());
-    sortNotRecent.setOnClickListener(cyclesSortOptionListener());
-    sortAlphaStart.setOnClickListener(cyclesSortOptionListener());
-    sortAlphaEnd.setOnClickListener(cyclesSortOptionListener());
+    sortCycleTitleAToZ.setOnClickListener(cyclesSortOptionListener());
+    sortCycleTitleZtoA.setOnClickListener(cyclesSortOptionListener());
     sortHigh.setOnClickListener(cyclesSortOptionListener());
     sortLow.setOnClickListener(cyclesSortOptionListener());
+    sortActivityTitleAtoZ.setOnClickListener(cyclesSortOptionListener());
+    sortActivityTitleZToA.setOnClickListener(cyclesSortOptionListener());
 
     sortStatsAToZTextView.setOnClickListener(statsSortOptionListener());
     sortStatsZToATextView.setOnClickListener(statsSortOptionListener());

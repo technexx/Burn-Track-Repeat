@@ -12,8 +12,8 @@
     android:theme="@style/MenuTheme">
 
     <TextView
-        android:text="Added: Most Recent"
-        android:id="@+id/sort_most_recent"
+        android:text="Cycle Title: A - Z"
+        android:id="@+id/sort_title_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
@@ -24,31 +24,7 @@
     </TextView>
 
     <TextView
-        android:text="Added: Least Recent"
-        android:id="@+id/sort_least_recent"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_most_recent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="4dp"
-        android:textSize="16sp">
-    </TextView>
-
-    <TextView
-        android:text="Title: A - Z"
-        android:id="@+id/sort_title_start"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_least_recent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
-        android:textSize="16sp">
-    </TextView>
-
-    <TextView
-        android:text="Title: Z - A"
+        android:text="Cycle Title: Z - A"
         android:id="@+id/sort_title_end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -77,6 +53,32 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sort_number_high"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Activity Title: A - Z"
+        android:id="@+id/sort_activity_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_number_low"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp"
+        android:textSize="16sp">
+    </TextView>
+
+    <TextView
+        android:text="Activity Title: Z - A"
+        android:id="@+id/sort_activity_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_activity_start"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"
