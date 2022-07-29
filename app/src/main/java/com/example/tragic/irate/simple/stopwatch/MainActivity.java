@@ -552,8 +552,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Dotdraws index error back when adding new cycles.
+      //Todo: Error likely in info retrieved from edit vs add.
+      //Todo: reDraw() is never called, but onDraw is when launching cycle.
+          //Todo: There may be a runnable being called.
+
+  //Todo: Clicking on a cycle while another is active retains the old timer. Likely resume/reset error.
   //Todo: Sometimes save runnable runs when timer is not active.
-  //Todo: White background tearing when launching stopwatch.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -769,9 +774,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onCycleHighlight(List<Integer> listOfPositions, boolean addButtons) {
     receivedHighlightPositions = listOfPositions;
+
     if (addButtons) {
       fadeEditCycleButtonsInAndOut(FADE_IN_HIGHLIGHT_MODE);
     }
+
     if (edit_highlighted_cycle.getAlpha()!=1 && receivedHighlightPositions.size()==1) {
       edit_highlighted_cycle.setAlpha(1.0f);
       edit_highlighted_cycle.setEnabled(true);
@@ -912,12 +919,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setViewsAndColorsToPreventTearingInEditPopUp(true);
       fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
       removeHighlightFromCycle();
+
       editHighlightedCycleLogic();
 
       if (mode==1) cycles = cyclesList.get(positionOfSelectedCycle);
       if (mode==3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
 
       clearRoundAndCycleAdapterArrayLists();
+
       populateCycleAdapterArrayList();
       populateRoundAdapterArraysForHighlightedCycle();
 
@@ -932,7 +941,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     delete_highlighted_cycle.setOnClickListener(v-> {
-      deletingHighlightedCycleLogic();
+      AsyncTask.execute(()-> {
+        deleteHighlightedCycles();
+      });
+
+      delete_highlighted_cycle.setEnabled(false);
+      fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
+
+      if (mode==1) savedCycleAdapter.removeHighlight();
+      if (mode==3) savedPomCycleAdapter.removeHighlight();
+
+      showToastIfNoneActive("Deleted!");
     });
 
     //Selects all text when long clicking in editText.
@@ -1202,7 +1221,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void stopWatchLaunchLogic() {
-    getSupportActionBar().hide();
+    //This caused tearing.
+//    getSupportActionBar().hide();
 
     savedCycleRecycler.setVisibility(View.INVISIBLE);
     savedPomCycleRecycler.setVisibility(View.INVISIBLE);
@@ -2014,11 +2034,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     assignOldCycleValuesToCheckForChanges();
     resetEditPopUpTimerHeaders();
+
     editPopUpTimerArray.clear();
     timerValueInEditPopUpTextView.setText("00:00");
 
     setTdeeSpinnersToDefaultValues();
     toggleEditPopUpViewsForAddingActivity(false);
+
     editCyclesPopupWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
@@ -2039,7 +2061,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       highlightSortTextView();
 
       AsyncTask.execute(()-> {
-        queryAndSortAllCyclesFromDatabase();
+        queryAndSortAllCyclesFromDatabase(true);
       });
 
       prefEdit.putInt("sortMode", sortMode);
@@ -2078,27 +2100,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityTitleZToA.setBackgroundColor(noHighlight);
   }
 
-  private void queryAndSortAllCyclesFromDatabase() {
+  private void queryAndSortAllCyclesFromDatabase(boolean useSortMode) {
     if (mode==1) {
-      switch (sortMode) {
-        case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ(); break;
-        case 2: cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA(); break;
-        case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
-        case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
-        case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ(); break;
-        case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA(); break;
+      if (useSortMode) {
+        switch (sortMode) {
+          case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ(); break;
+          case 2: cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA(); break;
+          case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
+          case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
+          case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ(); break;
+          case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA(); break;
+        }
+      } else {
+        cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
       }
+
       runOnUiThread(()->{
         clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
       });
     }
 
     if (mode==3) {
-      switch (sortModePom) {
-        case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
-        case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
-        case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
-        case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
+      if (useSortMode) {
+        switch (sortModePom) {
+          case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
+          case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
+          case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
+          case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
+        }
+      } else {
+        pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
       }
 
       runOnUiThread(()->{
@@ -2271,19 +2302,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
-  private void deletingHighlightedCycleLogic() {
-    AsyncTask.execute(()-> {
-      deleteHighlightedCycles();
-    });
-
-    delete_highlighted_cycle.setEnabled(false);
-    fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
-    if (mode==1) savedCycleAdapter.removeHighlight();
-    if (mode==3) savedPomCycleAdapter.removeHighlight();
-
-    Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-  }
-
   private void deleteHighlightedCycles() {
     if ((mode==1 && cyclesList.size()==0 || (mode==3 && pomCyclesList.size()==0))) {
       runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
@@ -2308,7 +2326,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     receivedHighlightPositions.clear();
 
-    queryAndSortAllCyclesFromDatabase();
+    queryAndSortAllCyclesFromDatabase(false);
 
     runOnUiThread(()->{
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -2316,7 +2334,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteAllCycles() {
-    queryAndSortAllCyclesFromDatabase();
+    queryAndSortAllCyclesFromDatabase(false);
 
     if (mode==1) {
       if (cyclesList.size()>0) {
@@ -2595,7 +2613,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void editCyclesPopUpDismissalLogic() {
     if (currentlyEditingACycle) {
-//      saveCycleOnPopUpDismissIfEdited();
 
       if (mode==1) {
         savedCycleAdapter.removeHighlight();
@@ -2610,42 +2627,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
     cycleRoundsAdapterTwo.notifyDataSetChanged();
     roundListDivider.setVisibility(View.GONE);
-  }
-
-  private void saveCycleOnPopUpDismissIfEdited() {
-    boolean roundIsEdited = false;
-
-    if (!timerPopUpWindow.isShowing()) {
-      if (mode==1) {
-        if (!workoutStringListOfRoundValuesForFirstAdapter.isEmpty()){
-          if (!workoutStringListOfRoundValuesForFirstAdapter.equals(oldCycleRoundListOne) || !workoutStringListOfRoundValuesForSecondAdapter.equals(oldCycleRoundListTwo) || !cycleTitle.equals(oldCycleTitleString)) {
-            roundIsEdited = true;
-          }
-        }
-      }
-      if (mode==3) {
-        if (!pomArray.isEmpty()) {
-          if (!pomArray.equals(oldPomRoundList) || !cycleTitle.equals(oldCycleTitleString)) {
-            roundIsEdited = true;
-          }
-        }
-      }
-    }
-
-    if (roundIsEdited) {
-      if (currentlyEditingACycle) {
-        ResumeOrResetCycle(RESETTING_CYCLE_FROM_ADAPTER);
-      }
-
-      //This already executes when timer is launched.
-      AsyncTask.execute(()-> {
-        saveAddedOrEditedCycleASyncRunnable();
-        queryAndSortAllCyclesFromDatabase();
-      });
-
-      roundIsEdited = false;
-      Toast.makeText(getApplicationContext(), "Saved!", Toast.LENGTH_SHORT).show();
-    }
   }
 
   private void assignOldCycleValuesToCheckForChanges() {
@@ -3178,7 +3159,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.clearAnimation();
       appHeader.clearAnimation();
       sortButton.clearAnimation();
+
+      delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
+    }
+    if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
+      sortButton.setVisibility(View.VISIBLE);
+      delete_highlighted_cycle.setVisibility(View.INVISIBLE);
+
+      delete_highlighted_cycle.setEnabled(false);
+      sortButton.setEnabled(true);
+      edit_highlighted_cycle.setEnabled(false);
+      cancelHighlight.setEnabled(false);
     }
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
       appHeader.startAnimation(fadeOut);
@@ -3186,6 +3178,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeIn);
       sortButton.startAnimation(fadeOut);
+//      sortButton.setVisibility(View.GONE);
 
       sortButton.setEnabled(false);
       edit_highlighted_cycle.setEnabled(true);
@@ -3198,19 +3191,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.startAnimation(fadeOut);
       appHeader.startAnimation(fadeIn);
       sortButton.startAnimation(fadeIn);
-
       cancelHighlight.startAnimation(fadeOut);
       cancelHighlight.setVisibility(View.GONE);
-
-      sortButton.setEnabled(true);
-      edit_highlighted_cycle.setEnabled(false);
-      delete_highlighted_cycle.setEnabled(false);
-      cancelHighlight.setEnabled(false);
-    }
-    if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
-      sortButton.setVisibility(View.VISIBLE);
-      delete_highlighted_cycle.setVisibility(View.INVISIBLE);
-      delete_highlighted_cycle.setEnabled(false);
 
       sortButton.setEnabled(true);
       edit_highlighted_cycle.setEnabled(false);
@@ -3540,11 +3522,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
+          dotDraws.reDraw();
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
         }
         break;
-
       case 3:
         pomValuesTime.clear();
         if (pomArray.size()-1>=positionOfSelectedCycle) {
@@ -3576,7 +3558,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase();
+      queryAndSortAllCyclesFromDatabase(false);
 
       runOnUiThread(new Runnable() {
         @Override
@@ -3634,7 +3616,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase();
+      queryAndSortAllCyclesFromDatabase(false);
 
       runOnUiThread(new Runnable() {
         @Override
@@ -3653,7 +3635,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     displayCycleOrDailyTotals();
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
-    resetTimer();
+    //Todo: Added this. Didn't work. Issue comes from launching from
+    clearRoundAndCycleAdapterArrayLists();
+    populateCycleAdapterArrayList();
+
+//    resetTimer();
   }
 
   private void setTimerLaunchViews(int typeOfLaunch) {
@@ -3858,11 +3844,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
       total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-
-      Log.i("testTime", "set millis is " + setMillis);
-      Log.i("testTime", "total set time millis is " + totalCycleSetTimeInMillis);
-      Log.i("testTime", "total divided time millis is " + dividedMillisForTimerDisplay(totalCycleSetTimeInMillis));
-      Log.i("testTime", "divided total string time is " + convertSeconds(dividedMillisForTimerDisplay(totalCycleSetTimeInMillis)));
     }
     if (mode==3) {
       total_set_time.setText(convertSeconds(totalCycleWorkTimeInMillis/1000));
@@ -4806,11 +4787,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-
-        Log.i("testDraw", "time list is " + workoutTime.size());
-        Log.i("testDraw", "type of round list is " + typeOfRound.size());
-        Log.i("testDraw", "round count is " + startRounds);
-
+        dotDraws.reDraw();
 
         if (workoutTime.size()>0) {
           switch (typeOfRound.get(0)) {
@@ -4840,7 +4817,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
 
           dotDraws.pomDraw(pomDotCounter,pomValuesTime);
-          dotDraws.reDraw();
 
           setInitialTextSizeForRounds(pomMillis);
         }
@@ -4849,6 +4825,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     dotDraws.resetDotAlpha();
+    dotDraws.reDraw();
   }
 
   private void resetTimer() {

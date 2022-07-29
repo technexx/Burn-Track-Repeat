@@ -154,12 +154,6 @@ CyclesDao {
     @Query("SELECT * from Cycles ORDER by title DESC")
     List<Cycles> loadCyclesTitleZToA();
 
-    @Query("SELECT * from CYCLES ORDER by timeAdded DESC")
-    List<Cycles> loadCyclesMostRecent();
-
-    @Query("SELECT * from CYCLES ORDER by timeAdded ASC")
-    List<Cycles> loadCycleLeastRecent();
-
     @Query("SELECT * from CYCLES ORDER by itemCount DESC")
     List<Cycles> loadCyclesMostItems();
 

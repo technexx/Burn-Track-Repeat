@@ -132,6 +132,7 @@ public class DotDraws extends View {
   }
 
   public void reDraw() {
+    Log.i("testDraw", "reDraw called!");
     invalidate();
   }
 
@@ -283,6 +284,7 @@ public class DotDraws extends View {
           if (mRoundTimes.size()<=8) {
             //Draws dot, timer value, and round count.
             mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, circleRadius, mPaint);
+            //Todo: Index exception here. Conditional above uses roundType.
             drawText(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForOneRow, i);
             mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows, yRoundNumberTextPositionForOneRow, mPaintRoundNumbers);
           } else {
