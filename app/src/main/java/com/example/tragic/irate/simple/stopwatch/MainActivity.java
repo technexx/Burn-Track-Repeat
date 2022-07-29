@@ -552,12 +552,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Should have sort option for activity name in Cycles. Replace most/least recent.
-  //Todo: Slight difference between fragment total daily and timer.
-  //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
-  //Todo: Adding 2:00:00 to stats frag shows as 2:00:07 in timer.
   //Todo: Sometimes save runnable runs when timer is not active.
   //Todo: White background tearing when launching stopwatch.
+  //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -3874,7 +3871,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForTimer(totalSetTimeForCurrentDayInMillis));
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
   }
 
   private void setTotalDailyCaloriesToTextView() {
@@ -3882,7 +3879,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalActivityTimeToTextView() {
-    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertMillisToHourBasedStringForTimer(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForSpecificActivityForCurrentDayInMillis));
   }
 
   private void setTotalActivityCaloriesToTextView() {
