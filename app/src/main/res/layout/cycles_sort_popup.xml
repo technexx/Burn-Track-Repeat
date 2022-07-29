@@ -62,7 +62,7 @@
 
     <TextView
         android:text="Activity Title: A - Z"
-        android:id="@+id/sort_activity_start"
+        android:id="@+id/sort_activity_ascending_from_cycles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sort_number_low"
@@ -75,10 +75,10 @@
 
     <TextView
         android:text="Activity Title: Z - A"
-        android:id="@+id/sort_activity_end"
+        android:id="@+id/sort_activity_descending_from_cycles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_activity_start"
+        app:layout_constraintTop_toBottomOf="@id/sort_activity_ascending_from_cycles"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"

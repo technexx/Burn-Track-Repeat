@@ -1610,8 +1610,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortCycleTitleZtoA = sortCyclePopupView.findViewById(R.id.sort_title_end);;
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
-    sortActivityTitleAtoZ = sortCyclePopupView.findViewById(R.id.sort_activity_name_start);
-    sortActivityTitleZToA = sortCyclePopupView.findViewById(R.id.sort_activity_name_end);
+    sortActivityTitleAtoZ = sortCyclePopupView.findViewById(R.id.sort_activity_ascending_from_cycles);
+    sortActivityTitleZToA = sortCyclePopupView.findViewById(R.id.sort_activity_descending_from_cycles);
 
     sortStatsAToZTextView = sortStatsPopupView.findViewById(R.id.sort_activity_name_start);
     sortStatsZToATextView = sortStatsPopupView.findViewById(R.id.sort_activity_name_end);
@@ -2084,10 +2084,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void queryAndSortAllCyclesFromDatabase() {
     if (mode==1) {
       switch (sortMode) {
-        case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaStart(); break;
-        case 2: cyclesList = cyclesDatabase.cyclesDao().loadCyclesAlphaEnd(); break;
+        case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ(); break;
+        case 2: cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA(); break;
         case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
         case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
+        case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ(); break;
+        case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA(); break;
       }
       runOnUiThread(()->{
         clearAndRepopulateCycleAdapterListsFromDatabaseList(false);

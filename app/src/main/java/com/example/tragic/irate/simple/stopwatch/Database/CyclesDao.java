@@ -89,27 +89,6 @@ CyclesDao {
     ///////////////////////////////////////////////////////////
 
     @Insert(onConflict = OnConflictStrategy.IGNORE)
-    void insertCalorieDay(CalorieDayHolder calorieDayHolder);
-
-    @Update
-    void updateCalorieDay(CalorieDayHolder calorieDayHolder);
-
-    @Query("DELETE from CalorieDayHolder")
-    void deleteAllCalorieDayEntries();
-
-    @Query("SELECT * from CalorieDayHolder")
-    List<CalorieDayHolder> loadAllCalorieDayRows();
-
-    @Query("SELECT * from CalorieDayHolder WHERE calorieDaySelectedId IS:listID")
-    List<CalorieDayHolder> loadSingleCalorieDay(long listID);
-
-    @Query("SELECT * from CalorieDayHolder WHERE calorieDaySelectedId IN (:listIDs)")
-    List<CalorieDayHolder> loadMultipleCalorieDays(List<Integer> listIDs);
-
-    @Query("DELETE from CalorieDayHolder WHERE calorieDaySelectedId IN (:listIDs)")
-    void deleteMultipleCalorieDays(List<Long> listIDs);
-
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
     void insertCaloriesForEachFoodRow(CaloriesForEachFood caloriesForEachFood);
 
     @Update
@@ -169,11 +148,11 @@ CyclesDao {
     @Query("SELECT * from PomCycles")
     List<PomCycles> loadAllPomCycles();
 
-    @Query("SELECT * from Cycles ORDER by title DESC")
-    List<Cycles> loadCyclesAlphaEnd();
-
     @Query("SELECT * from Cycles ORDER by title ASC")
-    List<Cycles> loadCyclesAlphaStart();
+    List<Cycles> loadCyclesTitleAToZ();
+
+    @Query("SELECT * from Cycles ORDER by title DESC")
+    List<Cycles> loadCyclesTitleZToA();
 
     @Query("SELECT * from CYCLES ORDER by timeAdded DESC")
     List<Cycles> loadCyclesMostRecent();
@@ -186,6 +165,12 @@ CyclesDao {
 
     @Query("SELECT * from CYCLES ORDER by itemCount ASC")
     List<Cycles> loadCyclesLeastItems();
+
+    @Query("SELECT * from CYCLES ORDER by activityString ASC")
+    List<Cycles> loadCyclesActivityAToZ();
+
+    @Query("SELECT * from CYCLES ORDER by activityString DESC")
+    List<Cycles> loadCyclesActivityZToA();
 
     @Query("SELECT * from PomCycles ORDER by title DESC")
     List<PomCycles> loadPomAlphaEnd();
