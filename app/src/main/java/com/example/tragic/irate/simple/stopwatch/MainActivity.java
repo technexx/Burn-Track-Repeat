@@ -557,7 +557,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: reDraw() is never called, but onDraw is when launching cycle.
           //Todo: There may be a runnable being called.
 
-  //Todo: Clicking on a cycle while another is active retains the old timer. Likely resume/reset error.
   //Todo: Sometimes save runnable runs when timer is not active.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
@@ -3635,11 +3634,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     displayCycleOrDailyTotals();
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
-    //Todo: Added this. Didn't work. Issue comes from launching from
     clearRoundAndCycleAdapterArrayLists();
     populateCycleAdapterArrayList();
 
-//    resetTimer();
+    resetTimer();
   }
 
   private void setTimerLaunchViews(int typeOfLaunch) {
