@@ -557,7 +557,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: reDraw() is never called, but onDraw is when launching cycle.
           //Todo: There may be a runnable being called.
 
-  //Todo: Sometimes save runnable runs when timer is not active.
+  //Todo: Index exception bug when resetting timer from Main.
+
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -4854,6 +4855,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     switch (mode) {
       case 1:
+        //Todo: Occasional 0/0 index exception here when resetting cycle from Main's recyclerView.
         switch (typeOfRound.get(0)) {
           case 1: setMillis = workoutTime.get(0); break;
           case 2: setMillis = 0; break;
