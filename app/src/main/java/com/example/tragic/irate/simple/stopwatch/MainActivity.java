@@ -607,7 +607,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onDestroy() {
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
-    AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
     super.onDestroy();
   }
@@ -1974,8 +1973,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (!timerIsPaused) {
           mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
+          Log.i("testSave", "save runnable is running!");
         } else {
           mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
+          Log.i("testSave", "save runnable has been stopped!!");
         }
       }
     };
@@ -4294,12 +4295,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void globalNextRoundLogic() {
+    timerIsPaused = false;
+
     setAllActivityTimesAndCaloriesToTextViews();
 
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
-    currentProgressBarValue = 10000;
     reset.setVisibility(View.INVISIBLE);
+
+    currentProgressBarValue = 10000;
     next_round.setEnabled(false);
 
     roundDownAllTotalTimeValuesToEnsureSyncing();
