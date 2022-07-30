@@ -758,8 +758,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
-    //Called in timerLaunch
-//    populateCycleAdapterArrayList();
+    populateCycleAdapterArrayList();
 
     if (mode==1) {
       savedCycleAdapter.removeActiveCycleLayout();
@@ -3218,8 +3217,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     cycleRoundsAdapter.notifyDataSetChanged();
     cycleRoundsAdapterTwo.notifyDataSetChanged();
-
-    Log.i("testReset", "typeOfRound clearing via clearRoundAndCycleAdapterArrayLists()");
   }
 
   private void setAndCapTimerValues(int value) {
@@ -3513,10 +3510,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         workoutTime.clear();
         typeOfRound.clear();
-
-        //Todo: Called twice on cycle launch PLUS clearRoundAndCycleAdapterArrayLists()
-        Log.i("testReset", "typeOfRound clearing via populateCycleAdapterArrayList() with a workoutCyclesArray size of " + workoutCyclesArray.size());
-
         if (workoutCyclesArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
           String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
@@ -3643,7 +3636,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     displayCycleOrDailyTotals();
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
-    //Todo: Called in Fab and Edit Cycles. If we call this in resetTimer(), we can remove it from launchTimer which would be ideal.
     clearRoundAndCycleAdapterArrayLists();
     populateCycleAdapterArrayList();
 
@@ -4864,7 +4856,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         //Todo: Occasional 0/0 index exception here when resetting cycle from Main's recyclerView.
-        //Todo: May be workoutCyclesArray not populated @ line 3515, OR typeOfRound clearing via clearRoundAndCycleAdapterArrayLists() @ line 3205.
         switch (typeOfRound.get(0)) {
           case 1: setMillis = workoutTime.get(0); break;
           case 2: setMillis = 0; break;
