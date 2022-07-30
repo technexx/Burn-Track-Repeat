@@ -759,7 +759,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
+    //Todo: Also called in timerLaunchLogic, but we get blank lists if we don't start it here.
     populateCycleAdapterArrayList();
+    dotDraws.reDraw();
 
     if (mode==1) {
       savedCycleAdapter.removeActiveCycleLayout();
@@ -928,6 +930,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearRoundAndCycleAdapterArrayLists();
 
       populateCycleAdapterArrayList();
+      dotDraws.reDraw();
       populateRoundAdapterArraysForHighlightedCycle();
 
       setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
@@ -3528,10 +3531,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
-          dotDraws.reDraw();
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
+
+          Log.i("testDraw", "fetchedRounds size is " + fetchedRounds.length);
+          Log.i("testDraw", "fetchedRoundType size is " + fetchedRoundType.length);
+          Log.i("testDraw", "workOutTime size is " + workoutTime.size());
+          Log.i("testDraw", "typeOfRound size is " + typeOfRound.size());
         }
+
         break;
       case 3:
         pomValuesTime.clear();
@@ -3642,7 +3650,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
     clearRoundAndCycleAdapterArrayLists();
-    populateCycleAdapterArrayList();
+    //Called in reset().
+//    populateCycleAdapterArrayList();
 
     resetTimer();
   }
@@ -4778,70 +4787,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void populateTimerUI() {
-    beginTimerForNextRound = true;
-    cycles_completed_textView.setText(R.string.cycles_done);
-
-    toggleLayoutParamsForCyclesAndStopwatch();
-    setCyclesCompletedTextView();
-
-    switch (mode) {
-      case 1:
-        for (int i=0; i<workoutTime.size(); i++) {
-          if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
-        }
-
-        startRounds = workoutTime.size();
-        numberOfRoundsLeft = startRounds;
-
-        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
-        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
-
-        dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
-        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-        dotDraws.reDraw();
-
-        if (workoutTime.size()>0) {
-          switch (typeOfRound.get(0)) {
-            case 1:
-              setMillis = workoutTime.get(0);
-              timeLeft.setText(convertSeconds((dividedMillisForTimerDisplay(setMillis))));
-              setInitialTextSizeForRounds(setMillis);
-              break;
-            case 3:
-              breakMillis = workoutTime.get(0);
-              timeLeft.setText(convertSeconds(((dividedMillisForTimerDisplay(breakMillis)))));
-              setInitialTextSizeForRounds(breakMillis);
-              break;
-            case 2: case 4:
-              setMillis = 0;
-              breakMillis = 0;
-              timeLeft.setText("0");
-              setInitialTextSizeForRounds(0);
-              break;
-          }
-          toggleCycleTimeTextViewSizes(trackActivityWithinCycle);
-        }
-        break;
-      case 3:
-        if (pomValuesTime.size() > 0) {
-          pomMillis = pomValuesTime.get(0);
-          timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
-
-          dotDraws.pomDraw(pomDotCounter,pomValuesTime);
-
-          setInitialTextSizeForRounds(pomMillis);
-        }
-        toggleCycleTimeTextViewSizes(false);
-        break;
-    }
-
-    dotDraws.resetDotAlpha();
-    dotDraws.reDraw();
-  }
-
   private void resetTimer() {
     activeCycle = false;
+    timerIsPaused = true;
+    timerEnded = false;
+    timerDisabled = false;
+    next_round.setEnabled(true);
+
     vibrator.cancel();
     if (timer != null) timer.cancel();
     if (endAnimation!=null) endAnimation.cancel();
@@ -4850,11 +4802,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mediaPlayer.reset();
     }
 
-    timerIsPaused = true;
-    timerEnded = false;
-    timerDisabled = false;
-    next_round.setEnabled(true);
-
     progressBar.setProgress(10000);
     currentProgressBarValue = 10000;
     delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
@@ -4862,14 +4809,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
     reset_total_cycle_times.setEnabled(true);
 
-    switch (mode) {
-      case 1:
-        //Todo: Occasional 0/0 index exception here when resetting cycle from Main's recyclerView.
+    beginTimerForNextRound = true;
+    cycles_completed_textView.setText(R.string.cycles_done);
+
+    toggleLayoutParamsForCyclesAndStopwatch();
+    setCyclesCompletedTextView();
+
+    populateCycleAdapterArrayList();
+    dotDraws.resetDotAlpha();
+    dotDraws.reDraw();
+
+    if (mode==1) {
+      if (workoutTime.size()>0) {
         switch (typeOfRound.get(0)) {
-          case 1: setMillis = workoutTime.get(0); break;
-          case 2: setMillis = 0; break;
-          case 3: breakMillis = workoutTime.get(0); break;
-          case 4: breakMillis = 0; break;
+          case 1:
+            setMillis = workoutTime.get(0);
+            timeLeft.setText(convertSeconds((dividedMillisForTimerDisplay(setMillis))));
+            setInitialTextSizeForRounds(setMillis);
+            break;
+          case 2:
+            setMillis = 0;
+            timeLeft.setText("0");
+            setInitialTextSizeForRounds(0);
+            break;
+          case 3:
+            breakMillis = workoutTime.get(0);
+            timeLeft.setText(convertSeconds(((dividedMillisForTimerDisplay(breakMillis)))));
+            setInitialTextSizeForRounds(breakMillis);
+            break;
+          case 4:
+            breakMillis = 0;
+            timeLeft.setText("0");
+            setInitialTextSizeForRounds(0);
+            break;
         };
         countUpMillisHolder = 0;
         startRounds = workoutTime.size();
@@ -4885,18 +4857,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.removeActiveCycleLayout();
           savedCycleAdapter.notifyDataSetChanged();
         }
-        break;
-      case 3:
-        pomDotCounter = 0;
-        if (objectAnimatorPom != null) objectAnimatorPom.cancel();
+        toggleCycleTimeTextViewSizes(trackActivityWithinCycle);
 
-        if (savedPomCycleAdapter.isCycleActive()==true) {
-          savedPomCycleAdapter.removeActiveCycleLayout();
-          savedPomCycleAdapter.notifyDataSetChanged();
+        for (int i=0; i<workoutTime.size(); i++) {
+          if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
         }
-        break;
+
+        startRounds = workoutTime.size();
+        numberOfRoundsLeft = startRounds;
+
+        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+      }
     }
-    populateTimerUI();
+
+    if (mode==3) {
+      pomDotCounter = 0;
+      if (objectAnimatorPom != null) objectAnimatorPom.cancel();
+
+      if (savedPomCycleAdapter.isCycleActive()==true) {
+        savedPomCycleAdapter.removeActiveCycleLayout();
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
+
+      if (pomValuesTime.size() > 0) {
+        pomMillis = pomValuesTime.get(0);
+        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
+
+        dotDraws.pomDraw(pomDotCounter,pomValuesTime);
+
+        setInitialTextSizeForRounds(pomMillis);
+      }
+      toggleCycleTimeTextViewSizes(false);
+    }
+
     setNotificationValues();
   }
 
