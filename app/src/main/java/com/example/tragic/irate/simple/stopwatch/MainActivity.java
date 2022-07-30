@@ -557,8 +557,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: reDraw() is never called, but onDraw is when launching cycle.
           //Todo: There may be a runnable being called.
 
-  //Todo: Index exception bug when resetting timer from Main.
-
+  //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
+      //Todo: Still getting a blank activity added at some point. We've added Toasts to Daily Access to catch it.
+      //Todo: Try to catch DayHolder discrepancy first.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -3663,6 +3664,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     for (int i=0; i<dailyStatsAccess.getStatsForEachActivityList().size(); i++) {
       Log.i("testListOfActivities", "mStats activity list is " + dailyStatsAccess.getStatsForEachActivityList().get(i).getActivity());
     }
+
+    //Todo: Does not have instance of list like mStats.
+    if (dailyStatsAccess.getDayHolderList().size()>0) {
+      Log.i("testListOfDays", "DayHolder total is " + dailyStatsAccess.getDayHolderList().get(0).getTotalSetTime());
+    }
   }
 
   private void insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects() {
@@ -3677,6 +3683,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
     dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+    if (dailyStatsAccess.getActivityStringVariable().equalsIgnoreCase("")) {
+      Toast.makeText(getApplicationContext(), "Blank activity added!", Toast.LENGTH_SHORT).show();
+    }
 
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
 
@@ -4793,8 +4803,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.reDraw();
 
         if (workoutTime.size()>0) {
-          //Todo: Occasional 0/0 index exception here when resetting cycle from Main's recyclerView.
-          //Todo: May be workoutCyclesArray not populated @ line 3515, OR typeOfRound clearing via clearRoundAndCycleAdapterArrayLists() @ line 3205.
           switch (typeOfRound.get(0)) {
             case 1:
               setMillis = workoutTime.get(0);

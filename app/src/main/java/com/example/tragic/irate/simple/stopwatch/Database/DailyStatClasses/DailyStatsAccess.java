@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
 import android.util.Log;
+import android.widget.Toast;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CalorieDayHolder;
@@ -528,6 +529,10 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
         }
+
+        if (mActivityString.equalsIgnoreCase("")) {
+            Toast.makeText(mContext, "Blank activity added!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void setStatsForEachActivityEntityFromPosition(int position) {
@@ -571,6 +576,10 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+
+        if (mActivityString.equalsIgnoreCase("")) {
+            Toast.makeText(mContext, "Blank activity updated!", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(int position) {
@@ -714,6 +723,11 @@ public class DailyStatsAccess {
             Log.i("testActivityInsert", "activity inserted with zero'd out stats!");
             Log.i("testActivityInsert", "activity retrieved for NEW activity is " + mStatsForEachActivity.getActivity());
             Log.i("testActivityInsert", "activity position for NEW activity is " + activityPositionInListForCurrentDay);
+
+            //Todo: Called here. Think it's the cycle click after launch, likely because we don't have an instance of mActivity yet.
+//            if (mActivityString.equalsIgnoreCase("")) {
+//                Toast.makeText(mContext, "Blank activity added!", Toast.LENGTH_SHORT).show();
+//            }
 
         } else {
             setActivityPositionInListForCurrentDayForExistingActivity();
