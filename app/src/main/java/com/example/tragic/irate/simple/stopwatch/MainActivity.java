@@ -1966,7 +1966,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         }
 
-        createNewListOfActivitiesIfDayHasChanged();
+        if (cycleHasActivityAssigned) {
+          createNewListOfActivitiesIfDayHasChanged();
+        }
 
         if (trackActivityWithinCycle) {
           setAndUpdateDayHolderValuesInDatabase();
@@ -1995,6 +1997,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+      Log.i("testActivityInsert", "added blank from save runnable!");
     }
   }
 
@@ -3316,7 +3320,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             addOrReplaceRounds(0, roundIsSelected);
             break;
           default:
-            Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
             return;
         }
       }
@@ -3665,7 +3669,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       Log.i("testListOfActivities", "mStats activity list is " + dailyStatsAccess.getStatsForEachActivityList().get(i).getActivity());
     }
 
-    //Todo: Does not have instance of list like mStats.
     if (dailyStatsAccess.getDayHolderList().size()>0) {
       Log.i("testListOfDays", "DayHolder total is " + dailyStatsAccess.getDayHolderList().get(0).getTotalSetTime());
     }
@@ -3683,10 +3686,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
     dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
-
-    if (dailyStatsAccess.getActivityStringVariable().equalsIgnoreCase("")) {
-      Toast.makeText(getApplicationContext(), "Blank activity added!", Toast.LENGTH_SHORT).show();
-    }
 
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
 

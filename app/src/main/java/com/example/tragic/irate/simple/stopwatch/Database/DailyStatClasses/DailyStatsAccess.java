@@ -724,10 +724,9 @@ public class DailyStatsAccess {
             Log.i("testActivityInsert", "activity retrieved for NEW activity is " + mStatsForEachActivity.getActivity());
             Log.i("testActivityInsert", "activity position for NEW activity is " + activityPositionInListForCurrentDay);
 
-            //Todo: Called here. Think it's the cycle click after launch, likely because we don't have an instance of mActivity yet.
-//            if (mActivityString.equalsIgnoreCase("")) {
-//                Toast.makeText(mContext, "Blank activity added!", Toast.LENGTH_SHORT).show();
-//            }
+            if (mActivityString.equalsIgnoreCase("")) {
+                Log.i("testActivityInsert", "Blank activity added!");
+            }
 
         } else {
             setActivityPositionInListForCurrentDayForExistingActivity();
