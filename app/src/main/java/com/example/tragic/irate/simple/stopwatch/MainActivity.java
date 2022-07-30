@@ -4793,6 +4793,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.reDraw();
 
         if (workoutTime.size()>0) {
+          //Todo: Occasional 0/0 index exception here when resetting cycle from Main's recyclerView.
+          //Todo: May be workoutCyclesArray not populated @ line 3515, OR typeOfRound clearing via clearRoundAndCycleAdapterArrayLists() @ line 3205.
           switch (typeOfRound.get(0)) {
             case 1:
               setMillis = workoutTime.get(0);
