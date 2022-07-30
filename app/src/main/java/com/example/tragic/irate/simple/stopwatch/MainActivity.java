@@ -759,7 +759,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
-    //Todo: Also called in timerLaunchLogic, but we get blank lists if we don't start it here.
+    //Todo: Also called in timerLaunchLogic via resetTimer(), but we get blank lists if we don't start it here. We need it in reset() because it sets the lists that we set our millis values from.
     populateCycleAdapterArrayList();
     dotDraws.reDraw();
 
@@ -2159,6 +2159,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       for (int i=0; i<cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
 
+        //Todo: We likely don't have a new instance of cycles here! So it fetches old list.
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
@@ -3534,6 +3535,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
 
+          //Todo: Lists maintain previous value when creating new cycle. Is workoutCyclesArray not updating?
           Log.i("testDraw", "fetchedRounds size is " + fetchedRounds.length);
           Log.i("testDraw", "fetchedRoundType size is " + fetchedRoundType.length);
           Log.i("testDraw", "workOutTime size is " + workoutTime.size());
@@ -3650,8 +3652,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
     clearRoundAndCycleAdapterArrayLists();
-    //Called in reset().
-//    populateCycleAdapterArrayList();
 
     resetTimer();
   }
