@@ -281,20 +281,19 @@ public class DotDraws extends View {
             }
           }
 
-          //Todo: Returns previous smaller size - but why wouldn't it then continue to use that?
-          Log.i("testDraw", "mRoundTimes size is " + mRoundTimes.size());
+          //Todo: mRoundTYPE is the larger size. mRoundSize is the previous smaller.
+          Log.i("testDraw", "mRoundTimes size is " + mRoundType.size());
 
           if (mRoundTimes.size()<=8) {
             //Draws dot, timer value, and round count.
             mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, circleRadius, mPaint);
-            //Todo: Here, on drawText() below.
-            drawText(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForOneRow, i);
+            drawTextInCircles(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForOneRow, i);
             mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows, yRoundNumberTextPositionForOneRow, mPaintRoundNumbers);
           } else {
             //Different draw positions for each row if more than 8 rounds.
             if (i<=7) {
               mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForFirstOfTwoRows, circleRadius, mPaint);
-              drawText(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForOneOfTwoRows, i);
+              drawTextInCircles(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForOneOfTwoRows, i);
               mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows, yRoundNumberTextPositionForOneOfTwoRows, mPaintRoundNumbers);
               //Resetting mX after 8th round so the second row begins on top of first.
             } else {
@@ -304,7 +303,7 @@ public class DotDraws extends View {
                 xRoundNumberTextPositionForAllRows = xStartingPositionOfRoundNumberTextForAllRows;
               }
               mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForSecondOfTwoRows, circleRadius, mPaint);
-              drawText(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForSecondOfTwoRows, i);
+              drawTextInCircles(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForSecondOfTwoRows, i);
 
               mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows, yRoundNumberTextPositionForSecondOfTwoRows, mPaintRoundNumbers);
               if (i==8) {
@@ -375,7 +374,7 @@ public class DotDraws extends View {
               mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, pomRadiusLarge, mPaint);
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-              drawText(mPomTime, dotTextDrawForX, yCircleTextPositionForOneRow, i);
+              drawTextInCircles(mPomTime, dotTextDrawForX, yCircleTextPositionForOneRow, i);
               break;
             case 1: case 3: case 5:
               mPaint.setColor(MINI_BREAK_COLOR);
@@ -383,7 +382,7 @@ public class DotDraws extends View {
               mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, pomRadiusSmall , mPaint);
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-              drawText(mPomTime, dotTextDrawForX, yCircleTextPositionForOneRow, i);
+              drawTextInCircles(mPomTime, dotTextDrawForX, yCircleTextPositionForOneRow, i);
               break;
             case 7:
               mPaint.setColor(FULL_BREAK_COLOR);
@@ -391,7 +390,7 @@ public class DotDraws extends View {
               mCanvas.drawRect(xRectangleStart, yRectangleTop, xRectangleEnd, yRectangleBottom, mPaint);
 
               if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
-              drawText(mPomTime, xRectangleStart + dpConv(8), yCircleTextPositionForOneRow, i);
+              drawTextInCircles(mPomTime, xRectangleStart + dpConv(8), yCircleTextPositionForOneRow, i);
               break;
           }
           if (i==7) {
@@ -417,7 +416,7 @@ public class DotDraws extends View {
     }
   }
 
-  private void drawText(ArrayList<String> list, float x, float y, int i) {
+  private void drawTextInCircles(ArrayList<String> list, float x, float y, int i) {
     Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
 
     float modeOneTextSizeForLowDigits = dpConvFloat(30f);
@@ -465,7 +464,6 @@ public class DotDraws extends View {
       mPaintRoundNumbers.setTextSize(dpConvFloat(20f));
     }
 
-    //Todo: (i) is the list SIZE, so 5 positions will iterate as 0-4, but if we try to get (i) up to 5, that causes our index exception.
     if (list.size() >0) {
       //If 2 or less chars in time string, fonts are as follows.
       if (list.get(i).length() <= 2) {
