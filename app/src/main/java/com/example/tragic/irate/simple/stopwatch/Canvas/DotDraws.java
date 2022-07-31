@@ -123,6 +123,10 @@ public class DotDraws extends View {
 
     this.mRoundTimes = roundTimes;
     this.mRoundType = roundType;
+
+    Log.i("testDraw", "mRoundTimes size in update method is is " + mRoundTimes.size());
+    Log.i("testDraw", "mRoundType size in update method is " + mRoundType.size());
+
   }
 
   public void pomDraw(int pomDotCounter, ArrayList<Integer> pomTime) {
@@ -168,6 +172,9 @@ public class DotDraws extends View {
   @Override
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
+
+    Log.i("testDraw", "mRoundTimes size in canvas draw is " + mRoundTimes.size());
+    Log.i("testDraw", "mRoundType size in canvas draw is " + mRoundType.size());
 
     int paddedWidth = (int) mPhoneWidth-dpConv(11);
     double circleCircumference = (double) paddedWidth/8;
@@ -232,8 +239,6 @@ public class DotDraws extends View {
 //      yRoundNumberTextPositionForSecondOfTwoRows = dpConv(160);
 //    }
 
-    Log.i("testDraw", "DotDraws is updating!");
-
     switch (mMode) {
       case 1:
         if (mRoundTimes.size()<=8) {
@@ -280,9 +285,6 @@ public class DotDraws extends View {
               mPaintText.setAlpha(255);
             }
           }
-
-          //Todo: mRoundTYPE is the larger size. mRoundSize is the previous smaller.
-          Log.i("testDraw", "mRoundTimes size is " + mRoundType.size());
 
           if (mRoundTimes.size()<=8) {
             //Draws dot, timer value, and round count.

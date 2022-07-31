@@ -761,7 +761,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
-    //Todo: Also called in timerLaunchLogic via resetTimer(), but we get blank lists if we don't start it here. We need it in reset() because it sets the lists that we set our millis values from.
     populateCycleAdapterArrayList();
     dotDraws.reDraw();
 
@@ -2150,7 +2149,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This isn't pulled on new launch, when we need it to update our list.
   private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
     if (mode==1 || forAllModes) {
       workoutCyclesArray.clear();
@@ -2163,7 +2161,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       for (int i=0; i<cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
 
-        //Todo: We likely don't have a new instance of cycles here! So it fetches old list.
         //Todo: If our insertion method isn't complete before this is called, we'll get old list.
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
@@ -2172,8 +2169,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
       }
-
-      Log.i("testDraw", "cycleList size pulled is " + cyclesList.size());
 
       savedCycleAdapter.notifyDataSetChanged();
     }
@@ -3384,6 +3379,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Running ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime) and
+  //Todo: dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound) would stop crash, but not the root cause.
   private void addOrReplaceRounds(int integerValue, boolean replacingValue) {
     if (mode==1) {
       //If adding a round.
@@ -3408,7 +3405,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else {
           showToastIfNoneActive("Full!");
         }
-
         setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
       } else {
         workoutTime.set(roundSelectedPosition, integerValue*1000);
@@ -3540,11 +3536,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
 
-          //Todo: Lists maintain previous value when creating new cycle. Is workoutCyclesArray not updating?
-          Log.i("testDraw", "fetchedRounds size is " + fetchedRounds.length);
-          Log.i("testDraw", "fetchedRoundType size is " + fetchedRoundType.length);
-          Log.i("testDraw", "workOutTime size is " + workoutTime.size());
-          Log.i("testDraw", "typeOfRound size is " + typeOfRound.size());
+//          Log.i("testDraw", "fetchedRounds size is " + fetchedRounds.length);
+//          Log.i("testDraw", "fetchedRoundType size is " + fetchedRoundType.length);
+//          Log.i("testDraw", "workOutTime size is " + workoutTime.size());
+//          Log.i("testDraw", "typeOfRound size is " + typeOfRound.size());
         }
 
         break;
@@ -3677,6 +3672,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.dismiss();
     }
 
+    //Todo: It's because we're opening this view!!
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
 
     for (int i=0; i<dailyStatsAccess.getStatsForEachActivityList().size(); i++) {
@@ -4824,7 +4820,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
     populateCycleAdapterArrayList();
     dotDraws.resetDotAlpha();
-    dotDraws.reDraw();
+//    dotDraws.reDraw();
     //////////////////////////////////
 
     if (mode==1) {
