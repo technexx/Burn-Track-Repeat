@@ -553,7 +553,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Dotdraws index error back when adding new cycles.
-      //Todo: Error likely in info retrieved from edit vs add.
       //Todo: reDraw() is never called, but onDraw is when launching cycle.
           //Todo: There may be a runnable being called.
 
@@ -561,6 +560,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Still getting a blank activity added at some point. We've added Toasts to Daily Access to catch it.
       //Todo: Try to catch DayHolder discrepancy first.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
+
+  //Todo: Clicking on empty area in cycles list does not launch cycle.
+  //Todo: No visible scroller bar when scrolling through list of cycles.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -930,11 +932,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearRoundAndCycleAdapterArrayLists();
 
       populateCycleAdapterArrayList();
-      dotDraws.reDraw();
       populateRoundAdapterArraysForHighlightedCycle();
 
       setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
       assignOldCycleValuesToCheckForChanges();
+
+      dotDraws.reDraw();
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -2147,6 +2150,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: This isn't pulled on new launch, when we need it to update our list.
   private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
     if (mode==1 || forAllModes) {
       workoutCyclesArray.clear();
@@ -2160,15 +2164,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTitleArray.add(cyclesList.get(i).getTitle());
 
         //Todo: We likely don't have a new instance of cycles here! So it fetches old list.
+        //Todo: If our insertion method isn't complete before this is called, we'll get old list.
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
-        Log.i("testTitle", "title array for cycle list is " + workoutTitleArray.get(i));
-//        Log.i("testToggle", "state saved retrieved for cycle list is " + tdeeIsBeingTrackedInCycleList.get(i));
       }
+
+      Log.i("testDraw", "cycleList size pulled is " + cyclesList.size());
 
       savedCycleAdapter.notifyDataSetChanged();
     }
@@ -4815,9 +4820,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleLayoutParamsForCyclesAndStopwatch();
     setCyclesCompletedTextView();
 
+    //////////////////////////////////
+    clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
     populateCycleAdapterArrayList();
     dotDraws.resetDotAlpha();
     dotDraws.reDraw();
+    //////////////////////////////////
 
     if (mode==1) {
       if (workoutTime.size()>0) {
@@ -4844,8 +4852,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
         };
         countUpMillisHolder = 0;
-        startRounds = workoutTime.size();
-        numberOfRoundsLeft = startRounds;
+        numberOfRoundsLeft = workoutTime.size();
         currentRound = 0;
 
         mHandler.removeCallbacks(infinityTimerForSets);
@@ -4862,9 +4869,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
         }
-
-        startRounds = workoutTime.size();
-        numberOfRoundsLeft = startRounds;
 
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);

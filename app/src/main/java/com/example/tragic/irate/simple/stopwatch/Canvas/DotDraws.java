@@ -281,10 +281,13 @@ public class DotDraws extends View {
             }
           }
 
+          //Todo: Returns previous smaller size - but why wouldn't it then continue to use that?
+          Log.i("testDraw", "mRoundTimes size is " + mRoundTimes.size());
+
           if (mRoundTimes.size()<=8) {
             //Draws dot, timer value, and round count.
             mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, circleRadius, mPaint);
-            //Todo: Index exception here. Conditional above uses roundType.
+            //Todo: Here, on drawText() below.
             drawText(mRoundTimes, xCircleTextPositionForAllRows, yCircleTextPositionForOneRow, i);
             mCanvas.drawText(String.valueOf(i+1), xRoundNumberTextPositionForAllRows, yRoundNumberTextPositionForOneRow, mPaintRoundNumbers);
           } else {
@@ -462,6 +465,7 @@ public class DotDraws extends View {
       mPaintRoundNumbers.setTextSize(dpConvFloat(20f));
     }
 
+    //Todo: (i) is the list SIZE, so 5 positions will iterate as 0-4, but if we try to get (i) up to 5, that causes our index exception.
     if (list.size() >0) {
       //If 2 or less chars in time string, fonts are as follows.
       if (list.get(i).length() <= 2) {
