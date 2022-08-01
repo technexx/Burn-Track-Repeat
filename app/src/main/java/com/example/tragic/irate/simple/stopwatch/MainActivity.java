@@ -549,16 +549,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Dotdraws index error back when adding new cycles.
-      //Todo: reDraw() is never called, but onDraw is when launching cycle.
-          //Todo: There may be a runnable being called.
-
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
-      //Todo: Still getting a blank activity added at some point. We've added Toasts to Daily Access to catch it.
-      //Todo: Try to catch DayHolder discrepancy first.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
-  //Todo: Clicking on empty area in cycles list does not launch cycle.
   //Todo: No visible scroller bar when scrolling through list of cycles.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -3517,7 +3510,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTime.clear();
         typeOfRound.clear();
         if (workoutCyclesArray.size()-1>=positionOfSelectedCycle) {
-          //Todo: Position is wrong.
           String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
           String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
 
@@ -3532,9 +3524,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
-
-          Log.i("testDraw", "workOutTime size in Main's populate is " + workoutTime.size());
-          Log.i("testDraw", "typeOfRound size in Main's populate is " + typeOfRound.size());
         }
 
         break;
@@ -3671,7 +3660,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.dismiss();
     }
 
-    //Todo: It's because we're opening this view. DotDraws does hold instances of variables through show/dismiss.
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
 
     for (int i=0; i<dailyStatsAccess.getStatsForEachActivityList().size(); i++) {
@@ -4817,7 +4805,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //////////////////////////////////
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-    //Todo: Cycle title aside, this shouldn't be in resetTimer().
+    //Should not need this here.
 //    populateCycleRoundAndRoundTypeArrayLists();
     dotDraws.resetDotAlpha();
     dotDraws.reDraw();
@@ -4866,8 +4854,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
         }
 
+        startRounds = workoutTime.size();
+        numberOfRoundsLeft = startRounds;
+
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+
+        dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
+        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
       }
     }
 

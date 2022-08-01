@@ -120,12 +120,7 @@ public class DotDraws extends View {
   //Updates list every time it is called w/ a String conversion of our long millis value.
   public void updateWorkoutTimes(ArrayList<String> roundTimes, ArrayList<Integer> roundType) {
     //Populates our String Array of round times from the Integer Array of values received from Timer class.
-
-    this.mRoundTimes = roundTimes;
-    this.mRoundType = roundType;
-
-    Log.i("testDraw", "mRoundTimes size in adapter is " + mRoundTimes.size());
-    Log.i("testDraw", "mRoundType size in adapter is " + mRoundType.size());
+    this.mRoundTimes = roundTimes; this.mRoundType = roundType;
   }
 
   public void pomDraw(int pomDotCounter, ArrayList<Integer> pomTime) {
@@ -170,9 +165,6 @@ public class DotDraws extends View {
   @Override
   public void onDraw(Canvas canvas) {
     this.mCanvas = canvas;
-
-    Log.i("testDraw", "mRoundTimes size in canvas draw is " + mRoundTimes.size());
-    Log.i("testDraw", "mRoundType size in canvas draw is " + mRoundType.size());
 
     int paddedWidth = (int) mPhoneWidth-dpConv(11);
     double circleCircumference = (double) paddedWidth/8;
