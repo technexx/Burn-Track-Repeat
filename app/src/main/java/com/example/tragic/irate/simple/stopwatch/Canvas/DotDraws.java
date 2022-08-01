@@ -124,19 +124,17 @@ public class DotDraws extends View {
     this.mRoundTimes = roundTimes;
     this.mRoundType = roundType;
 
-    Log.i("testDraw", "mRoundTimes size in update method is is " + mRoundTimes.size());
-    Log.i("testDraw", "mRoundType size in update method is " + mRoundType.size());
-
+    Log.i("testDraw", "mRoundTimes size in adapter is " + mRoundTimes.size());
+    Log.i("testDraw", "mRoundType size in adapter is " + mRoundType.size());
   }
 
   public void pomDraw(int pomDotCounter, ArrayList<Integer> pomTime) {
-    mPomTime = new ArrayList<>();
+    mPomTime.clear();
     for (int i=0; i<pomTime.size(); i++) mPomTime.add(convertSeconds(pomTime.get(i)/1000));
     this.mPomDotCounter = pomDotCounter;
   }
 
   public void reDraw() {
-    Log.i("testDraw", "reDraw called!");
     invalidate();
   }
 

@@ -244,9 +244,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> pomStringListOfRoundValues;
   ArrayList<String> pomTitleArray;
   ArrayList<String> pomArray;
-  String workoutString;
-  String roundTypeString;
-  String pomString;
   int ADDING_CYCLE = 1;
   int EDITING_CYCLE = 2;
   int DELETING_CYCLE = 3;
@@ -2161,7 +2158,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       for (int i=0; i<cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
 
-        //Todo: If our insertion method isn't complete before this is called, we'll get old list.
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
@@ -3521,6 +3517,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTime.clear();
         typeOfRound.clear();
         if (workoutCyclesArray.size()-1>=positionOfSelectedCycle) {
+          //Todo: Position is wrong.
           String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
           String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
 
@@ -3536,10 +3533,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
 
-//          Log.i("testDraw", "fetchedRounds size is " + fetchedRounds.length);
-//          Log.i("testDraw", "fetchedRoundType size is " + fetchedRoundType.length);
-//          Log.i("testDraw", "workOutTime size is " + workoutTime.size());
-//          Log.i("testDraw", "typeOfRound size is " + typeOfRound.size());
+          Log.i("testDraw", "workOutTime size in Main's populate is " + workoutTime.size());
+          Log.i("testDraw", "typeOfRound size in Main's populate is " + typeOfRound.size());
         }
 
         break;
@@ -3591,8 +3586,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    setTimerLaunchViews(typeOfLaunch);
-
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
@@ -3638,6 +3631,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         @Override
         public void run() {
           setTimerLaunchLogic(trackActivityWithinCycle);
+          setTimerLaunchViews(typeOfLaunch);
         }
       });
     });
@@ -3672,7 +3666,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editCyclesPopupWindow.dismiss();
     }
 
-    //Todo: It's because we're opening this view!!
+    //Todo: It's because we're opening this view. DotDraws does hold instances of variables through show/dismiss.
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
 
     for (int i=0; i<dailyStatsAccess.getStatsForEachActivityList().size(); i++) {
@@ -3751,9 +3745,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Getting toggle stat from adapter on timer launch and saving that. Retrieve w/ everything else coming back.
   private void saveAddedOrEditedCycleASyncRunnable() {
     Gson gson = new Gson();
-    workoutString = "";
-    roundTypeString = "";
-    pomString = "";
+    String workoutString = "";
+    String roundTypeString = "";
+    String pomString = "";
 
     int cycleID;
     if (mode==1) {
@@ -4818,9 +4812,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //////////////////////////////////
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+    //Todo: Cycle title aside, this shouldn't be in resetTimer().
     populateCycleAdapterArrayList();
     dotDraws.resetDotAlpha();
-//    dotDraws.reDraw();
+    dotDraws.reDraw();
     //////////////////////////////////
 
     if (mode==1) {
