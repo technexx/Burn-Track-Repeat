@@ -758,7 +758,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
-    populateCycleAdapterArrayList();
+    populateCycleRoundAndRoundTypeArrayLists();
     dotDraws.reDraw();
 
     if (mode==1) {
@@ -927,7 +927,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       clearRoundAndCycleAdapterArrayLists();
 
-      populateCycleAdapterArrayList();
+      populateCycleRoundAndRoundTypeArrayLists();
       populateRoundAdapterArraysForHighlightedCycle();
 
       setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
@@ -3511,7 +3511,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
-  private void populateCycleAdapterArrayList() {
+  private void populateCycleRoundAndRoundTypeArrayLists() {
     switch (mode) {
       case 1:
         workoutTime.clear();
@@ -3566,6 +3566,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(()-> {
       if (!isNewCycle) {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      } else {
+        positionOfSelectedCycle = pomArray.size()-1;
       }
 
       saveAddedOrEditedCycleASyncRunnable();
@@ -3620,12 +3622,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
       }
 
-      if (!isNewCycle) {
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-      }
-
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromDatabase(false);
+
+      if (!isNewCycle) {
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      } else {
+        positionOfSelectedCycle = workoutCyclesArray.size()-1;
+      }
 
       runOnUiThread(new Runnable() {
         @Override
@@ -3646,6 +3650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
     clearRoundAndCycleAdapterArrayLists();
+    populateCycleRoundAndRoundTypeArrayLists();
 
     resetTimer();
   }
@@ -4813,7 +4818,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //////////////////////////////////
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
     //Todo: Cycle title aside, this shouldn't be in resetTimer().
-    populateCycleAdapterArrayList();
+//    populateCycleRoundAndRoundTypeArrayLists();
     dotDraws.resetDotAlpha();
     dotDraws.reDraw();
     //////////////////////////////////
