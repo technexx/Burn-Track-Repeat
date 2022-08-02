@@ -2064,6 +2064,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       AsyncTask.execute(()-> {
         queryAndSortAllCyclesFromDatabase(true);
+
+        runOnUiThread(()->{
+          clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+          if (mode==1) savedCycleAdapter.notifyDataSetChanged();
+          if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
+        });
       });
 
       prefEdit.putInt("sortMode", sortMode);
@@ -2116,10 +2122,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
       }
-
-      runOnUiThread(()->{
-        clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-      });
     }
 
     if (mode==3) {
@@ -2133,43 +2135,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
       }
-
-      runOnUiThread(()->{
-        clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-      });
-    }
-  }
-
-  private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
-    if (mode==1 || forAllModes) {
-      workoutCyclesArray.clear();
-      typeOfRoundArray.clear();
-      workoutTitleArray.clear();
-      workoutActivityStringArray.clear();
-      tdeeActivityExistsInCycleList.clear();
-      tdeeIsBeingTrackedInCycleList.clear();
-
-      for (int i=0; i<cyclesList.size(); i++) {
-        workoutTitleArray.add(cyclesList.get(i).getTitle());
-
-        workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
-        typeOfRoundArray.add(cyclesList.get(i).getRoundType());
-        workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
-        tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
-        tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
-
-      }
-
-      savedCycleAdapter.notifyDataSetChanged();
-    }
-    if (mode==3 || forAllModes) {
-      pomArray.clear();
-      pomTitleArray.clear();
-      for (int i=0; i<pomCyclesList.size(); i++) {
-        pomArray.add(pomCyclesList.get(i).getFullCycle());
-        pomTitleArray.add(pomCyclesList.get(i).getTitle());
-      }
-      savedPomCycleAdapter.notifyDataSetChanged();
     }
   }
 
@@ -2329,24 +2294,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     queryAndSortAllCyclesFromDatabase(false);
 
     runOnUiThread(()->{
+      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+      if (mode==1) savedCycleAdapter.notifyDataSetChanged();
+      if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();;
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
   }
 
   private void deleteAllCycles() {
-    queryAndSortAllCyclesFromDatabase(false);
-
     if (mode==1) {
       if (cyclesList.size()>0) {
         cyclesDatabase.cyclesDao().deleteAllCycles();
+        queryAndSortAllCyclesFromDatabase(false);
+
         runOnUiThread(()->{
-          //Clears adapter arrays and populates recyclerView with (nothing) since arrays are now empty. Also called notifyDataSetChanged().
-          workoutCyclesArray.clear();
-          typeOfRoundArray.clear();
-          workoutTitleArray.clear();
-          tdeeIsBeingTrackedInCycleList.clear();
-          tdeeActivityExistsInCycleList.clear();
-          workoutActivityStringArray.clear();
+          clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
           savedCycleAdapter.notifyDataSetChanged();
         });
       }
@@ -2354,9 +2316,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) {
       if (pomCyclesList.size()>0) {
         cyclesDatabase.cyclesDao().deleteAllPomCycles();
+
         runOnUiThread(()->{
-          pomArray.clear();
-          pomTitleArray.clear();
+          clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
           savedPomCycleAdapter.notifyDataSetChanged();
         });
       }
@@ -3503,6 +3465,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
+  private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
+    if (mode==1 || forAllModes) {
+      workoutCyclesArray.clear();
+      typeOfRoundArray.clear();
+      workoutTitleArray.clear();
+      workoutActivityStringArray.clear();
+      tdeeActivityExistsInCycleList.clear();
+      tdeeIsBeingTrackedInCycleList.clear();
+
+      for (int i=0; i<cyclesList.size(); i++) {
+        workoutTitleArray.add(cyclesList.get(i).getTitle());
+
+        workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
+        typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+        workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
+        tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
+        tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
+
+      }
+    }
+    if (mode==3 || forAllModes) {
+      pomArray.clear();
+      pomTitleArray.clear();
+      for (int i=0; i<pomCyclesList.size(); i++) {
+        pomArray.add(pomCyclesList.get(i).getFullCycle());
+        pomTitleArray.add(pomCyclesList.get(i).getTitle());
+      }
+    }
+  }
+
   private void populateCycleRoundAndRoundTypeArrayLists() {
     switch (mode) {
       case 1:
@@ -3522,14 +3514,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
-          //Todo: Uses old title, but saved correctly
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
 
           for (int i=0; i<workoutTitleArray.size(); i++) {
-            Log.i("testPopulate", "titles in array are " + workoutTitleArray.get(i));;
           }
-          Log.i("testPopulate", "position is " + positionOfSelectedCycle);
-          Log.i("testPopulate", "title pulled is " + cycleTitle);
         }
 
         break;
@@ -3571,6 +3559,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
+          clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
           setTimerLaunchLogic(false);
         }
       });
@@ -3619,10 +3608,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromDatabase(false);
+      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (!isNewCycle) {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       } else {
+        Log.i("testPopulate", "workOutCycles size in launch after insertion + query is " + workoutCyclesArray.size());
         positionOfSelectedCycle = workoutCyclesArray.size()-1;
       }
 
