@@ -549,9 +549,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Pom cycle layout title bug.
   //Todo: Expanding/simplifying should not toggle edit in calorie consumption tab.
-  //Todo: Creating/launching new cycle will carry over old set/break times (both modes).
+  //Todo: Cycle time may not always be saving.
+  //Todo: Reset button in cycle adapter overlapping cycles.
+  //Todo: Center title/cycles in sep. layout within workout cycles.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
@@ -3572,6 +3573,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         positionOfSelectedCycle = pomArray.size()-1;
       }
 
+      setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+      retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -3626,10 +3630,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       queryAndSortAllCyclesFromDatabase(false);
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
-      if (!isNewCycle) {
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-      } else {
+      if (isNewCycle) {
         positionOfSelectedCycle = workoutCyclesArray.size()-1;
+      }
+
+      if (!cycleHasActivityAssigned) {
+        setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
       runOnUiThread(new Runnable() {
