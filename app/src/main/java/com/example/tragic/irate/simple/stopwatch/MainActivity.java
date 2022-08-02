@@ -549,9 +549,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Creating/launching new cycle will carry over old set/break times (both modes).
   //Todo: CycleTitle stuff for Pom.
-      //Todo: Also does not update work/break time correctly when creating new (Pom) cycle.
-  //Todo: Soft KB does not push recyclerView up in edit mode!
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
@@ -2048,7 +2047,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTdeeSpinnersToDefaultValues();
     toggleEditPopUpViewsForAddingActivity(false);
 
-    editCyclesPopupWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+    //For some reason, shownAsDropDown vs showAtLocation prevents soft kb displacing layout.
+    editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
   }
 
   private View.OnClickListener cyclesSortOptionListener() {
