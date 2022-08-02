@@ -549,7 +549,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Cycle time may not always be saving.
   //Todo: Center title/cycles in sep. layout within workout cycles.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
@@ -3632,7 +3631,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         positionOfSelectedCycle = workoutCyclesArray.size()-1;
       }
 
-      if (!cycleHasActivityAssigned) {
+      if (!trackActivityWithinCycle) {
         setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
