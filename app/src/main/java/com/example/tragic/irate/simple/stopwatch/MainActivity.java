@@ -549,8 +549,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Pom cycle layout title bug.
   //Todo: Creating/launching new cycle will carry over old set/break times (both modes).
-  //Todo: CycleTitle stuff for Pom.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
@@ -3491,6 +3491,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3 || forAllModes) {
       pomArray.clear();
       pomTitleArray.clear();
+
       for (int i=0; i<pomCyclesList.size(); i++) {
         pomArray.add(pomCyclesList.get(i).getFullCycle());
         pomTitleArray.add(pomCyclesList.get(i).getTitle());
@@ -3518,24 +3519,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
-
-          for (int i=0; i<workoutTitleArray.size(); i++) {
-          }
         }
 
         break;
       case 3:
         pomValuesTime.clear();
+
         if (pomArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
-
-          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
 
           /////---------Testing pom round iterations---------------/////////
 //          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
           for (int i=0; i<fetchedPomCycle.length; i++) {
             pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
           }
+
+          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
+
         }
         break;
     }
@@ -3550,6 +3550,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (savedPomCycleAdapter.isCycleActive()) {
       savedPomCycleAdapter.removeActiveCycleLayout();
       savedPomCycleAdapter.notifyDataSetChanged();
+    }
+
+    if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
+      if (cycleNameEdit.getText().toString().isEmpty()) {
+        cycleTitle = getCurrentDateAsFullTextString();
+      } else {
+        cycleTitle = cycleNameEdit.getText().toString();
+      }
     }
 
     AsyncTask.execute(()-> {
@@ -3781,8 +3789,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setItemCount(workoutTime.size());
         cycles.setTitle(cycleTitle);
 
-        Log.i("testPopulate", "title being saved is " + cycleTitle);
-
         if (isNewCycle) {
           cycles.setTimeAdded(System.currentTimeMillis());;
           cyclesDatabase.cyclesDao().insertCycle(cycles);
@@ -3792,23 +3798,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
     if (mode==3) {
-      if (isNewCycle) pomCycles = new PomCycles(); else if (pomCyclesList.size()>0) {
+      if (isNewCycle) {
+        pomCycles = new PomCycles();
+      } else if (pomCyclesList.size()>0) {
         cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
         pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
       }
+
       pomString = gson.toJson(pomValuesTime);
       pomString = friendlyString(pomString);
 
       if (!pomString.equals("")) {
         pomCycles.setFullCycle(pomString);
         pomCycles.setTimeAccessed(System.currentTimeMillis());
+        pomCycles.setTitle(cycleTitle);
+
         if (isNewCycle) {
           pomCycles.setTimeAdded(System.currentTimeMillis());
           cyclesDatabase.cyclesDao().insertPomCycle(pomCycles);
         } else {
           cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
         }
-        pomCycles.setTitle(cycleTitle);
       }
     }
 
