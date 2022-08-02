@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
