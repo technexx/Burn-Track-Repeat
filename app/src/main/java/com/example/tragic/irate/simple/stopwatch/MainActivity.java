@@ -549,7 +549,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Expanding/simplifying should not toggle edit in calorie consumption tab.
   //Todo: Cycle time may not always be saving.
   //Todo: Reset button in cycle adapter overlapping cycles.
   //Todo: Center title/cycles in sep. layout within workout cycles.
