@@ -549,7 +549,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: CycleTitle stuff.
+  //Todo: CycleTitle stuff for Pom.
+  //Todo: Soft KB does not push recyclerView up in edit mode!
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
@@ -743,8 +744,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onCycleClick(int position) {
     isNewCycle = false;
     positionOfSelectedCycle = position;
-    cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
-    trackActivityWithinCycle = savedCycleAdapter.retrieveActiveTdeeModeBoolean(position);
+
+    if (mode==1) {
+      cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
+      trackActivityWithinCycle = savedCycleAdapter.retrieveActiveTdeeModeBoolean(position);
+    }
 
     setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(position);
 
@@ -3299,7 +3303,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleRoundsAdapter.setPomFade(true);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
-          showToastIfNoneActive("Pomodoro cycle already loaded!");
+//          showToastIfNoneActive("Pomodoro cycle already loaded!");
         }
       }
     } else {
@@ -3544,22 +3548,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    setTimerLaunchViews(typeOfLaunch);
-
     AsyncTask.execute(()-> {
+      saveAddedOrEditedCycleASyncRunnable();
+      queryAndSortAllCyclesFromDatabase(false);
+      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+
       if (!isNewCycle) {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       } else {
         positionOfSelectedCycle = pomArray.size()-1;
       }
 
-      saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase(false);
-
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+          setTimerLaunchViews(typeOfLaunch);
           setTimerLaunchLogic(false);
         }
       });
@@ -3613,7 +3616,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!isNewCycle) {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       } else {
-        Log.i("testPopulate", "workOutCycles size in launch after insertion + query is " + workoutCyclesArray.size());
         positionOfSelectedCycle = workoutCyclesArray.size()-1;
       }
 
