@@ -53,6 +53,10 @@
         <item name="android:windowExitAnimation">@anim/slide_out_to_bottom</item>
     </style>
 
+    <style name="EditCyclesPopUpTheme">
+        <item name="android:windowSoftInputMode">adjustNothing</item>
+    </style>
+
     <style name="EditButtonTextColor">
         <item name="android:textColor">@color/light_white</item>
     </style>

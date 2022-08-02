@@ -549,6 +549,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: CycleTitle stuff.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
@@ -3368,8 +3369,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Running ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime) and
-  //Todo: dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound) would stop crash, but not the root cause.
   private void addOrReplaceRounds(int integerValue, boolean replacingValue) {
     if (mode==1) {
       //If adding a round.
@@ -3523,7 +3522,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
+          //Todo: Uses old title, but saved correctly
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
+
+          for (int i=0; i<workoutTitleArray.size(); i++) {
+            Log.i("testPopulate", "titles in array are " + workoutTitleArray.get(i));;
+          }
+          Log.i("testPopulate", "position is " + positionOfSelectedCycle);
+          Log.i("testPopulate", "title pulled is " + cycleTitle);
         }
 
         break;
@@ -3775,6 +3781,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setActivityString(getString(R.string.add_activity));
         cycles.setCurrentlyTrackingCycle(false);
       }
+
       if (!workoutString.equals("")) {
         cycles.setWorkoutRounds(workoutString);
         cycles.setRoundType(roundTypeString);
@@ -3782,7 +3789,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setItemCount(workoutTime.size());
         cycles.setTitle(cycleTitle);
 
-        Log.i("testTitle", "title being saved is " + cycleTitle);
+        Log.i("testPopulate", "title being saved is " + cycleTitle);
 
         if (isNewCycle) {
           cycles.setTimeAdded(System.currentTimeMillis());;
@@ -3790,7 +3797,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else {
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
-
       }
     }
     if (mode==3) {
