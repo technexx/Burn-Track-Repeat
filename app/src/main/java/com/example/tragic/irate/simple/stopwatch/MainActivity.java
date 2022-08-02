@@ -550,6 +550,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Pom cycle layout title bug.
+  //Todo: Expanding/simplifying should not toggle edit in calorie consumption tab.
   //Todo: Creating/launching new cycle will carry over old set/break times (both modes).
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
