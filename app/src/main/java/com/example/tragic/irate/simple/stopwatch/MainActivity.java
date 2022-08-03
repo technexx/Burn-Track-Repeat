@@ -551,7 +551,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Selecting "daily stats" from a settings menu will not dismiss settings or replace fragment.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -2444,27 +2443,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchDailyStatsFragment() {
-
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
       mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftLong);
-      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
-
-      fragmentManager.beginTransaction()
-              .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
-              .commit();
-      setTypeOFMenu(DAILY_SETTINGS_MENU);
-
-      toggleSortMenuViewBetweenCyclesAndStats(SORTING_STATS);
     }
 
-//    if (rootSettingsFragment.isVisible()) {
-//      mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
-//    }
+    mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
-  }
+    fragmentManager.beginTransaction()
+            .setCustomAnimations(
+                    R.anim.slide_in_from_left,  // enter
+                    R.anim.slide_out_from_right,  // exit
+                    R.anim.slide_in_from_left_short,   // popEnter
+                    R.anim.slide_out_from_right  // popExit
 
-  private void slideOutSettingsFragment(Fragment fragment) {
+            )
+            .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
+            .commit();
 
+    setTypeOFMenu(DAILY_SETTINGS_MENU);
+    toggleSortMenuViewBetweenCyclesAndStats(SORTING_STATS);
   }
 
   private void deleteDailyStatsForSelectedDays() {
