@@ -84,6 +84,7 @@ import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConve
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.AboutFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ChangeSettingsValues;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
@@ -487,7 +488,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RootSettingsFragment rootSettingsFragment;
   SoundSettingsFragment soundSettingsFragment;
   ColorSettingsFragment colorSettingsFragment;
-  com.example.tragic.irate.simple.stopwatch.SettingsFragments.tdeeSettingsFragment tdeeSettingsFragment;
+  tdeeSettingsFragment tdeeSettingsFragment;
+  AboutFragment aboutFragment;
 
   ChangeSettingsValues changeSettingsValues;
 
@@ -549,6 +551,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Calories expended showing much higher in daily value.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -556,7 +559,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
- //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
+  //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Check sizes on long aspect for all layouts + menus.
 
   //Todo: Test dates from future years.
@@ -622,7 +625,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
     }
 
-    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible()) {
+    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || aboutFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
               .addToBackStack(null)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
@@ -678,6 +681,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (settingNumber==1) fragmentToReplace = soundSettingsFragment;
     if (settingNumber==2) fragmentToReplace = colorSettingsFragment;
     if (settingNumber==3) fragmentToReplace = tdeeSettingsFragment;
+    if (settingNumber==4) fragmentToReplace = aboutFragment;
 
     getSupportFragmentManager().beginTransaction()
             .addToBackStack (null)
@@ -1507,6 +1511,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     soundSettingsFragment = new SoundSettingsFragment();
     colorSettingsFragment = new ColorSettingsFragment();
     tdeeSettingsFragment = new tdeeSettingsFragment();
+    aboutFragment = new AboutFragment();
 
     rootSettingsFragment.sendSettingsData(MainActivity.this);
     soundSettingsFragment.soundSetting(MainActivity.this);

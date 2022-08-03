@@ -10,7 +10,4 @@
     <item android:id="@+id/delete_all_cycles"
         android:title="Delete All">
     </item>
-    <item android:id="@+id/about"
-        android:title="About">
-    </item>
 </menu>

@@ -16,6 +16,7 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
     int SOUND_SETTINGS = 1;
     int COLOR_SETTINGS = 2;
     int TDEE_SETTINGS = 3;
+    int ABOUT_FRAGMENT = 4;
 
     onChangedSettings mOnChangedSettings;
 
@@ -35,6 +36,7 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
         Preference soundOptionPref = findPreference("soundPref");
         Preference colorPref = findPreference("colorPref");
         Preference tdeePref = findPreference("tdeePref");
+        Preference aboutPref = findPreference("aboutPref");
 
         soundOptionPref.setOnPreferenceClickListener(v-> {
             mOnChangedSettings.settingsData(SOUND_SETTINGS);
@@ -49,6 +51,12 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
 
         tdeePref.setOnPreferenceClickListener(v-> {
             mOnChangedSettings.settingsData(TDEE_SETTINGS);
+
+            return true;
+        });
+
+        aboutPref.setOnPreferenceClickListener(v-> {
+            mOnChangedSettings.settingsData(ABOUT_FRAGMENT);
 
             return true;
         });

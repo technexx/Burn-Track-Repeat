@@ -20,4 +20,8 @@
         android:title="TDEE"
         />
 
+    <PreferenceScreen
+        android:key="aboutPref"
+        android:title="About"/>
+
 </PreferenceScreen>
