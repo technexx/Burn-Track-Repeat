@@ -54,6 +54,10 @@
         <item name="android:windowExitAnimation">@anim/slide_out_to_bottom</item>
     </style>
 
+    <style name="CustomActionBarTheme">
+        <item name="android:textSize">24sp</item>
+    </style>
+
     <style name="EditCyclesPopUpTheme">
         <item name="android:windowSoftInputMode">adjustNothing</item>
     </style>
