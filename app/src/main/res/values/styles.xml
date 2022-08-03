@@ -64,6 +64,7 @@
 
     <style name="MenuTheme">
         <item name="backgroundColor">@color/darker_grey</item>
+        <item name="android:textSize">18sp</item>
     </style>
 
     <style name="StatFragmentThemeDark">

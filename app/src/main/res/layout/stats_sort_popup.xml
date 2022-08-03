@@ -19,8 +19,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
-        android:textSize="16sp">
+        android:layout_marginTop="10dp">
     </TextView>
 
     <TextView
@@ -31,8 +30,7 @@
         app:layout_constraintTop_toBottomOf="@id/sort_activity_name_start"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
-        android:textSize="16sp">
+        android:layout_marginTop="10dp">
     </TextView>
 
     <TextView
@@ -43,8 +41,7 @@
         app:layout_constraintTop_toBottomOf="@id/sort_activity_name_end"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
-        android:textSize="16sp">
+        android:layout_marginTop="10dp">
     </TextView>
 
     <TextView
@@ -55,8 +52,7 @@
         app:layout_constraintTop_toBottomOf="@id/sort_most_time"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="4dp"
-        android:layout_marginTop="10dp"
-        android:textSize="16sp">
+        android:layout_marginTop="10dp">
     </TextView>
 
     <TextView
@@ -67,8 +63,7 @@
         app:layout_constraintTop_toBottomOf="@id/sort_least_time"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="4dp"
-        android:textSize="16sp">
+        android:layout_marginStart="4dp">
     </TextView>
 
     <TextView
@@ -80,8 +75,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"
-        android:layout_marginBottom="4dp"
-        android:textSize="16sp">
+        android:layout_marginBottom="4dp">
     </TextView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

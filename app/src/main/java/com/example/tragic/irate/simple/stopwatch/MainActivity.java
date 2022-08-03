@@ -550,7 +550,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
-  //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -898,8 +897,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setViewsAndColorsToPreventTearingInEditPopUp(false);
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-
-      logCyclesTitlesFromDatabase();
     });
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
