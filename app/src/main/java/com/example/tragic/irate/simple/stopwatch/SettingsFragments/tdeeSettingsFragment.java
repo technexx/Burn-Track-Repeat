@@ -281,7 +281,6 @@ public class tdeeSettingsFragment extends Fragment {
         return getString(R.string.bmr_value, String.valueOf(calculateBMR()));
     }
 
-    //Todo: Calculation error likely due to metric/imperial difference.
     private int calculateBMR() {
         int caloriesBurned = 0;
 

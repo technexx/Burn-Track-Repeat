@@ -275,10 +275,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   AlphaAnimation fadeIn;
   AlphaAnimation fadeOut;
   Animation slideLeft;
-  Animation slideDailyStatsFragmentInFromLeft;
-  Animation slideDailyStatsFragmentOutFromLeft;
-  Animation slideGlobalSettingsFragmentInFromLeft;
-  Animation slideGlobalSettingsFragmentOutFromLeft;
+  Animation slideInFromLeftLong;
+  Animation slideOutFromLeftLong;
+  Animation slideInFromLeftShort;
+  Animation slideOutFromLeftShort;
 
   ConstraintLayout.LayoutParams cycleTitleLayoutParams;
   ConstraintLayout.LayoutParams cyclesCompletedLayoutParams;
@@ -551,7 +551,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Selecting "daily stats" from a settings menu will launch Fragment but not dismiss settings.
+  //Todo: Selecting "daily stats" from a settings menu will not dismiss settings or replace fragment.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -614,11 +614,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
 
       if (rootSettingsFragment.isVisible()) {
-        mainActivityFragmentFrameLayout.startAnimation(slideGlobalSettingsFragmentOutFromLeft);
+        mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
       }
 
       if (dailyStatsFragment.isVisible()) {
-        mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentOutFromLeft);
+        mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftLong);
       }
 
       setTypeOFMenu(DEFAULT_MENU);
@@ -1739,19 +1739,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     slideLeft =  AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
     slideLeft.setDuration(400);
 
-    slideDailyStatsFragmentInFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_from_left);
-    slideDailyStatsFragmentInFromLeft.setDuration(600);
+    slideInFromLeftLong = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_from_left);
+    slideInFromLeftLong.setDuration(600);
 
-    slideDailyStatsFragmentOutFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_from_left);
-    slideDailyStatsFragmentOutFromLeft.setDuration(300);
+    slideOutFromLeftLong = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_from_left);
+    slideOutFromLeftLong.setDuration(300);
 
-    slideGlobalSettingsFragmentInFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_from_left);
-    slideGlobalSettingsFragmentInFromLeft.setDuration(300);
+    slideInFromLeftShort = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_from_left);
+    slideInFromLeftShort.setDuration(300);
 
-    slideGlobalSettingsFragmentOutFromLeft = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_from_left);
-    slideGlobalSettingsFragmentOutFromLeft.setDuration(300);
+    slideOutFromLeftShort = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_from_left);
+    slideOutFromLeftShort.setDuration(300);
 
-    slideGlobalSettingsFragmentOutFromLeft.setAnimationListener(new Animation.AnimationListener() {
+    slideOutFromLeftShort.setAnimationListener(new Animation.AnimationListener() {
       @Override
       public void onAnimationStart(Animation animation) {
       }
@@ -1769,7 +1769,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    slideDailyStatsFragmentOutFromLeft.setAnimationListener(new Animation.AnimationListener() {
+    slideOutFromLeftLong.setAnimationListener(new Animation.AnimationListener() {
       @Override
       public void onAnimationStart(Animation animation) {
       }
@@ -2431,7 +2431,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void launchGlobalSettingsFragment() {
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(slideGlobalSettingsFragmentInFromLeft);
+      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
       mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
       if (rootSettingsFragment !=null) {
@@ -2444,8 +2444,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchDailyStatsFragment() {
+
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(slideDailyStatsFragmentInFromLeft);
+      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftLong);
       mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
       fragmentManager.beginTransaction()
@@ -2455,6 +2456,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       toggleSortMenuViewBetweenCyclesAndStats(SORTING_STATS);
     }
+
+//    if (rootSettingsFragment.isVisible()) {
+//      mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
+//    }
+
+  }
+
+  private void slideOutSettingsFragment(Fragment fragment) {
+
   }
 
   private void deleteDailyStatsForSelectedDays() {
