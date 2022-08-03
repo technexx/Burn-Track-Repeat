@@ -410,7 +410,7 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:background="@color/light_black">
+            android:background="@color/darker_grey">
         </View>
 
         <androidx.recyclerview.widget.RecyclerView

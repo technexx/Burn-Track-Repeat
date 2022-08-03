@@ -549,11 +549,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Center title/cycles in sep. layout within workout cycles.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
   //Todo: If our timer activity stats don't pull correctly, it can be due to a blank activity b0rking the position retrieval.
-
-  //Todo: No visible scroller bar when scrolling through list of cycles.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -1100,9 +1097,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
       }
       if (mode==3) {
-        reset.setText(R.string.confirm_cycle_reset);
+        if (reset.getText().toString().equals(getString(R.string.reset))) {
+          reset.setText(R.string.confirm_cycle_reset);
+        } else {
+          resetTimer();
+        }
       }
-
     });
 
     pauseResumeButton.setOnClickListener(v -> {
@@ -4807,6 +4807,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     currentProgressBarValue = 10000;
     delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
+    reset.setText(R.string.reset);
     reset.setVisibility(View.INVISIBLE);
     reset_total_cycle_times.setEnabled(true);
 
@@ -4819,7 +4820,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //////////////////////////////////
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
     //Should not need this here.
-//    populateCycleRoundAndRoundTypeArrayLists();
     dotDraws.resetDotAlpha();
     dotDraws.reDraw();
     //////////////////////////////////

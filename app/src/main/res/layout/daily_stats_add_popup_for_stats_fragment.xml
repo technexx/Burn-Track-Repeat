@@ -62,7 +62,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="4dp"
-        android:backgroundTint="@color/Gray"
+        android:backgroundTint="@color/darker_grey"
         android:textColor="@color/white"
         app:cornerRadius="10dp"
         app:rippleColor="#33AAAAAA"

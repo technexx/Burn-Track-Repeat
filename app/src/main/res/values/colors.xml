@@ -17,7 +17,6 @@
     <color name="circular_progress_default_background">#787878</color>
     <color name="circular_progress_default_title">#bada55</color>
     <color name="circular_progress_default_subtitle">#D1D1D1</color>
-    <color name="Gray">#263238</color>
     <color name="light_grey">#BDBDBD</color>
     <color name="mid_grey">#757575</color>
     <color name="dark_grey">#37474F</color>
@@ -26,7 +25,6 @@
     <color name="green">#00C853</color>
     <color name="red">#FF0000</color>
     <color name="test_grey">#616161</color>
-    <color name="light_black">#263238</color>
     <color name="blue">#1976D2</color>
     <color name="blue_2">#2196F3</color>
     <color name="blue_test">#0D47A1</color>
