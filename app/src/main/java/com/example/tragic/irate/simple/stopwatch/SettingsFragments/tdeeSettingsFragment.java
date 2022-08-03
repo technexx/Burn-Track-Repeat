@@ -125,7 +125,12 @@ public class tdeeSettingsFragment extends Fragment {
         saveTdeeSettingsButton.setOnClickListener(v -> {
             saveSpinnerStatsToSharedPreferences(metricMode);
             bmrTextView.setText(calculatedBMRString());
+            saveUpdatedBmrSettings();
             showToastIfNoneActive("Updated");
+
+            Log.i("testBmr", "bmr from settings class is " + calculateBMR());
+            Log.i("testBmr", "metric mode is " + metricMode);
+
         });
 
         return root;
@@ -169,10 +174,7 @@ public class tdeeSettingsFragment extends Fragment {
             prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
         }
 
-        prefEdit.putInt("savedBmr", calculateBMR());
         prefEdit.putBoolean("metricMode", metricMode);
-
-        Log.i("testBmr", "bmr from settings class is " + calculateBMR());
 
         prefEdit.putString("tdeeGender", getStringValueFromSpinner(gender_spinner));
         prefEdit.putInt("tdeeAge", getIntegerValueFromFullSpinnerString(age_spinner));
@@ -184,6 +186,11 @@ public class tdeeSettingsFragment extends Fragment {
         prefEdit.putInt("activityLevelPosition", activityLevelPosition);
         prefEdit.putString("activityLevelString", activityLevelString);
 
+        prefEdit.apply();
+    }
+
+    private void saveUpdatedBmrSettings() {
+        prefEdit.putInt("savedBmr", calculateBMR());
         prefEdit.apply();
     }
 
@@ -274,6 +281,7 @@ public class tdeeSettingsFragment extends Fragment {
         return getString(R.string.bmr_value, String.valueOf(calculateBMR()));
     }
 
+    //Todo: Calculation error likely due to metric/imperial difference.
     private int calculateBMR() {
         int caloriesBurned = 0;
 

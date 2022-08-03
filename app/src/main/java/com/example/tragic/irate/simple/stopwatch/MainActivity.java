@@ -551,7 +551,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Calories expended showing much higher in daily value.
+  //Todo: Selecting "daily stats" from a settings menu will launch Fragment but not dismiss settings.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
