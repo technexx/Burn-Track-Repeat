@@ -96,7 +96,7 @@
     <string name="difference_calories">Caloric Difference:</string>
     <string name="difference_weight">Lb/Kg Difference: </string>
 
-    <string name="daily_stats_string">%1$s\n%2$s</string>
+    <string name="activity_stats_string">%1$s\n%2$s</string>
     <string name="day_total_header">Daily</string>
     <string name="weekly_total_header">Weekly</string>
     <string name="monthly_total_header">Monthly</string>

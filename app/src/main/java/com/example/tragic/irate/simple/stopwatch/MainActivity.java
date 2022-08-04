@@ -551,9 +551,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Activity Stats footer animation.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
-  //Todo: Smoother transitions between popUps. Maybe slide instead of fade animation.
   //Todo: Should have intro screen for app + option to re-display intro screen.
       //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.

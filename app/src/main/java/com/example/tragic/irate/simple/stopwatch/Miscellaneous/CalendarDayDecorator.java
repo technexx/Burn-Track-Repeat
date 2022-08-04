@@ -33,5 +33,4 @@ public class CalendarDayDecorator implements DayViewDecorator {
     public void decorate(DayViewFacade dayViewFacade) {
         dayViewFacade.addSpan(new ForegroundColorSpan(mContext.getResources().getColor(R.color.green)));
     }
-
 }
