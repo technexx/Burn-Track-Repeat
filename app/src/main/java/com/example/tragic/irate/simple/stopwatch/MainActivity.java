@@ -551,7 +551,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Pause/resume area on stopwatch exceeds circle on top. Check for cycle timers as well.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Smoother transitions between popUps. Maybe slide instead of fade animation.

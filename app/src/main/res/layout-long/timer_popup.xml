@@ -258,13 +258,12 @@
 
     <com.google.android.material.button.MaterialButton
         android:id="@+id/pauseResumeButton"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="44dp"
-        android:background="@color/black"
         app:cornerRadius="90dp">
     </com.google.android.material.button.MaterialButton>
 
