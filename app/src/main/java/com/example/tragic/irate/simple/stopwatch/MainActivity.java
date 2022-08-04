@@ -4724,6 +4724,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerValueInEditPopUpTextView.setVisibility(View.VISIBLE);
         sortHigh.setVisibility(View.VISIBLE);
         sortLow.setVisibility(View.VISIBLE);
+        sortActivityTitleAtoZ.setVisibility(View.VISIBLE);
+        sortActivityTitleZToA.setVisibility(View.VISIBLE);
         savedCycleRecycler.setVisibility(View.VISIBLE);
         savedPomCycleRecycler.setVisibility(View.GONE);
 
@@ -4765,6 +4767,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
         sortHigh.setVisibility(View.GONE);
         sortLow.setVisibility(View.GONE);
+        sortActivityTitleAtoZ.setVisibility(View.GONE);
+        sortActivityTitleZToA.setVisibility(View.GONE);
         roundRecyclerTwo.setVisibility(View.GONE);
         roundListDivider.setVisibility(View.GONE);
         savedCycleRecycler.setVisibility(View.GONE);
