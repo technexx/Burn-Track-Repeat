@@ -551,8 +551,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Pause/resume area on stopwatch exceeds circle on top. Check for cycle timers as well.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
+  //Todo: Smoother transitions between popUps. Maybe slide instead of fade animation.
   //Todo: Should have intro screen for app + option to re-display intro screen.
       //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
@@ -1224,9 +1226,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //This caused tearing.
 //    getSupportActionBar().hide();
 
-    savedCycleRecycler.setVisibility(View.INVISIBLE);
-    savedPomCycleRecycler.setVisibility(View.INVISIBLE);
-    savedCyclesTabLayout.setVisibility(View.INVISIBLE);
+//    savedCycleRecycler.setVisibility(View.INVISIBLE);
+//    savedPomCycleRecycler.setVisibility(View.INVISIBLE);
+//    savedCyclesTabLayout.setVisibility(View.INVISIBLE);
 
     setInitialTextSizeForRounds(0);
 
@@ -1824,10 +1826,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimationWithoutAnimatedExit);
-    editCyclesPopupWindow.setAnimationStyle(R.style.WindowAnimation);
+    editCyclesPopupWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-    stopWatchPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     addTdeePopUpWindow.setAnimationStyle(R.style.WindowAnimation);
   }
 
@@ -2885,24 +2887,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setViewsAndColorsToPreventTearingInEditPopUp(boolean popUpIsActive) {
-    mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-
-    if (popUpIsActive) {
-      if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
-      if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
-      emptyCycleList.setVisibility(View.GONE);
-    } else {
-      if (!makeCycleAdapterVisible) {
-        if (mode==1) {
-          savedCycleAdapter.notifyDataSetChanged();
-          savedCycleRecycler.setVisibility(View.VISIBLE);
-        }
-        if (mode==3) {
-          savedPomCycleAdapter.notifyDataSetChanged();
-          savedPomCycleRecycler.setVisibility(View.VISIBLE);
-        }
-      }
-    }
+//    mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+//
+//    if (popUpIsActive) {
+//      if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
+//      if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
+//      emptyCycleList.setVisibility(View.GONE);
+//    } else {
+//      if (!makeCycleAdapterVisible) {
+//        if (mode==1) {
+//          savedCycleAdapter.notifyDataSetChanged();
+//          savedCycleRecycler.setVisibility(View.VISIBLE);
+//        }
+//        if (mode==3) {
+//          savedPomCycleAdapter.notifyDataSetChanged();
+//          savedPomCycleRecycler.setVisibility(View.VISIBLE);
+//        }
+//      }
+//    }
   }
 
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
@@ -3672,7 +3674,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTimerLaunchViews(int typeOfLaunch) {
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
-    setViewsAndColorsToPreventTearingInEditPopUp(true);
+//    setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     cycle_title_textView.setText(cycleTitle);
 
