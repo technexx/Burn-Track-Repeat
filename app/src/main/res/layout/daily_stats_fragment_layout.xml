@@ -16,7 +16,7 @@
         android:background="@color/black"
         app:tabTextColor="@color/white"
         app:tabIndicatorColor="@color/off_white"
-        app:tabTextAppearance="@style/tabText"
+        app:tabTextAppearance="@style/TabLayoutTextStyle"
         app:tabIndicatorFullWidth="false" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

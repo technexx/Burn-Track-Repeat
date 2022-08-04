@@ -551,10 +551,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Consider long click for edit in stats frag (similar to cycles).
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
-  //Todo: Setting Tdee stuff should be clear/offer a prompt.
+  //Todo: Should have intro screen for app + option to re-display intro screen.
+      //Todo: Setting Tdee stuff should be clear/offer a prompt.
   //Todo: Green/Red for cal diff may want to reverse colors.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
