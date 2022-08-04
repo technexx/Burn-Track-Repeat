@@ -189,7 +189,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
-        workoutHolder.resetCycle.setOnClickListener(v-> mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER));
+
+        workoutHolder.resetCycle.setOnClickListener(v-> {
+          mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
+        });
       }
     }
 

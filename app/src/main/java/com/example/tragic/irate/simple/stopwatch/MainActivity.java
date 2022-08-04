@@ -551,6 +551,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Reset in mode 1 falling above divider (we changed that recently).
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -2453,9 +2454,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             .setCustomAnimations(
                     R.anim.slide_in_from_left,  // enter
                     R.anim.slide_out_from_right,  // exit
-                    R.anim.slide_in_from_left_short,   // popEnter
-                    R.anim.slide_out_from_right  // popExit
-
+                    R.anim.slide_in_from_left_short,   // popEnter (backstack)
+                    R.anim.slide_out_from_right  // popExit (backstack)
             )
             .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
             .commit();
