@@ -551,6 +551,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Consider long click for edit in stats frag (similar to cycles).
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
@@ -558,8 +559,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
-  //Todo: Timer and Edit popUps have a lot of changes in /long that are not in /nonLong. Need to copy + paste + revamp.
   //Todo: Check sizes on long aspect for all layouts + menus.
+  //Todo: Tab selection color may clash w/ teal selection for rounds.
 
   //Todo: Test dates from future years.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
@@ -568,7 +569,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
-  //Todo: Test layouts w/ emulator.
+  //Todo: Test layouts w/ diff. emulator phones and Moto phone (for diff aspect ratios/resolutions).
   //Todo: Test everything 10x. Incl. round selection/replacement.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.

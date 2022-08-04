@@ -867,7 +867,6 @@ public class DailyStatsAccess {
             if (mStatsForEachActivityList.get(i).getActivity()!=null) {
                 if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
 
-
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
                     totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
 
@@ -875,7 +874,6 @@ public class DailyStatsAccess {
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.add(caloriesToAdd);
 
                     Log.i("testTotal", "individual activity calories for dayHolder in Retrieval are " +  mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
-
                 } else {
                     totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedCaloriesFromExistingAndRepeatingPositions(i));

@@ -233,6 +233,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView simplifiedActivityLevelTextView;
     TextView simplifiedCaloriesBurnedTextView;
 
+    DividerItemDecoration activityRecyclerDivider;
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -1872,9 +1874,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
 
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
-        dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
-        dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
+        activityRecyclerDivider = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
+        activityRecyclerDivider.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
+        dailyStatsRecyclerView.addItemDecoration(activityRecyclerDivider);
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {

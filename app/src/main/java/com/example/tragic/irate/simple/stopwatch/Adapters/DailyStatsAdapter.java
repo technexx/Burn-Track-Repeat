@@ -186,6 +186,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyDataSetChanged();
     }
 
+    public boolean getEditMode() {
+        return mEditModeIsActive;
+    }
+
     private void populateHeaderRowViews() {
         mHeaderViewHolder.activityHeaderTextView.setText(R.string.activity_text_header);
         mHeaderViewHolder.setTimeHeaderTextView.setText(R.string.set_time_text_header);
