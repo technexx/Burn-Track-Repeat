@@ -551,7 +551,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Reset in mode 1 falling above divider (we changed that recently).
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Setting Tdee stuff should be clear/offer a prompt.
