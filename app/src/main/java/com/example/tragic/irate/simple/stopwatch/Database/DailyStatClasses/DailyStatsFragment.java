@@ -110,10 +110,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     ImageButton minimizeCalendarButton;
     boolean calendarIsMinimized;
-    Animation slideOutToBottom;
-    Animation slideInFromBottom;
-    Animation slideOutToBottomNoAlphaChange;
-    Animation slideInFromBottomNoAlphaChange;
+    Animation slideOutCalendarToBottom;
+    Animation slideInCalendarFromBottom;
 
     int currentStatDurationMode;
     int ITERATING_ACTIVITY_STATS_UP = 0;
@@ -257,7 +255,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         instantiateTextViewsAndMiscClasses();
         instantiateActivityRecyclerViewAndItsAdapter();
         instantiateCalorieConsumptionRecyclerAndItsAdapter();
-        instantiateAnimations();
+        instantiateCalendarAnimations();
 
         instantiateActivityEditPopUpViews();
         instantiateAddPopUpViews();
@@ -271,6 +269,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         instantiateExpansionPopUpViews();
         setValueCappingTextWatcherOnEditTexts();
         setTextWatchersOnActivityEditTexts();
+
+        setCalendarAnimationListeners();
 
         areActivityStatsSimplified = sharedPref.getBoolean("areActivityStatsSimplified", false);
         toggleSimplifiedStatsButtonView(areActivityStatsSimplified);
@@ -1584,18 +1584,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void setCalendarMinimizationAnimations(ConstraintLayout layout) {
-        if (!calendarIsMinimized) {
-            layout.startAnimation(slideInFromBottomNoAlphaChange);
-        } else {
-            layout.startAnimation(slideOutToBottomNoAlphaChange);
-        }
-    }
-
     private void setCalendarMinimizationLayoutParams(ConstraintLayout.LayoutParams recyclerParams, ConstraintLayout.LayoutParams textViewParams) {
         if (!calendarIsMinimized) {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
-            calendarView.startAnimation(slideInFromBottom);
+
+            calendarView.startAnimation(slideInCalendarFromBottom);
 
             recyclerParams.height = dpToPxConv(275);
             recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
@@ -1606,7 +1599,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             textViewParams.bottomToTop = R.id.stats_calendar;
         } else {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
-            calendarView.startAnimation(slideOutToBottom);
+            calendarView.startAnimation(slideOutCalendarToBottom);
 
             recyclerParams.height = 0;
             recyclerParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
@@ -1903,19 +1896,39 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     }
 
-    private void instantiateAnimations() {
-        slideOutToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom);
-        slideOutToBottom.setDuration(250);
-        slideOutToBottom.setFillAfter(true);
-        slideInFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom);
-        slideInFromBottom.setDuration(250);
-        slideInFromBottom.setFillAfter(true);
+    private void instantiateCalendarAnimations() {
+        slideOutCalendarToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom);
+        slideOutCalendarToBottom.setDuration(250);
+        slideInCalendarFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom);
+        slideInCalendarFromBottom.setDuration(250);
+    }
 
-        // If animation not set to setFillAfter, it goes back to constraint against arrow button. We WANT this tho, otherwise the total calories will be obscured. Issue is w/ the vertical range of the animation.
-        slideOutToBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom_no_alpha_change);
-        slideOutToBottomNoAlphaChange.setDuration(250);
-        slideInFromBottomNoAlphaChange = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom_untouched_alpha);
-        slideInFromBottomNoAlphaChange.setDuration(250);
+    private void setCalendarAnimationListeners() {
+        slideOutCalendarToBottom.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                calendarView.setVisibility(View.GONE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
+
+        slideInCalendarFromBottom.setAnimationListener(new Animation.AnimationListener() {
+            @Override
+            public void onAnimationStart(Animation animation) {
+            }
+            @Override
+            public void onAnimationEnd(Animation animation) {
+                calendarView.setVisibility(View.VISIBLE);
+            }
+            @Override
+            public void onAnimationRepeat(Animation animation) {
+            }
+        });
     }
 
     private int dpToPxConv(float pixels) {
