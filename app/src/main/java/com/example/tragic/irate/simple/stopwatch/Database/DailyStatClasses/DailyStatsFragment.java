@@ -490,10 +490,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void toggleEditButtonView(boolean buttonDisabled) {
         if (!buttonDisabled) {
-//            editTdeeStatsButton.setAlpha(1.0f);
+            editTdeeStatsButton.setAlpha(1.0f);
             editTdeeStatsButton.setEnabled(true);
         } else {
-//            editTdeeStatsButton.setAlpha(0.3f);
+            editTdeeStatsButton.setAlpha(0.5f);
             editTdeeStatsButton.setEnabled(false);
         }
     }

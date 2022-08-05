@@ -143,7 +143,7 @@
         app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
         app:layout_constraintBottom_toTopOf="@id/daily_stats_recyclerView"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="16dp"
+        android:layout_marginStart="10dp"
         android:src="@drawable/collapse_1"
         android:theme="@style/StatsFragmentHeaderTheme">
     </ImageButton>
@@ -155,7 +155,7 @@
         app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/ic_edit_svgrepo_com"
-        android:layout_marginEnd="16dp"
+        android:layout_marginEnd="10dp"
         android:theme="@style/StatsFragmentHeaderTheme">
     </ImageButton>
 
