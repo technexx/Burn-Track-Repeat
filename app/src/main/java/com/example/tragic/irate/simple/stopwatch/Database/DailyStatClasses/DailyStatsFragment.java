@@ -275,6 +275,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         areActivityStatsSimplified = sharedPref.getBoolean("areActivityStatsSimplified", false);
         toggleSimplifiedStatsButtonView(areActivityStatsSimplified);
         toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
+        toggleEditButtonView(areActivityStatsSimplified);
         setSimplifiedViewTextViews();
 
         AsyncTask.execute(()-> {
@@ -469,7 +470,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             if (caloriesComparisonTabLayout.getSelectedTabPosition()==0) {
                 toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
+                toggleEditButtonView(areActivityStatsSimplified);
             }
+
             if (caloriesComparisonTabLayout.getSelectedTabPosition()==2) {
                 toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
             }
@@ -500,10 +503,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void toggleSimplifiedStatsButtonView(boolean areSimplified) {
         if (!areSimplified) {
-            toggleEditButtonView(false);
             dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
         } else {
-            toggleEditButtonView(true);
             dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
         }
     }

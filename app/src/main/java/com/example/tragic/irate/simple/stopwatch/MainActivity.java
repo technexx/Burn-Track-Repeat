@@ -111,6 +111,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int DEFAULT_MENU = 0;
   int DAILY_SETTINGS_MENU = 1;
   int SETTINGS_MENU = 2;
+  int EMPTY_MENU = 3;
 
   DailyStatsAccess dailyStatsAccess;
   FragmentManager fragmentManager;
@@ -551,6 +552,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Edit should not toggle on/off when on calories compared tab.
+  //Todo: OnOptionsSelected should change/be disabled while in Settings.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Should have intro screen for app + option to re-display intro screen.
@@ -671,6 +674,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (mMenuType==DAILY_SETTINGS_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_options_menu, menu);
+    }
+    if (mMenuType==EMPTY_MENU) {
+//      getMenuInflater().inflate(R.menu.empty_menu_layout, menu);
     }
     return super.onPrepareOptionsMenu(menu);
   }
@@ -2440,6 +2446,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 .commit();
       }
       sortButton.setVisibility(View.INVISIBLE);
+
+//      setTypeOFMenu(EMPTY_MENU);
     }
   }
 
