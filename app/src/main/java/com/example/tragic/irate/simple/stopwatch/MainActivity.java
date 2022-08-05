@@ -551,7 +551,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Activity Stats footer animation.
+  //Todo: Can still click calendar when animated off screen.
+  //Todo: Edit activity enable/disable looks weird switching so much between tabs.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Should have intro screen for app + option to re-display intro screen.
