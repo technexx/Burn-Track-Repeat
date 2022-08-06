@@ -162,7 +162,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/daily_stats_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="275dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activity_stats_total_header_layout">
@@ -264,6 +264,24 @@
         </View>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
+        android:id="@+id/stats_calendar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:mcv_tileHeight="35dp"
+        app:mcv_tileWidth="52dp"
+        app:mcv_showOtherDates="other_months"
+        app:mcv_selectionColor="@color/teal"
+        app:mcv_dateTextAppearance="@style/CalendarDateTextAppearance"
+        app:mcv_headerTextAppearance="@style/CalendarHeader"
+        app:mcv_weekDayTextAppearance="@style/CalendarWeekDayHeader"
+        app:mcv_leftArrowMask="@drawable/calendar_left_arrow"
+        app:mcv_rightArrowMask="@drawable/calendar_right_arrow">
+    </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/total_food_stats_values_textView_layout"
         android:layout_width="match_parent"
@@ -338,7 +356,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="6dp"
             android:layout_marginStart="2dp"
-            android:textColor="@color/light_grey"
+            android:textColor="@color/lighter_grey"
             android:textSize="24sp">
         </TextView>
 
@@ -440,7 +458,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
             android:textSize="18sp"
-            android:textColor="@color/yellow_1">
+            android:textColor="@color/yellow_3">
         </TextView>
 
         <TextView
@@ -452,7 +470,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
             android:textSize="18sp"
-            android:textColor="@color/yellow_1">
+            android:textColor="@color/yellow_3">
         </TextView>
 
         <TextView
@@ -479,24 +497,6 @@
             android:textStyle="bold">
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <com.prolificinteractive.materialcalendarview.MaterialCalendarView
-        android:id="@+id/stats_calendar"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:mcv_tileHeight="35dp"
-        app:mcv_tileWidth="52dp"
-        app:mcv_showOtherDates="other_months"
-        app:mcv_selectionColor="@color/teal"
-        app:mcv_dateTextAppearance="@style/CalendarDateTextAppearance"
-        app:mcv_headerTextAppearance="@style/CalendarHeader"
-        app:mcv_weekDayTextAppearance="@style/CalendarWeekDayHeader"
-        app:mcv_leftArrowMask="@drawable/calendar_left_arrow"
-        app:mcv_rightArrowMask="@drawable/calendar_right_arrow">
-    </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
 
     <ImageButton
         android:id="@+id/minimize_calendarView_button"

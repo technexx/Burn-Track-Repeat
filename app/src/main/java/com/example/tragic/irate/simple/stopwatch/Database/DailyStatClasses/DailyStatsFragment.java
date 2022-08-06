@@ -496,7 +496,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             editTdeeStatsButton.setAlpha(1.0f);
             editTdeeStatsButton.setEnabled(true);
         } else {
-            editTdeeStatsButton.setAlpha(0.5f);
+            editTdeeStatsButton.setAlpha(0.3f);
             editTdeeStatsButton.setEnabled(false);
         }
     }
@@ -1588,14 +1588,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setCalendarMinimizationLayoutParams(ConstraintLayout.LayoutParams recyclerParams, ConstraintLayout.LayoutParams textViewParams) {
         if (!calendarIsMinimized) {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
-
             calendarView.startAnimation(slideInCalendarFromBottom);
 
             recyclerParams.height = dpToPxConv(275);
             recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-            textViewParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            textViewParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
             textViewParams.bottomToTop = R.id.stats_calendar;
         } else {
@@ -1604,9 +1600,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             recyclerParams.height = 0;
             recyclerParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
-
-            textViewParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
-            textViewParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
             textViewParams.bottomToTop = R.id.minimize_calendarView_button;
         }
@@ -1911,7 +1904,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             }
             @Override
             public void onAnimationEnd(Animation animation) {
-                calendarView.setVisibility(View.GONE);
+                calendarView.setVisibility(View.INVISIBLE);
             }
             @Override
             public void onAnimationRepeat(Animation animation) {
