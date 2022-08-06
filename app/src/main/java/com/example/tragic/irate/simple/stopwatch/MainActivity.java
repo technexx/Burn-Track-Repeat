@@ -552,9 +552,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Edit should not toggle on/off when on calories compared tab.
+  //Todo: Blank activity is back and its related issues w/ rows not deleting.
   //Todo: OnOptionsSelected should change/be disabled while in Settings.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
+  //Todo: Maybe remove simplified mode.
 
   //Todo: Should have intro screen for app + option to re-display intro screen.
       //Todo: Setting Tdee stuff should be clear/offer a prompt.
