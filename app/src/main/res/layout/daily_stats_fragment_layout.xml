@@ -338,7 +338,7 @@
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginTop="6dp"
             android:layout_marginStart="2dp"
-            android:textColor="@color/lighter_grey"
+            android:textColor="@color/light_grey"
             android:textSize="24sp">
         </TextView>
 
@@ -416,7 +416,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
             android:textSize="22sp"
-            android:textColor="@color/red">
+            android:textColor="@color/light_red">
         </TextView>
 
         <TextView
@@ -428,7 +428,7 @@
             android:layout_marginTop="48dp"
             android:layout_marginEnd="2dp"
             android:textSize="22sp"
-            android:textColor="@color/green">
+            android:textColor="@color/light_green">
         </TextView>
 
         <TextView

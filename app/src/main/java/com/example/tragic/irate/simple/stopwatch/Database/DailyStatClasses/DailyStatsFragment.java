@@ -1511,9 +1511,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private int getTextColorForDoubleDifference(String plusOrMinus) {
         if (plusOrMinus.equals("+")) {
-            return R.color.greyed_red;
+            return R.color.dark_red;
         } else {
-            return R.color.green;
+            return R.color.dark_green;
         }
     }
 
