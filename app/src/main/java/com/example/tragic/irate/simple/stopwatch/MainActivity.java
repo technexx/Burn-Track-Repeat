@@ -552,19 +552,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Current date should be marked on calendar. Decorating causes blip so should only execute on fragment launch.
+  //Todo: Divider for activity stats blends in.
   //Todo: Blank activity is back and its related issues w/ rows not deleting.
-  //Todo: OnOptionsSelected should change/be disabled while in Settings.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
   //Todo: Maybe remove simplified mode.
 
-  //Todo: Should have intro screen for app + option to re-display intro screen.
+  //Todo: OnOptionsSelected should change/be disabled while in Settings (or have a single backup option.
+  //Todo: Should have intro screen for app + option to re-display intro screen (above "About" in Settings).
       //Todo: Setting Tdee stuff should be clear/offer a prompt.
-  //Todo: Green/Red for cal diff may want to reverse colors.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
   //Todo: Check sizes on long aspect for all layouts + menus.
-  //Todo: Tab selection color may clash w/ teal selection for rounds.
 
   //Todo: Test dates from future years.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
@@ -5161,7 +5161,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  private void logStatsForEachActivityDatabase(boolean currentDayOnly) {
+  private void logStatsForEachActivityDatabase() {
     AsyncTask.execute(()->{
       Calendar calendar = Calendar.getInstance(Locale.getDefault());
       dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);

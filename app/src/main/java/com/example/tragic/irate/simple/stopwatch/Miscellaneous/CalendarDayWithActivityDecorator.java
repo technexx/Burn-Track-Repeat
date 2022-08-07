@@ -11,11 +11,11 @@ import com.prolificinteractive.materialcalendarview.DayViewFacade;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CalendarDayDecorator implements DayViewDecorator {
+public class CalendarDayWithActivityDecorator implements DayViewDecorator {
     Context mContext;
     List<CalendarDay> mCalendarDayListWithAtLeastOneActivity;
 
-    public CalendarDayDecorator(Context context) {
+    public CalendarDayWithActivityDecorator(Context context) {
         this.mContext = context;
         mCalendarDayListWithAtLeastOneActivity = new ArrayList<>();
     }

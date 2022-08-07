@@ -37,8 +37,8 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.CaloriesConsumedAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayDecorator;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDurationSelectedDecorator;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayWithActivityDecorator;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CurrentCalendarDateDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 
 import com.example.tragic.irate.simple.stopwatch.R;
@@ -52,7 +52,6 @@ import com.prolificinteractive.materialcalendarview.OnRangeSelectedListener;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.List;
@@ -65,8 +64,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     SharedPreferences.Editor prefEdit;
     Calendar calendar;
     com.prolificinteractive.materialcalendarview.MaterialCalendarView calendarView;
-    CalendarDayDecorator calendarDayDecorator;
-    CalendarDurationSelectedDecorator calendarDurationSelectedDecorator;
+    CalendarDayWithActivityDecorator calendarDayWithActivityDecorator;
+    CurrentCalendarDateDecorator currentCalendarDateDecorator;
 
     int daySelectedFromCalendar;
     CalendarDay daySelectedAsACalendarDayObject;
@@ -287,6 +286,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
             colorDaysWithAtLeastOneActivity();
+
+            currentCalendarDateDecorator.setCurrentDay(customCalendarDayList);
+            calendarView.addDecorator(currentCalendarDateDecorator);
 
             getActivity().runOnUiThread(()-> {
                 setStatDurationViews(currentStatDurationMode);
@@ -781,8 +783,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         getActivity().runOnUiThread(()->{
-            calendarDayDecorator.setCalendarDayList(calendarDayList);
-            calendarView.addDecorator(calendarDayDecorator);
+            calendarDayWithActivityDecorator.setCalendarDayList(calendarDayList);
+            calendarView.addDecorator(calendarDayWithActivityDecorator);
         });
     }
 
@@ -1839,8 +1841,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         simplifiedActivityLevelTextView = mRoot.findViewById(R.id.simplified_activity_level_textView);
         simplifiedCaloriesBurnedTextView = mRoot.findViewById(R.id.simplified_calories_burned_textView);
 
-        calendarDayDecorator = new CalendarDayDecorator(getContext());
-        calendarDurationSelectedDecorator = new CalendarDurationSelectedDecorator(getContext());
+        calendarDayWithActivityDecorator = new CalendarDayWithActivityDecorator(getContext());
+        currentCalendarDateDecorator = new CurrentCalendarDateDecorator(getContext());
 
         customCalendarDayList = new ArrayList<>();
 
