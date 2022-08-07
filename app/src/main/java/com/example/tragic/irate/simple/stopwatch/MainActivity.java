@@ -552,7 +552,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Current date should be marked on calendar. Decorating causes blip so should only execute on fragment launch.
   //Todo: Divider for activity stats blends in.
   //Todo: Blank activity is back and its related issues w/ rows not deleting.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.

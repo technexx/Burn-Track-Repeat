@@ -1862,10 +1862,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
 
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
-
-        activityRecyclerDivider = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
-        activityRecyclerDivider.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
-        dailyStatsRecyclerView.addItemDecoration(activityRecyclerDivider);
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
@@ -1880,10 +1876,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedRecyclerView.setAdapter(caloriesConsumedAdapter);
 
         caloriesConsumedRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) caloriesConsumedRecyclerView.getLayoutParams();
-
-        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(caloriesConsumedRecyclerView.getContext(), lm.getOrientation());
-        dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
-        caloriesConsumedRecyclerView.addItemDecoration(dividerItemDecoration);
     }
 
     private void instantiateExpansionPopUpViews() {

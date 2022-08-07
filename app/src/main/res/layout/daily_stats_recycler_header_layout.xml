@@ -39,4 +39,15 @@
         android:gravity="center">
     </TextView>
 
+    <View
+        android:id="@+id/cycle_row_divider"
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/activity_in_daily_stats_header"
+        android:layout_marginTop="1.5dp"
+        android:background="@color/mid_grey">
+    </View>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
