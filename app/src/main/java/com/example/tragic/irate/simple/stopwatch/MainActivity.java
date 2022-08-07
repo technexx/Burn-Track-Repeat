@@ -552,14 +552,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Divider for activity stats blends in.
+  //Todo: Pause/Resume View is on top of Timer.
+  //Todo: Launching timer animations show Main recyclerView for a moment (we've intentionally removed its lack of visbility - may want to bring that back).
   //Todo: Blank activity is back and its related issues w/ rows not deleting.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
-  //Todo: Maybe remove simplified mode.
 
-  //Todo: OnOptionsSelected should change/be disabled while in Settings (or have a single backup option.
-  //Todo: Should have intro screen for app + option to re-display intro screen (above "About" in Settings).
-      //Todo: Setting Tdee stuff should be clear/offer a prompt.
+  //Todo: Splash screen on app start as a guide.
+  //Todo: Put disclaimer in "About" section.
+  //Todo: OnOptionsSelected should change/be disabled while in Settings (or have a single backup option).
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
   //Todo: Backup/export option for stats (if app is deleted).
@@ -568,7 +568,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test dates from future years.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
   //Todo: Test all notifications.
-  //Todo: Add disclaimer about accuracy, for entertainment purposes, not medical advice, etc. Should pop up on app start.
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
@@ -3680,7 +3679,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTimerLaunchViews(int typeOfLaunch) {
     makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
-//    setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     cycle_title_textView.setText(cycleTitle);
 

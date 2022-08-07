@@ -31,7 +31,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:scrollbars="vertical"
         android:scrollbarThumbVertical="@color/light_grey"
-        android:scrollbarSize="3dp">
+        android:scrollbarSize="3dp"
+        android:paddingBottom="?attr/actionBarSize">
     </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -43,7 +44,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:scrollbars="vertical"
         android:scrollbarThumbVertical="@color/light_grey"
-        android:scrollbarSize="3dp">
+        android:scrollbarSize="3dp"
+        android:paddingBottom="?attr/actionBarSize">
     </androidx.recyclerview.widget.RecyclerView>
 
     <ImageButton

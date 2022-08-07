@@ -698,6 +698,7 @@ public class DailyStatsAccess {
         }
     }
 
+    //Todo: If it doesn't occur here, it will occur in our Fragment insertion method or our update method.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
         if (!doesActivityExistsInDatabaseForSelectedDay) {
             mStatsForEachActivity = new StatsForEachActivity();

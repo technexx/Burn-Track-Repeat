@@ -805,9 +805,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
             } else {
                 activityToAdd = addCustomActivityEditText.getText().toString();
-                if (activityToAdd.equalsIgnoreCase("")) {
-                    showToastIfNoneActive("Enter an activity!");
-                }
+            }
+
+            //Todo: We added this return here if activity is empty.
+            if (activityToAdd.equalsIgnoreCase("")) {
+                return;
             }
 
             dailyStatsAccess.setActivityString(activityToAdd);

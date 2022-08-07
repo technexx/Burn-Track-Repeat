@@ -162,7 +162,7 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/daily_stats_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="275dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activity_stats_total_header_layout">

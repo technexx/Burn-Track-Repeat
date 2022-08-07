@@ -257,6 +257,10 @@
 
     <string name="about_met">\"MET\" stands for \"Metabolic Equivalent of Task,\" and is used to approximate how many calories per minute various tasks burn. A 1.0 value is equivalent to doing absolutely nothing (e.g. sitting motionless, sleeping).\n\nThis calculator will show the MET value of your chosen activity, in addition to the calories it burns when engaging in it for the chosen duration.\n\nPlease note, these values are approximations only.\n\nSource: Barbara E. Ainsworth, William L. Haskell, Stephen D. Herrmann, et al., \“2011 Compendium of Physical Activities: A Second Update of Codes and MET Values,\” Medicine and Science in Sports and Exercise, Aug. 2011 </string>
 
+    <string name="disclaimer">
+        This app is for recreational purposes only. It is not meant to offer any medical or dietary advice.
+    </string>
+
     <string-array name="bicycling">
         <item>Mountain biking - general </item>
         <item>Mountain biking- uphill and vigorous </item>
