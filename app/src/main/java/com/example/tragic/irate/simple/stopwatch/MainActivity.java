@@ -553,7 +553,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Launching timer animations show Main recyclerView for a moment (we've intentionally removed its lack of visbility - may want to bring that back).
-  //Todo: Blank activity is back and its related issues w/ rows not deleting.
+      //Todo: Could cause crash on quick clicks on recyclerView.
+
+  //Todo: Test add/update/delete over multiple days.
+  //Todo: Blank activity may be back and its related issues w/ rows not deleting.
+      //Todo: Tests will include trying different days.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Splash screen on app start as a guide.

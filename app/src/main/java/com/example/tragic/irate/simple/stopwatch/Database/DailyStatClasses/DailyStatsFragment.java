@@ -28,6 +28,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -885,10 +886,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setIsActivityCustomBoolean(true);
         }
 
-        if (newActivityTime<=0) {
-            getActivity().runOnUiThread(()-> {
-                showToastIfNoneActive("Time cannot be empty!");
-            });
+        if (newActivityTime == 0) {
+            showToastIfNoneActive("Time cannot be empty!");
+            return;
+        }
+        if (newActivityTime == -1) {
+            showToastIfNoneActive("No more time remaining!");
             return;
         }
 
@@ -1074,7 +1077,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private long cappedActivityTimeInMillis(long activityTime, long remainingTime) {
         if (activityTime>remainingTime) {
-            activityTime = remainingTime;
+            activityTime = -1;
         }
         return activityTime;
     }
