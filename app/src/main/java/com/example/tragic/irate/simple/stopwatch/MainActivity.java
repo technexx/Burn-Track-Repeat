@@ -440,7 +440,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean textSizeIncreased;
 
   int receivedAlpha;
-  MaterialButton pauseResumeButton;
+  View pauseResumeButton;
 
   public Runnable infinityTimerForSets;
   public Runnable infinityTimerForBreaks;
@@ -552,7 +552,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Pause/Resume View is on top of Timer.
   //Todo: Launching timer animations show Main recyclerView for a moment (we've intentionally removed its lack of visbility - may want to bring that back).
   //Todo: Blank activity is back and its related issues w/ rows not deleting.
   //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
@@ -1387,8 +1386,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     instantiateNotifications();
 
-    setVisualModificationsOnObjects();
-
     instantiateTdeeSpinnersAndSetThemOnAdapters();
     setTdeeSpinnerListeners();
     instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable();
@@ -1934,13 +1931,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     sortHolder = sortMode;
     highlightSortTextView();
-  }
-
-  private void setVisualModificationsOnObjects() {
-    pauseResumeButton.setBackgroundColor(Color.argb(0, 0, 0, 0));
-    pauseResumeButton.setRippleColor(null);
-
-    savedCycleRecycler.startAnimation(slideLeft);
   }
 
   private void instantiateTdeeSpinnersAndSetThemOnAdapters() {
