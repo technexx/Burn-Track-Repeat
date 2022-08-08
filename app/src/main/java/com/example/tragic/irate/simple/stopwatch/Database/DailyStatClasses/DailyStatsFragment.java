@@ -901,6 +901,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
+        if (dailyStatsAccess.getActivityStringVariable().equalsIgnoreCase("")) {
+            getActivity().runOnUiThread(()-> {
+                //Todo: Remove this at some point.
+                Toast.makeText(getContext(), "Trying to add blank activity in addActivityStatsInDatabase()!", Toast.LENGTH_SHORT).show();
+            });
+            return;
+        }
+
         long finalNewActivityTime = newActivityTime;
         double finalNewCaloriesBurned = newCaloriesBurned;
 
@@ -962,7 +970,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
 
             if (!dailyStatsAccess.getIsActivityCustomBooleanFromDatabaseInstance()) {
-//                dailyStatsAccess.setActivityString(dailyStatsAccess.getActivityStringFromSelectedActivity());
+                dailyStatsAccess.setActivityString(dailyStatsAccess.getActivityStringFromSelectedActivity());
                 newCaloriesBurned = calculateCaloriesForSpinnerActivity();
             } else {
                 double caloriesBurnedPerHour = dailyStatsAccess.getCaloriesBurnedPerHourForSelectedDay();

@@ -529,10 +529,6 @@ public class DailyStatsAccess {
 
             cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
         }
-
-        if (mActivityString.equalsIgnoreCase("")) {
-            Toast.makeText(mContext, "Blank activity added!", Toast.LENGTH_SHORT).show();
-        }
     }
 
     public void setStatsForEachActivityEntityFromPosition(int position) {
@@ -576,10 +572,6 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
-
-        if (mActivityString.equalsIgnoreCase("")) {
-            Toast.makeText(mContext, "Blank activity updated!", Toast.LENGTH_SHORT).show();
-        }
     }
 
     public void deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(int position) {
