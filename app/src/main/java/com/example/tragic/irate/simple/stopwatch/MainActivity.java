@@ -552,9 +552,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Launching timer animations show Main recyclerView for a moment (we've intentionally removed its lack of visbility - may want to bring that back).
-      //Todo: Could cause crash on quick clicks on recyclerView.
-
   //Todo: Test add/update/delete over multiple days.
   //Todo: Blank activity may be back and its related issues w/ rows not deleting.
       //Todo: Tests will include trying different days.
@@ -906,7 +903,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-      setViewsAndColorsToPreventTearingInEditPopUp(false);
+      toggleCycleAndPomCycleRecyclerViewVisibilities(false);
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
@@ -914,12 +911,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.setOnDismissListener(() -> {
       editCyclesPopUpDismissalLogic();
 
-      setViewsAndColorsToPreventTearingInEditPopUp(false);
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
 
     edit_highlighted_cycle.setOnClickListener(v-> {
-      setViewsAndColorsToPreventTearingInEditPopUp(true);
       fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
       removeHighlightFromCycle();
 
@@ -1229,13 +1224,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void stopWatchLaunchLogic() {
-    //This caused tearing.
-//    getSupportActionBar().hide();
-
-//    savedCycleRecycler.setVisibility(View.INVISIBLE);
-//    savedPomCycleRecycler.setVisibility(View.INVISIBLE);
-//    savedCyclesTabLayout.setVisibility(View.INVISIBLE);
-
     setInitialTextSizeForRounds(0);
 
     stopWatchTimeTextView.setText(displayTime);
@@ -2036,7 +2024,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     isNewCycle = true;
 
     clearRoundAndCycleAdapterArrayLists();
-    setViewsAndColorsToPreventTearingInEditPopUp(true);
 
     assignOldCycleValuesToCheckForChanges();
     resetEditPopUpTimerHeaders();
@@ -2567,7 +2554,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void timerPopUpDismissalLogic() {
     timerDisabled = false;
-    makeCycleAdapterVisible = false;
     timerPopUpIsVisible = false;
     beginTimerForNextRound = false;
     reset.setVisibility(View.INVISIBLE);
@@ -2885,25 +2871,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setViewsAndColorsToPreventTearingInEditPopUp(boolean popUpIsActive) {
-//    mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
-//
-//    if (popUpIsActive) {
-//      if (mode==1) savedCycleRecycler.setVisibility(View.GONE);
-//      if (mode==3) savedPomCycleRecycler.setVisibility(View.GONE);
-//      emptyCycleList.setVisibility(View.GONE);
-//    } else {
-//      if (!makeCycleAdapterVisible) {
-//        if (mode==1) {
-//          savedCycleAdapter.notifyDataSetChanged();
-//          savedCycleRecycler.setVisibility(View.VISIBLE);
-//        }
-//        if (mode==3) {
-//          savedPomCycleAdapter.notifyDataSetChanged();
-//          savedPomCycleRecycler.setVisibility(View.VISIBLE);
-//        }
-//      }
-//    }
+  private void toggleCycleAndPomCycleRecyclerViewVisibilities(boolean launchingPopUp) {
+    mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+
+    if (launchingPopUp) {
+      if (mode==1) {
+        savedCycleRecycler.setVisibility(View.GONE);
+      }
+      if (mode==3) {
+        savedPomCycleRecycler.setVisibility(View.GONE);
+      }
+      emptyCycleList.setVisibility(View.GONE);
+    } else {
+      if (mode==1) {
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+      }
+      if (mode==3) {
+        savedPomCycleRecycler.setVisibility(View.VISIBLE);
+      }
+    }
   }
 
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
@@ -3671,8 +3657,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTimerLaunchViews(int typeOfLaunch) {
-    makeCycleAdapterVisible = true;
     timerPopUpIsVisible = true;
+    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
     cycle_title_textView.setText(cycleTitle);
 
