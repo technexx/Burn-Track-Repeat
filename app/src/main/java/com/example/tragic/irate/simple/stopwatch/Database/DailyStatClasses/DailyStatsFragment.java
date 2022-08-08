@@ -791,6 +791,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onAddingActivity(int position) {
+        if (dailyStatsAccess.getUnassignedDailyTotalTime() == 0) {
+            showToastIfNoneActive("No time remaining in day!");
+            return;
+        }
+
         toggleEditingForMultipleDaysTextViews();
         setDefaultCustomActivityAdditionViews();
         addTdeePopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
@@ -808,8 +813,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 activityToAdd = addCustomActivityEditText.getText().toString();
             }
 
-            //Todo: We added this return here if activity is empty.
             if (activityToAdd.equalsIgnoreCase("")) {
+                getActivity().runOnUiThread(()-> {
+                    //Todo: Remove this at some point.
+                    Toast.makeText(getContext(), "Trying to add blank activity in setNewActivityVariablesAndCheckIfActivityExists()!", Toast.LENGTH_SHORT).show();
+                });
                 return;
             }
 
@@ -886,12 +894,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setIsActivityCustomBoolean(true);
         }
 
-        if (newActivityTime == 0) {
-            showToastIfNoneActive("Time cannot be empty!");
-            return;
-        }
-        if (newActivityTime == -1) {
-            showToastIfNoneActive("No more time remaining!");
+        if (newActivityTime==0) {
+            getActivity().runOnUiThread(()-> {
+                showToastIfNoneActive("Time cannot be empty!");
+            });
             return;
         }
 
@@ -961,6 +967,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             } else {
                 double caloriesBurnedPerHour = dailyStatsAccess.getCaloriesBurnedPerHourForSelectedDay();
                 newCaloriesBurned = calculateCaloriesForCustomActivityEdit(newActivityTime, caloriesBurnedPerHour);
+            }
+
+            if (dailyStatsAccess.getActivityStringVariable().equalsIgnoreCase("")) {
+                getActivity().runOnUiThread(()-> {
+                    //Todo: Remove this at some point.
+                    Toast.makeText(getContext(), "Trying to add blank activity in editActivityStatsInDatabase()!", Toast.LENGTH_SHORT).show();
+                });
+                return;
             }
 
             dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(newActivityTime, newCaloriesBurned);
@@ -1075,9 +1089,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return timeSetInEditText;
     }
 
+
     private long cappedActivityTimeInMillis(long activityTime, long remainingTime) {
         if (activityTime>remainingTime) {
-            activityTime = -1;
+            activityTime = remainingTime;
         }
         return activityTime;
     }
