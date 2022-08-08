@@ -555,14 +555,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test add/update/delete over multiple days.
   //Todo: Blank activity may be back and its related issues w/ rows not deleting.
       //Todo: Tests will include trying different days.
-  //Todo: Timer shows lower total time than Stats Frag, which does it correctly.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
   //Todo: OnOptionsSelected should change/be disabled while in Settings (or have a single backup option).
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
+  //Todo: Consider having activity edit select multiple rows (like cycles) and long click for edit.
   //Todo: Add Day/Night modes.
-  //Todo: Backup/export option for stats (if app is deleted).
   //Todo: Check sizes on long aspect for all layouts + menus.
 
   //Todo: Test dates from future years.

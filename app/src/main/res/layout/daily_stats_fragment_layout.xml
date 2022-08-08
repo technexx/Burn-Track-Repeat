@@ -271,7 +271,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:mcv_tileHeight="35dp"
+        app:mcv_tileHeight="34dp"
         app:mcv_tileWidth="52dp"
         app:mcv_showOtherDates="other_months"
         app:mcv_selectionColor="@color/teal"

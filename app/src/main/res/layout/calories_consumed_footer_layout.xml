@@ -15,4 +15,13 @@
         android:src="@drawable/add_40">
     </ImageButton>
 
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="2dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/add_food_in_edit_stats"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:background="@color/white">
+    </View>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
