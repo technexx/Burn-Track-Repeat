@@ -54,7 +54,6 @@ public class DailyStatsAccess {
 
     int mDaySelectedFromCalendar;
     int numberOfDaysSelected;
-    boolean mAddingOrEditingSingleDay = true;
 
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
@@ -495,11 +494,7 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(long setTime, double caloriesBurned) {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
-        if (mAddingOrEditingSingleDay) {
-            listToPullDaysFrom = Collections.singletonList(mDaySelectedFromCalendar);
-        } else {
-            listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
-        }
+        listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
 
         for (int i=0; i<listToPullDaysFrom.size(); i++) {
 
@@ -575,17 +570,12 @@ public class DailyStatsAccess {
     }
 
     public void deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(int position) {
-        if (mAddingOrEditingSingleDay) {
-            mStatsForEachActivity = mStatsForEachActivityList.get(position);
-            cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
-        } else {
-            String activityToDelete = mStatsForEachActivityList.get(position).getActivity();
+        String activityToDelete = mStatsForEachActivityList.get(position).getActivity();
 
-            for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-                if (mStatsForEachActivityList.get(i).getActivity().equals(activityToDelete)) {
-                    mStatsForEachActivity = mStatsForEachActivityList.get(i);
-                    cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
-                }
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mStatsForEachActivityList.get(i).getActivity().equals(activityToDelete)) {
+                mStatsForEachActivity = mStatsForEachActivityList.get(i);
+                cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
             }
         }
     }
@@ -635,11 +625,7 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesBurnedForSelectedDays(long setTime, double caloriesBurned) {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
-        if (mAddingOrEditingSingleDay) {
-            listToPullDaysFrom = Collections.singletonList(mDaySelectedFromCalendar);
-        } else {
-            listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
-        }
+        listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
 
         for (int i=0; i<listToPullDaysFrom.size(); i++) {
             mDayHolder = new DayHolder();
@@ -668,10 +654,6 @@ public class DailyStatsAccess {
         mDayHolder.setTotalCaloriesBurned(caloriesBurned);
 
         cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
-    }
-
-    public void setAddingOrEditingSingleDayBoolean(boolean singleDay) {
-        this.mAddingOrEditingSingleDay = singleDay;
     }
 
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
@@ -1014,28 +996,11 @@ public class DailyStatsAccess {
     public void insertCaloriesAndEachFoodIntoDatabase() {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
-        if (mAddingOrEditingSingleDay) {
-            listToPullDaysFrom = Collections.singletonList(mDaySelectedFromCalendar);
-        } else {
-            listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
-        }
+        listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
 
         for (int i=0; i<listToPullDaysFrom.size(); i++) {
             mCaloriesForEachFood = new CaloriesForEachFood();
             int daySelected = listToPullDaysFrom.get(i);
-
-            //This overwrites row if food String exists.
-//            if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
-//                for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {
-//                    long uniqueIdToCheck = mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood();
-//                    String foodStringToCheck = mCaloriesForEachFoodList.get(k).getTypeOfFood();
-//
-//                    if (uniqueIdToCheck==daySelected && foodStringToCheck.equalsIgnoreCase(mFoodString)) {
-//                        long primaryId = mCaloriesForEachFoodList.get(k).getCaloriesForEachFoodId();
-//                        mCaloriesForEachFood.setCaloriesForEachFoodId(primaryId);
-//                    }
-//                }
-//            }
 
             mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
             mCaloriesForEachFood.setTypeOfFood(mFoodString);
@@ -1054,17 +1019,12 @@ public class DailyStatsAccess {
     }
 
     public void deleteCaloriesAndEachFoodInDatabase(int position) {
-        if (mAddingOrEditingSingleDay) {
-            mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
-            cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodRow(mCaloriesForEachFood);
-        } else {
-            String foodToDelete = mCaloriesForEachFoodList.get(position).getTypeOfFood();
+        String foodToDelete = mCaloriesForEachFoodList.get(position).getTypeOfFood();
 
-            for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-                if (mCaloriesForEachFoodList.get(i).getTypeOfFood().equals(foodToDelete)) {
-                    mCaloriesForEachFood = mCaloriesForEachFoodList.get(i);
-                    cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodRow(mCaloriesForEachFood);
-                }
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            if (mCaloriesForEachFoodList.get(i).getTypeOfFood().equals(foodToDelete)) {
+                mCaloriesForEachFood = mCaloriesForEachFoodList.get(i);
+                cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodRow(mCaloriesForEachFood);
             }
         }
     }

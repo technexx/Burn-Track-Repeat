@@ -175,12 +175,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ConstraintLayout.LayoutParams confirmActivityEditWithinPopUpButtonLayoutParams;
     ConstraintLayout.LayoutParams deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams;
 
-    TextView addOrEditActivitiesForCurrentDayOnlyTextView;
-    TextView addOrEditActivitiesForAllSelectedDaysTextView;
-
-    TextView addOrEditFoodForCurrentDayOnlyTextView;
-    TextView addOrEditFoodForAllSelectedDaysTextView;
-
     int mActivitySortMode;
     int mPositionToEdit;
 
@@ -389,22 +383,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             }
         });
 
-        addOrEditActivitiesForCurrentDayOnlyTextView.setOnClickListener(v-> {
-            SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = SINGLE_DAY;
-            dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
-        });
-
-        addOrEditActivitiesForAllSelectedDaysTextView.setOnClickListener(v-> {
-            if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
-                SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
-                dailyStatsAccess.setAddingOrEditingSingleDayBoolean(false);
-                setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, false);
-                setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, true);
-            }
-        });
-
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
             if (unassignedTimeInEditPopUpTextView.getVisibility()==View.VISIBLE) {
                 if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
@@ -437,20 +415,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 deleteActivityFromStats(mPositionToEdit);
             }
             tdeeEditPopUpWindow.dismiss();
-        });
-
-        addOrEditFoodForCurrentDayOnlyTextView.setOnClickListener(v-> {
-            SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = SINGLE_DAY;
-            dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForCurrentDayOnlyTextView, true);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForAllSelectedDaysTextView, false);
-        });
-
-        addOrEditFoodForAllSelectedDaysTextView.setOnClickListener(v-> {
-            SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
-            dailyStatsAccess.setAddingOrEditingSingleDayBoolean(false);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForCurrentDayOnlyTextView, false);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForAllSelectedDaysTextView, true);
         });
 
         confirmCaloriesConsumedAdditionWithinPopUpButton.setOnClickListener(v-> {
@@ -487,6 +451,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         return root;
     }
+
+    //Todo: Set warning textView visibility.
+    private void toggleEditingForMultipleDaysTextViews() {
+        if (currentStatDurationMode==CUSTOM_STATS) {
+            setEditActivityPopUpButtonsLayoutParams(true);
+            unassignedTimeInEditPopUpTextView.setVisibility(View.INVISIBLE);
+        } else {
+            setEditActivityPopUpButtonsLayoutParams(false);
+            unassignedTimeInEditPopUpTextView.setVisibility(View.VISIBLE);
+        }
+    }
+
 
     public void setHaveStatsBeenChangedBoolean(boolean haveStatsChanged) {
         mHaveStatsBeenChanged = haveStatsChanged;
@@ -798,8 +774,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
-        toggleEditingForMultipleDaysTextViews();
         setDefaultCustomActivityAdditionViews();
+
+        toggleEditingForMultipleDaysTextViews();
+
         addTdeePopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
@@ -871,8 +849,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextHours.requestFocus();
 
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0));
-
-        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
     }
 
     private void addActivityStatsInDatabase(boolean customActivity) {
@@ -953,8 +929,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void activityEditItemSelected(int position) {
         this.mPositionToEdit = position;
         launchActivityEditPopUpWithEditTextValuesSet(position);
-        toggleEditingForMultipleDaysTextViews();
         setDefaultCustomActivityAdditionViews();
+
+        toggleEditingForMultipleDaysTextViews();
     }
 
     private void editActivityStatsInDatabase() {
@@ -1118,23 +1095,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         metScoreTextView.setText(getString(R.string.met_score_single_line, String.valueOf(metScore)));
     }
 
-    private void toggleEditingForMultipleDaysTextViews() {
-        if (currentStatDurationMode==CUSTOM_STATS) {
-            setEditActivityPopUpButtonsLayoutParams(true);
-            toggleSingleOrMultipleDayInsertionTextViewVisibilities(true);
-            toggleSingleOrMultipleFoodInsertionTextViewVisibilities(true);
-            toggleUnassignedTimeTextViewVisibility (false);
-
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, true);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, false);
-        } else {
-            setEditActivityPopUpButtonsLayoutParams(false);
-            toggleSingleOrMultipleDayInsertionTextViewVisibilities(false);
-            toggleSingleOrMultipleFoodInsertionTextViewVisibilities(false);
-            toggleUnassignedTimeTextViewVisibility (true);
-        }
-    }
-
     private void setDefaultCustomActivityAdditionViews() {
         addCustomActivityEditText.setText("");
         addCustomCaloriesEditText.setText("");
@@ -1152,8 +1112,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setActivityEditPopUpTimeRemainingTextView();
         toggleCancelOrDeleteButtonInEditPopUpTextView(EDITING_ACTIVITY);
 
-        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
-
         tdeeEditTextHours.requestFocus();
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
@@ -1170,34 +1128,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         if (addingOrEditing==EDITING_ACTIVITY) {
             deleteActivityIfEditingRowWithinEditPopUpButton.setText(R.string.delete);
-        }
-    }
-
-    private void toggleSingleOrMultipleDayInsertionTextViewVisibilities(boolean isVisible) {
-        if (isVisible) {
-            addOrEditActivitiesForCurrentDayOnlyTextView.setVisibility(View.VISIBLE);
-            addOrEditActivitiesForAllSelectedDaysTextView.setVisibility(View.VISIBLE);
-        } else {
-            addOrEditActivitiesForCurrentDayOnlyTextView.setVisibility(View.GONE);
-            addOrEditActivitiesForAllSelectedDaysTextView.setVisibility(View.GONE);
-        }
-    }
-
-    private void toggleSingleOrMultipleFoodInsertionTextViewVisibilities(boolean isVisible) {
-        if (isVisible) {
-            addOrEditFoodForCurrentDayOnlyTextView.setVisibility(View.VISIBLE);
-            addOrEditFoodForAllSelectedDaysTextView.setVisibility(View.VISIBLE);
-        } else {
-            addOrEditFoodForCurrentDayOnlyTextView.setVisibility(View.GONE);
-            addOrEditFoodForAllSelectedDaysTextView.setVisibility(View.GONE);
-        }
-    }
-
-    private void toggleUnassignedTimeTextViewVisibility(boolean isVisible) {
-        if (isVisible) {
-            unassignedTimeInEditPopUpTextView.setVisibility(View.VISIBLE);
-        } else {
-            unassignedTimeInEditPopUpTextView.setVisibility(View.GONE);
         }
     }
 
@@ -1402,9 +1332,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         typeOfFoodEditText.requestFocus();
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.cancel);
 
-        setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForCurrentDayOnlyTextView, true);
-        setTextStyleAndAlphaValuesOnTextViews(addOrEditFoodForAllSelectedDaysTextView, false);
-
         caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
 
@@ -1455,8 +1382,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedEditText.setText(caloriesAsString);
 
         typeOfFoodEditText.requestFocus();
-
-        dailyStatsAccess.setAddingOrEditingSingleDayBoolean(true);
 
         caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
@@ -1722,12 +1647,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmActivityEditWithinPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) confirmActivityEditWithinPopUpButton.getLayoutParams();
         deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) deleteActivityIfEditingRowWithinEditPopUpButton.getLayoutParams();
 
-        addOrEditActivitiesForCurrentDayOnlyTextView = tdeeEditView.findViewById(R.id.add_or_edit_current_day_only_textView);
-        addOrEditActivitiesForAllSelectedDaysTextView = tdeeEditView.findViewById(R.id.add_or_edit_all_selected_days_textView);
-
-        addOrEditActivitiesForCurrentDayOnlyTextView.setTypeface(Typeface.DEFAULT_BOLD);
-        addOrEditActivitiesForAllSelectedDaysTextView.setAlpha(0.3f);
-
         popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
 
         confirmEditView = inflater.inflate(R.layout.edit_confirm_popup_layout, null);
@@ -1751,10 +1670,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmCaloriesConsumedAdditionWithinPopUpButton = caloriesConsumedAddAndEditView.findViewById(R.id.confirm_calories_consumed_add_button);
         confirmCaloriesConsumedDeletionWithinPopUpButton = caloriesConsumedAddAndEditView.findViewById(R.id.confirm_calories_consumed_delete_button);
-
-        addOrEditFoodForCurrentDayOnlyTextView = caloriesConsumedAddAndEditView.findViewById(R.id.add_or_edit_current_food_only_textView);
-        addOrEditFoodForAllSelectedDaysTextView = caloriesConsumedAddAndEditView.findViewById(R.id.add_or_edit_all_selected_foods_textView);
-
 
         caloriesConsumedAddAndEditPopUpWindow.setOnDismissListener(()-> {
             caloriesConsumedAdapter.turnOffEditMode();

@@ -114,7 +114,7 @@
     <string name="delete">Delete</string>
     <string name="cancel">Cancel</string>
 
-    <string name="confirm_multiple_add_or_edit_activities">This will overwrite any existing activities for the selected days. Continue?</string>
+    <string name="confirm_multiple_add_or_edit_activities">This will overwrite any existing activities for the selected days.</string>
 
     <string name="activity_text_header">Activity</string>
     <string name="set_time_text_header">Time</string>
@@ -122,6 +122,8 @@
 
     <string name="per_hour">Per hour</string>
     <string name="per_minute">Per minute</string>
+
+    <string name="multiple_day_edit_warning">This will affect all days selected!</string>
 
     <string name="current_day">Selected day</string>
     <string name="date_range">Date range</string>

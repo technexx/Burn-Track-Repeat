@@ -552,8 +552,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Option for multiple day addition/edit should be clearer
-      //Todo: Should keep option even w/ one day selected, just not allow it/do the same thing.
+  //Todo: PopUp confirmation for multiple days needs fixing.
+      //Todo: With the option to add so many days, an option to delete single activities over multiple days should also exist.
+  //Todo: Edit in multiple days shows total value of selected days.
   //Todo: Test add/update/delete over multiple days.
 
   //Todo: Splash screen on app start as a guide.
