@@ -552,9 +552,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Option for multiple day addition/edit should be clearer
+      //Todo: Should keep option even w/ one day selected, just not allow it/do the same thing.
   //Todo: Test add/update/delete over multiple days.
-  //Todo: Blank activity may be back and its related issues w/ rows not deleting.
-      //Todo: Tests will include trying different days.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.

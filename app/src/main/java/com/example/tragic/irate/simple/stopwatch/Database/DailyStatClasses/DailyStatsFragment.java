@@ -397,10 +397,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         addOrEditActivitiesForAllSelectedDaysTextView.setOnClickListener(v-> {
-            SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
-            dailyStatsAccess.setAddingOrEditingSingleDayBoolean(false);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, false);
-            setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, true);
+            if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+                SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT = MULTIPLE_DAYS;
+                dailyStatsAccess.setAddingOrEditingSingleDayBoolean(false);
+                setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForCurrentDayOnlyTextView, false);
+                setTextStyleAndAlphaValuesOnTextViews(addOrEditActivitiesForAllSelectedDaysTextView, true);
+            }
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
@@ -1117,7 +1119,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void toggleEditingForMultipleDaysTextViews() {
-        if (currentStatDurationMode==CUSTOM_STATS && dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+        if (currentStatDurationMode==CUSTOM_STATS) {
             setEditActivityPopUpButtonsLayoutParams(true);
             toggleSingleOrMultipleDayInsertionTextViewVisibilities(true);
             toggleSingleOrMultipleFoodInsertionTextViewVisibilities(true);
@@ -1639,7 +1641,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (!constrainedToTop) {
             activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
         } else {
-            activityInEditPopUpTextViewLayoutParams.topMargin = 0;
+            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(15);
         }
     }
 
