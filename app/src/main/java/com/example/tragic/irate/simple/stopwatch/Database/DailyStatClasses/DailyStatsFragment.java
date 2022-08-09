@@ -267,7 +267,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         areActivityStatsSimplified = sharedPref.getBoolean("areActivityStatsSimplified", false);
         toggleSimplifiedStatsButtonView(areActivityStatsSimplified);
         toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
-        toggleEditButtonView(areActivityStatsSimplified);
         setSimplifiedViewTextViews();
 
         AsyncTask.execute(()-> {
@@ -419,7 +418,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             if (caloriesComparisonTabLayout.getSelectedTabPosition()==0) {
                 toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
-                toggleEditButtonView(areActivityStatsSimplified);
             }
 
             if (caloriesComparisonTabLayout.getSelectedTabPosition()==2) {
@@ -1594,7 +1592,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateActivityEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
-        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(275), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         customActivityPopUpView = inflater.inflate(R.layout.custom_activity_popup_layout, null);
@@ -1636,7 +1634,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateCaloriesConsumedEditPopUpViews() {
         caloriesConsumedAddAndEditView = inflater.inflate(R.layout.calories_consumed_add_and_edit_popup, null);
-        caloriesConsumedAddAndEditPopUpWindow = new PopupWindow(caloriesConsumedAddAndEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(270), true);
+        caloriesConsumedAddAndEditPopUpWindow = new PopupWindow(caloriesConsumedAddAndEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(275), true);
         caloriesConsumedAddAndEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         typeOfFoodEditText = caloriesConsumedAddAndEditView.findViewById(R.id.food_name_add_text);
@@ -1677,7 +1675,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
 
                         toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
-                        toggleEditButtonView(areActivityStatsSimplified);
+                        toggleEditButtonView(false);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
