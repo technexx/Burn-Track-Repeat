@@ -128,12 +128,13 @@
     <TextView
         android:id="@+id/multiple_day_edit_warning_textView"
         android:text="@string/multiple_day_edit_warning"
-        android:layout_width="wrap_content"
+        android:layout_width="275dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/unassigned_time_textView"
         app:layout_constraintBottom_toTopOf="@id/confirm_activity_edit_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center"
         android:textSize="18sp">
     </TextView>
 

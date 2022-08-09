@@ -431,7 +431,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void toggleEditingForMultipleDaysTextViews() {
-        if (currentStatDurationMode==CUSTOM_STATS) {
+        if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
             setEditActivityPopUpButtonsLayoutParams(true);
             unassignedTimeInEditPopUpTextView.setVisibility(View.GONE);
             multipleDayEditWarningTextView.setVisibility(View.VISIBLE);
@@ -782,15 +782,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.setActivityString(activityToAdd);
 
-            if (currentStatDurationMode!=CUSTOM_STATS) {
+            if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+                getActivity().runOnUiThread(()-> {
+                    populateActivityEditPopUpWithNewRow();
+                });
+            } else {
                 dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
 
                 getActivity().runOnUiThread(()-> {
                     launchEditPopUpIfActivityDoesNotExistAndToastIfItDoes(dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay());
-                });
-            } else {
-                getActivity().runOnUiThread(()-> {
-                    populateActivityEditPopUpWithNewRow();
                 });
             }
         });
@@ -1123,22 +1123,28 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setActivityEditPopUpEditTexts(long valueToSet) {
-        String stringToSet = longToStringConverters.convertSecondsForEditPopUp(valueToSet);
-        String[] splitString = stringToSet.split(":");
-
-        if (splitString.length==3) {
-            tdeeEditTextHours.setText(splitString[0]);
-            tdeeEditTextMinutes.setText(splitString[1]);
-            tdeeEditTextSeconds.setText(splitString[2]);
+        if (dailyStatsAccess.getNumberOfDaysSelected()>1) {
+            tdeeEditTextHours.setText("");
+            tdeeEditTextMinutes.setText("");
+            tdeeEditTextSeconds.setText("");
         } else {
-            tdeeEditTextHours.setText(R.string.double_zeros);
-            tdeeEditTextMinutes.setText(splitString[0]);
-            tdeeEditTextSeconds.setText(splitString[1]);
-        }
+            String stringToSet = longToStringConverters.convertSecondsForEditPopUp(valueToSet);
+            String[] splitString = stringToSet.split(":");
 
-        setEditTextsToZeroIfEmpty(tdeeEditTextHours);
-        setEditTextsToZeroIfEmpty(tdeeEditTextMinutes);
-        setEditTextsToZeroIfEmpty(tdeeEditTextSeconds);
+            if (splitString.length==3) {
+                tdeeEditTextHours.setText(splitString[0]);
+                tdeeEditTextMinutes.setText(splitString[1]);
+                tdeeEditTextSeconds.setText(splitString[2]);
+            } else {
+                tdeeEditTextHours.setText(R.string.double_zeros);
+                tdeeEditTextMinutes.setText(splitString[0]);
+                tdeeEditTextSeconds.setText(splitString[1]);
+            }
+
+            setEditTextsToZeroIfEmpty(tdeeEditTextHours);
+            setEditTextsToZeroIfEmpty(tdeeEditTextMinutes);
+            setEditTextsToZeroIfEmpty(tdeeEditTextSeconds);
+        }
     }
 
     private void setEditTextsToZeroIfEmpty(EditText editText) {

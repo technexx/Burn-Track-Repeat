@@ -552,10 +552,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Addition/Edit can be separate from calendar view to remove confusion.
-      //Todo: Could have option to add every X day of month/year (monday, tuesday, etc.).
-  //Todo: Edit in weekly/monthly etc. shows that amount of time left in edit popUp.
-  //Todo: Edit in multiple days shows total value of selected days.
+  //Todo: Copy for food as well.
   //Todo: Test add/update/delete over multiple days.
 
   //Todo: Splash screen on app start as a guide.
@@ -566,9 +563,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add Day/Night modes.
   //Todo: Check sizes on long aspect for all layouts + menus.
 
+  //Todo: Test all notifications.
   //Todo: Test dates from future years.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
-  //Todo: Test all notifications.
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
