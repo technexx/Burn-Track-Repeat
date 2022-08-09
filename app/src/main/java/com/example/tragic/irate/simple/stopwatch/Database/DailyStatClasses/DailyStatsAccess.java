@@ -62,6 +62,7 @@ public class DailyStatsAccess {
     long mOldDayHolderId;
     boolean doesDayExistInDatabase;
     boolean doesActivityExistsInDatabaseForSelectedDay;
+    boolean doesFoodExistsInDatabaseForSelectedDay;
 
     int activityPositionInListForCurrentDay;
     int mOldActivityPositionInListForCurrentDay;
@@ -993,6 +994,16 @@ public class DailyStatsAccess {
         return totalCaloriesBurnedListForEachActivityForSelectedDuration;
     }
 
+    public boolean doesFoodExistsInDatabaseForSelectedDayBoolean() {
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            if (mFoodString.equalsIgnoreCase(mCaloriesForEachFoodList.get(i).getTypeOfFood())) {
+                doesFoodExistsInDatabaseForSelectedDay = true;
+                return true;
+            }
+        }
+        return false;
+    }
+
     public void insertCaloriesAndEachFoodIntoDatabase() {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
@@ -1001,6 +1012,18 @@ public class DailyStatsAccess {
         for (int i=0; i<listToPullDaysFrom.size(); i++) {
             mCaloriesForEachFood = new CaloriesForEachFood();
             int daySelected = listToPullDaysFrom.get(i);
+
+            if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
+                for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {
+                    long uniqueIdToCheck = mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood();
+                    String foodStringToCheck = mCaloriesForEachFoodList.get(k).getTypeOfFood();
+
+                    if (uniqueIdToCheck==daySelected && foodStringToCheck.equalsIgnoreCase(mFoodString)) {
+                        long primaryId = mCaloriesForEachFoodList.get(k).getCaloriesForEachFoodId();
+                        mCaloriesForEachFood.setCaloriesForEachFoodId(primaryId);
+                    }
+                }
+            }
 
             mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
             mCaloriesForEachFood.setTypeOfFood(mFoodString);

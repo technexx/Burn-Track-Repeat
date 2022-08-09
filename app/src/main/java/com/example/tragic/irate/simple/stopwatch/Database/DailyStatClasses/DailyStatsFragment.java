@@ -777,7 +777,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
             } else {
-                activityToAdd = addCustomActivityEditText.getText().toString();
+                activityToAdd = addCustomActivityEditText.getText().toString().trim();
             }
 
             if (activityToAdd.equalsIgnoreCase("")) {
@@ -850,7 +850,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             newCaloriesBurned = calculateCaloriesForSpinnerActivity();
             dailyStatsAccess.setIsActivityCustomBoolean(false);
         } else {
-            dailyStatsAccess.setActivityString(addCustomActivityEditText.getText().toString());
+            dailyStatsAccess.setActivityString(addCustomActivityEditText.getText().toString().trim());
 
             newCaloriesBurned = calculateCaloriesForCustomActivityAddition(newActivityTime);
             caloriesBurnedPerHour = Double.parseDouble(addCustomCaloriesEditText.getText().toString());
@@ -1312,6 +1312,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.two_line_concat, getString(R.string.calories_burned_per_minute, caloriesBurnedPerMinute), getString(R.string.calories_burned_per_hour, caloriesBurnedPerHour)));
     }
 
+    private void saveFoodIfItDoesNotExistsAndToastIfItDoes(boolean foodExists) {
+        if (!foodExists) {
+
+        }
+    }
+
     @Override
     public void onAddingFood() {
         typeOfFoodEditText.requestFocus();
@@ -1331,22 +1337,28 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             showToastIfNoneActive("Must enter a caloric value!");
             return;
         }
+
+        if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDay) {
             AsyncTask.execute(()-> {
-            dailyStatsAccess.setFoodString(getFoodStringFromEditText());
-            dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
+                dailyStatsAccess.setFoodString(getFoodStringFromEditText());
+                dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
 
-            dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase();
-            populateListsAndTextViewsFromEntityListsInDatabase();
+                dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase();
+                populateListsAndTextViewsFromEntityListsInDatabase();
 
-            getActivity().runOnUiThread(()-> {
-                caloriesConsumedAdapter.notifyDataSetChanged();
-                caloriesConsumedAddAndEditPopUpWindow.dismiss();
+                getActivity().runOnUiThread(()-> {
+                    caloriesConsumedAdapter.notifyDataSetChanged();
+                    caloriesConsumedAddAndEditPopUpWindow.dismiss();
+                });
             });
-        });
+        } else {
+            showToastIfNoneActive("Food exists!");
+        }
+
     }
 
     private String getFoodStringFromEditText() {
-        return typeOfFoodEditText.getText().toString();
+        return typeOfFoodEditText.getText().toString().trim();
     }
 
     private String getCaloriesForFoodItemFromEditText() {

@@ -552,6 +552,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Empty space doesn't count toward duplicates.
+  //Todo: Hard to click on calorie editText.
   //Todo: Test add/update/delete over multiple days.
 
   //Todo: Splash screen on app start as a guide.
