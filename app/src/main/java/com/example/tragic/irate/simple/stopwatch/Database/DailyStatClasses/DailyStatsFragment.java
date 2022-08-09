@@ -172,6 +172,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView unassignedTimeInEditPopUpTextView;
     Button confirmActivityEditWithinPopUpButton;
     Button deleteActivityIfEditingRowWithinEditPopUpButton;
+    TextView multipleDayEditWarningTextView;
+
     ConstraintLayout.LayoutParams confirmActivityEditWithinPopUpButtonLayoutParams;
     ConstraintLayout.LayoutParams deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams;
 
@@ -452,14 +454,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
-    //Todo: Set warning textView visibility.
     private void toggleEditingForMultipleDaysTextViews() {
         if (currentStatDurationMode==CUSTOM_STATS) {
             setEditActivityPopUpButtonsLayoutParams(true);
-            unassignedTimeInEditPopUpTextView.setVisibility(View.INVISIBLE);
+            unassignedTimeInEditPopUpTextView.setVisibility(View.GONE);
+            multipleDayEditWarningTextView.setVisibility(View.VISIBLE);
         } else {
             setEditActivityPopUpButtonsLayoutParams(false);
             unassignedTimeInEditPopUpTextView.setVisibility(View.VISIBLE);
+            multipleDayEditWarningTextView.setVisibility(View.GONE);
         }
     }
 
@@ -1566,7 +1569,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (!constrainedToTop) {
             activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
         } else {
-            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(15);
+            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(30);
         }
     }
 
@@ -1644,6 +1647,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit_button);
         deleteActivityIfEditingRowWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
+        multipleDayEditWarningTextView = tdeeEditView.findViewById(R.id.multiple_day_edit_warning_textView);
+
         confirmActivityEditWithinPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) confirmActivityEditWithinPopUpButton.getLayoutParams();
         deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) deleteActivityIfEditingRowWithinEditPopUpButton.getLayoutParams();
 

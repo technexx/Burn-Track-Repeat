@@ -121,7 +121,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/edit_text_layout"
-        android:layout_marginTop="6dp"
+        android:layout_marginTop="18dp"
         android:textSize="18sp">
     </TextView>
 
@@ -133,7 +133,8 @@
         app:layout_constraintTop_toBottomOf="@id/unassigned_time_textView"
         app:layout_constraintBottom_toTopOf="@id/confirm_activity_edit_button"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        android:textSize="18sp">
     </TextView>
 
     <com.google.android.material.button.MaterialButton
