@@ -1338,7 +1338,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
-        if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDay) {
+        if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
             AsyncTask.execute(()-> {
                 dailyStatsAccess.setFoodString(getFoodStringFromEditText());
                 dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));

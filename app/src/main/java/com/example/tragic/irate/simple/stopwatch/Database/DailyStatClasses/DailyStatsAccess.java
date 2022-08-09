@@ -994,10 +994,9 @@ public class DailyStatsAccess {
         return totalCaloriesBurnedListForEachActivityForSelectedDuration;
     }
 
-    public boolean doesFoodExistsInDatabaseForSelectedDayBoolean() {
+    public boolean doesFoodExistsInDatabaseForSelectedDayBoolean(String foodString) {
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            if (mFoodString.equalsIgnoreCase(mCaloriesForEachFoodList.get(i).getTypeOfFood())) {
-                doesFoodExistsInDatabaseForSelectedDay = true;
+            if (foodString.equalsIgnoreCase(mCaloriesForEachFoodList.get(i).getTypeOfFood())) {
                 return true;
             }
         }
