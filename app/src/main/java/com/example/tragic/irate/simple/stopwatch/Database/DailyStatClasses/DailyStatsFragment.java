@@ -159,10 +159,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     Button cancelCustomActivityValues;
 
     ConstraintLayout editActivityPopUpLayout;
-    View confirmEditView;
-    PopupWindow confirmEditPopUpWindow;
-    Button confirmMultipleAddOrEditButton;
-    Button cancelMultipleAddOrEditButton;
 
     TextView activityInEditPopUpTextView;
     ConstraintLayout.LayoutParams activityInEditPopUpTextViewLayoutParams;
@@ -386,30 +382,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         confirmActivityEditWithinPopUpButton.setOnClickListener(v-> {
-            if (unassignedTimeInEditPopUpTextView.getVisibility()==View.VISIBLE) {
-                if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
-                    addActivityStatsInDatabase(areWeAddingOrEditngACustomActivity);
-                }
-                if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
-                    editActivityStatsInDatabase();
-                }
-            } else {
-                displayPopUpForMultipleAddOrEditConfirmation();
-            }
-        });
-
-        confirmMultipleAddOrEditButton.setOnClickListener(v-> {
             if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==ADDING_ACTIVITY) {
                 addActivityStatsInDatabase(areWeAddingOrEditngACustomActivity);
             }
             if (dailyStatsAdapter.getAddingOrEditingActivityVariable()==EDITING_ACTIVITY) {
                 editActivityStatsInDatabase();
             }
-            confirmEditPopUpWindow.dismiss();
-        });
-
-        cancelMultipleAddOrEditButton.setOnClickListener(v-> {
-            confirmEditPopUpWindow.dismiss();
         });
 
         deleteActivityIfEditingRowWithinEditPopUpButton.setOnClickListener(v-> {
@@ -922,10 +900,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
         dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
         dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
-    }
-
-    private void displayPopUpForMultipleAddOrEditConfirmation() {
-        confirmEditPopUpWindow.showAsDropDown(bottomOfRecyclerViewAnchor);
     }
 
     @Override
@@ -1653,11 +1627,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) deleteActivityIfEditingRowWithinEditPopUpButton.getLayoutParams();
 
         popUpAnchorBottom = mRoot.findViewById(R.id.tdee_edit_popUp_anchor_bottom);
-
-        confirmEditView = inflater.inflate(R.layout.edit_confirm_popup_layout, null);
-        confirmEditPopUpWindow = new PopupWindow(confirmEditView, dpToPxConv(300), dpToPxConv(150), true);
-        confirmMultipleAddOrEditButton = confirmEditView.findViewById(R.id.edit_confirm_button);
-        cancelMultipleAddOrEditButton = confirmEditView.findViewById(R.id.edit_cancel_button);
 
         tdeeEditPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
