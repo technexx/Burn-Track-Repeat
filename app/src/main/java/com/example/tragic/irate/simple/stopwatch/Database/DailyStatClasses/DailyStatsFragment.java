@@ -168,7 +168,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView unassignedTimeInEditPopUpTextView;
     Button confirmActivityEditWithinPopUpButton;
     Button deleteActivityIfEditingRowWithinEditPopUpButton;
-    TextView multipleDayEditWarningTextView;
+    TextView multipleDayEditWarningForActivitiesTextView;
 
     ConstraintLayout.LayoutParams confirmActivityEditWithinPopUpButtonLayoutParams;
     ConstraintLayout.LayoutParams deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams;
@@ -192,6 +192,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     PopupWindow caloriesConsumedAddAndEditPopUpWindow;
     EditText typeOfFoodEditText;
     EditText caloriesConsumedEditText;
+    TextView multipleDayEditWarningForFoodConsumedTextView;
 
     Button confirmCaloriesConsumedAdditionWithinPopUpButton;
     Button confirmCaloriesConsumedDeletionWithinPopUpButton;
@@ -430,18 +431,25 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
-    private void toggleEditingForMultipleDaysTextViews() {
+    private void toggleActivityEditingForMultipleDaysTextViews() {
         if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
             setEditActivityPopUpButtonsLayoutParams(true);
             unassignedTimeInEditPopUpTextView.setVisibility(View.GONE);
-            multipleDayEditWarningTextView.setVisibility(View.VISIBLE);
+            multipleDayEditWarningForActivitiesTextView.setVisibility(View.VISIBLE);
         } else {
             setEditActivityPopUpButtonsLayoutParams(false);
             unassignedTimeInEditPopUpTextView.setVisibility(View.VISIBLE);
-            multipleDayEditWarningTextView.setVisibility(View.GONE);
+            multipleDayEditWarningForActivitiesTextView.setVisibility(View.GONE);
         }
     }
 
+    private void toggleFoodConsumedEditingForMultipleDaysTextViews() {
+        if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+            multipleDayEditWarningForFoodConsumedTextView.setVisibility(View.VISIBLE);
+        } else {
+            multipleDayEditWarningForFoodConsumedTextView.setVisibility(View.GONE);
+        }
+    }
 
     public void setHaveStatsBeenChangedBoolean(boolean haveStatsChanged) {
         mHaveStatsBeenChanged = haveStatsChanged;
@@ -755,7 +763,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         setDefaultCustomActivityAdditionViews();
 
-        toggleEditingForMultipleDaysTextViews();
+        toggleActivityEditingForMultipleDaysTextViews();
 
         addTdeePopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
@@ -906,7 +914,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         launchActivityEditPopUpWithEditTextValuesSet(position);
         setDefaultCustomActivityAdditionViews();
 
-        toggleEditingForMultipleDaysTextViews();
+        toggleActivityEditingForMultipleDaysTextViews();
     }
 
     private void editActivityStatsInDatabase() {
@@ -1028,10 +1036,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private double calculateCaloriesForCustomActivityEdit(long timeInMillis, double caloriesPerHour) {
         double hourDivisor = 60;
         double hoursInActivity = (double) getMinutesFromMillisValue(timeInMillis) / hourDivisor;
-
-        Log.i("testCals", "minutes retrieved are " + getMinutesFromMillisValue(timeInMillis));
-        Log.i("testCals", "hours retrieved are " + hoursInActivity);
-        Log.i("testCals", "cals burned are " + caloriesPerHour * hoursInActivity);
 
         return caloriesPerHour * hoursInActivity;
     }
@@ -1312,6 +1316,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void onAddingFood() {
         typeOfFoodEditText.requestFocus();
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.cancel);
+        toggleFoodConsumedEditingForMultipleDaysTextViews();
 
         caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
@@ -1351,16 +1356,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void editCaloriesConsumedRowSelected(int position) {
         this.mPositionToEdit = position;
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.delete);
+        toggleFoodConsumedEditingForMultipleDaysTextViews();
         launchFoodEditPopUpWithEditTextValuesSet(position);
     }
 
     private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
         String foodString = dailyStatsAccess.getTotalFoodStringListForSelectedDuration().get(position);
-        double caloriesInFood = dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration().get(position);
-        String caloriesAsString = formatDoubleToStringWithoutDecimals(caloriesInFood);
-
         typeOfFoodEditText.setText(foodString);
-        caloriesConsumedEditText.setText(caloriesAsString);
+
+        if (dailyStatsAccess.getNumberOfDaysSelected()>1) {
+            caloriesConsumedEditText.setText("");
+        } else {
+            double caloriesInFood = dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration().get(position);
+            String caloriesAsString = formatDoubleToStringWithoutDecimals(caloriesInFood);
+            caloriesConsumedEditText.setText(caloriesAsString);
+        }
 
         typeOfFoodEditText.requestFocus();
 
@@ -1625,7 +1635,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit_button);
         deleteActivityIfEditingRowWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
-        multipleDayEditWarningTextView = tdeeEditView.findViewById(R.id.multiple_day_edit_warning_textView);
+        multipleDayEditWarningForActivitiesTextView = tdeeEditView.findViewById(R.id.multiple_day_edit_warning_for_activities_textView);
 
         confirmActivityEditWithinPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) confirmActivityEditWithinPopUpButton.getLayoutParams();
         deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) deleteActivityIfEditingRowWithinEditPopUpButton.getLayoutParams();
@@ -1645,6 +1655,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         typeOfFoodEditText = caloriesConsumedAddAndEditView.findViewById(R.id.food_name_add_text);
         caloriesConsumedEditText = caloriesConsumedAddAndEditView.findViewById(R.id.add_calories_consumed_editText);
+        multipleDayEditWarningForFoodConsumedTextView = caloriesConsumedAddAndEditView.findViewById(R.id.multiple_day_edit_warning_for_food_consumed_textView);
 
         confirmCaloriesConsumedAdditionWithinPopUpButton = caloriesConsumedAddAndEditView.findViewById(R.id.confirm_calories_consumed_add_button);
         confirmCaloriesConsumedDeletionWithinPopUpButton = caloriesConsumedAddAndEditView.findViewById(R.id.confirm_calories_consumed_delete_button);

@@ -70,27 +70,16 @@
     </EditText>
 
     <TextView
-        android:id="@+id/add_or_edit_current_food_only_textView"
-        android:text="@string/current_day"
-        android:layout_width="wrap_content"
+        android:id="@+id/multiple_day_edit_warning_for_food_consumed_textView"
+        android:layout_width="275dp"
+        android:gravity="center"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/confirm_calories_consumed_delete_button"
+        android:text="@string/multiple_day_edit_warning"
+        android:textSize="18sp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/add_or_edit_all_selected_foods_textView"
-        android:layout_marginStart="8dp"
-        android:layout_marginBottom="20dp">
-    </TextView>
-
-    <TextView
-        android:id="@+id/add_or_edit_all_selected_foods_textView"
-        android:text="@string/date_range"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@id/confirm_calories_consumed_add_button"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@id/add_or_edit_current_food_only_textView"
-        android:layout_marginEnd="8dp"
-        android:layout_marginBottom="20dp">
+        app:layout_constraintBottom_toTopOf="@id/confirm_calories_consumed_add_button"
+        app:layout_constraintTop_toBottomOf="@id/add_calories_consumed_editText">
     </TextView>
 
     <com.google.android.material.button.MaterialButton
