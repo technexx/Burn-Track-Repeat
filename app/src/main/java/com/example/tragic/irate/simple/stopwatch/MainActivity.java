@@ -553,7 +553,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
 
-  //Todo: Row highlight in activity edit is off.
   //Todo: Edit in weekly/monthly etc. shows that amount of time left in edit popUp.
   //Todo: Edit in multiple days shows total value of selected days.
   //Todo: Test add/update/delete over multiple days.
