@@ -15,8 +15,11 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginStart="8dp"
-        android:gravity="center">
+        android:layout_marginStart="2dp"
+        android:gravity="center_horizontal"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
+        android:textSize="20sp">
     </TextView>
 
     <TextView
@@ -28,7 +31,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
         android:layout_marginEnd="32dp"
-        android:textSize="17sp"
+        android:textSize="20sp"
         android:minWidth="100dp"
         android:maxWidth="150dp">
     </TextView>

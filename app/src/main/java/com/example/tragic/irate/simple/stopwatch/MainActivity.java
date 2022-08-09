@@ -552,7 +552,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Copy for food as well.
   //Todo: Test add/update/delete over multiple days.
 
   //Todo: Splash screen on app start as a guide.

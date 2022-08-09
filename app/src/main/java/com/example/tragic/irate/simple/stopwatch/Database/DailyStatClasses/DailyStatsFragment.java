@@ -1317,6 +1317,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         typeOfFoodEditText.requestFocus();
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.cancel);
         toggleFoodConsumedEditingForMultipleDaysTextViews();
+        clearFoodConsumedEditTexts();
 
         caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
@@ -1350,6 +1351,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private String getCaloriesForFoodItemFromEditText() {
         return caloriesConsumedEditText.getText().toString();
+    }
+
+    private void clearFoodConsumedEditTexts() {
+        typeOfFoodEditText.setText("");
+        caloriesConsumedEditText.setText("");
     }
 
     @Override
