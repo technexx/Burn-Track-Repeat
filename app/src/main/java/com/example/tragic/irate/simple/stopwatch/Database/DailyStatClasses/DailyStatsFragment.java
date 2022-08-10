@@ -931,17 +931,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
-            dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
-            dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
+            long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
 
-            Log.i("testCals", "edit custom activity boolean is " + dailyStatsAccess.getIsActivityCustomBooleanLocalVariable());
+            if (newActivityTime == 0) {
+                getActivity().runOnUiThread(()-> {
+                    showToastIfNoneActive("Time cannot be empty!");
+                });
+                return;
+            }
 
             String newActivityString = "";
-            long newActivityTime = 0;
             double newCaloriesBurned = 0;
 
-            //Used for spinner and custom.
-            newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
+            dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
+            dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
             if (!dailyStatsAccess.getIsActivityCustomBooleanFromDatabaseInstance()) {
                 dailyStatsAccess.setActivityString(dailyStatsAccess.getActivityStringFromSelectedActivity());

@@ -552,7 +552,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Updating activity needs Toast @ 0 time entered.
+  //Todo: Updating wrong position on multiple day update.
   //Todo: Test add/update/delete over multiple days.
   //Todo: Fast onBackPressed in a fragment will cause stutter.
 
