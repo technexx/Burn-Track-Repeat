@@ -1588,7 +1588,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (!constrainedToTop) {
             activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
         } else {
-            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(30);
+            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(10);
         }
     }
 
