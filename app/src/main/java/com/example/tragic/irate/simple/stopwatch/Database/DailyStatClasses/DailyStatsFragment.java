@@ -948,7 +948,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 return;
             }
 
-            dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(newActivityTime, newCaloriesBurned);
+            dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForMultipleDays(mPositionToEdit, newActivityTime, newCaloriesBurned);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -956,6 +956,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCalorieBurnedForSelectedDuration();
 
             dailyStatsAccess.setDayHolderEntityFromStatsForEachActivityDaySelection(daySelectedFromCalendar);
+
+            //Todo: Needs to be changed, too.
             dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
             populateListsAndTextViewsFromEntityListsInDatabase();

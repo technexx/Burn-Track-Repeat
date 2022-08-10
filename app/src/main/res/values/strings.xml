@@ -123,7 +123,7 @@
     <string name="per_hour">Per hour</string>
     <string name="per_minute">Per minute</string>
 
-    <string name="multiple_day_edit_warning">This will overwrite save or delete for all days in current date range!</string>
+    <string name="multiple_day_edit_warning">This will save or delete for all days in current date range!</string>
 
     <string name="current_day">Selected day</string>
     <string name="date_range">Date range</string>

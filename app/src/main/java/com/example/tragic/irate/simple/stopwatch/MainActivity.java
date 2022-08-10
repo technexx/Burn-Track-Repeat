@@ -552,6 +552,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Editing for multiple days not working. We never added method for it.
   //Todo: Address deletion for multiple days.
   //Todo: Test add/update/delete over multiple days.
   //Todo: Fast onBackPressed in a fragment will cause stutter.

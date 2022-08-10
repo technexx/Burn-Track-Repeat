@@ -563,6 +563,7 @@ public class DailyStatsAccess {
         return mStatsForEachActivity.getCaloriesPerHour();
     }
 
+    //Used by Main.
     public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(long setTime, double caloriesBurned) {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
@@ -570,11 +571,34 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
 
+    //Used by Stats Fragment
+    public void updateTotalTimesAndCaloriesForEachActivityForMultipleDays(int position, long setTime, double caloriesBurned) {
+        String activityToUpdate = mStatsForEachActivityList.get(position).getActivity();
+        Log.i("testUpdate", "activity to be updated is " + activityToUpdate);
+
+        List<Integer> listToPullDaysFrom = new ArrayList<>();
+        listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
+
+        //Todo: Db list only has populated rows.
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToUpdate)) {
+                mStatsForEachActivity = mStatsForEachActivityList.get(i);
+
+                mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+                mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+                cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+
+            }
+            Log.i("testUpdate", "activity iterating is " + mStatsForEachActivityList.get(i).getActivity());
+        }
+    }
+
     public void deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(int position) {
         String activityToDelete = mStatsForEachActivityList.get(position).getActivity();
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            if (mStatsForEachActivityList.get(i).getActivity().equals(activityToDelete)) {
+            if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToDelete)) {
                 mStatsForEachActivity = mStatsForEachActivityList.get(i);
                 cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
             }
@@ -813,7 +837,6 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    //Todo: Stats Frag access this for daily total, while Main uses getTotalSetTimeFromDayHolderEntity().
     public long getTotalActivityTimeForSelectedDuration() {
         long valueToReturn = 0;
 
