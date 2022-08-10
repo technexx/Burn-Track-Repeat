@@ -807,6 +807,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void launchEditPopUpIfActivityDoesNotExistAndToastIfItDoes(boolean activityExists) {
         if (!activityExists) {
             populateActivityEditPopUpWithNewRow();
+
             if (addTdeePopUpWindow.isShowing()) {
                 addTdeePopUpWindow.dismiss();
             }
@@ -835,7 +836,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tdeeEditTextHours.requestFocus();
 
-        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0));
+        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(-5));
     }
 
     private void addActivityStatsInDatabase(boolean customActivity) {
@@ -1092,7 +1093,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         toggleCancelOrDeleteButtonInEditPopUpTextView(EDITING_ACTIVITY);
 
         tdeeEditTextHours.requestFocus();
-        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
+        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(-5));
     }
 
     private void setActivityEditPopUpTimeRemainingTextView() {
@@ -1626,7 +1627,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateActivityEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
-        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(275), true);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(280), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         customActivityPopUpView = inflater.inflate(R.layout.custom_activity_popup_layout, null);

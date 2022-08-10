@@ -552,8 +552,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Hard to click on calorie editText.
+  //Todo: Address deletion for multiple days.
   //Todo: Test add/update/delete over multiple days.
+  //Todo: Fast onBackPressed in a fragment will cause stutter.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.

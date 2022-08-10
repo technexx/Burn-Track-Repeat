@@ -21,7 +21,7 @@
         app:tabIndicatorFullWidth="true" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/activity_stats_total_header_layout"
+        android:id="@+id/activity_duration_header_layout"
         android:layout_width="match_parent"
         android:layout_height="65dp"
         app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
@@ -82,7 +82,7 @@
         android:layout_height="275dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activity_stats_total_header_layout">
+        app:layout_constraintTop_toBottomOf="@id/activity_duration_header_layout">
 
         <TextView
             android:id="@+id/simplified_activity_level_header"
@@ -165,7 +165,7 @@
         android:layout_height="275dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activity_stats_total_header_layout">
+        app:layout_constraintTop_toBottomOf="@id/activity_duration_header_layout">
     </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -174,7 +174,7 @@
         android:layout_height="275dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activity_stats_total_header_layout">
+        app:layout_constraintTop_toBottomOf="@id/activity_duration_header_layout">
     </androidx.recyclerview.widget.RecyclerView>
 
     <View
@@ -183,7 +183,7 @@
         android:layout_height="1dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activity_stats_total_header_layout">
+        app:layout_constraintTop_toBottomOf="@id/activity_duration_header_layout">
     </View>
 
     <View
@@ -344,7 +344,7 @@
         android:id="@+id/calories_compared_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/activity_stats_total_header_layout"
+        app:layout_constraintTop_toBottomOf="@id/activity_duration_header_layout"
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
