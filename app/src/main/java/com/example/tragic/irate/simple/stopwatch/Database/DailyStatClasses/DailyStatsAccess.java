@@ -584,6 +584,7 @@ public class DailyStatsAccess {
                 mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
                 cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+
                 Log.i("testUpdate", "activity String updated from unique ID " + mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
             }
 
@@ -1053,11 +1054,18 @@ public class DailyStatsAccess {
     }
 
     public void updateCaloriesAndEachFoodInDatabase(int position, String food, double calories) {
-        mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
-        mCaloriesForEachFood.setTypeOfFood(food);
-        mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(calories);
+        String foodToUpdate = totalFoodStringListForSelectedDuration.get(position);
 
-        cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            if (mCaloriesForEachFoodList.get(i).getTypeOfFood().equalsIgnoreCase(foodToUpdate)) {
+                mCaloriesForEachFood = mCaloriesForEachFoodList.get(i);
+
+                mCaloriesForEachFood.setTypeOfFood(food);
+                mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(calories);
+
+                cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
+            }
+        }
     }
 
     public void deleteCaloriesAndEachFoodInDatabase(int position) {
