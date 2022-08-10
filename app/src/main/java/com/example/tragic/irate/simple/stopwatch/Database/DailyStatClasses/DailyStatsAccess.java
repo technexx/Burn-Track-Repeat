@@ -593,7 +593,7 @@ public class DailyStatsAccess {
     }
 
     public void deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(int position) {
-        String activityToDelete = mStatsForEachActivityList.get(position).getActivity();
+        String activityToDelete = totalActivitiesListForSelectedDuration.get(position);
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToDelete)) {
@@ -1069,7 +1069,7 @@ public class DailyStatsAccess {
     }
 
     public void deleteCaloriesAndEachFoodInDatabase(int position) {
-        String foodToDelete = mCaloriesForEachFoodList.get(position).getTypeOfFood();
+        String foodToDelete = totalFoodStringListForSelectedDuration.get(position);
 
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
             if (mCaloriesForEachFoodList.get(i).getTypeOfFood().equals(foodToDelete)) {
