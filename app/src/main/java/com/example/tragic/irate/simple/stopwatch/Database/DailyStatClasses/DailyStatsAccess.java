@@ -572,10 +572,9 @@ public class DailyStatsAccess {
     }
 
     //Used by Stats Fragment
-    //Todo: mStats includes positions for all instances of activities, e.g. an activity over 7 days will have 7 positions in addition to other activities, using unique IDs to denote the days.
-    //Todo: Need to get list within specific day (unique ID) for activity retrieval, and then iterate through list of populated days to check for it.
     public void updateTotalTimesAndCaloriesForEachActivityForMultipleDays(int position, long setTime, double caloriesBurned) {
-        String activityToUpdate = mStatsForEachActivityList.get(position).getActivity();
+        String activityToUpdate = totalActivitiesListForSelectedDuration.get(position);
+        Log.i("testUpdate", "activity String chosen is " + activityToUpdate);
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToUpdate)) {
@@ -585,7 +584,10 @@ public class DailyStatsAccess {
                 mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
                 cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+                Log.i("testUpdate", "activity String updated from unique ID " + mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
             }
+
+            Log.i("testUpdate", "activity Id list in mStats is " + mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
         }
     }
 
