@@ -14,7 +14,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/divider_view_for_food_consumed"
         android:layout_marginStart="2dp"
         android:gravity="center_horizontal"
         android:paddingStart="6dp"
@@ -27,8 +27,8 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/divider_view_for_food_consumed"
         android:gravity="center"
         android:layout_marginEnd="32dp"
         android:textSize="20sp"
@@ -37,10 +37,10 @@
     </TextView>
 
     <View
+        android:id="@+id/divider_view_for_food_consumed"
         android:layout_width="match_parent"
         android:layout_height="1.5dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/food_eaten_textView"
         app:layout_constraintBottom_toBottomOf="parent"
         android:background="@color/white">
     </View>

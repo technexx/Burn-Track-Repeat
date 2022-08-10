@@ -1813,6 +1813,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerView.setLayoutManager(lm);
         dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
 
+//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
+//        dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
+//        dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
+
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
     }
 
