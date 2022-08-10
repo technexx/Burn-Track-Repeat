@@ -22,18 +22,18 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/add_food_name_header"
-        android:layout_marginStart="0dp"
-        android:textSize="22sp"
+        android:gravity="center"
         app:layout_constraintEnd_toEndOf="@id/add_food_name_header"
         android:layout_marginTop="4dp"
-        app:layout_constraintStart_toStartOf="@id/add_food_name_header"
         android:textColor="@color/white"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
-        android:maxLength="35"
+        android:maxLength="50"
+        android:minWidth="80dp"
         android:maxLines="2"
-        android:minWidth="50dp"
+        android:textSize="22sp"
         android:maxWidth="175dp"
+        app:layout_constraintStart_toStartOf="@id/add_food_name_header"
         android:inputType="textCapSentences|textAutoCorrect|textMultiLine"
         android:textColorHint="@color/light_grey">
     </EditText>
@@ -52,20 +52,20 @@
 
     <EditText
         android:id="@+id/add_calories_consumed_editText"
-        android:layout_width="wrap_content"
+        android:layout_width="80dp"
         android:layout_height="wrap_content"
         android:textSize="26sp"
         app:layout_constraintEnd_toEndOf="@id/add_calories_consumed_header"
         app:layout_constraintTop_toBottomOf="@id/add_calories_consumed_header"
-        android:layout_marginTop="4dp"
         app:layout_constraintStart_toStartOf="@id/add_calories_consumed_header"
+        android:layout_marginTop="4dp"
+        android:gravity="center"
         android:textColor="@color/white"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
         android:singleLine="true"
         android:maxLength="4"
         android:inputType="number"
-        android:hint="0"
         android:textColorHint="@color/light_grey">
     </EditText>
 
