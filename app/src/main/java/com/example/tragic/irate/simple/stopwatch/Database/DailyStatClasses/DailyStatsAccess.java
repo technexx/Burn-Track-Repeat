@@ -574,12 +574,7 @@ public class DailyStatsAccess {
     //Used by Stats Fragment
     public void updateTotalTimesAndCaloriesForEachActivityForMultipleDays(int position, long setTime, double caloriesBurned) {
         String activityToUpdate = mStatsForEachActivityList.get(position).getActivity();
-        Log.i("testUpdate", "activity to be updated is " + activityToUpdate);
 
-        List<Integer> listToPullDaysFrom = new ArrayList<>();
-        listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
-
-        //Todo: Db list only has populated rows.
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToUpdate)) {
                 mStatsForEachActivity = mStatsForEachActivityList.get(i);
@@ -590,7 +585,6 @@ public class DailyStatsAccess {
                 cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
 
             }
-            Log.i("testUpdate", "activity iterating is " + mStatsForEachActivityList.get(i).getActivity());
         }
     }
 

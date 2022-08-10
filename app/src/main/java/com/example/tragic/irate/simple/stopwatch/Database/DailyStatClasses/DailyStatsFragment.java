@@ -168,7 +168,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView unassignedTimeInEditPopUpTextView;
     Button confirmActivityEditWithinPopUpButton;
     Button deleteActivityIfEditingRowWithinEditPopUpButton;
-    TextView multipleDayEditWarningForActivitiesTextView;
+    TextView multipleDayWarningForActivitiesTextView;
 
     ConstraintLayout.LayoutParams confirmActivityEditWithinPopUpButtonLayoutParams;
     ConstraintLayout.LayoutParams deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams;
@@ -435,11 +435,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
             setEditActivityPopUpButtonsLayoutParams(true);
             unassignedTimeInEditPopUpTextView.setVisibility(View.GONE);
-            multipleDayEditWarningForActivitiesTextView.setVisibility(View.VISIBLE);
+            multipleDayWarningForActivitiesTextView.setVisibility(View.VISIBLE);
         } else {
             setEditActivityPopUpButtonsLayoutParams(false);
             unassignedTimeInEditPopUpTextView.setVisibility(View.VISIBLE);
-            multipleDayEditWarningForActivitiesTextView.setVisibility(View.GONE);
+            multipleDayWarningForActivitiesTextView.setVisibility(View.GONE);
         }
     }
 
@@ -448,6 +448,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             multipleDayEditWarningForFoodConsumedTextView.setVisibility(View.VISIBLE);
         } else {
             multipleDayEditWarningForFoodConsumedTextView.setVisibility(View.GONE);
+        }
+    }
+
+    //Todo: For food as well.
+    private void setMultipleDayWarningTextView(int addingOrEditing) {
+        if (addingOrEditing == ADDING_ACTIVITY) {
+            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_day_addition_warning);
+        }
+        if (addingOrEditing == EDITING_ACTIVITY) {
+            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_day_edit_warning);
         }
     }
 
@@ -762,7 +772,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         setDefaultCustomActivityAdditionViews();
-
         toggleActivityEditingForMultipleDaysTextViews();
 
         addTdeePopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
@@ -826,6 +835,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         activityInEditPopUpTextView.setText(activityToAdd);
         zeroOutActivityEditPopUpEditTexts();
+        setMultipleDayWarningTextView(ADDING_ACTIVITY);
     }
 
     private void replaceActivityAddPopUpWithEmptyEditPopUp() {
@@ -916,6 +926,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setDefaultCustomActivityAdditionViews();
 
         toggleActivityEditingForMultipleDaysTextViews();
+        setMultipleDayWarningTextView(EDITING_ACTIVITY);
     }
 
     private void editActivityStatsInDatabase() {
@@ -957,7 +968,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.setDayHolderEntityFromStatsForEachActivityDaySelection(daySelectedFromCalendar);
 
-            //Todo: Needs to be changed, too.
             dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
@@ -1656,7 +1666,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         confirmActivityEditWithinPopUpButton = tdeeEditView.findViewById(R.id.confirm_activity_edit_button);
         deleteActivityIfEditingRowWithinEditPopUpButton = tdeeEditView.findViewById(R.id.activity_delete_button);
-        multipleDayEditWarningForActivitiesTextView = tdeeEditView.findViewById(R.id.multiple_day_edit_warning_for_activities_textView);
+        multipleDayWarningForActivitiesTextView = tdeeEditView.findViewById(R.id.multiple_day_warning_for_activities_textView);
 
         confirmActivityEditWithinPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) confirmActivityEditWithinPopUpButton.getLayoutParams();
         deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams = (ConstraintLayout.LayoutParams) deleteActivityIfEditingRowWithinEditPopUpButton.getLayoutParams();

@@ -126,8 +126,7 @@
     </TextView>
 
     <TextView
-        android:id="@+id/multiple_day_edit_warning_for_activities_textView"
-        android:text="@string/multiple_day_edit_warning"
+        android:id="@+id/multiple_day_warning_for_activities_textView"
         android:layout_width="275dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/unassigned_time_textView"
