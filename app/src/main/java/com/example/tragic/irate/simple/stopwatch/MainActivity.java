@@ -280,6 +280,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Animation slideOutFromLeftLong;
   Animation slideInFromLeftShort;
   Animation slideOutFromLeftShort;
+  boolean isAnimationActive;
 
   ConstraintLayout.LayoutParams cycleTitleLayoutParams;
   ConstraintLayout.LayoutParams cyclesCompletedLayoutParams;
@@ -552,9 +553,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Updating wrong position on multiple day update.
   //Todo: Test add/update/delete over multiple days.
-  //Todo: Fast onBackPressed in a fragment will cause stutter.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
@@ -614,16 +613,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
 
-      if (rootSettingsFragment.isVisible()) {
-        mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
-      }
+      Log.i("testAnim", "has started is " + slideOutFromLeftShort.hasStarted());
 
-      if (dailyStatsFragment.isVisible()) {
-        mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftLong);
-      }
+      if (!isAnimationActive) {
+        if (rootSettingsFragment.isVisible()) {
+          mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
+        }
 
-      setTypeOFMenu(DEFAULT_MENU);
-      toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
+        if (dailyStatsFragment.isVisible()) {
+          mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
+        }
+
+        setTypeOFMenu(DEFAULT_MENU);
+        toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
+      }
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || aboutFragment.isVisible()) {
@@ -1747,6 +1750,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     slideOutFromLeftShort.setAnimationListener(new Animation.AnimationListener() {
       @Override
       public void onAnimationStart(Animation animation) {
+        isAnimationActive = true;
       }
 
       @Override
@@ -1755,6 +1759,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 .remove(rootSettingsFragment)
                 .commit();
         mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
+        isAnimationActive = false;
       }
 
       @Override
@@ -1765,6 +1770,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     slideOutFromLeftLong.setAnimationListener(new Animation.AnimationListener() {
       @Override
       public void onAnimationStart(Animation animation) {
+        isAnimationActive = true;
       }
 
       @Override
@@ -1773,6 +1779,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 .remove(dailyStatsFragment)
                 .commit();
         mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
+        isAnimationActive = false;
       }
 
       @Override
