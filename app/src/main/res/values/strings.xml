@@ -16,8 +16,8 @@
 
     <string name="cycles_done">Cycles Completed: %1$s</string>
 
-    <string name="total_daily_time">Total Activity Time:</string>
-    <string name="total_daily_calories">Total Calories Burned:</string>
+    <string name="total_daily_time">Activity Time:</string>
+    <string name="total_daily_calories">Calories Burned:</string>
 
     <string name="total_daily_time_for_single_activity">Activity Time:</string>
     <string name="total_daily_calories_for_single_activity">Calories Burned:</string>

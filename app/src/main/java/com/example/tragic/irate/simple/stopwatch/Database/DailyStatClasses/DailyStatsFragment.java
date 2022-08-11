@@ -280,10 +280,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             populateListsAndTextViewsFromEntityListsInDatabase();
             colorDaysWithAtLeastOneActivity();
 
-            currentCalendarDateDecorator.setCurrentDay(customCalendarDayList);
-            calendarView.addDecorator(currentCalendarDateDecorator);
-
             getActivity().runOnUiThread(()-> {
+                currentCalendarDateDecorator.setCurrentDay(customCalendarDayList);
+                calendarView.addDecorator(currentCalendarDateDecorator);
                 setStatDurationViews(currentStatDurationMode);
             });
         });

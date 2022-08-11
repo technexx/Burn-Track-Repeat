@@ -574,7 +574,6 @@ public class DailyStatsAccess {
     //Used by Stats Fragment
     public void updateTotalTimesAndCaloriesForEachActivityForMultipleDays(int position, long setTime, double caloriesBurned) {
         String activityToUpdate = totalActivitiesListForSelectedDuration.get(position);
-        Log.i("testUpdate", "activity String chosen is " + activityToUpdate);
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToUpdate)) {
@@ -584,11 +583,7 @@ public class DailyStatsAccess {
                 mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
 
                 cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
-
-                Log.i("testUpdate", "activity String updated from unique ID " + mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
             }
-
-            Log.i("testUpdate", "activity Id list in mStats is " + mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
         }
     }
 
@@ -675,6 +670,9 @@ public class DailyStatsAccess {
     public void updateTotalTimesAndCaloriesForSelectedDay(long setTime, double caloriesBurned) {
         mDayHolder.setTotalSetTime(setTime);
         mDayHolder.setTotalCaloriesBurned(caloriesBurned);
+
+        Log.i("testUpdate", "dayHolder Id updating is " + mDayHolder.getDayId());
+        Log.i("testUpdate", "updated dayHolder set time in seconds is " + setTime/1000);
 
         cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }

@@ -553,11 +553,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Test add/update/delete over multiple days.
+  //Todo: DAYHOLDER is way off. It's using getTotalSetTimeForSelectedDuration(), which will include aggregate of all days added/updated, loaded into our single DayHolder day.
+      //Todo: A pitfall of using total activity times added for stats fragment total, but using DayHolder for our timer total.
+  //Todo: First dot can be faded at beginning of cycle.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
   //Todo: OnOptionsSelected should change/be disabled while in Settings (or have a single backup option).
+  //Todo: Calendar blip w/ activityExists boolean.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Consider having activity edit select multiple rows (like cycles) and long click for edit.
   //Todo: Add Day/Night modes.
@@ -2439,7 +2442,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void launchDailyStatsFragment() {
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftLong);
+      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
     }
 
     mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
