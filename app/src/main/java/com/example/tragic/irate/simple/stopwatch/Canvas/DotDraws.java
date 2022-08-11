@@ -348,14 +348,9 @@ public class DotDraws extends View {
           boolean fadeDot = false;
 
           if (mPomDotCounter == i) {
-            alphaValue = 255;
             fadeDot = true;
           } else if (i - mPomDotCounter <=0) {
             alphaValue = 105;
-            fadeDot = false;
-          } else {
-            alphaValue = 255;
-            fadeDot = false;
           }
 
           switch (i) {
@@ -509,7 +504,9 @@ public class DotDraws extends View {
 
   public void fadeDot(boolean fadeText) {
     mPaint.setAlpha(mAlpha);
-    if (fadeText) mPaintText.setAlpha(mAlpha);
+    if (fadeText) {
+      mPaintText.setAlpha(mAlpha);
+    }
 
     mSendAlpha.sendAlphaValue(mAlpha);
     if (mAlpha >=255) {

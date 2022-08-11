@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.AsyncTask;
+import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -23,6 +24,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class DailyStatsAccess {
     Context mContext;
@@ -543,9 +545,6 @@ public class DailyStatsAccess {
         this.mIsActivityCustom = isCustom;
     }
 
-    public boolean getIsActivityCustomBooleanLocalVariable() {
-        return mIsActivityCustom;
-    }
 
     public boolean getIsActivityCustomBooleanFromDatabaseInstance() {
         return mStatsForEachActivity.getIsCustomActivity();
@@ -553,10 +552,6 @@ public class DailyStatsAccess {
 
     public void setCaloriesBurnedPerHourVariable(double calories) {
         this.mCaloriesBurnedPerHour = calories;
-    }
-
-    public double getCaloriesBurnedPerHourVariable() {
-        return mCaloriesBurnedPerHour;
     }
 
     public double getCaloriesBurnedPerHourForSelectedDay() {
@@ -571,7 +566,7 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
     }
 
-    //Used by Stats Fragment
+    //Used by Stats Fragment.
     public void updateTotalTimesAndCaloriesForEachActivityForMultipleDays(int position, long setTime, double caloriesBurned) {
         String activityToUpdate = totalActivitiesListForSelectedDuration.get(position);
 
@@ -1184,15 +1179,24 @@ public class DailyStatsAccess {
         return simpleDateFormat.format(calendar.getTime());
     }
 
-    private void logEntityLists() {
-        Log.i("testList", "mStats list size is " + mCaloriesForEachFoodList.size());
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            Log.i("testList", "mFood foods in list are " + mCaloriesForEachFoodList.get(i).getTypeOfFood());
+    public void logNonZeroTimeDayHolderDays() {
+        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
+
+        List<Long> daysWithNonZeroTime = new ArrayList<>();
+        List<Long> timesForDaysWithNonZeroTime = new ArrayList<>();
+
+        for (int i=0; i<dayHolderList.size(); i++) {
+            if (dayHolderList.get(i).getTotalSetTime()>0) {
+                daysWithNonZeroTime.add(dayHolderList.get(i).getDayId());
+                timesForDaysWithNonZeroTime.add(dayHolderList.get(i).getTotalSetTime());
+            }
         }
 
-        Log.i("testList", "mFood list size is " + mStatsForEachActivityList.size());
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            Log.i("testList", "mStats activities in list are " + mStatsForEachActivityList.get(i).getActivity());
+        String joinedList = TextUtils.join(", ", dayHolderList);
+        Log.i("testDayHolder", "list of days with non-zero time are " + joinedList);
+
+        for (int i=0; i<daysWithNonZeroTime.size(); i++) {
+            Log.i("testDayHolder", "time for day " + daysWithNonZeroTime.get(i) + " is " + timesForDaysWithNonZeroTime.get(i));
         }
     }
 
