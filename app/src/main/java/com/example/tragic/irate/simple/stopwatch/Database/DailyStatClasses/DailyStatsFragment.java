@@ -217,7 +217,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     double metScore;
 
     Toast mToast;
-    boolean mHaveStatsBeenChanged = false;
 
     boolean areActivityStatsSimplified;
     ConstraintLayout simplifiedStatsLayout;
@@ -227,6 +226,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     DividerItemDecoration activityRecyclerDivider;
 
     boolean fragmentIsAttached;
+    boolean statsHaveBeenEditedForCurrentDay;
 
     @Override
     public void onDestroy() {
@@ -434,6 +434,34 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
+    public void setStatsHaveBeenEditedForCurrentDay(boolean haveBeenEdited) {
+        statsHaveBeenEditedForCurrentDay = haveBeenEdited;
+    }
+
+    public boolean getHaveStatsBeenEditedForCurrentDay() {
+        return statsHaveBeenEditedForCurrentDay;
+    }
+
+    private void checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay() {
+        calendar = Calendar.getInstance(Locale.getDefault());
+        int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
+
+        List<DayHolder> dayHolderList = dailyStatsAccess.getDayHolderList();
+        for (int i=0; i<dayHolderList.size(); i++) {
+            if (dayHolderList.get(i).getDayId()==currentDay) {
+                setStatsHaveBeenEditedForCurrentDay(true);
+                Log.i("testCheck", "have been changed for day!");
+                Log.i("testCheck", "aggregated day is " + currentDay);
+                Log.i("testCheck", "dayHolder list fetched in fragment contains " + dayHolderList.get(i).getDayId());
+                return;
+            } else {
+                Log.i("testCheck", "have NOT been changed for day!");
+                setStatsHaveBeenEditedForCurrentDay(false);
+                return;
+            }
+        }
+    }
+
     public boolean getIsFragmentAttached() {
         return fragmentIsAttached;
     }
@@ -468,13 +496,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    public void setHaveStatsBeenChangedBoolean(boolean haveStatsChanged) {
-        mHaveStatsBeenChanged = haveStatsChanged;
-    }
-
-    public boolean getHaveStatsBeenChangedBoolean() {
-        return mHaveStatsBeenChanged;
-    }
+//    public void setHaveStatsBeenChangedBoolean(boolean haveStatsChanged) {
+//        mHaveStatsBeenChanged = haveStatsChanged;
+//    }
+//
+//    public boolean getHaveStatsBeenChangedBoolean() {
+//        return mHaveStatsBeenChanged;
+//    }
 
     private void toggleEditButtonView(boolean buttonDisabled) {
         if (!buttonDisabled) {
@@ -909,6 +937,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
+            checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
@@ -918,8 +947,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         numberOfDaysWithActivitiesHasChanged = true;
-
-        setHaveStatsBeenChangedBoolean(true);
     }
 
     private void setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
@@ -978,20 +1005,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASingleDay(daySelectedFromCalendar);
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
-            //Todo: Will need to update for all days.
             dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
-
-            dailyStatsAccess.assignDayHolderInstanceForSelectedDay(daySelectedFromCalendar);
+            checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
                 tdeeEditPopUpWindow.dismiss();
             });
         });
-
-        setHaveStatsBeenChangedBoolean(true);
     }
 
     private void deleteActivityFromStats(int position) {
@@ -1007,14 +1030,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
+            checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
             });
         });
-
-        setHaveStatsBeenChangedBoolean(true);
     }
 
     private double calculateCaloriesForSpinnerActivity() {

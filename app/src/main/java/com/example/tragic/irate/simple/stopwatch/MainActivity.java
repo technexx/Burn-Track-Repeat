@@ -555,6 +555,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: We updated total daily time in Stats Frag, but it did not carry over time timer.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
+  //Todo: Ensure food consumption insert/update/delete mirror activity ones.
   //Todo: First dot can be faded at beginning of cycle.
 
   //Todo: Splash screen on app start as a guide.
@@ -2492,8 +2493,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
     dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
-
-    dailyStatsFragment.setHaveStatsBeenChangedBoolean(true);
   }
 
   private void deleteDailyStatsForAllDays() {
@@ -2502,8 +2501,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
     dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
-
-    dailyStatsFragment.setHaveStatsBeenChangedBoolean(true);
   }
 
   private boolean areAllDaysEmptyOfActivities(List<StatsForEachActivity> statsForEachActivityList) {
@@ -2905,6 +2902,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: If stats have been changed for current day, call db retrievals as we do when launching timer.
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
       timerIsPaused = true;
@@ -2914,7 +2912,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
       AsyncTask.execute(()-> {
-//        dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
+        if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
+          insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
+        }
 
        runOnUiThread(()->{
          displayCycleOrDailyTotals();
@@ -3690,9 +3690,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Resume/reset doesn't all this. Works if cycle is not active.
   private void insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects() {
     dailyStatsAccess.setDoesDayExistInDatabaseBoolean(dayOfYear);
-    dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+    if (dailyStatsAccess.getDoesDayExistInDatabase()) {
+      dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
+    } else {
+      dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+    }
 
     assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
 
