@@ -553,8 +553,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: DAYHOLDER is way off. It's using getTotalSetTimeForSelectedDuration(), which will include aggregate of all days added/updated, loaded into our single DayHolder day.
-      //Todo: A pitfall of using total activity times added for stats fragment total, but using DayHolder for our timer total.
+  //Todo: DayHolder was off, aggregating time of all days added/updated, loaded into our single DayHolder day. Fixed but test.
+      //Todo: In Main, to load daily time by StatsForEach call:
+          //Todo: loadAllActivitiesToStatsListForSpecificDay() to set statsForEach list, then setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues(), then setTotalSetTimeVariableForSelectedDuration() and getTotalSetTimeForSelectedDuration() to retrieve via StatsForEachActivity.
   //Todo: First dot can be faded at beginning of cycle.
 
   //Todo: Splash screen on app start as a guide.
