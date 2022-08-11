@@ -652,25 +652,38 @@ public class DailyStatsAccess {
         }
     }
 
-    public void setDayHolderEntityFromStatsForEachActivityDaySelection(int daySelected) {
-        for (int i=0; i<mDayHolderList.size(); i++) {
-            if (mDayHolderList.get(i).getDayId()==daySelected) {
-                mDayHolder = mDayHolderList.get(i);
-                Log.i("testdb", "day selected is " + daySelected + " and dayHolder time is " + mDayHolder.getTotalSetTime()/1000/60);
-                return;
-            }
-        }
-    }
+//    public void setDayHolderEntityFromStatsForEachActivityDaySelection(int daySelected) {
+//        for (int i=0; i<mDayHolderList.size(); i++) {
+//            if (mDayHolderList.get(i).getDayId()==daySelected) {
+//                mDayHolder = mDayHolderList.get(i);
+//                return;
+//            }
+//        }
+//    }
 
+    //Used by Main.
     public void updateTotalTimesAndCaloriesForSelectedDay(long setTime, double caloriesBurned) {
         mDayHolder.setTotalSetTime(setTime);
         mDayHolder.setTotalCaloriesBurned(caloriesBurned);
 
         Log.i("testUpdate", "dayHolder Id updating is " + mDayHolder.getDayId());
-        Log.i("testUpdate", "updated dayHolder set time in seconds is " + setTime/1000);
+        Log.i("testUpdate", "updated dayHolder set time in minutes are " + setTime/1000/60);
 
         cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
     }
+
+    //Used by Stats Fragment.
+    public void updateTotalTimesAndCaloriesForMultipleDays(long setTime, double caloriesBurned) {
+        for (int i=0; i<mDayHolderList.size(); i++) {
+            mDayHolder = mDayHolderList.get(i);
+
+            mDayHolder.setTotalSetTime(setTime);
+            mDayHolder.setTotalCaloriesBurned(caloriesBurned);
+
+            cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
+        }
+    }
+
 
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
@@ -1196,7 +1209,7 @@ public class DailyStatsAccess {
         Log.i("testDayHolder", "list of days with non-zero time are " + joinedList);
 
         for (int i=0; i<daysWithNonZeroTime.size(); i++) {
-            Log.i("testDayHolder", "time for day " + daysWithNonZeroTime.get(i) + " in seconds is " + timesForDaysWithNonZeroTime.get(i)/1000);
+            Log.i("testDayHolder", "time for day " + daysWithNonZeroTime.get(i) + " in minutes is " + timesForDaysWithNonZeroTime.get(i)/1000/60);
         }
     }
 

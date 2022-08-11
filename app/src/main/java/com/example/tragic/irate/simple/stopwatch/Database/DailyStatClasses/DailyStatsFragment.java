@@ -978,9 +978,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASingleDay(daySelectedFromCalendar);
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
-            dailyStatsAccess.setDayHolderEntityFromStatsForEachActivityDaySelection(daySelectedFromCalendar);
-
-            dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
+            //Todo: Will need to update for all days.
+            dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -1006,7 +1005,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASingleDay(daySelectedFromCalendar);
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
-            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
+            dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -1036,11 +1035,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         String editTextCalories = addCustomCaloriesEditText.getText().toString();
         double caloriesEntered = Double.parseDouble(editTextCalories);
-
-//        if (CUSTOM_ACTIVITY_CALORIES_FORMULA == CALORIES_PER_MINUTE) {
-//            long minutes = getMinutesFromMillisValue(activityTime);
-//            valueToReturn = caloriesEntered * minutes;
-//        }
 
         if (CUSTOM_ACTIVITY_CALORIES_FORMULA == CALORIES_PER_HOUR) {
             long hours = getHoursFromMillisValue(activityTime);
