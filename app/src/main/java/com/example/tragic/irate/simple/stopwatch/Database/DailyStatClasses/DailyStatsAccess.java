@@ -1192,11 +1192,11 @@ public class DailyStatsAccess {
             }
         }
 
-        String joinedList = TextUtils.join(", ", dayHolderList);
+        String joinedList = TextUtils.join(", ", daysWithNonZeroTime);
         Log.i("testDayHolder", "list of days with non-zero time are " + joinedList);
 
         for (int i=0; i<daysWithNonZeroTime.size(); i++) {
-            Log.i("testDayHolder", "time for day " + daysWithNonZeroTime.get(i) + " is " + timesForDaysWithNonZeroTime.get(i));
+            Log.i("testDayHolder", "time for day " + daysWithNonZeroTime.get(i) + " in seconds is " + timesForDaysWithNonZeroTime.get(i)/1000);
         }
     }
 

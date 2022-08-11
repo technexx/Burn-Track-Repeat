@@ -226,6 +226,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     DividerItemDecoration activityRecyclerDivider;
 
+    boolean fragmentIsAttached;
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -237,6 +239,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
+
+        fragmentIsAttached = true;
 
         mToast = new Toast(getContext());
         dailyStatsAccess = new DailyStatsAccess(getContext());
@@ -428,6 +432,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
+    }
+
+    public boolean getIsFragmentAttached() {
+        return fragmentIsAttached;
     }
 
     private void toggleActivityEditingForMultipleDaysTextViews() {

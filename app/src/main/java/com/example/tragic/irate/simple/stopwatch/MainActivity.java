@@ -554,6 +554,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Make sure only days in range get saved for DayHolder during adds/edits.
+  //Todo: Stats Fragment should refresh even if already in framelayout (when open and timer has changed stats).
   //Todo: First dot can be faded at beginning of cycle.
 
   //Todo: Splash screen on app start as a guide.
@@ -2434,8 +2435,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 .commit();
       }
       sortButton.setVisibility(View.INVISIBLE);
-
-//      setTypeOFMenu(EMPTY_MENU);
     }
   }
 
@@ -2458,6 +2457,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setTypeOFMenu(DAILY_SETTINGS_MENU);
     toggleSortMenuViewBetweenCyclesAndStats(SORTING_STATS);
+
+    if (dailyStatsFragment.getIsFragmentAttached()) {
+      AsyncTask.execute(()-> {
+        dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+      });
+    }
   }
 
   private void deleteDailyStatsForSelectedDays() {
