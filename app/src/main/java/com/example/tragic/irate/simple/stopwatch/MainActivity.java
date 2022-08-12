@@ -3692,7 +3692,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Resume/reset doesn't all this. Works if cycle is not active.
   private void insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects() {
     dailyStatsAccess.setDoesDayExistInDatabaseBoolean(dayOfYear);
 
@@ -3709,7 +3708,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
-    dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+
+    if (dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
+      dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
+      dailyStatsAccess.assignPositionOfActivityListForRetrieveActivityToStatsEntity();
+
+      dailyStatsAccess.logActivityRetrievedAndItsPositionForExistingCycles();
+    } else {
+      dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+      dailyStatsAccess.loadAllActivitiesToStatsListForSpecificDay(dayOfYear);
+      dailyStatsAccess.assignPositionOfRecentlyAddedRowToStatsEntity();
+      dailyStatsAccess.setActivityPositionInListForCurrentDayForNewActivity();
+    }
 
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
 

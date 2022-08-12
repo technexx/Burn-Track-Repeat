@@ -678,49 +678,36 @@ public class DailyStatsAccess {
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
-        if (!doesActivityExistsInDatabaseForSelectedDay) {
-            mStatsForEachActivity = new StatsForEachActivity();
+        mStatsForEachActivity = new StatsForEachActivity();
 
-            mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
-            mStatsForEachActivity.setActivity(mActivityString);
-            mStatsForEachActivity.setMetScore(mMetScore);
+        mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(selectedDay);
+        mStatsForEachActivity.setActivity(mActivityString);
+        mStatsForEachActivity.setMetScore(mMetScore);
 
-            mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
-            mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
+        mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
+        mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
 
-            mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
-            mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
-            mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
+        mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
+        mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
+        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
-            cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
-
-            loadAllActivitiesToStatsListForSpecificDay(selectedDay);
-            assignPositionOfRecentlyAddedRowToStatsEntity();
-
-            setActivityPositionInListForCurrentDayForNewActivity();
-
-        } else {
-            setActivityPositionInListForCurrentDayForExistingActivity();
-            assignPositionOfActivityListForRetrieveActivityToStatsEntity();
-
-            Log.i("testActivityInsert", "activity retrieved for EXISTING activity is " + mStatsForEachActivity.getActivity());
-            Log.i("testActivityInsert", "activity position for EXISTING activity is " + activityPositionInListForCurrentDay);
-        }
+        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
     }
 
-    private void loadAllActivitiesToStatsListForSpecificDay(int daySelected) {
+    public void logActivityRetrievedAndItsPositionForExistingCycles() {
+        Log.i("testActivityInsert", "activity retrieved for EXISTING activity is " + mStatsForEachActivity.getActivity());
+        Log.i("testActivityInsert", "activity position for EXISTING activity is " + activityPositionInListForCurrentDay);
+    }
+
+    public void loadAllActivitiesToStatsListForSpecificDay(int daySelected) {
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
     }
 
-    private void assignPositionOfRecentlyAddedRowToStatsEntity() {
+    public void assignPositionOfRecentlyAddedRowToStatsEntity() {
         mStatsForEachActivity = mStatsForEachActivityList.get(mStatsForEachActivityList.size()-1);
     }
 
-    private void assignPositionOfActivityListForRetrieveActivityToStatsEntity() {
-        mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
-    }
-
-    private void setActivityPositionInListForCurrentDayForNewActivity() {
+    public void setActivityPositionInListForCurrentDayForNewActivity() {
         activityPositionInListForCurrentDay = mStatsForEachActivityList.size()-1;
     }
 
@@ -731,6 +718,10 @@ public class DailyStatsAccess {
                 return;
             }
         }
+    }
+
+    public void assignPositionOfActivityListForRetrieveActivityToStatsEntity() {
+        mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
     }
 
     public boolean getDoesActivityExistsInDatabaseForSelectedDay () {
