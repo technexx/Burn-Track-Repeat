@@ -553,11 +553,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Test infinity rounds for overlapping runnable + other stuff.
+
   //Todo: Activity time starting at 0 within Timer is one second behind timer (e.g. a 10 second round shows 9 seconds for activity).
       //Todo: Millis can be 3900 for activity but time shown will be 0:02. Likely due to conditional forcing timer sync.
       //Todo: In general, activity millis also falls behind. We clocked 38 seconds on timer showing 35 for activity.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
-  //Todo: First dot can be faded at beginning of cycle.
 
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
 
@@ -4465,7 +4466,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 1:
               setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
               timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
-              if (beginTimerForNextRound) {
+
+              if (!objectAnimator.isStarted()) {
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startSetTimer();
               }
@@ -4480,14 +4482,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 3:
               breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
               timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
-              if (beginTimerForNextRound) {
+
+              if (!objectAnimator.isStarted()) {
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startBreakTimer();
               }
               break;
             case 4:
               timeLeft.setText("0");
-              if (beginTimerForNextRound) {
+              if (!objectAnimator.isStarted()) {
                 instantiateAndStartObjectAnimator(30000);
                 mHandler.post(infinityTimerForBreaks);
               }
@@ -4518,7 +4521,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomDotCounter<=7) {
           pomMillis = pomValuesTime.get(pomDotCounter);
           timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
-          if (beginTimerForNextRound) {
+          if (!objectAnimatorPom.isStarted()) {
             startObjectAnimatorAndTotalCycleTimeCounters();
             startPomTimer();
           }
@@ -4606,8 +4609,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           switch (typeOfRound.get(currentRound)) {
             case 1:
-              startObjectAnimatorAndTotalCycleTimeCounters();
-              startSetTimer();
+              if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
+                startObjectAnimatorAndTotalCycleTimeCounters();
+                startSetTimer();
+              }
               break;
             case 2:
               //Uses the current time as a base for our count-up rounds.
@@ -4616,8 +4621,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               mHandler.post(infinityTimerForSets);
               break;
             case 3:
-              startObjectAnimatorAndTotalCycleTimeCounters();
-              startBreakTimer();
+              if (objectAnimatorPom.isPaused() || !objectAnimatorPom.isStarted()) {
+                startObjectAnimatorAndTotalCycleTimeCounters();
+                startBreakTimer();
+              }
               break;
             case 4:
               defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
