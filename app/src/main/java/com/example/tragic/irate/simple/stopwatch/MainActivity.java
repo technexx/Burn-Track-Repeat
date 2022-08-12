@@ -553,7 +553,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: We updated total daily time in Stats Frag, but it did not carry over time timer.
+  //Todo: Should turn off edit mode when sliding out daily stats fragment.
+  //Todo: "Reset" textView in cycle recycler visibily disappears as we launch timer.
+  //Todo: Size of timer textView was small @ <60 on resuming set. Changed to large after pause/resume.
+  //Todo: Activity time starting at 0 within Timer is one second behind timer (e.g. a 10 second round shows 9 seconds for activity).
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Ensure food consumption insert/update/delete mirror activity ones.
   //Todo: First dot can be faded at beginning of cycle.
@@ -616,9 +619,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
-
-      Log.i("testAnim", "has started is " + slideOutFromLeftShort.hasStarted());
-
       if (!isAnimationActive) {
         if (rootSettingsFragment.isVisible()) {
           mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
@@ -2902,7 +2902,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: If stats have been changed for current day, call db retrievals as we do when launching timer.
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
     if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
       timerIsPaused = true;
@@ -2914,6 +2913,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(()-> {
         if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
           insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
+          dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
+
+          Log.i("testChange", "Activity stats queried from Timer due to Stats Fragment change!");
         }
 
        runOnUiThread(()->{

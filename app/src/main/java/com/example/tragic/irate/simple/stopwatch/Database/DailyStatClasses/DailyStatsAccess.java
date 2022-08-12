@@ -699,14 +699,6 @@ public class DailyStatsAccess {
 
             setActivityPositionInListForCurrentDayForNewActivity();
 
-            Log.i("testActivityInsert", "activity inserted with zero'd out stats!");
-            Log.i("testActivityInsert", "activity retrieved for NEW activity is " + mStatsForEachActivity.getActivity());
-            Log.i("testActivityInsert", "activity position for NEW activity is " + activityPositionInListForCurrentDay);
-
-            if (mActivityString.equalsIgnoreCase("")) {
-                Log.i("testActivityInsert", "Blank activity added!");
-            }
-
         } else {
             setActivityPositionInListForCurrentDayForExistingActivity();
             assignPositionOfActivityListForRetrieveActivityToStatsEntity();

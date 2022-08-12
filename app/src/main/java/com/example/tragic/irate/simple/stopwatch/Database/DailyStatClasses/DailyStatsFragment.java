@@ -450,12 +450,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         for (int i=0; i<dayHolderList.size(); i++) {
             if (dayHolderList.get(i).getDayId()==currentDay) {
                 setStatsHaveBeenEditedForCurrentDay(true);
-                Log.i("testCheck", "have been changed for day!");
-                Log.i("testCheck", "aggregated day is " + currentDay);
-                Log.i("testCheck", "dayHolder list fetched in fragment contains " + dayHolderList.get(i).getDayId());
+                Log.i("testChange", "activity stats have been changed for day!");
                 return;
             } else {
-                Log.i("testCheck", "have NOT been changed for day!");
+                Log.i("testChange", "activity stats have NOT been changed for day!");
                 setStatsHaveBeenEditedForCurrentDay(false);
                 return;
             }
