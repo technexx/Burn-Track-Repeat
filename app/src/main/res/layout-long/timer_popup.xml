@@ -106,13 +106,12 @@
     </TextView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/daily_total_activity_times_and_calories_layout"
+        android:id="@+id/timer_activity_stats_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tracking_daily_stats_header_textView"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="12dp"
-        app:layout_constraintEnd_toEndOf="parent">
+        android:layout_marginStart="80dp">
 
         <TextView
             android:id="@+id/daily_total_time_textView_header"
@@ -160,6 +159,7 @@
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+
     <TextView
         android:id="@+id/daily_single_activity_string_header"
         android:layout_width="wrap_content"
@@ -169,8 +169,8 @@
         android:gravity="center"
         android:layout_marginTop="16dp"
         android:textSize="22sp"
-        android:textColor="@color/light_grey"
-        app:layout_constraintTop_toBottomOf="@id/daily_total_activity_times_and_calories_layout">
+        android:textColor="@color/light_blue"
+        app:layout_constraintTop_toBottomOf="@id/timer_activity_stats_layout">
     </TextView>
 
     <TextView
@@ -222,7 +222,6 @@
         android:gravity="center"
         android:textColor="@color/purple_200">
     </TextView>
-
 
     <com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws
         android:id="@+id/dotdraws"
