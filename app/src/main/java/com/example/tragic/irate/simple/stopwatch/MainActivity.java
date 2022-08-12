@@ -553,12 +553,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Size of timer textView was small @ <60 on resuming set. Changed to large after pause/resume.
   //Todo: Activity time starting at 0 within Timer is one second behind timer (e.g. a 10 second round shows 9 seconds for activity).
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: First dot can be faded at beginning of cycle.
 
-  //Todo: Ensure food consumption insert/update/delete mirror activity ones.
+  //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
@@ -4252,10 +4251,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
     if (!textSizeIncreased && mode==1) {
       if (checkIfRunningTextSizeChange(setOrBreakMillis)) {
-        if (setOrBreakMillis < 59000) {
-          changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
-          textSizeIncreased = true;
-        }
+        changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
+        textSizeIncreased = true;
       }
     }
   }
@@ -4263,10 +4260,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void changeTextSizeOnTimerDigitCountTransitionForModeThree() {
     if (!textSizeIncreased && mode==3) {
       if (checkIfRunningTextSizeChange(pomMillis)) {
-        if (pomMillis < 59000) {
-          changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
-          textSizeIncreased = true;
-        }
+        changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
+        textSizeIncreased = true;
       }
     }
   }
@@ -4292,12 +4287,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public boolean checkIfRunningTextSizeChange(long startingMillis) {
     if (mode==1) {
       if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
-        return startingMillis>60000;
+        return startingMillis<59000;
       } else {
-        return startingMillis<=60000;
+        return startingMillis>=60000;
       }
     } else if (mode==3) {
-      return startingMillis>60000;
+      return startingMillis<59000;
     } else {
       return false;
     }
