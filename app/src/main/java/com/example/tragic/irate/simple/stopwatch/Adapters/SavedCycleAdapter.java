@@ -216,7 +216,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
       if (!mHighlightMode) {
         if (mActiveCycle && position==mPositionOfActiveCycle) {
-          workoutHolder.resetCycle.setVisibility(View.INVISIBLE);
           mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER);
         } else {
           mOnCycleClickListener.onCycleClick(position);

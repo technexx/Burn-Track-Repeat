@@ -553,7 +553,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: "Reset" textView in cycle recycler visibily disappears as we launch timer.
   //Todo: Size of timer textView was small @ <60 on resuming set. Changed to large after pause/resume.
   //Todo: Activity time starting at 0 within Timer is one second behind timer (e.g. a 10 second round shows 9 seconds for activity).
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.

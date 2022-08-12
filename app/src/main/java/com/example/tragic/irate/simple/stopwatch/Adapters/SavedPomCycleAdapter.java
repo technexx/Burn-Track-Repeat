@@ -184,7 +184,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             boolean changed = false;
             if (!mHighlightMode) {
                 if (mActiveCycle && position==mPositionOfActiveCycle) {
-                    pomHolder.resetCycle.setVisibility(View.INVISIBLE);
                     mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER);
                 } else {
                     mOnCycleClickListener.onCycleClick(position);
