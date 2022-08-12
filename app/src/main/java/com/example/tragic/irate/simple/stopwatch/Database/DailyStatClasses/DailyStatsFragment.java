@@ -184,9 +184,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int EDITING_ACTIVITY = 1;
 
     boolean areWeAddingOrEditngACustomActivity;
-    int CUSTOM_ACTIVITY_CALORIES_FORMULA;
-    int CALORIES_PER_HOUR = 0;
-    int CALORIES_PER_MINUTE = 1;
 
     View caloriesConsumedAddAndEditView;
     PopupWindow caloriesConsumedAddAndEditPopUpWindow;
@@ -352,21 +349,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         addCustomCaloriesPerHourTextView.setOnClickListener(v->{
-            CUSTOM_ACTIVITY_CALORIES_FORMULA = CALORIES_PER_HOUR;
             setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerHourTextView, true);
             setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, false);
         });
 
-//        addCustomCaloriesPerMinuteTextView.setOnClickListener(v-> {
-//            CUSTOM_ACTIVITY_CALORIES_FORMULA = CALORIES_PER_MINUTE;
-//            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerHourTextView, false);
-//            setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, true);
-//        });
-
         confirmCustomActivityAdditionValues.setOnClickListener(v-> {
             customActivityPopUpWindow.dismiss();
             setNewActivityVariablesAndCheckIfActivityExists(true);
-
         });
 
         cancelCustomActivityValues.setOnClickListener(v-> {
@@ -434,6 +423,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
+    public void executeTurnOffEditModeMethod() {
+        dailyStatsAdapter.turnOffEditMode();
+    }
+
     public void setStatsHaveBeenEditedForCurrentDay(boolean haveBeenEdited) {
         statsHaveBeenEditedForCurrentDay = haveBeenEdited;
     }
@@ -493,14 +486,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             multipleDayWarningForActivitiesTextView.setText(R.string.multiple_day_edit_warning);
         }
     }
-
-//    public void setHaveStatsBeenChangedBoolean(boolean haveStatsChanged) {
-//        mHaveStatsBeenChanged = haveStatsChanged;
-//    }
-//
-//    public boolean getHaveStatsBeenChangedBoolean() {
-//        return mHaveStatsBeenChanged;
-//    }
 
     private void toggleEditButtonView(boolean buttonDisabled) {
         if (!buttonDisabled) {
@@ -1056,10 +1041,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String editTextCalories = addCustomCaloriesEditText.getText().toString();
         double caloriesEntered = Double.parseDouble(editTextCalories);
 
-        if (CUSTOM_ACTIVITY_CALORIES_FORMULA == CALORIES_PER_HOUR) {
-            long hours = getHoursFromMillisValue(activityTime);
-            valueToReturn = caloriesEntered * hours;
-        }
+        long hours = getHoursFromMillisValue(activityTime);
+        valueToReturn = caloriesEntered * hours;
 
         return valueToReturn;
     }
@@ -1116,7 +1099,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setDefaultCustomActivityAdditionViews() {
         addCustomActivityEditText.setText("");
         addCustomCaloriesEditText.setText("");
-        CUSTOM_ACTIVITY_CALORIES_FORMULA = CALORIES_PER_HOUR;
         setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerHourTextView, true);
         setTextStyleAndAlphaValuesOnTextViews(addCustomCaloriesPerMinuteTextView, false);
     }

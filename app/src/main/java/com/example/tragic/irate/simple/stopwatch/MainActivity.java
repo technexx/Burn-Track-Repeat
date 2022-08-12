@@ -553,13 +553,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Should turn off edit mode when sliding out daily stats fragment.
   //Todo: "Reset" textView in cycle recycler visibily disappears as we launch timer.
   //Todo: Size of timer textView was small @ <60 on resuming set. Changed to large after pause/resume.
   //Todo: Activity time starting at 0 within Timer is one second behind timer (e.g. a 10 second round shows 9 seconds for activity).
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
-  //Todo: Ensure food consumption insert/update/delete mirror activity ones.
   //Todo: First dot can be faded at beginning of cycle.
+
+  //Todo: Ensure food consumption insert/update/delete mirror activity ones.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
@@ -625,6 +625,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         if (dailyStatsFragment.isVisible()) {
+          dailyStatsFragment.executeTurnOffEditModeMethod();
           mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
         }
 
