@@ -121,7 +121,7 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="12dp"
             android:textColor="@color/white"
-            android:textSize="22sp">
+            android:textSize="24sp">
         </TextView>
 
         <TextView
@@ -133,7 +133,7 @@
             android:layout_marginTop="12dp"
             android:layout_marginStart="8dp"
             android:textColor="@color/green"
-            android:textSize="22sp">
+            android:textSize="24sp">
         </TextView>
 
         <TextView
@@ -143,7 +143,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
             android:layout_marginTop="4dp"
-            android:textSize="22sp">
+            android:textSize="24sp">
         </TextView>
 
         <TextView
@@ -154,7 +154,7 @@
             app:layout_constraintStart_toEndOf="@id/daily_total_calories_textView_header"
             android:layout_marginTop="4dp"
             android:layout_marginStart="8dp"
-            android:textSize="22sp"
+            android:textSize="24sp"
             android:textColor="@color/purple_200">
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -180,8 +180,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/daily_single_activity_string_header"
         android:layout_marginTop="4dp"
-        android:layout_marginStart="80dp"
-        android:textSize="20sp"
+        android:layout_marginStart="110dp"
+        android:textSize="22sp"
         android:gravity="center">
     </TextView>
 
@@ -193,7 +193,7 @@
         app:layout_constraintTop_toBottomOf="@id/daily_single_activity_string_header"
         android:layout_marginTop="4dp"
         android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:gravity="center"
         android:textColor="@color/green">
     </TextView>
@@ -205,8 +205,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header"
         android:layout_marginTop="4dp"
-        android:layout_marginStart="80dp"
-        android:textSize="20sp"
+        android:layout_marginStart="110dp"
+        android:textSize="22sp"
         android:gravity="center">
     </TextView>
 
@@ -218,7 +218,7 @@
         app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header"
         android:layout_marginTop="4dp"
         android:layout_marginStart="8dp"
-        android:textSize="20sp"
+        android:textSize="22sp"
         android:gravity="center"
         android:textColor="@color/purple_200">
     </TextView>
@@ -226,7 +226,7 @@
     <com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws
         android:id="@+id/dotdraws"
         android:layout_width="match_parent"
-        android:layout_height="175dp"
+        android:layout_height="180dp"
         app:layout_constraintBottom_toTopOf="@id/progressBar"
         app:layout_constraintStart_toStartOf="parent">
     </com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws>

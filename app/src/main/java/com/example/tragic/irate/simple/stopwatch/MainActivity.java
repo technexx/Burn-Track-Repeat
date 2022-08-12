@@ -554,6 +554,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Activity time starting at 0 within Timer is one second behind timer (e.g. a 10 second round shows 9 seconds for activity).
+      //Todo: Millis can be 3900 for activity but time shown will be 0:02. Likely due to conditional forcing timer sync.
+      //Todo: In general, activity millis also falls behind. We clocked 38 seconds on timer showing 35 for activity.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: First dot can be faded at beginning of cycle.
 
@@ -2015,8 +2017,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
-
-    Log.i("testActivity", "time being saved via Main is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
@@ -3071,7 +3071,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void activateResumeOrResetOptionForCycle() {
     if (mode==1) {
-      //Only shows restart/resume options of a cycle has been started.
       if (activeCycle) {
         if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
         savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
@@ -3124,9 +3123,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Fades action bar buttons in/out depending on whether we are editing cycles or not.
   private void fadeEditCycleButtonsInAndOut(int typeOfFade) {
-    //Clearing all animations. If we don't, their alphas tend to get reset.
     if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
       edit_highlighted_cycle.clearAnimation();
       delete_highlighted_cycle.clearAnimation();
@@ -3152,7 +3149,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeIn);
       sortButton.startAnimation(fadeOut);
-//      sortButton.setVisibility(View.GONE);
 
       sortButton.setEnabled(false);
       edit_highlighted_cycle.setEnabled(true);
@@ -3288,7 +3284,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             addOrReplaceRounds(0, roundIsSelected);
             break;
           default:
-//            Toast.makeText(getApplicationContext(), "Nada for now!", Toast.LENGTH_SHORT).show();
             return;
         }
       }
@@ -3345,7 +3340,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void addOrReplaceRounds(int integerValue, boolean replacingValue) {
     if (mode==1) {
-      //If adding a round.
       if (!replacingValue) {
         if (workoutTime.size()<16) {
           workoutTime.add(integerValue * 1000);
@@ -4028,8 +4022,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
     totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
 
-    Log.i("testTime", "rounded down total set time is " + totalCycleSetTimeInMillis);
-
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
   }
@@ -4175,6 +4167,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+
+        Log.i("testTime", "activity set time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+        Log.i("testTime", "setmillis time divided for display is " + dividedMillisForTimerDisplay(setMillis));
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis);
         dotDraws.reDraw();

@@ -151,10 +151,10 @@ public class DotDraws extends View {
   public void encloseDots(float xStart, float xEnd, float topY, float botY) {
     mPaintBox.setStyle(Paint.Style.STROKE);
     mPaintBox.setAlpha(175);
-    mCanvas.drawRoundRect(xStart, topY, xEnd, botY, 20, 20, mPaintBox);
+    mCanvas.drawRoundRect(xStart, topY, xEnd, botY, 20, 30, mPaintBox);
     mPaintBox.setStyle(Paint.Style.FILL);
     mPaintBox.setAlpha(35);
-    mCanvas.drawRoundRect(xStart, topY, xEnd, botY, 20, 20, mPaintBox);
+    mCanvas.drawRoundRect(xStart, topY, xEnd, botY, 20, 30, mPaintBox);
   }
 
   public void receivePhoneDimensions(int height, int width) {
@@ -179,8 +179,8 @@ public class DotDraws extends View {
 
     int yStartingEnclosurePositionWithOneRow = dpConv(40);
     int yEndingEnclosurePositionWithOneRow = dpConv(130);
-    int yStartingEnclosurePositionWithTwoRows = dpConv(10);
-    int yEndingEnclosurePositionWithTwoRows = dpConv(165);
+    int yStartingEnclosurePositionWithTwoRows = dpConv(25);
+    int yEndingEnclosurePositionWithTwoRows = dpConv(180);
 
     int xStartingPositionOfCircleForAllRows = dpConv(28);
     int xStartingPositionOfCircleTextForAllRows = dpConv(11);
@@ -188,18 +188,18 @@ public class DotDraws extends View {
 
     int xCirclePositionForAllRows = dpConv(28);
     int yCirclePositionForOneRow = dpConv(76);
-    int yCirclePositionForFirstOfTwoRows = dpConv(41);
-    int yCirclePositionForSecondOfTwoRows = dpConv(115);
+    int yCirclePositionForFirstOfTwoRows = dpConv(56);
+    int yCirclePositionForSecondOfTwoRows = dpConv(130);
 
     int xCircleTextPositionForAllRows = dpConv(10);
     int yCircleTextPositionForOneRow = dpConv(88);
-    int yCircleTextPositionForOneOfTwoRows= dpConv(53);
-    int yCircleTextPositionForSecondOfTwoRows = dpConv(127);
+    int yCircleTextPositionForOneOfTwoRows= dpConv(68);
+    int yCircleTextPositionForSecondOfTwoRows = dpConv(142);
 
     int xRoundNumberTextPositionForAllRows = dpConv(25);
     int yRoundNumberTextPositionForOneRow = dpConv(119);
-    int yRoundNumberTextPositionForOneOfTwoRows = dpConv(82);
-    int yRoundNumberTextPositionForSecondOfTwoRows = dpConv(157);
+    int yRoundNumberTextPositionForOneOfTwoRows = dpConv(97);
+    int yRoundNumberTextPositionForSecondOfTwoRows = dpConv(172);
 
 //    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
 //      circleRadius = (int) dpConv((float) circleCircumference/2);
