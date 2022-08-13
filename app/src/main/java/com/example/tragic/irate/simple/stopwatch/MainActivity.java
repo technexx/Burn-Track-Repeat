@@ -449,7 +449,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long defaultProgressBarDurationForInfinityRounds;
   long countUpMillisHolder;
   boolean makeCycleAdapterVisible;
-  boolean beginTimerForNextRound;
   boolean timerPopUpIsVisible;
 
   NotificationManagerCompat notificationManagerCompat;
@@ -553,15 +552,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Test change of !mHandler.hasCallbacks(infinityTimerForSets() for pause/resume and removal of beginTimerForNextRound boolean.
   //Todo: Rare and hard to duplicate instance of infinity runnables going 2x speed when quickly clicking to next round.
-  //Todo: Single line of infinity (shorter width) rounds + 4 line activity leads to activity overlapping divider.
+  //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
 
   //Todo: Activity time starting at 0 within Timer is one second behind timer (e.g. a 10 second round shows 9 seconds for activity).
       //Todo: Millis can be 3900 for activity but time shown will be 0:02. Likely due to conditional forcing timer sync.
       //Todo: In general, activity millis also falls behind. We clocked 38 seconds on timer showing 35 for activity.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
-
-  //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
@@ -2566,7 +2564,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void timerPopUpDismissalLogic() {
     timerDisabled = false;
     timerPopUpIsVisible = false;
-    beginTimerForNextRound = false;
     reset.setVisibility(View.INVISIBLE);
     dotDraws.setMode(mode);
 
@@ -4110,6 +4107,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.reDraw();
 
         setNotificationValues();
+
         mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
@@ -4413,8 +4411,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
-
-    beginTimerForNextRound = true;
   }
 
   private void nextPomRound(boolean endingEarly) {
@@ -4457,8 +4453,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (objectAnimatorPom != null) objectAnimatorPom.cancel();
       progressBar.setProgress(0);
     }
-
-    beginTimerForNextRound = true;
   }
 
   private Runnable postRoundRunnableForFirstMode() {
@@ -4488,8 +4482,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 2:
               timeLeft.setText("0");
-              if (beginTimerForNextRound) {
-                instantiateAndStartObjectAnimator(30000);
+              instantiateAndStartObjectAnimator(30000);
+
+              if (!mHandler.hasCallbacks(infinityTimerForSets)) {
                 mHandler.post(infinityTimerForSets);
               }
               break;
@@ -4504,10 +4499,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 4:
               timeLeft.setText("0");
-              if (!objectAnimator.isStarted()) {
-                instantiateAndStartObjectAnimator(30000);
+              instantiateAndStartObjectAnimator(30000);
+
+              if (!mHandler.hasCallbacks(infinityTimerForSets)) {
                 mHandler.post(infinityTimerForBreaks);
               }
+
               break;
           }
         } else {
@@ -4632,7 +4629,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               //Uses the current time as a base for our count-up rounds.
               defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
               setMillis = countUpMillisHolder;
-              mHandler.post(infinityTimerForSets);
+
+              if (!mHandler.hasCallbacks(infinityTimerForSets)) {
+                mHandler.post(infinityTimerForSets);
+              }
+
               break;
             case 3:
               if (objectAnimatorPom.isPaused() || !objectAnimatorPom.isStarted()) {
@@ -4643,7 +4644,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 4:
               defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
               breakMillis = countUpMillisHolder;
-              mHandler.post(infinityTimerForBreaks);
+
+              if (!mHandler.hasCallbacks(infinityTimerForBreaks)) {
+                mHandler.post(infinityTimerForBreaks);
+              }
               break;
           }
         }
@@ -4852,7 +4856,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
     reset_total_cycle_times.setEnabled(true);
 
-    beginTimerForNextRound = true;
     cycles_completed_textView.setText(R.string.cycles_done);
 
     toggleLayoutParamsForCyclesAndStopwatch();
