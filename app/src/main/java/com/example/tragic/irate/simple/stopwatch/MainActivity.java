@@ -552,14 +552,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Test change of !mHandler.hasCallbacks(infinityTimerForSets() for pause/resume and removal of beginTimerForNextRound boolean.
-  //Todo: Rare and hard to duplicate instance of infinity runnables going 2x speed when quickly clicking to next round.
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
-
-  //Todo: Activity time starting at 0 within Timer is one second behind timer (e.g. a 10 second round shows 9 seconds for activity).
-      //Todo: Millis can be 3900 for activity but time shown will be 0:02. Likely due to conditional forcing timer sync.
-      //Todo: In general, activity millis also falls behind. We clocked 38 seconds on timer showing 35 for activity.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
+
+  //Todo: Activity time/daily total time running behind timer millis.
+      //Todo: Infinity runs fine. It's lack of sync between countDownTimer and the iteration within.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
@@ -4083,12 +4080,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        if (setMillis>=60000 && !textSizeIncreased) {
-          changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
-          textSizeIncreased = true;
-        }
 
-//        setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         setMillis += timerRunnableDelay;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
@@ -4106,6 +4098,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.reDraw();
 
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis, false);
+
         setNotificationValues();
 
         mHandler.postDelayed(this, timerRunnableDelay);
@@ -4117,11 +4111,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        if (breakMillis>=60000 && !textSizeIncreased) {
-          changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
-          textSizeIncreased = true;
-        }
-//        breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
         breakMillis += timerRunnableDelay;
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
@@ -4135,8 +4124,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
         }
 
-        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis, false);
 
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.reDraw();
 
@@ -4157,7 +4147,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void startSetTimer() {
-    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(setMillis);
     long initialMillisValue = setMillis;
     setInitialTextSizeForRounds(setMillis);
     syncTimerTextViewStringsForBeginningOfRounds();
@@ -4174,10 +4163,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
+        Log.i("testTime", "daily set time is " + totalSetTimeForCurrentDayInMillis);
         Log.i("testTime", "activity set time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-        Log.i("testTime", "setmillis time divided for display is " + dividedMillisForTimerDisplay(setMillis));
+        Log.i("testTime", "setmillis time in seconds is " + setMillis);
 
-        changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis);
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis, true);
+
         dotDraws.reDraw();
         setNotificationValues();
       }
@@ -4190,7 +4181,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void startBreakTimer() {
-    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(breakMillis);
     setInitialTextSizeForRounds(breakMillis);
     long initialMillisValue = breakMillis;
     syncTimerTextViewStringsForBeginningOfRounds();
@@ -4206,7 +4196,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
-        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis);
+        changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis, true);
         dotDraws.reDraw();
         setNotificationValues();
       }
@@ -4219,7 +4209,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void startPomTimer() {
-    boolean willWeChangeTextSize = checkIfRunningTextSizeChange(pomMillis);
     setInitialTextSizeForRounds(pomMillis);
     long initialMillisValue = pomMillis;
     syncTimerTextViewStringsForBeginningOfRounds();
@@ -4249,10 +4238,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis) {
+  private void changeTextSizeOnTimerDigitCountTransitionForModeOne(long setOrBreakMillis, boolean increasingSize) {
     if (!textSizeIncreased && mode==1) {
       if (checkIfRunningTextSizeChange(setOrBreakMillis)) {
-        changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
+        if (increasingSize) {
+          changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
+        } else {
+          changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
+        }
         textSizeIncreased = true;
       }
     }
