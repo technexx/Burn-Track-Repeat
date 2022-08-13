@@ -553,7 +553,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Index exception for infinity rounds @ line 4591.
   //Todo: Test infinity rounds for overlapping runnable + other stuff.
+  //Todo: Single line of infinity (shorter width) rounds + 4 line activity leads to activity overlapping divider.
 
   //Todo: Activity time starting at 0 within Timer is one second behind timer (e.g. a 10 second round shows 9 seconds for activity).
       //Todo: Millis can be 3900 for activity but time shown will be 0:02. Likely due to conditional forcing timer sync.
@@ -4100,6 +4102,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           updateDailyStatTextViewsIfTimerHasAlsoUpdated();
         }
 
+
         workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
@@ -4400,7 +4403,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     numberOfRoundsLeft--;
-    currentRound++;
+
+    //Todo: In a cycle of 5 rounds, this iterated to 5. Should stop at 4.
+    if (currentRound < typeOfRound.size()-1) {
+      currentRound++;
+    }
+
     mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
 
     beginTimerForNextRound = true;
@@ -4434,7 +4442,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     timeLeft.setText("0");
     mHandler.post(endFade);
-    pomDotCounter++;
+
+    if (pomDotCounter < 7) {
+      pomDotCounter++;
+    }
 
     mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
 
