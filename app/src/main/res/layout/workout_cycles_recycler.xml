@@ -16,7 +16,7 @@
         android:textSize="18sp"
         android:textColor="@color/light_grey"
         android:textStyle="bold"
-        android:maxLines="1">
+        android:maxLines="2">
     </TextView>
 
     <TextView
@@ -58,7 +58,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@color/white"
         android:textSize="18sp"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:textStyle="bold">
     </TextView>
 
@@ -68,7 +68,6 @@
         android:layout_height="1.5dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/reset_active_cycle_button_for_mode_1"
         android:layout_marginTop="3dp"
         android:background="@color/mid_grey">
     </View>
