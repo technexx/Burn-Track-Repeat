@@ -556,7 +556,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
 
   //Todo: Activity time/daily total time running behind timer millis.
-      //Todo: Infinity runs fine. It's lack of sync between countDownTimer and the iteration within.
+      //Todo: Activity time/daily activity time run behind when iterated w/ in countDownTimer, but fine w/ in infinity runnable.
+      //Todo: Should we use a separate runnable just for activity times? There are likely several less "ticks" within countDownTimer to fully keep up with the activity time iteration.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
@@ -4144,6 +4145,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     return listToReturn;
+  }
+
+  private Runnable iterationRunnableForActivityMillis() {
+    return new Runnable() {
+      @Override
+      public void run() {
+
+      }
+    };
   }
 
   private void startSetTimer() {
