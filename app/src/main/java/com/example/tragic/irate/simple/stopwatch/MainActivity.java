@@ -413,7 +413,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedEntries;
   ArrayList<String> currentLapList;
   ArrayList<String> savedLapList;
-  Runnable stopWatchRunnable;
 
   int cyclesCompleted;
   int lapsNumber;
@@ -443,6 +442,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int receivedAlpha;
   View pauseResumeButton;
 
+  Runnable stopWatchRunnable;
   public Runnable infinityTimerForSets;
   public Runnable infinityTimerForBreaks;
 
@@ -552,12 +552,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  TimerIteration timerIteration;
+
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
-
-  //Todo: Activity time/daily total time running behind timer millis.
-      //Todo: Activity time/daily activity time run behind when iterated w/ in countDownTimer, but fine w/ in infinity runnable.
-      //Todo: Should we use a separate runnable just for activity times? There are likely several less "ticks" within countDownTimer to fully keep up with the activity time iteration.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
@@ -877,6 +875,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     groupAllAppStartInstantiations();
 
+    stopWatchRunnable = stopWatchRunnable();
     infinityTimerForSets = infinityRunnableForSets();
     infinityTimerForBreaks = infinityRunnableForBreaks();
 
@@ -1196,36 +1195,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       savedCyclesTabLayout.setVisibility(View.VISIBLE);
     });
-
-    stopWatchRunnable = new Runnable() {
-      @Override
-      public void run() {
-        setNotificationValues();
-
-        DecimalFormat df2 = new DecimalFormat("00");
-
-        stopWatchTotalTime = stopWatchTotalTimeHolder + (System.currentTimeMillis() - stopWatchstartTime);
-
-        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
-        stopWatchMinutes = (int) stopWatchSeconds/60;
-        stopWatchMs = (stopWatchTotalTime%1000) / 10;
-
-        displayTime = convertSeconds( (long)stopWatchSeconds);
-        displayMs = df2.format(stopWatchMs);
-
-        stopWatchTimeTextView.setText(displayTime);
-        msTimeTextView.setText(displayMs);
-
-        if (!textSizeIncreased && mode==4) {
-          if (stopWatchSeconds > 59) {
-            changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
-            textSizeIncreased = true;
-          }
-        }
-
-        mHandler.postDelayed(this, 10);
-      }
-    };
   }
 
   private void stopWatchLaunchLogic() {
@@ -1236,33 +1205,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
 
     stopWatchPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-  }
-
-  private void pauseAndResumeStopwatch (int pausing) {
-    if (pausing == PAUSING_TIMER) {
-      stopWatchIsPaused = true;
-
-      stopWatchTotalTime = stopWatchTotalTime + (long) stopWatchSeconds;
-      stopWatchTotalTimeHolder = stopWatchTotalTime;
-
-      stopwatchReset.setVisibility(View.VISIBLE);
-
-      new_lap.setAlpha(0.3f);
-      new_lap.setEnabled(false);
-
-      mHandler.removeCallbacks(stopWatchRunnable);
-
-    } else if (pausing == RESUMING_TIMER) {
-      stopWatchIsPaused = false;
-      stopWatchstartTime = System.currentTimeMillis();
-
-      new_lap.setAlpha(1.0f);
-      new_lap.setEnabled(true);
-
-      stopwatchReset.setVisibility(View.INVISIBLE);
-
-      mHandler.post(stopWatchRunnable);
-    }
   }
 
   private void newLapLogic() {
@@ -4077,12 +4019,49 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private Runnable stopWatchRunnable() {
+    timerIteration = new TimerIteration();
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        setNotificationValues();
+
+        DecimalFormat df2 = new DecimalFormat("00");
+
+        timerIteration.setCurrentTime(System.currentTimeMillis());
+        stopWatchTotalTime = timerIteration.getIteratedTime();
+
+        Log.i("testStop", "time in millis is " + stopWatchTotalTime);
+
+//        stopWatchTotalTime = stopWatchTotalTimeHolder + (System.currentTimeMillis() - stopWatchstartTime);
+
+        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
+        stopWatchMinutes = (int) stopWatchSeconds/60;
+        stopWatchMs = (stopWatchTotalTime%1000) / 10;
+
+        displayTime = convertSeconds( (long)stopWatchSeconds);
+        displayMs = df2.format(stopWatchMs);
+
+        stopWatchTimeTextView.setText(displayTime);
+        msTimeTextView.setText(displayMs);
+
+        if (!textSizeIncreased && mode==4) {
+          if (stopWatchSeconds > 59) {
+            changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
+            textSizeIncreased = true;
+          }
+        }
+        mHandler.postDelayed(this, 10);
+      }
+    };
+  }
+
   private Runnable infinityRunnableForSets() {
     return new Runnable() {
       @Override
       public void run() {
-
-        setMillis += timerRunnableDelay;
+        setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         timeLeft.setText(convertSeconds(setMillis/1000));
@@ -4112,7 +4091,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        breakMillis += timerRunnableDelay;
+        breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         timeLeft.setText(convertSeconds(breakMillis/1000));
@@ -4658,6 +4637,51 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         resetTimer();
       }
+    }
+  }
+
+  private void pauseAndResumeStopwatch (int pausing) {
+    if (pausing == PAUSING_TIMER) {
+      stopWatchIsPaused = true;
+
+      stopWatchTotalTime = stopWatchTotalTime + (long) stopWatchSeconds;
+      stopWatchTotalTimeHolder = stopWatchTotalTime;
+
+      stopwatchReset.setVisibility(View.VISIBLE);
+
+      new_lap.setAlpha(0.3f);
+      new_lap.setEnabled(false);
+
+      mHandler.removeCallbacks(stopWatchRunnable);
+
+    } else if (pausing == RESUMING_TIMER) {
+      stopWatchIsPaused = false;
+      stopWatchstartTime = System.currentTimeMillis();
+
+      new_lap.setAlpha(1.0f);
+      new_lap.setEnabled(true);
+
+      stopwatchReset.setVisibility(View.INVISIBLE);
+
+      mHandler.post(stopWatchRunnable());
+    }
+  }
+
+  private class TimerIteration {
+    long mStableTime = System.currentTimeMillis();
+    long mCurrentTime;
+    long mTimeToIterate;
+
+    public TimerIteration() {
+//      this.mStableTime = stableTime;
+    }
+
+    public void setCurrentTime(long currentTime) {
+      this.mCurrentTime = currentTime;
+    }
+
+    public long getIteratedTime() {
+      return (mCurrentTime - mStableTime);
     }
   }
 
