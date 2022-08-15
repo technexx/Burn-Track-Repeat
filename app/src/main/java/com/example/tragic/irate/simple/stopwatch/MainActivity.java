@@ -1251,33 +1251,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
   }
 
-  private void resetStopwatchTimer() {
-    stopWatchIsPaused = true;
-
-    stopWatchstartTime = 0;
-    stopWatchTotalTime = 0;
-    stopWatchTotalTimeHolder = 0;
-
-    stopWatchMs = 0;
-    stopWatchSeconds = 0;
-    stopWatchMinutes = 0;
-
-    stopWatchTimeTextView.setAlpha(1);
-    stopWatchTimeTextView.setText("0");
-    msTimeTextView.setText("00");
-
-    if (currentLapList.size() > 0) currentLapList.clear();
-    if (savedLapList.size() > 0) savedLapList.clear();
-
-    lapsNumber = 0;
-
-    lapAdapter.notifyDataSetChanged();
-    empty_laps.setVisibility(View.VISIBLE);
-    setInitialTextSizeForRounds(0);
-
-    setNotificationValues();
-  }
-
   private void toggleSortMenuViewBetweenCyclesAndStats(int typeOfSort) {
     if (typeOfSort==SORTING_CYCLES) {
       sortPopupWindow.setContentView(sortCyclePopupView);
@@ -4020,7 +3993,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable stopWatchRunnable() {
-    timerIteration = new TimerIteration();
+    timerIteration = new TimerIteration(System.currentTimeMillis());
 
     return new Runnable() {
       @Override
@@ -4031,10 +4004,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timerIteration.setCurrentTime(System.currentTimeMillis());
         stopWatchTotalTime = timerIteration.getIteratedTime();
-
-        Log.i("testStop", "time in millis is " + stopWatchTotalTime);
-
-//        stopWatchTotalTime = stopWatchTotalTimeHolder + (System.currentTimeMillis() - stopWatchstartTime);
 
         stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
         stopWatchMinutes = (int) stopWatchSeconds/60;
@@ -4644,13 +4613,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (pausing == PAUSING_TIMER) {
       stopWatchIsPaused = true;
 
-      stopWatchTotalTime = stopWatchTotalTime + (long) stopWatchSeconds;
-      stopWatchTotalTimeHolder = stopWatchTotalTime;
-
-      stopwatchReset.setVisibility(View.VISIBLE);
-
       new_lap.setAlpha(0.3f);
       new_lap.setEnabled(false);
+
+      stopwatchReset.setVisibility(View.VISIBLE);
 
       mHandler.removeCallbacks(stopWatchRunnable);
 
@@ -4663,26 +4629,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       stopwatchReset.setVisibility(View.INVISIBLE);
 
-      mHandler.post(stopWatchRunnable());
+      //Todo: Instantiation of class resets stable time.
+      stopWatchRunnable = stopWatchRunnable();
+      mHandler.post(stopWatchRunnable);
     }
   }
 
-  private class TimerIteration {
-    long mStableTime = System.currentTimeMillis();
-    long mCurrentTime;
-    long mTimeToIterate;
+  private void resetStopwatchTimer() {
+    stopWatchIsPaused = true;
 
-    public TimerIteration() {
-//      this.mStableTime = stableTime;
-    }
+    stopWatchstartTime = 0;
+    stopWatchTotalTime = 0;
+    stopWatchTotalTimeHolder = 0;
 
-    public void setCurrentTime(long currentTime) {
-      this.mCurrentTime = currentTime;
-    }
+    stopWatchMs = 0;
+    stopWatchSeconds = 0;
+    stopWatchMinutes = 0;
 
-    public long getIteratedTime() {
-      return (mCurrentTime - mStableTime);
-    }
+    stopWatchTimeTextView.setAlpha(1);
+    stopWatchTimeTextView.setText("0");
+    msTimeTextView.setText("00");
+
+    if (currentLapList.size() > 0) currentLapList.clear();
+    if (savedLapList.size() > 0) savedLapList.clear();
+
+    lapsNumber = 0;
+
+    lapAdapter.notifyDataSetChanged();
+    empty_laps.setVisibility(View.VISIBLE);
+    setInitialTextSizeForRounds(0);
+
+    setNotificationValues();
   }
 
   private void startObjectAnimatorAndTotalCycleTimeCounters() {
@@ -4970,6 +4947,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     setNotificationValues();
+  }
+
+  private class TimerIteration {
+    long mStableTime;
+    long mCurrentTime;
+    long mTimeToIterate;
+
+    public TimerIteration(long stableTime) {
+      this.mStableTime = stableTime;
+    }
+
+    public void setCurrentTime(long currentTime) {
+      this.mCurrentTime = currentTime;
+    }
+
+    public long getIteratedTime() {
+      return (mCurrentTime - mStableTime);
+    }
   }
 
   private void sendPhoneResolutionToDotDrawsClass() {
