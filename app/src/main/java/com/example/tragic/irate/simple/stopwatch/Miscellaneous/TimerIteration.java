@@ -4,6 +4,8 @@ public class TimerIteration {
     long mStableTime;
     long mCurrentTime;
     long mIteratedTime;
+    long mPreviousTotal;
+    long mNewTotal;
 
     public TimerIteration() {
     }
@@ -32,9 +34,24 @@ public class TimerIteration {
         return mIteratedTime;
     }
 
-    //Todo: We just need a simple return method for difference between stable time and current time, and then add that to our total time.
     public long getDifference(long stableTime, long currentTime) {
         return currentTime - stableTime;
+    }
+
+    public long getPreviousTotal() {
+        return mPreviousTotal;
+    }
+
+    public void setPreviousTotal(long previousTotal) {
+        this.mPreviousTotal = previousTotal;
+    }
+
+    public long getNewTotal() {
+        return mNewTotal;
+    }
+
+    public void setNewTotal(long newTotal) {
+        this.mNewTotal = newTotal;
     }
 
 }

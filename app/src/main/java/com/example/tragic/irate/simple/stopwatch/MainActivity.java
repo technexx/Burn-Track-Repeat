@@ -553,8 +553,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  TimerIteration timerIteration;
-
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
 
@@ -3994,8 +3992,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable stopWatchRunnable() {
-    timerIteration = new TimerIteration();
+    TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
+    timerIteration.setPreviousTotal(stopWatchTotalTime);
 
     return new Runnable() {
       @Override
@@ -4004,14 +4003,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         DecimalFormat df2 = new DecimalFormat("00");
 
+        //Todo: Move as much to class as possible.
+        //Todo: We can use class for every timer we have. We just need new instantiations of it. No globals!
         long timeToIterate = timerIteration.getDifference(timerIteration.getStableTime(), timerIteration.getCurrentTime());
         timerIteration.setIteratedTime(timeToIterate);
-        long timeToDisplay = stopWatchTotalTime + timeToIterate;
-//        stopWatchTotalTime = timerIteration.getIteratedTime();
 
-        stopWatchSeconds = (int) (timeToDisplay)/1000;
+        timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
+        stopWatchTotalTime = timerIteration.getNewTotal();
+
+        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
         stopWatchMinutes = (int) stopWatchSeconds/60;
-        stopWatchMs = (timeToDisplay%1000) / 10;
+        stopWatchMs = (stopWatchTotalTime%1000) / 10;
 
         displayTime = convertSeconds( (long)stopWatchSeconds);
         displayMs = df2.format(stopWatchMs);
@@ -4613,7 +4615,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       stopwatchReset.setVisibility(View.VISIBLE);
 
-      stopWatchTotalTime += timerIteration.getIteratedTime();
       mHandler.removeCallbacks(stopWatchRunnable);
 
     } else if (pausing == RESUMING_TIMER) {
