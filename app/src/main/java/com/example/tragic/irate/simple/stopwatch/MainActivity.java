@@ -83,6 +83,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TimerIteration;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.AboutFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ChangeSettingsValues;
@@ -3993,8 +3994,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable stopWatchRunnable() {
-    timerIteration = new TimerIteration(System.currentTimeMillis());
-
     return new Runnable() {
       @Override
       public void run() {
@@ -4093,15 +4092,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     return listToReturn;
-  }
-
-  private Runnable iterationRunnableForActivityMillis() {
-    return new Runnable() {
-      @Override
-      public void run() {
-
-      }
-    };
   }
 
   private void startSetTimer() {
@@ -4630,6 +4620,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       stopwatchReset.setVisibility(View.INVISIBLE);
 
       //Todo: Instantiation of class resets stable time.
+      timerIteration = new TimerIteration(System.currentTimeMillis());
       stopWatchRunnable = stopWatchRunnable();
       mHandler.post(stopWatchRunnable);
     }
@@ -4947,24 +4938,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     setNotificationValues();
-  }
-
-  private class TimerIteration {
-    long mStableTime;
-    long mCurrentTime;
-    long mTimeToIterate;
-
-    public TimerIteration(long stableTime) {
-      this.mStableTime = stableTime;
-    }
-
-    public void setCurrentTime(long currentTime) {
-      this.mCurrentTime = currentTime;
-    }
-
-    public long getIteratedTime() {
-      return (mCurrentTime - mStableTime);
-    }
   }
 
   private void sendPhoneResolutionToDotDrawsClass() {
