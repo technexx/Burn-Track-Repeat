@@ -3994,6 +3994,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable stopWatchRunnable() {
+    timerIteration = new TimerIteration();
+    timerIteration.setStableTime(System.currentTimeMillis());
+
     return new Runnable() {
       @Override
       public void run() {
@@ -4002,6 +4005,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         DecimalFormat df2 = new DecimalFormat("00");
 
         timerIteration.setCurrentTime(System.currentTimeMillis());
+        timerIteration.setIterateTime();
+
         stopWatchTotalTime = timerIteration.getIteratedTime();
 
         stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
@@ -4619,8 +4624,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       stopwatchReset.setVisibility(View.INVISIBLE);
 
-      //Todo: Instantiation of class resets stable time.
-      timerIteration = new TimerIteration(System.currentTimeMillis());
       stopWatchRunnable = stopWatchRunnable();
       mHandler.post(stopWatchRunnable);
     }

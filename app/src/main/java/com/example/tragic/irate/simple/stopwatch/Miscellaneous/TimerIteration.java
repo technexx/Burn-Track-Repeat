@@ -3,9 +3,12 @@ package com.example.tragic.irate.simple.stopwatch.Miscellaneous;
 public class TimerIteration {
     long mStableTime;
     long mCurrentTime;
-    long mTimeToIterate;
+    long mIteratedTime;
 
-    public TimerIteration(long stableTime) {
+    public TimerIteration() {
+    }
+
+    public void setStableTime (long stableTime) {
         this.mStableTime = stableTime;
     }
 
@@ -14,6 +17,10 @@ public class TimerIteration {
     }
 
     public long getIteratedTime() {
-        return (mCurrentTime - mStableTime);
+        return mIteratedTime;
+    }
+
+    public void setIterateTime() {
+        mIteratedTime =  mCurrentTime - mStableTime;
     }
 }
