@@ -4004,14 +4004,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         DecimalFormat df2 = new DecimalFormat("00");
 
-        timerIteration.setCurrentTime(System.currentTimeMillis());
-        timerIteration.setIterateTime();
+        long timeToIterate = timerIteration.getDifference(timerIteration.getStableTime(), timerIteration.getCurrentTime());
+        timerIteration.setIteratedTime(timeToIterate);
+        long timeToDisplay = stopWatchTotalTime + timeToIterate;
+//        stopWatchTotalTime = timerIteration.getIteratedTime();
 
-        stopWatchTotalTime = timerIteration.getIteratedTime();
-
-        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
+        stopWatchSeconds = (int) (timeToDisplay)/1000;
         stopWatchMinutes = (int) stopWatchSeconds/60;
-        stopWatchMs = (stopWatchTotalTime%1000) / 10;
+        stopWatchMs = (timeToDisplay%1000) / 10;
 
         displayTime = convertSeconds( (long)stopWatchSeconds);
         displayMs = df2.format(stopWatchMs);
@@ -4613,6 +4613,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       stopwatchReset.setVisibility(View.VISIBLE);
 
+      stopWatchTotalTime += timerIteration.getIteratedTime();
       mHandler.removeCallbacks(stopWatchRunnable);
 
     } else if (pausing == RESUMING_TIMER) {
