@@ -1,19 +1,19 @@
 package com.example.tragic.irate.simple.stopwatch.Miscellaneous;
 
+import android.util.Log;
+
 public class TimerIteration {
     long mStableTime;
     long mCurrentTime;
-    long mIteratedTime;
     long mPreviousTotal;
     long mNewTotal;
+    long mAddedTotal;
 
-    //Todo: nextRound() needs logic.
-    //Todo: For activity stats, include logic in runnables so pause/resume can remain untouched. Will have to include non-infinity runnables if doing it this way, though.
     public TimerIteration() {
     }
 
-    public void setStableTime () {
-        mStableTime = System.currentTimeMillis();
+    public void setStableTime (long stableTime) {
+        mStableTime = stableTime;
     }
 
     public long getStableTime() {
@@ -25,11 +25,11 @@ public class TimerIteration {
     }
 
     public long getCurrentTime() {
-        return System.currentTimeMillis();
+        return mCurrentTime;
     }
 
-    public long getDifference(long stableTime, long currentTime) {
-        return currentTime - stableTime;
+    public long getDifference() {
+        return mCurrentTime - mStableTime;
     }
 
     public long getPreviousTotal() {
@@ -46,6 +46,14 @@ public class TimerIteration {
 
     public void setNewTotal(long newTotal) {
         this.mNewTotal = newTotal;
+    }
+
+    public void setAddedTotal() {
+        mAddedTotal = mPreviousTotal + mNewTotal;
+    }
+
+    public long getAddedTotal() {
+        return mAddedTotal;
     }
 
 }

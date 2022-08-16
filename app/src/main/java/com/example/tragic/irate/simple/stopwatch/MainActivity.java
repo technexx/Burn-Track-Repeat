@@ -443,9 +443,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int receivedAlpha;
   View pauseResumeButton;
 
-  public Runnable infinityTimerForSetsRunnable;
-  public Runnable infinityTimerForBreaksRunnable;
+  Runnable infinityTimerForSetsRunnable;
+  Runnable infinityTimerForBreaksRunnable;
   Runnable stopWatchTimerRunnable;
+
+  Runnable infinityRunnableForCyclesTimer;
+
+  int CYCLE_TIME_TO_ITERATE;
+
+  int CYCLE_SETS = 0;
+  int CYCLE_BREAKS = 1;
+  int POM_CYCLE_WORK = 2;
+  int POM_CYCLE_REST = 3;
+
+  int TOTAL_DAILY_TIME = 0;
+  int SINGLE_ACTIVITY_TIME = 1;
 
   long countUpMillisHolder;
   boolean makeCycleAdapterVisible;
@@ -3831,11 +3843,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       iteratetotalCaloriesForSelectedDuration(timerRunnableDelay);
       iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
     } else {
+      //Todo: Total work/break time in Pom will be off, too, since it uses this. Will need to alter pause/resume for Pom as well.
       iterateTotalTimesForSelectedCycle(timerRunnableDelay);
     }
   }
 
+  private void iterateTimerMillisForInfinityRounds(TimerIteration timerIteration, long millis) {
+    if (mode==1) {
+      if (typeOfRound.get(currentRound) == 2) {
+        setMillis = timerIteration.getNewTotal();
+      }
+      if (typeOfRound.get(currentRound) == 4) {
+        breakMillis = timerIteration.getNewTotal();
+      }
+    }
+  }
+
+  private void iterateCycleTimeMillisForAllRounds() {
+    if (mode==1) {
+
+    }
+  }
+
   private void iterateTotalTimesForSelectedCycle(long millis) {
+    TimerIteration timerIteration = new TimerIteration();
+//    timerIteration.setStableTime();
+
     if (mode==1) {
       switch (typeOfRound.get(currentRound)) {
         case 1: case 2:
@@ -3991,7 +4024,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private Runnable stopWatchRunnable() {
     TimerIteration timerIteration = new TimerIteration();
-    timerIteration.setStableTime();
+    timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(stopWatchTotalTime);
 
     return new Runnable() {
@@ -4001,7 +4034,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         DecimalFormat df2 = new DecimalFormat("00");
 
-        long timeToIterate = timerIteration.getDifference(timerIteration.getStableTime(), timerIteration.getCurrentTime());
+        long timeToIterate = timerIteration.getDifference();
 
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         stopWatchTotalTime = timerIteration.getNewTotal();
@@ -4027,20 +4060,84 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  private void setCycleTimeToIterate() {
+    if (mode == 1) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
+        CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
+      }
+      if (typeOfRound.get(currentRound) == 2 || typeOfRound.get(currentRound) == 4) {
+        CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
+      }
+    }
+
+    if (mode==3) {
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
+          break;
+          case 1: case 3: case 5: case 7:
+          CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;;
+          break;
+      }
+    }
+  }
+
+  private Runnable infinityRunnableForCyclesTimer() {
+    TimerIteration timerIteration = new TimerIteration();
+    timerIteration.setStableTime(System.currentTimeMillis());
+
+    if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
+      timerIteration.setPreviousTotal(totalCycleSetTimeInMillis);
+    }
+    if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
+      timerIteration.setPreviousTotal(totalCycleBreakTimeInMillis);
+    }
+    if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
+      timerIteration.setPreviousTotal(totalCycleWorkTimeInMillis);
+    }
+    if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
+      timerIteration.setPreviousTotal(totalCycleRestTimeInMillis);
+    }
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        timerIteration.setCurrentTime(System.currentTimeMillis());
+        long timeToIterate = timerIteration.getDifference();
+
+        timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
+
+        if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
+          totalCycleSetTimeInMillis = timerIteration.getNewTotal();
+        }
+        if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
+          totalCycleBreakTimeInMillis = timerIteration.getNewTotal();
+        }
+        if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
+          totalCycleWorkTimeInMillis = timerIteration.getNewTotal();
+        }
+        if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
+          totalCycleRestTimeInMillis = timerIteration.getNewTotal();
+        }
+
+        mHandler.postDelayed(this, timerRunnableDelay);
+      }
+    };
+  }
+
   private Runnable infinityRunnableForSets() {
     TimerIteration timerIteration = new TimerIteration();
-    timerIteration.setStableTime();
+    timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(setMillis);
 
     return new Runnable() {
       @Override
       public void run() {
-        long timeToIterate = timerIteration.getDifference(timerIteration.getStableTime(), timerIteration.getCurrentTime());
+        timerIteration.setCurrentTime(System.currentTimeMillis());
+        long timeToIterate = timerIteration.getDifference();
 
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         setMillis = timerIteration.getNewTotal();
-
-        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
 
         timeLeft.setText(convertSeconds(setMillis/1000));
 
@@ -4067,13 +4164,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private Runnable infinityRunnableForBreaks() {
     TimerIteration timerIteration = new TimerIteration();
-    timerIteration.setStableTime();
+    timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(setMillis);
 
     return new Runnable() {
       @Override
       public void run() {
-        long timeToIterate = timerIteration.getDifference(timerIteration.getStableTime(), timerIteration.getCurrentTime());
+        long timeToIterate = timerIteration.getDifference();
 
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         breakMillis = timerIteration.getNewTotal();
@@ -4127,10 +4224,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-
-        Log.i("testTime", "daily set time is " + totalSetTimeForCurrentDayInMillis);
-        Log.i("testTime", "activity set time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-        Log.i("testTime", "setmillis time in seconds is " + setMillis);
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis, true);
 
@@ -4550,6 +4643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 2:
               mHandler.removeCallbacks(infinityTimerForSetsRunnable);
+              mHandler.removeCallbacks(infinityRunnableForCyclesTimer);
               break;
             case 3:
               breakMillisUntilFinished = breakMillis;
@@ -4566,6 +4660,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           infinityTimerForSetsRunnable = infinityRunnableForSets();
           infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
+          infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
 
           switch (typeOfRound.get(currentRound)) {
             case 1:
@@ -4577,6 +4672,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
               if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
                 mHandler.post(infinityTimerForSetsRunnable);
+              }
+              if (!mHandler.hasCallbacks(infinityRunnableForCyclesTimer)) {
+                mHandler.post(infinityRunnableForCyclesTimer);
               }
 
               break;
