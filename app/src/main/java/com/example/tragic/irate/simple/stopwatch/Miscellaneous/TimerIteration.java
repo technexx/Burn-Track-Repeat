@@ -7,6 +7,8 @@ public class TimerIteration {
     long mPreviousTotal;
     long mNewTotal;
 
+    //Todo: nextRound() needs logic.
+    //Todo: For activity stats, include logic in runnables so pause/resume can remain untouched. Will have to include non-infinity runnables if doing it this way, though.
     public TimerIteration() {
     }
 

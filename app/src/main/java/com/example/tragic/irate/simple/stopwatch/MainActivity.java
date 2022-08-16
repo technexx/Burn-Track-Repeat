@@ -447,7 +447,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public Runnable infinityTimerForBreaksRunnable;
   Runnable stopWatchTimerRunnable;
 
-  long defaultProgressBarDurationForInfinityRounds;
   long countUpMillisHolder;
   boolean makeCycleAdapterVisible;
   boolean timerPopUpIsVisible;
@@ -4042,6 +4041,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = timerIteration.getNewTotal();
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
+
         timeLeft.setText(convertSeconds(setMillis/1000));
 
         if (setMillis>=1000) {
@@ -4417,14 +4417,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
         dotDraws.resetDotAlpha();
         dotDraws.reDraw();
 
         setMillis = 0;
         breakMillis = 0;
-        countUpMillisHolder = 0;
         timerIsPaused = false;
 
         if (numberOfRoundsLeft>0) {
@@ -4440,11 +4438,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 2:
               timeLeft.setText("0");
-              instantiateAndStartObjectAnimator(30000);
-
-              if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
-                mHandler.post(infinityTimerForSetsRunnable);
-              }
+              infinityTimerForSetsRunnable = infinityRunnableForSets();
+              mHandler.post(infinityTimerForSetsRunnable);
               break;
             case 3:
               breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
@@ -4457,17 +4452,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 4:
               timeLeft.setText("0");
-              instantiateAndStartObjectAnimator(30000);
-
-              if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
-                mHandler.post(infinityTimerForBreaksRunnable);
-              }
-
+              infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
+              mHandler.post(infinityTimerForBreaksRunnable);
               break;
           }
         } else {
           animateEnding();
-          progressBar.setProgress(0);
           currentRound = 0;
           timerEnded = true;
           cyclesCompleted++;
@@ -4585,9 +4575,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
             case 2:
-              //Uses the current time as a base for our count-up rounds.
-              defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-
               if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
                 mHandler.post(infinityTimerForSetsRunnable);
               }
@@ -4600,8 +4587,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
             case 4:
-              defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-
               if (!mHandler.hasCallbacks(infinityTimerForBreaksRunnable)) {
                 mHandler.post(infinityTimerForBreaksRunnable);
               }
@@ -4897,7 +4882,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setInitialTextSizeForRounds(0);
             break;
         };
-        countUpMillisHolder = 0;
         numberOfRoundsLeft = workoutTime.size();
         currentRound = 0;
 
