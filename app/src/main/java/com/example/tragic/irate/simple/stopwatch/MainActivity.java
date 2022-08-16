@@ -443,9 +443,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int receivedAlpha;
   View pauseResumeButton;
 
-  Runnable stopWatchRunnable;
-  public Runnable infinityTimerForSets;
-  public Runnable infinityTimerForBreaks;
+  public Runnable infinityTimerForSetsRunnable;
+  public Runnable infinityTimerForBreaksRunnable;
+  Runnable stopWatchTimerRunnable;
 
   long defaultProgressBarDurationForInfinityRounds;
   long countUpMillisHolder;
@@ -874,9 +874,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     groupAllAppStartInstantiations();
 
-    stopWatchRunnable = stopWatchRunnable();
-    infinityTimerForSets = infinityRunnableForSets();
-    infinityTimerForBreaks = infinityRunnableForBreaks();
+    stopWatchTimerRunnable = stopWatchRunnable();
+    infinityTimerForSetsRunnable = infinityRunnableForSets();
+    infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
 
     addTDEEfirstMainTextView.setOnClickListener(v-> {
       View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
@@ -3961,7 +3961,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerTextViewStringOne = (String) timeLeft.getText();
 
     if (hasTimerTextViewChanged()) {
-//      timerTextViewStringTwo = (String) timeLeft.getText();
       timerTextViewStringTwo = timerTextViewStringOne;
 
       displayCycleOrDailyTotals();
@@ -3993,7 +3992,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private Runnable stopWatchRunnable() {
     TimerIteration timerIteration = new TimerIteration();
-    timerIteration.setStableTime(System.currentTimeMillis());
+    timerIteration.setStableTime();
     timerIteration.setPreviousTotal(stopWatchTotalTime);
 
     return new Runnable() {
@@ -4003,10 +4002,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         DecimalFormat df2 = new DecimalFormat("00");
 
-        //Todo: Move as much to class as possible.
-        //Todo: We can use class for every timer we have. We just need new instantiations of it. No globals!
         long timeToIterate = timerIteration.getDifference(timerIteration.getStableTime(), timerIteration.getCurrentTime());
-        timerIteration.setIteratedTime(timeToIterate);
 
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         stopWatchTotalTime = timerIteration.getNewTotal();
@@ -4033,10 +4029,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable infinityRunnableForSets() {
+    TimerIteration timerIteration = new TimerIteration();
+    timerIteration.setStableTime();
+    timerIteration.setPreviousTotal(setMillis);
+
     return new Runnable() {
       @Override
       public void run() {
-        setMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+        long timeToIterate = timerIteration.getDifference(timerIteration.getStableTime(), timerIteration.getCurrentTime());
+
+        timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
+        setMillis = timerIteration.getNewTotal();
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         timeLeft.setText(convertSeconds(setMillis/1000));
@@ -4045,7 +4048,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           updateDailyStatTextViewsIfTimerHasAlsoUpdated();
         }
 
-        if (workoutTime.size() <= (workoutTime.size() - numberOfRoundsLeft)) {
+        if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         }
 
@@ -4063,10 +4066,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable infinityRunnableForBreaks() {
+    TimerIteration timerIteration = new TimerIteration();
+    timerIteration.setStableTime();
+    timerIteration.setPreviousTotal(setMillis);
+
     return new Runnable() {
       @Override
       public void run() {
-        breakMillis = (int) (countUpMillisHolder) +  (System.currentTimeMillis() - defaultProgressBarDurationForInfinityRounds);
+        long timeToIterate = timerIteration.getDifference(timerIteration.getStableTime(), timerIteration.getCurrentTime());
+
+        timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
+        breakMillis = timerIteration.getNewTotal();
 
         iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         timeLeft.setText(convertSeconds(breakMillis/1000));
@@ -4075,7 +4085,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           updateDailyStatTextViewsIfTimerHasAlsoUpdated();
         }
 
-        if (workoutTime.size() <= (workoutTime.size() - numberOfRoundsLeft)) {
+        if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
         }
 
@@ -4329,7 +4339,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setEndOfRoundSounds(vibrationSettingForSets, false);
         break;
       case 2:
-        mHandler.removeCallbacks(infinityTimerForSets);
+        mHandler.removeCallbacks(infinityTimerForSetsRunnable);
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
         if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
@@ -4344,7 +4354,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setEndOfRoundSounds(vibrationSettingForBreaks, false);
         break;
       case 4:
-        mHandler.removeCallbacks(infinityTimerForBreaks);
+        mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
         total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
 
         if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
@@ -4432,8 +4442,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               timeLeft.setText("0");
               instantiateAndStartObjectAnimator(30000);
 
-              if (!mHandler.hasCallbacks(infinityTimerForSets)) {
-                mHandler.post(infinityTimerForSets);
+              if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
+                mHandler.post(infinityTimerForSetsRunnable);
               }
               break;
             case 3:
@@ -4449,8 +4459,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               timeLeft.setText("0");
               instantiateAndStartObjectAnimator(30000);
 
-              if (!mHandler.hasCallbacks(infinityTimerForSets)) {
-                mHandler.post(infinityTimerForBreaks);
+              if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
+                mHandler.post(infinityTimerForBreaksRunnable);
               }
 
               break;
@@ -4549,15 +4559,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               setMillisUntilFinished = setMillis;
               break;
             case 2:
-              countUpMillisHolder = setMillis;
-              mHandler.removeCallbacks(infinityTimerForSets);
+              mHandler.removeCallbacks(infinityTimerForSetsRunnable);
               break;
             case 3:
               breakMillisUntilFinished = breakMillis;
               break;
             case 4:
-              countUpMillisHolder = breakMillis;
-              mHandler.removeCallbacks(infinityTimerForBreaks);
+              mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
               break;
           }
         } else if (pausing == RESUMING_TIMER) {
@@ -4565,6 +4573,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timerIsPaused = false;
           reset.setVisibility(View.INVISIBLE);
           reset_total_cycle_times.setEnabled(false);
+
+          infinityTimerForSetsRunnable = infinityRunnableForSets();
+          infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
 
           switch (typeOfRound.get(currentRound)) {
             case 1:
@@ -4576,10 +4587,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
               //Uses the current time as a base for our count-up rounds.
               defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-              setMillis = countUpMillisHolder;
 
-              if (!mHandler.hasCallbacks(infinityTimerForSets)) {
-                mHandler.post(infinityTimerForSets);
+              if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
+                mHandler.post(infinityTimerForSetsRunnable);
               }
 
               break;
@@ -4591,10 +4601,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 4:
               defaultProgressBarDurationForInfinityRounds = System.currentTimeMillis();
-              breakMillis = countUpMillisHolder;
 
-              if (!mHandler.hasCallbacks(infinityTimerForBreaks)) {
-                mHandler.post(infinityTimerForBreaks);
+              if (!mHandler.hasCallbacks(infinityTimerForBreaksRunnable)) {
+                mHandler.post(infinityTimerForBreaksRunnable);
               }
               break;
           }
@@ -4615,8 +4624,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       stopwatchReset.setVisibility(View.VISIBLE);
 
-      mHandler.removeCallbacks(stopWatchRunnable);
-
+      mHandler.removeCallbacks(stopWatchTimerRunnable);
     } else if (pausing == RESUMING_TIMER) {
       stopWatchIsPaused = false;
       stopWatchstartTime = System.currentTimeMillis();
@@ -4626,8 +4634,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       stopwatchReset.setVisibility(View.INVISIBLE);
 
-      stopWatchRunnable = stopWatchRunnable();
-      mHandler.post(stopWatchRunnable);
+      stopWatchTimerRunnable = stopWatchRunnable();
+      mHandler.post(stopWatchTimerRunnable);
     }
   }
 
@@ -4893,8 +4901,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         numberOfRoundsLeft = workoutTime.size();
         currentRound = 0;
 
-        mHandler.removeCallbacks(infinityTimerForSets);
-        mHandler.removeCallbacks(infinityTimerForBreaks);
+        mHandler.removeCallbacks(infinityTimerForSetsRunnable);
+        mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
 
         if (objectAnimator != null) objectAnimator.cancel();
 

@@ -10,8 +10,8 @@ public class TimerIteration {
     public TimerIteration() {
     }
 
-    public void setStableTime (long stableTime) {
-        this.mStableTime = stableTime;
+    public void setStableTime () {
+        mStableTime = System.currentTimeMillis();
     }
 
     public long getStableTime() {
@@ -24,14 +24,6 @@ public class TimerIteration {
 
     public long getCurrentTime() {
         return System.currentTimeMillis();
-    }
-
-    public void setIteratedTime(long time) {
-        this.mIteratedTime = time;
-    }
-
-    public long getIteratedTime() {
-        return mIteratedTime;
     }
 
     public long getDifference(long stableTime, long currentTime) {
