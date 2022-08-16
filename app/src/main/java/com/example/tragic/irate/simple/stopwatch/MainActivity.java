@@ -448,6 +448,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable stopWatchTimerRunnable;
 
   Runnable infinityRunnableForCyclesTimer;
+  Runnable infinityRunnableForDailyActivityTimer;
+  Runnable infinityRunnableForSingleActivityTime;
 
   int CYCLE_TIME_TO_ITERATE;
 
@@ -4082,6 +4084,45 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: updateDailyStatTextViewsIfTimerHasAlsoUpdated() may cause issues because of conditional and separate runnables. We also don't want every textView set in each runnable.
+  private Runnable infinityRunnableForDailyActivityTime() {
+    TimerIteration timerIteration = new TimerIteration();
+    timerIteration.setStableTime(System.currentTimeMillis());
+    timerIteration.setPreviousTotal(totalSetTimeForCurrentDayInMillis);
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        timerIteration.setCurrentTime(System.currentTimeMillis());
+        long timeToIterate = timerIteration.getDifference();
+
+        timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
+        totalSetTimeForCurrentDayInMillis = timerIteration.getNewTotal();
+
+        mHandler.postDelayed(this, timerRunnableDelay);
+      }
+    };
+  }
+
+  private Runnable infinityRunnableForSingleActivityTime() {
+    TimerIteration timerIteration = new TimerIteration();
+    timerIteration.setStableTime(System.currentTimeMillis());
+    timerIteration.setPreviousTotal(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        timerIteration.setCurrentTime(System.currentTimeMillis());
+        long timeToIterate = timerIteration.getDifference();
+
+        timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
+        totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewTotal();
+
+        mHandler.postDelayed(this, timerRunnableDelay);
+      }
+    };
+  }
+
   private Runnable infinityRunnableForCyclesTimer() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -4661,6 +4702,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           infinityTimerForSetsRunnable = infinityRunnableForSets();
           infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
           infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
+          infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
+          infinityRunnableForSingleActivityTime = infinityRunnableForSingleActivityTime();
 
           switch (typeOfRound.get(currentRound)) {
             case 1:
