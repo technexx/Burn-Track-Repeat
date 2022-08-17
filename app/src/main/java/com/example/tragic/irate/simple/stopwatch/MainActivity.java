@@ -4557,63 +4557,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (int) (totalVar += singleVar) / 1000;
   }
 
-  private void pauseAndResumePomodoroTimer(int pausing) {
-    if (!timerDisabled) {
-      if (!timerEnded) {
-        reset.setText(R.string.reset);
-
-        if (!timerEnded) {
-          if (pausing == PAUSING_TIMER) {
-            timerIsPaused = true;
-            pomMillisUntilFinished = pomMillis;
-
-            if (objectAnimatorPom != null) objectAnimatorPom.pause();
-            if (timer != null) timer.cancel();
-
-            reset.setVisibility(View.VISIBLE);
-            reset_total_cycle_times.setEnabled(true);
-          } else if (pausing == RESUMING_TIMER) {
-            startObjectAnimatorAndTotalCycleTimeCounters();
-            startPomTimer();
-
-            activeCycle = true;
-            timerIsPaused = false;
-            reset.setVisibility(View.INVISIBLE);
-            reset_total_cycle_times.setEnabled(false);
-
-            infinityRunnableForPomCyclesTimer = infinityRunnableForPomCyclesTimer();
-
-            if (mHandler.hasCallbacks(infinityRunnableForPomCyclesTimer)) {
-              mHandler.post(infinityRunnableForPomCyclesTimer);
-            }
-          }
-          AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-        }
-      } else {
-        resetTimer();
-      }
-    }
-  }
-
   private void pauseAndResumeTimer(int pausing) {
     if (!timerDisabled) {
       if (!timerEnded) {
         if (pausing == PAUSING_TIMER) {
-          timerIsPaused = true;
-          reset.setVisibility(View.VISIBLE);
-
-          if (timer != null) timer.cancel();
-          if (objectAnimator != null) objectAnimator.pause();
-
-          reset_total_cycle_times.setEnabled(true);
-
-          mHandler.removeCallbacks(infinityRunnableForCyclesTimer);
-
-          if (trackActivityWithinCycle) {
-            mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
-            mHandler.removeCallbacks(infinityRunnableForSingleActivityTimer);
-          }
-
           switch (typeOfRound.get(currentRound)) {
             case 1:
               setMillisUntilFinished = setMillis;
@@ -4628,32 +4575,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
               break;
           }
-        } else if (pausing == RESUMING_TIMER) {
-          activeCycle = true;
-          timerIsPaused = false;
-          reset.setVisibility(View.INVISIBLE);
-          reset_total_cycle_times.setEnabled(false);
 
+          timerPauseLogic();
+          removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
+        } else if (pausing == RESUMING_TIMER) {
           infinityTimerForSetsRunnable = infinityRunnableForSets();
           infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
-          infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
-
-          if (trackActivityWithinCycle) {
-            infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
-            infinityRunnableForSingleActivityTimer = infinityRunnableForSingleActivityTimer();
-
-            if (!mHandler.hasCallbacks(infinityRunnableForDailyActivityTimer)) {
-              mHandler.post(infinityRunnableForDailyActivityTimer);
-            }
-
-            if (!mHandler.hasCallbacks(infinityRunnableForSingleActivityTimer)) {
-              mHandler.post(infinityRunnableForSingleActivityTimer);
-            }
-          }
-
-            if (!mHandler.hasCallbacks(infinityRunnableForCyclesTimer)) {
-              mHandler.post(infinityRunnableForCyclesTimer);
-            }
 
           switch (typeOfRound.get(currentRound)) {
             case 1:
@@ -4669,7 +4596,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
               break;
             case 3:
-              if (objectAnimatorPom.isPaused() || !objectAnimatorPom.isStarted()) {
+              if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startBreakTimer();
               }
@@ -4680,12 +4607,113 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
           }
+
+          timerResumeLogic();
+          postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       } else {
         resetTimer();
       }
     }
+  }
+
+  private void timerPauseLogic() {
+    timerIsPaused = true;
+    reset.setVisibility(View.VISIBLE);
+
+    if (timer != null) timer.cancel();
+    if (objectAnimator != null) objectAnimator.pause();
+
+    reset_total_cycle_times.setEnabled(true);
+  }
+
+  private void timerResumeLogic() {
+    activeCycle = true;
+    timerIsPaused = false;
+    reset.setVisibility(View.INVISIBLE);
+    reset_total_cycle_times.setEnabled(false);
+  }
+
+  private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
+    if (trackingActivity) {
+      infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
+      infinityRunnableForSingleActivityTimer = infinityRunnableForSingleActivityTimer();
+
+      if (!mHandler.hasCallbacks(infinityRunnableForDailyActivityTimer)) {
+        mHandler.post(infinityRunnableForDailyActivityTimer);
+      }
+
+      if (!mHandler.hasCallbacks(infinityRunnableForSingleActivityTimer)) {
+        mHandler.post(infinityRunnableForSingleActivityTimer);
+      }
+    } else {
+      infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
+
+      if (!mHandler.hasCallbacks(infinityRunnableForCyclesTimer)) {
+        mHandler.post(infinityRunnableForCyclesTimer);
+      }
+    }
+  }
+
+  private void removeActivityOrCycleTimeRunnables(boolean trackingActivity) {
+    if (trackingActivity) {
+      mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
+      mHandler.removeCallbacks(infinityRunnableForSingleActivityTimer);
+    } else {
+      mHandler.removeCallbacks(infinityRunnableForCyclesTimer);
+    }
+  }
+
+  private void pauseAndResumePomodoroTimer(int pausing) {
+    if (!timerDisabled) {
+      if (!timerEnded) {
+        if (pausing == PAUSING_TIMER) {
+          pomMillisUntilFinished = pomMillis;
+          pomTimerPauseLogic();
+          removePomCycleTimeRunnable();
+        } else if (pausing == RESUMING_TIMER) {
+          if (objectAnimatorPom.isPaused() || !objectAnimatorPom.isStarted()) {
+            startObjectAnimatorAndTotalCycleTimeCounters();
+            startPomTimer();
+          }
+          pomTimerResumeLogic();
+          postPomCycleTimeRunnable();
+        }
+        AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+      } else {
+        resetTimer();
+      }
+    }
+  }
+
+  private void pomTimerPauseLogic() {
+    if (objectAnimatorPom != null) objectAnimatorPom.pause();
+    if (timer != null) timer.cancel();
+
+    timerIsPaused = true;
+    reset.setText(R.string.reset);
+    reset.setVisibility(View.VISIBLE);
+    reset_total_cycle_times.setEnabled(true);
+  }
+
+  private void pomTimerResumeLogic() {
+    activeCycle = true;
+    timerIsPaused = false;
+    reset.setVisibility(View.INVISIBLE);
+    reset_total_cycle_times.setEnabled(false);
+  }
+
+  private void postPomCycleTimeRunnable() {
+    infinityRunnableForPomCyclesTimer = infinityRunnableForPomCyclesTimer();
+
+    if (mHandler.hasCallbacks(infinityRunnableForPomCyclesTimer)) {
+      mHandler.post(infinityRunnableForPomCyclesTimer);
+    }
+  }
+
+  private void removePomCycleTimeRunnable() {
+    mHandler.removeCallbacks(infinityRunnableForPomCyclesTimer);
   }
 
   private void pauseAndResumeStopwatch (int pausing) {
