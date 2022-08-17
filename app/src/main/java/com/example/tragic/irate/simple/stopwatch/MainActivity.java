@@ -3798,124 +3798,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setCyclesCompletedTextView() {
-    cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
-  }
-
-  private void setTotalCycleTimeValuesToTextView() {
-    if (mode==1) {
-      total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-      total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
-    }
-    if (mode==3) {
-      total_set_time.setText(convertSeconds(totalCycleWorkTimeInMillis/1000));
-      total_break_time.setText(convertSeconds(totalCycleRestTimeInMillis/1000));
-    }
-  }
-
-  private void setTotalDailyTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
-  }
-
-  private void setTotalDailyCaloriesToTextView() {
-    dailyTotalCaloriesTextView.setText(formatCalorieString(totalCaloriesBurnedForCurrentDay));
-  }
-
-  private void setTotalActivityTimeToTextView() {
-    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForSpecificActivityForCurrentDayInMillis));
-  }
-
-  private void setTotalActivityCaloriesToTextView() {
-    dailyTotalCaloriesForSinglefirstMainTextView.setText(formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
-  }
-
-  private void setAllActivityTimesAndCaloriesToTextViews() {
-    setTotalDailyTimeToTextView();
-    setTotalDailyCaloriesToTextView();
-    setTotalActivityTimeToTextView();
-    setTotalActivityCaloriesToTextView();
-    dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
-  }
-
-  private void iterationMethodsForTotalTimesAndCaloriesForSelectedDay() {
-    if (trackActivityWithinCycle) {
-      iterateTotalTimesForSelectedDay(timerRunnableDelay);
-      iterateTotalTimesForSelectedActivity(timerRunnableDelay);
-
-      iteratetotalCaloriesForSelectedDuration(timerRunnableDelay);
-      iterateTotalCaloriesForSelectedActivity(timerRunnableDelay);
-    } else {
-      //Todo: Total work/break time in Pom will be off, too, since it uses this. Will need to alter pause/resume for Pom as well.
-      iterateTotalTimesForSelectedCycle(timerRunnableDelay);
-    }
-  }
-
-  private void iterateTimerMillisForInfinityRounds(TimerIteration timerIteration, long millis) {
-    if (mode==1) {
-      if (typeOfRound.get(currentRound) == 2) {
-        setMillis = timerIteration.getNewTotal();
-      }
-      if (typeOfRound.get(currentRound) == 4) {
-        breakMillis = timerIteration.getNewTotal();
-      }
-    }
-  }
-
-  private void iterateCycleTimeMillisForAllRounds() {
-    if (mode==1) {
-
-    }
-  }
-
-  private void iterateTotalTimesForSelectedCycle(long millis) {
-    TimerIteration timerIteration = new TimerIteration();
-//    timerIteration.setStableTime();
-
-    if (mode==1) {
-      switch (typeOfRound.get(currentRound)) {
-        case 1: case 2:
-          totalCycleSetTimeInMillis += millis;
-          break;
-        case 3: case 4:
-          totalCycleBreakTimeInMillis += millis;
-          break;
-      };
-    }
-    if (mode==3) {
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          totalCycleWorkTimeInMillis += millis;
-          break;
-        case 1: case 3: case 5: case 7:
-          totalCycleRestTimeInMillis += millis;
-          break;
-      }
-    }
-  }
-
-  private void iterateTotalTimesForSelectedDay(long millis) {
-    if (mode==1) {
-      switch (typeOfRound.get(currentRound)) {
-        case 1: case 2:
-          totalSetTimeForCurrentDayInMillis += millis;
-          break;
-        case 3: case 4:
-          totalBreakTimeForCurrentDayInMillis += millis;
-          break;
-      };
-    }
-  }
-
-  private void iterateTotalTimesForSelectedActivity(long millis) {
-    switch (typeOfRound.get(currentRound)) {
-      case 1: case 2:
-        totalSetTimeForSpecificActivityForCurrentDayInMillis += millis;
-        break;
-      case 3: case 4:
-        totalBreakTimeForSpecificActivityForCurrentDayInMillis += millis;
-        break;
-    };
-  }
 
   private void iteratetotalCaloriesForSelectedDuration(long millis) {
     totalCaloriesBurnedForCurrentDay += calculateCaloriesBurnedPerTick(millis);
@@ -4024,6 +3906,67 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void setAllActivityTimesAndCaloriesToTextViews() {
+    setTotalDailyTimeToTextView();
+    setTotalDailyCaloriesToTextView();
+    setTotalActivityTimeToTextView();
+    setTotalActivityCaloriesToTextView();
+    dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
+  }
+
+  private void setCyclesCompletedTextView() {
+    cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
+  }
+
+  private void setTotalCycleTimeValuesToTextView() {
+    if (mode==1) {
+      total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
+      total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+    }
+    if (mode==3) {
+      total_set_time.setText(convertSeconds(totalCycleWorkTimeInMillis/1000));
+      total_break_time.setText(convertSeconds(totalCycleRestTimeInMillis/1000));
+    }
+  }
+
+  private void setTotalDailyTimeToTextView() {
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
+  }
+
+  private void setTotalDailyCaloriesToTextView() {
+    dailyTotalCaloriesTextView.setText(formatCalorieString(totalCaloriesBurnedForCurrentDay));
+  }
+
+  private void setTotalActivityTimeToTextView() {
+    dailyTotalTimeForSinglefirstMainTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+  }
+
+  private void setTotalActivityCaloriesToTextView() {
+    dailyTotalCaloriesForSinglefirstMainTextView.setText(formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
+  }
+
+  private void setCycleTimeToIterate() {
+    if (mode == 1) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
+        CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
+      }
+      if (typeOfRound.get(currentRound) == 2 || typeOfRound.get(currentRound) == 4) {
+        CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
+      }
+    }
+
+    if (mode==3) {
+      switch (pomDotCounter) {
+        case 0: case 2: case 4: case 6:
+          CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
+          break;
+        case 1: case 3: case 5: case 7:
+          CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
+          break;
+      }
+    }
+  }
+
   private Runnable stopWatchRunnable() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -4062,29 +4005,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private void setCycleTimeToIterate() {
-    if (mode == 1) {
-      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
-        CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
-      }
-      if (typeOfRound.get(currentRound) == 2 || typeOfRound.get(currentRound) == 4) {
-        CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
-      }
-    }
-
-    if (mode==3) {
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
-          break;
-          case 1: case 3: case 5: case 7:
-          CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
-          break;
-      }
-    }
-  }
-
-  //Todo: updateDailyStatTextViewsIfTimerHasAlsoUpdated() may cause issues because of conditional and separate runnables. We also don't want every textView set in each runnable.
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -4097,7 +4017,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         long timeToIterate = timerIteration.getDifference();
 
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
+
         totalSetTimeForCurrentDayInMillis = timerIteration.getNewTotal();
+
+        setTotalDailyTimeToTextView();
+        setTotalDailyCaloriesToTextView();
 
         mHandler.postDelayed(this, timerRunnableDelay);
       }
@@ -4117,6 +4041,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewTotal();
+
+        setTotalActivityTimeToTextView();
+        setTotalActivityCaloriesToTextView();
 
         mHandler.postDelayed(this, timerRunnableDelay);
       }
@@ -4161,6 +4088,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           totalCycleRestTimeInMillis = timerIteration.getNewTotal();
         }
 
+        setTotalCycleTimeValuesToTextView();
+
         mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
@@ -4182,9 +4111,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timeLeft.setText(convertSeconds(setMillis/1000));
 
-        if (setMillis>=1000) {
-          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-        }
+//        if (setMillis>=1000) {
+//          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+//        }
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
@@ -4216,12 +4145,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         breakMillis = timerIteration.getNewTotal();
 
-        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         timeLeft.setText(convertSeconds(breakMillis/1000));
 
-        if (breakMillis>=1000) {
-          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-        }
+//        if (breakMillis>=1000) {
+//          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+//        }
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
@@ -4263,7 +4191,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (setMillis < 500) timerDisabled = true;
 
-        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(setMillis, true);
@@ -4292,7 +4219,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
         if (breakMillis < 500) timerDisabled = true;
 
-        iterationMethodsForTotalTimesAndCaloriesForSelectedDay();
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         changeTextSizeOnTimerDigitCountTransitionForModeOne(breakMillis, true);
@@ -4321,7 +4247,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
-        iterateTotalTimesForSelectedCycle(timerRunnableDelay);
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         changeTextSizeOnTimerDigitCountTransitionForModeThree();
