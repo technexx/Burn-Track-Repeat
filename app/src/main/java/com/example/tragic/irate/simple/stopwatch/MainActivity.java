@@ -449,7 +449,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Runnable infinityRunnableForCyclesTimer;
   Runnable infinityRunnableForDailyActivityTimer;
-  Runnable infinityRunnableForSingleActivityTime;
+  Runnable infinityRunnableForSingleActivityTimer;
 
   int CYCLE_TIME_TO_ITERATE;
 
@@ -4078,7 +4078,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
           break;
           case 1: case 3: case 5: case 7:
-          CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;;
+          CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
           break;
       }
     }
@@ -4104,7 +4104,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private Runnable infinityRunnableForSingleActivityTime() {
+  private Runnable infinityRunnableForSingleActivityTimer() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(totalSetTimeForSpecificActivityForCurrentDayInMillis);
@@ -4678,13 +4678,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           reset_total_cycle_times.setEnabled(true);
 
+          mHandler.removeCallbacks(infinityRunnableForCyclesTimer);
+
+          if (trackActivityWithinCycle) {
+            mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
+            mHandler.removeCallbacks(infinityRunnableForSingleActivityTimer);
+          }
+
           switch (typeOfRound.get(currentRound)) {
             case 1:
               setMillisUntilFinished = setMillis;
               break;
             case 2:
               mHandler.removeCallbacks(infinityTimerForSetsRunnable);
-              mHandler.removeCallbacks(infinityRunnableForCyclesTimer);
               break;
             case 3:
               breakMillisUntilFinished = breakMillis;
@@ -4702,8 +4708,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           infinityTimerForSetsRunnable = infinityRunnableForSets();
           infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
           infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
-          infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
-          infinityRunnableForSingleActivityTime = infinityRunnableForSingleActivityTime();
+
+          if (trackActivityWithinCycle) {
+            infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
+            infinityRunnableForSingleActivityTimer = infinityRunnableForSingleActivityTimer();
+
+            if (!mHandler.hasCallbacks(infinityRunnableForDailyActivityTimer)) {
+              mHandler.post(infinityRunnableForDailyActivityTimer);
+            }
+
+            if (!mHandler.hasCallbacks(infinityRunnableForSingleActivityTimer)) {
+              mHandler.post(infinityRunnableForSingleActivityTimer);
+            }
+          }
+
+            if (!mHandler.hasCallbacks(infinityRunnableForCyclesTimer)) {
+              mHandler.post(infinityRunnableForCyclesTimer);
+            }
 
           switch (typeOfRound.get(currentRound)) {
             case 1:
@@ -4715,9 +4736,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
               if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
                 mHandler.post(infinityTimerForSetsRunnable);
-              }
-              if (!mHandler.hasCallbacks(infinityRunnableForCyclesTimer)) {
-                mHandler.post(infinityRunnableForCyclesTimer);
               }
 
               break;
