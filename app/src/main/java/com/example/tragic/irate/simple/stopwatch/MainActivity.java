@@ -3587,6 +3587,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     clearRoundAndCycleAdapterArrayLists();
     populateCycleRoundAndRoundTypeArrayLists();
 
+    if (trackingActivity) {
+      setAllActivityTimesAndCaloriesToTextViews();
+    }
+
     resetTimer();
   }
 
@@ -3601,14 +3605,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-
-    for (int i=0; i<dailyStatsAccess.getStatsForEachActivityList().size(); i++) {
-      Log.i("testListOfActivities", "mStats activity list is " + dailyStatsAccess.getStatsForEachActivityList().get(i).getActivity());
-    }
-
-    if (dailyStatsAccess.getDayHolderList().size()>0) {
-      Log.i("testListOfDays", "DayHolder total is " + dailyStatsAccess.getDayHolderList().get(0).getTotalSetTime());
-    }
   }
 
   private void insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects() {
@@ -3998,7 +3994,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: Calories iteration. Just create method w/ long input and insert totalSetTime.
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -5110,8 +5105,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalTimeForSingleActivityTextView.setVisibility(View.VISIBLE);
       dailyTotalCaloriesForSingleActivityTextViewHeader.setVisibility(View.VISIBLE);
       dailyTotalCaloriesForSingleActivityTextView.setVisibility(View.VISIBLE);
-
-      setAllActivityTimesAndCaloriesToTextViews();
     }
   }
 

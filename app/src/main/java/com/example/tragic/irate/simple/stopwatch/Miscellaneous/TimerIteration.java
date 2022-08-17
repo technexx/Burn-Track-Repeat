@@ -7,7 +7,6 @@ public class TimerIteration {
     long mCurrentTime;
     long mPreviousTotal;
     long mNewTotal;
-    long mAddedTotal;
 
     public TimerIteration() {
     }
@@ -47,13 +46,4 @@ public class TimerIteration {
     public void setNewTotal(long newTotal) {
         this.mNewTotal = newTotal;
     }
-
-    public void setAddedTotal() {
-        mAddedTotal = mPreviousTotal + mNewTotal;
-    }
-
-    public long getAddedTotal() {
-        return mAddedTotal;
-    }
-
 }
