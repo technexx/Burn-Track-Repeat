@@ -448,6 +448,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable stopWatchTimerRunnable;
 
   Runnable infinityRunnableForCyclesTimer;
+  Runnable infinityRunnableForPomCyclesTimer;
   Runnable infinityRunnableForDailyActivityTimer;
   Runnable infinityRunnableForSingleActivityTimer;
 
@@ -566,6 +567,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: timer textView animation runs even if textView sets to correct size at start (if previous cycler's textView was larger/smaller).
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
 
@@ -4060,6 +4062,32 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
       timerIteration.setPreviousTotal(totalCycleBreakTimeInMillis);
     }
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        timerIteration.setCurrentTime(System.currentTimeMillis());
+        long timeToIterate = timerIteration.getDifference();
+        timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
+
+        if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
+          totalCycleSetTimeInMillis = timerIteration.getNewTotal();
+        }
+        if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
+          totalCycleBreakTimeInMillis = timerIteration.getNewTotal();
+        }
+
+        setTotalCycleTimeValuesToTextView();
+
+        mHandler.postDelayed(this, timerRunnableDelay);
+      }
+    };
+  }
+
+  private Runnable infinityRunnableForPomCyclesTimer() {
+    TimerIteration timerIteration = new TimerIteration();
+    timerIteration.setStableTime(System.currentTimeMillis());
+
     if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
       timerIteration.setPreviousTotal(totalCycleWorkTimeInMillis);
     }
@@ -4072,25 +4100,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         timerIteration.setCurrentTime(System.currentTimeMillis());
         long timeToIterate = timerIteration.getDifference();
-
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
 
-        if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
-          totalCycleSetTimeInMillis = timerIteration.getNewTotal();
-        }
-        if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
-          totalCycleBreakTimeInMillis = timerIteration.getNewTotal();
-        }
         if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
           totalCycleWorkTimeInMillis = timerIteration.getNewTotal();
         }
         if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
           totalCycleRestTimeInMillis = timerIteration.getNewTotal();
         }
-
-        setTotalCycleTimeValuesToTextView();
-
-        mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
   }
@@ -4110,10 +4127,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = timerIteration.getNewTotal();
 
         timeLeft.setText(convertSeconds(setMillis/1000));
-
-//        if (setMillis>=1000) {
-//          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-//        }
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
@@ -4146,10 +4159,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breakMillis = timerIteration.getNewTotal();
 
         timeLeft.setText(convertSeconds(breakMillis/1000));
-
-//        if (breakMillis>=1000) {
-//          updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-//        }
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
@@ -4582,6 +4591,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timerIsPaused = false;
             reset.setVisibility(View.INVISIBLE);
             reset_total_cycle_times.setEnabled(false);
+
+            infinityRunnableForPomCyclesTimer = infinityRunnableForPomCyclesTimer();
+
+            if (mHandler.hasCallbacks(infinityRunnableForPomCyclesTimer)) {
+              mHandler.post(infinityRunnableForPomCyclesTimer);
+            }
           }
           AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
         }
