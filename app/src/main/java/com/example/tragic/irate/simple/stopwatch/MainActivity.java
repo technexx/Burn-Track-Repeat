@@ -80,6 +80,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.Daily
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalorieIteration;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
@@ -567,6 +568,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: "Resume" sets single activity + calories briefly to "0".
+  //Todo: Activity times can sometimes revert slightly after post-round runnables.
   //Todo: timer textView animation runs even if textView sets to correct size at start (if previous cycler's textView was larger/smaller).
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
@@ -3815,16 +3818,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return elapsedTimeInSeconds * calculateCaloriesBurnedPerMillis();
   }
 
-  private void setCaloriesBurnedForSingleActivityToGlobalVariable() {
-    totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedForElapsedTime(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-  }
+//  private void setCaloriesBurnedForSingleActivityToGlobalVariable() {
+//    totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedForElapsedTime(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+//  }
 
   private void setCaloriesBurnedForAllActivitiesToGlobalVariable() {
     totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedForElapsedTime(totalSetTimeForCurrentDayInMillis);
   }
 
   private String formatCalorieString(double calories) {
-    DecimalFormat df = new DecimalFormat("#.##");
+    DecimalFormat df = new DecimalFormat("#.#");
     return df.format(calories);
   }
 
@@ -3999,6 +4002,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(totalSetTimeForCurrentDayInMillis);
 
+    CalorieIteration calorieIteration = new CalorieIteration();
+    calorieIteration.setPreviousTotalCalories(totalCaloriesBurnedForCurrentDay);
+
     return new Runnable() {
       @Override
       public void run() {
@@ -4006,10 +4012,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         long timeToIterate = timerIteration.getDifference();
 
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
-
         totalSetTimeForCurrentDayInMillis = timerIteration.getNewTotal();
 
-        setCaloriesBurnedForAllActivitiesToGlobalVariable();
+        double caloriesToIterate = calculateCaloriesBurnedPerMillis() * timeToIterate;
+        calorieIteration.setNewTotalCalories(calorieIteration.getPreviousTotalCalories() + caloriesToIterate);
+        totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
+
+//        setCaloriesBurnedForAllActivitiesToGlobalVariable();
         setTotalDailyTimeToTextView();
         setTotalDailyCaloriesToTextView();
 
@@ -4023,6 +4032,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(totalSetTimeForSpecificActivityForCurrentDayInMillis);
 
+    CalorieIteration calorieIteration = new CalorieIteration();
+    calorieIteration.setPreviousActivityCalories(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+
     return new Runnable() {
       @Override
       public void run() {
@@ -4032,9 +4044,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewTotal();
 
-        setCaloriesBurnedForSingleActivityToGlobalVariable();
+        double caloriesToIterate = calculateCaloriesBurnedPerMillis() * timeToIterate;
+        calorieIteration.setNewActivityCalories(calorieIteration.getPreviousActivityCalories() + caloriesToIterate);
+        totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
+
+//        setCaloriesBurnedForSingleActivityToGlobalVariable();
         setTotalActivityTimeToTextView();
         setTotalActivityCaloriesToTextView();
+
+        Log.i("testTime", "prev total is at " + timerIteration.getPreviousTotal());
+        Log.i("testTime", "timeToIterate (difference) is " + timeToIterate);
+        Log.i("testTime", "single activity time at " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
 
         mHandler.postDelayed(this, timerRunnableDelay);
       }
@@ -4590,7 +4610,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
                 mHandler.post(infinityTimerForSetsRunnable);
               }
-
               break;
             case 3:
               if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
