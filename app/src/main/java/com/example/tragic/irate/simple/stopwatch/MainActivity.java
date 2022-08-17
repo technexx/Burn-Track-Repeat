@@ -4351,22 +4351,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void globalNextRoundLogic() {
-    timerIsPaused = false;
-
-    setAllActivityTimesAndCaloriesToTextViews();
-
-    progressBar.startAnimation(fadeProgressOut);
-    timeLeft.startAnimation(fadeProgressOut);
-    reset.setVisibility(View.INVISIBLE);
-
-    currentProgressBarValue = 10000;
-    next_round.setEnabled(false);
-
-    roundDownAllTotalTimeValuesToEnsureSyncing();
-    AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-  }
-
   private void nextRound(boolean endingEarly) {
     globalNextRoundLogic();
 
@@ -4385,45 +4369,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     boolean isAlertRepeating = false;
+    if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) {
+      isAlertRepeating = true;
+    }
+
+    numberOfRoundsLeft--;
+    if (currentRound < typeOfRound.size()-1) {
+      currentRound++;
+    }
 
     switch (typeOfRound.get(currentRound)) {
       case 1:
-        timeLeft.setText("0");
-        changeTextSizeWithoutAnimator(true);
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
-        if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
         setEndOfRoundSounds(vibrationSettingForSets, false);
         break;
       case 2:
         mHandler.removeCallbacks(infinityTimerForSetsRunnable);
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
-        if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
         setEndOfRoundSounds(vibrationSettingForSets, false);
         break;
       case 3:
-        timeLeft.setText("0");
-        changeTextSizeWithoutAnimator(true);
         total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
 
-        if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
         setEndOfRoundSounds(vibrationSettingForBreaks, false);
         break;
       case 4:
         mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
         total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
 
-        if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) isAlertRepeating = true;
         setEndOfRoundSounds(vibrationSettingForBreaks, false);
         break;
     }
 
-    numberOfRoundsLeft--;
-
-    if (currentRound < typeOfRound.size()-1) {
-      currentRound++;
-    }
+    removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
     mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
   }
@@ -4470,6 +4450,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void globalNextRoundLogic() {
+    timerIsPaused = false;
+
+    setAllActivityTimesAndCaloriesToTextViews();
+
+    progressBar.startAnimation(fadeProgressOut);
+    timeLeft.startAnimation(fadeProgressOut);
+    reset.setVisibility(View.INVISIBLE);
+
+    currentProgressBarValue = 10000;
+    next_round.setEnabled(false);
+
+    roundDownAllTotalTimeValuesToEnsureSyncing();
+    AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+  }
+
   private Runnable postRoundRunnableForFirstMode() {
     return new Runnable() {
       @Override
@@ -4513,6 +4509,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               mHandler.post(infinityTimerForBreaksRunnable);
               break;
           }
+          postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
         } else {
           animateEnding();
           currentRound = 0;
