@@ -573,7 +573,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Test 10 -> 50ms for runnables.
-  //Todo: Size animation runs on first round even if text already correct size.
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
@@ -4035,7 +4034,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
-//        updateCalorieTextViewsSimultaneously(textViewDisplaySyncTwo);
 
         mHandler.postDelayed(this, 10);
       }
@@ -4189,6 +4187,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void startSetTimer() {
+    long startMillis = setMillis;
     long initialMillisValue = setMillis;
     setInitialTextSizeForRounds(setMillis);
 
@@ -4203,7 +4202,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (setMillis < 500) timerDisabled = true;
 
-        increaseTextSizeForTimers(setMillis);
+        increaseTextSizeForTimers(startMillis, setMillis);
 
         dotDraws.reDraw();
         setNotificationValues();
@@ -4217,6 +4216,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void startBreakTimer() {
+    long startMillis = breakMillis;
     setInitialTextSizeForRounds(breakMillis);
     long initialMillisValue = breakMillis;
 
@@ -4230,7 +4230,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
         if (breakMillis < 500) timerDisabled = true;
 
-        increaseTextSizeForTimers(breakMillis);
+        increaseTextSizeForTimers(startMillis, breakMillis);
 
         dotDraws.reDraw();
         setNotificationValues();
@@ -4244,6 +4244,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void startPomTimer() {
+    long startMillis = pomMillis;
     setInitialTextSizeForRounds(pomMillis);
     long initialMillisValue = pomMillis;
 
@@ -4258,7 +4259,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
-        increaseTextSizeForTimers(pomMillis);
+        increaseTextSizeForTimers(startMillis, pomMillis);
 
         dotDraws.reDraw();
         setNotificationValues();
@@ -4271,9 +4272,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  private void increaseTextSizeForTimers(long millis) {
+  private void increaseTextSizeForTimers(long startMillis, long iteratingMillis) {
+    if (startMillis<60000) {
+      return;
+    }
+
     if (!getHasTextSizeChangedForTimers()) {
-      if (millis <= 59000) {
+      if (iteratingMillis <= 59000) {
         changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
         setHasTextSizeChangedForTimers(true);
       }
