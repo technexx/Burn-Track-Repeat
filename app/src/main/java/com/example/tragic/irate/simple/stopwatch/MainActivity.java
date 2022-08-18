@@ -443,6 +443,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   VerticalSpaceItemDecoration verticalSpaceItemDecoration;
   boolean cyclesTextSizeHasChanged;
   boolean pomCyclesTextSizeHasChanged;
+  boolean stopWatchTextSizeHasChanged;
 
   int receivedAlpha;
   View pauseResumeButton;
@@ -571,12 +572,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: timeLeft textView size doesn't reset on runnable if animation is active.
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
-
-  //Todo: timeIsPaused and other important stuff set as single booleans w/ shared pref. saves. Make sure this holds.
-      //Todo: Saved when dismissing timer.
-      //Todo: Retrieved via getTimerVariablesForEachMode() called on swtiching tabs.
+  //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
@@ -3992,12 +3991,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchTimeTextView.setText(displayTime);
         msTimeTextView.setText(displayMs);
 
-        if (!cyclesTextSizeHasChanged && mode==4) {
-          if (stopWatchSeconds > 59) {
-            changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
-            cyclesTextSizeHasChanged = true;
-          }
-        }
+        decreaseTextSizeForTimersForStopWatch(stopWatchTotalTime);
+
         mHandler.postDelayed(this, 10);
       }
     };
@@ -4152,7 +4147,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.reDraw();
 
-        decreaseTextSize(setMillis);
+        decreaseTextSizeForTimers(setMillis);
 
         setNotificationValues();
 
@@ -4181,7 +4176,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
         }
 
-        decreaseTextSize(breakMillis);
+        decreaseTextSizeForTimers(breakMillis);
 
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
@@ -4219,7 +4214,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
-        increaseTextSize(setMillis);
+        increaseTextSizeForTimers(setMillis);
 
         dotDraws.reDraw();
         setNotificationValues();
@@ -4247,7 +4242,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
-        increaseTextSize(breakMillis);
+        increaseTextSizeForTimers(breakMillis);
 
         dotDraws.reDraw();
         setNotificationValues();
@@ -4276,7 +4271,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
-        increaseTextSize(pomMillis);
+        increaseTextSizeForTimers(pomMillis);
 
         dotDraws.reDraw();
         setNotificationValues();
@@ -4289,25 +4284,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }.start();
   }
 
-  private void increaseTextSize(long millis) {
-    if (!getHasTextSizeChanged()) {
+  private void increaseTextSizeForTimers(long millis) {
+    if (!getHasTextSizeChangedForTimers()) {
       if (millis <= 59000) {
         changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
-        setHasTextSizeChanged(true);
+        setHasTextSizeChangedForTimers(true);
       }
     }
   }
 
-  private void decreaseTextSize(long millis) {
-    if (!getHasTextSizeChanged()) {
+  private void decreaseTextSizeForTimers(long millis) {
+    if (!getHasTextSizeChangedForTimers()) {
       if (millis >= 5000) {
         changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
-        setHasTextSizeChanged(true);
+        setHasTextSizeChangedForTimers(true);
       }
     }
   }
 
-  private boolean getHasTextSizeChanged() {
+  private void decreaseTextSizeForTimersForStopWatch(long millis) {
+    if (!getHasTextSizeChangedForStopwatch()) {
+      if (millis >= 60000) {
+        changeTextSizeWithAnimator(valueAnimatorDown, stopWatchTimeTextView);
+        setHasTextSizeChangedForStopWatch(true);
+      }
+    }
+  }
+
+  private boolean getHasTextSizeChangedForTimers() {
     if (mode==1) {
       return cyclesTextSizeHasChanged;
     }
@@ -4317,13 +4321,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return false;
   }
 
-  private void setHasTextSizeChanged(boolean hasChanged) {
+  private void setHasTextSizeChangedForTimers(boolean hasChanged) {
     if (mode==1) {
       cyclesTextSizeHasChanged = hasChanged;
     }
     if (mode==3) {
       pomCyclesTextSizeHasChanged = hasChanged;
     }
+  }
+
+  private boolean getHasTextSizeChangedForStopwatch() {
+    return stopWatchTextSizeHasChanged;
+  }
+
+  private void setHasTextSizeChangedForStopWatch(boolean hasChanged) {
+    stopWatchTextSizeHasChanged = hasChanged;
   }
 
   private void setInitialTextSizeForRounds(long millis) {
@@ -4481,7 +4493,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void globalNextRoundLogic() {
     timerIsPaused = false;
-    setHasTextSizeChanged(false);
+    setHasTextSizeChangedForTimers(false);
 
     setAllActivityTimesAndCaloriesToTextViews();
 
