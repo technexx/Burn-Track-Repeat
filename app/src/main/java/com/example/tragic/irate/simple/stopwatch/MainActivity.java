@@ -3603,9 +3603,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setTimerLaunchViews(int typeOfLaunch) {
     timerPopUpIsVisible = true;
+    cycle_title_textView.setText(cycleTitle);
     toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
-    cycle_title_textView.setText(cycleTitle);
+    if (mode==1) {
+      setInitialTextSizeForRounds(workoutTime.get(0));
+    }
+    if (mode==3) {
+      setInitialTextSizeForRounds(pomValuesTime.get(0));
+    }
 
     if (editCyclesPopupWindow.isShowing()) {
       editCyclesPopupWindow.dismiss();
@@ -4122,6 +4128,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable infinityRunnableForSets() {
+    setInitialTextSizeForRounds(0);
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(setMillis);
@@ -4155,6 +4162,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable infinityRunnableForBreaks() {
+    setInitialTextSizeForRounds(0);
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(setMillis);
