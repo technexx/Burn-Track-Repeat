@@ -572,6 +572,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Calories from daily/activity iterate at different rates.
+  //Todo: Activity time also iterates *slightly* faster than daily.
+  //Todo: Size animation runs on first round even if text already correct size.
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
@@ -3885,6 +3888,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
+  //Todo: Even when this prevents a time from changing, it doesn't mean that it will sync up since the runnable delay is 50ms.
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
     timerTextViewStringOne = (String) timeLeft.getText();
 
@@ -3894,10 +3898,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       displayCycleOrDailyTotals();
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
-    }
 
-    setTotalDailyCaloriesToTextView();
-    setTotalActivityCaloriesToTextView();
+      setTotalDailyCaloriesToTextView();
+      setTotalActivityCaloriesToTextView();
+    }
   }
 
   private boolean hasTimerTextViewChanged() {
@@ -4018,11 +4022,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         calorieIteration.setNewTotalCalories(calorieIteration.getPreviousTotalCalories() + caloriesToIterate);
         totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
 
-//        setCaloriesBurnedForAllActivitiesToGlobalVariable();
         setTotalDailyTimeToTextView();
         setTotalDailyCaloriesToTextView();
 
-        mHandler.postDelayed(this, timerRunnableDelay);
+        mHandler.postDelayed(this, 10);
       }
     };
   }
@@ -4048,15 +4051,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         calorieIteration.setNewActivityCalories(calorieIteration.getPreviousActivityCalories() + caloriesToIterate);
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
-//        setCaloriesBurnedForSingleActivityToGlobalVariable();
         setTotalActivityTimeToTextView();
         setTotalActivityCaloriesToTextView();
 
-        Log.i("testTime", "prev total is at " + timerIteration.getPreviousTotal());
-        Log.i("testTime", "timeToIterate (difference) is " + timeToIterate);
-        Log.i("testTime", "single activity time at " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-
-        mHandler.postDelayed(this, timerRunnableDelay);
+        mHandler.postDelayed(this, 10);
       }
     };
   }
