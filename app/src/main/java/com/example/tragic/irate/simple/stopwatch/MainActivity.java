@@ -4304,7 +4304,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void decreaseTextSizeForTimers(long millis) {
     if (!getHasTextSizeChangedForTimers()) {
-      if (millis >= 5000) {
+      if (millis >= 60000) {
         changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
         setHasTextSizeChangedForTimers(true);
       }
