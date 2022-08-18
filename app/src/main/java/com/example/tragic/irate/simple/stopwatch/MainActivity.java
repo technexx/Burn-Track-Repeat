@@ -572,7 +572,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: timeLeft textView size doesn't reset on runnable if animation is active.
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
@@ -4123,7 +4122,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable infinityRunnableForSets() {
+    if (valueAnimatorDown.isStarted()) {
+      valueAnimatorDown.cancel();
+    }
+
     setInitialTextSizeForRounds(0);
+
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(setMillis);
@@ -4157,7 +4161,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable infinityRunnableForBreaks() {
+    if (valueAnimatorDown.isStarted()) {
+      valueAnimatorDown.cancel();
+    }
+
     setInitialTextSizeForRounds(0);
+
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(setMillis);
