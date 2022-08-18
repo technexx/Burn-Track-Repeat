@@ -2851,11 +2851,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
        runOnUiThread(()->{
-         displayCycleOrDailyTotals();
-         setCyclesCompletedTextView();
+         if (trackActivityWithinCycle) {
+           setAllActivityTimesAndCaloriesToTextViews();
+         } else {
+           setCyclesCompletedTextView();
+         }
          toggleCycleTimeTextViewSizes(trackActivityWithinCycle);
-
-         setAllActivityTimesAndCaloriesToTextViews();
 
          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
        });
@@ -3584,11 +3585,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTimerLaunchLogic(boolean trackingActivity) {
-    displayCycleOrDailyTotals();
     toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
 
     retrieveTotalDailySetAndBreakTimes();
-    displayCycleOrDailyTotals();
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
     clearRoundAndCycleAdapterArrayLists();
@@ -3887,14 +3886,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
-  //Todo: Even when this prevents a time from changing, it doesn't mean that it will sync up since the runnable delay is 50ms.
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
     timerTextViewStringOne = (String) timeLeft.getText();
 
     if (hasTimerTextViewChanged()) {
       timerTextViewStringTwo = timerTextViewStringOne;
 
-      displayCycleOrDailyTotals();
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
 
@@ -3910,15 +3907,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void syncTimerTextViewStringsForBeginningOfRounds() {
     timerTextViewStringOne = (String) timeLeft.getText();
     timerTextViewStringTwo = (String) timeLeft.getText();
-  }
-
-  private void displayCycleOrDailyTotals() {
-    if (typeOfTotalTimeToDisplay==TOTAL_CYCLE_TIMES) {
-      setTotalCycleTimeValuesToTextView();
-      setCyclesCompletedTextView();
-    } else if (typeOfTotalTimeToDisplay==TOTAL_DAILY_TIMES){
-      setAllActivityTimesAndCaloriesToTextViews();
-    }
   }
 
   private void setAllActivityTimesAndCaloriesToTextViews() {
@@ -4028,11 +4016,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
-        setTotalDailyTimeToTextView();
-        setTotalActivityTimeToTextView();
-
-        setTotalDailyCaloriesToTextView();
-        setTotalActivityCaloriesToTextView();
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
 
         mHandler.postDelayed(this, 10);
       }
