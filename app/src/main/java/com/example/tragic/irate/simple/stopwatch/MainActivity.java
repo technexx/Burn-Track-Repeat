@@ -571,10 +571,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: timeIsPaused is a single boolean. Do we account for this w/ both timers active at the same time?
-  //Todo: timer textView animation runs even if textView sets to correct size at start (if previous cycler's textView was larger/smaller).
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
+
+  //Todo: timeIsPaused and other important stuff set as single booleans w/ shared pref. saves. Make sure this holds.
+      //Todo: Saved when dismissing timer.
+      //Todo: Retrieved via getTimerVariablesForEachMode() called on swtiching tabs.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
@@ -3820,10 +3822,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return elapsedTimeInSeconds * calculateCaloriesBurnedPerMillis();
   }
 
-//  private void setCaloriesBurnedForSingleActivityToGlobalVariable() {
-//    totalCaloriesBurnedForSpecificActivityForCurrentDay = calculateCaloriesBurnedForElapsedTime(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-//  }
-
   private void setCaloriesBurnedForAllActivitiesToGlobalVariable() {
     totalCaloriesBurnedForCurrentDay = calculateCaloriesBurnedForElapsedTime(totalSetTimeForCurrentDayInMillis);
   }
@@ -4287,18 +4285,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!getHasTextSizeChanged()) {
       if (millis <= 59000) {
         changeTextSizeWithAnimator(valueAnimatorUp, timeLeft);
+        setHasTextSizeChanged(true);
       }
     }
-    setHasTextSizeChanged(true);
   }
 
   private void decreaseTextSize(long millis) {
     if (!getHasTextSizeChanged()) {
-      if (millis >= 60000) {
+      if (millis >= 5000) {
         changeTextSizeWithAnimator(valueAnimatorDown, timeLeft);
+        setHasTextSizeChanged(true);
       }
     }
-    setHasTextSizeChanged(true);
   }
 
   private boolean getHasTextSizeChanged() {
@@ -4321,20 +4319,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setInitialTextSizeForRounds(long millis) {
-    if (millis>59000) {
+    if (millis>=60000) {
       if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
         timeLeft.setTextSize(70f);
       } else {
         timeLeft.setTextSize(90f);
       }
-      cyclesTextSizeHasChanged = false;
     } else {
       if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
         timeLeft.setTextSize(90f);
       } else {
         timeLeft.setTextSize(120f);
       }
-      if (mode==4) cyclesTextSizeHasChanged = false;
     }
   }
 
