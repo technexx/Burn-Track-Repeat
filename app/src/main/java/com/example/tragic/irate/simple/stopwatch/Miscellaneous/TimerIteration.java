@@ -5,8 +5,15 @@ import android.util.Log;
 public class TimerIteration {
     long mStableTime;
     long mCurrentTime;
+
     long mPreviousTotal;
     long mNewTotal;
+
+    long mPreviousDailyTotal;
+    long mNewDailyTotal;
+
+    long mPreviousActivityTotal;
+    long mNewActivityTotal;
 
     public TimerIteration() {
     }
@@ -45,5 +52,37 @@ public class TimerIteration {
 
     public void setNewTotal(long newTotal) {
         this.mNewTotal = newTotal;
+    }
+
+    public long getPreviousDailyTotal() {
+        return mPreviousDailyTotal;
+    }
+
+    public void setPreviousDailyTotal(long previousTotal) {
+        this.mPreviousDailyTotal = previousTotal;
+    }
+
+    public long getNewDailyTotal() {
+        return mNewDailyTotal;
+    }
+
+    public void setNewDailyTotal(long newTotal) {
+        this.mNewDailyTotal = newTotal;
+    }
+
+    public long getPreviousActivityTotal() {
+        return mPreviousActivityTotal;
+    }
+
+    public void setPreviousActivityTotal(long previousActivityTotal) {
+        this.mPreviousActivityTotal = previousActivityTotal;
+    }
+
+    public long getNewActivityTotal() {
+        return mNewActivityTotal;
+    }
+
+    public void setNewActivityTotal(long newActivityTotal) {
+        this.mNewActivityTotal = newActivityTotal;
     }
 }

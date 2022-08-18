@@ -455,7 +455,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable infinityRunnableForCyclesTimer;
   Runnable infinityRunnableForPomCyclesTimer;
   Runnable infinityRunnableForDailyActivityTimer;
-  Runnable infinityRunnableForSingleActivityTimer;
 
   int CYCLE_TIME_TO_ITERATE;
 
@@ -4004,7 +4003,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
-    timerIteration.setPreviousTotal(totalSetTimeForCurrentDayInMillis);
+
+    timerIteration.setPreviousDailyTotal(totalSetTimeForCurrentDayInMillis);
+    timerIteration.setPreviousActivityTotal(totalSetTimeForSpecificActivityForCurrentDayInMillis);
 
     CalorieIteration calorieIteration = new CalorieIteration();
     calorieIteration.setPreviousTotalCalories(totalCaloriesBurnedForCurrentDay);
@@ -4013,45 +4014,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         timerIteration.setCurrentTime(System.currentTimeMillis());
+
         long timeToIterate = timerIteration.getDifference();
-
-        timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
-        totalSetTimeForCurrentDayInMillis = timerIteration.getNewTotal();
-
         double caloriesToIterate = calculateCaloriesBurnedPerMillis() * timeToIterate;
+
+        timerIteration.setNewDailyTotal(timerIteration.getPreviousDailyTotal() + timeToIterate);
+        timerIteration.setNewActivityTotal(timerIteration.getPreviousActivityTotal() + timeToIterate);
+        totalSetTimeForCurrentDayInMillis = timerIteration.getNewDailyTotal();
+        totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewActivityTotal();
+
         calorieIteration.setNewTotalCalories(calorieIteration.getPreviousTotalCalories() + caloriesToIterate);
-        totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
-
-        setTotalDailyTimeToTextView();
-        setTotalDailyCaloriesToTextView();
-
-        mHandler.postDelayed(this, 10);
-      }
-    };
-  }
-
-  private Runnable infinityRunnableForSingleActivityTimer() {
-    TimerIteration timerIteration = new TimerIteration();
-    timerIteration.setStableTime(System.currentTimeMillis());
-    timerIteration.setPreviousTotal(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-
-    CalorieIteration calorieIteration = new CalorieIteration();
-    calorieIteration.setPreviousActivityCalories(totalCaloriesBurnedForSpecificActivityForCurrentDay);
-
-    return new Runnable() {
-      @Override
-      public void run() {
-        timerIteration.setCurrentTime(System.currentTimeMillis());
-        long timeToIterate = timerIteration.getDifference();
-
-        timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
-        totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewTotal();
-
-        double caloriesToIterate = calculateCaloriesBurnedPerMillis() * timeToIterate;
         calorieIteration.setNewActivityCalories(calorieIteration.getPreviousActivityCalories() + caloriesToIterate);
+        totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
+        setTotalDailyTimeToTextView();
         setTotalActivityTimeToTextView();
+
+        setTotalDailyCaloriesToTextView();
         setTotalActivityCaloriesToTextView();
 
         mHandler.postDelayed(this, 10);
@@ -4683,14 +4663,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
     if (trackingActivity) {
       infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
-      infinityRunnableForSingleActivityTimer = infinityRunnableForSingleActivityTimer();
 
       if (!mHandler.hasCallbacks(infinityRunnableForDailyActivityTimer)) {
         mHandler.post(infinityRunnableForDailyActivityTimer);
-      }
-
-      if (!mHandler.hasCallbacks(infinityRunnableForSingleActivityTimer)) {
-        mHandler.post(infinityRunnableForSingleActivityTimer);
       }
     } else {
       infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
@@ -4704,7 +4679,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void removeActivityOrCycleTimeRunnables(boolean trackingActivity) {
     if (trackingActivity) {
       mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
-      mHandler.removeCallbacks(infinityRunnableForSingleActivityTimer);
     } else {
       mHandler.removeCallbacks(infinityRunnableForCyclesTimer);
     }
