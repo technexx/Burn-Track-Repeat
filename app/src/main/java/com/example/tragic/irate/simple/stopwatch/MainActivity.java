@@ -86,6 +86,7 @@ import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalorieIteration;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TextViewDisplaySync;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TimerIteration;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.AboutFragment;
@@ -3886,28 +3887,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
-  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
-    timerTextViewStringOne = (String) timeLeft.getText();
+  private void updateDailyStatsTest(TextViewDisplaySync textViewDisplaySync) {
+    textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
 
-    if (hasTimerTextViewChanged()) {
-      timerTextViewStringTwo = timerTextViewStringOne;
+    if (textViewDisplaySync.areTextViewsDifferent(textViewDisplaySync.getFirstTextView(), textViewDisplaySync.getSecondTextView())) {
+      textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
 
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
-
-      setTotalDailyCaloriesToTextView();
-      setTotalActivityCaloriesToTextView();
     }
-  }
 
-  private boolean hasTimerTextViewChanged() {
-    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
-  }
 
-  private void syncTimerTextViewStringsForBeginningOfRounds() {
-    timerTextViewStringOne = (String) timeLeft.getText();
-    timerTextViewStringTwo = (String) timeLeft.getText();
+    setTotalDailyCaloriesToTextView();
+    setTotalActivityCaloriesToTextView();
   }
+//
+//  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
+//    timerTextViewStringOne = (String) timeLeft.getText();
+//
+//    if (hasTimerTextViewChanged()) {
+//      timerTextViewStringTwo = timerTextViewStringOne;
+//
+//      setTotalDailyTimeToTextView();
+//      setTotalActivityTimeToTextView();
+//    }
+//
+//  }
+//
+//  private boolean hasTimerTextViewChanged() {
+//    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
+//  }
+//
+//  private void syncTimerTextViewStringsForBeginningOfRounds() {
+//    timerTextViewStringOne = (String) timeLeft.getText();
+//    timerTextViewStringTwo = (String) timeLeft.getText();
+//  }
 
   private void setAllActivityTimesAndCaloriesToTextViews() {
     setTotalDailyTimeToTextView();
@@ -3997,6 +4011,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     CalorieIteration calorieIteration = new CalorieIteration();
     calorieIteration.setPreviousTotalCalories(totalCaloriesBurnedForCurrentDay);
+    calorieIteration.setPreviousActivityCalories(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+
+    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
+    textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
+    textViewDisplaySync.setSecondTextView((String) timeLeft.getText());
 
     return new Runnable() {
       @Override
@@ -4016,7 +4035,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+//        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        updateDailyStatsTest(textViewDisplaySync);
 
         mHandler.postDelayed(this, 10);
       }
@@ -4172,7 +4192,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void startSetTimer() {
     long initialMillisValue = setMillis;
     setInitialTextSizeForRounds(setMillis);
-    syncTimerTextViewStringsForBeginningOfRounds();
+
+    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
 
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
@@ -4183,7 +4204,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (setMillis < 500) timerDisabled = true;
 
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        updateDailyStatsTest(textViewDisplaySync);
 
         increaseTextSizeForTimers(setMillis);
 
@@ -4201,7 +4222,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void startBreakTimer() {
     setInitialTextSizeForRounds(breakMillis);
     long initialMillisValue = breakMillis;
-    syncTimerTextViewStringsForBeginningOfRounds();
+
+    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
 
     timer = new CountDownTimer(breakMillis, timerRunnableDelay) {
       @Override
@@ -4211,7 +4233,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
         if (breakMillis < 500) timerDisabled = true;
 
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
+        updateDailyStatsTest(textViewDisplaySync);
 
         increaseTextSizeForTimers(breakMillis);
 
@@ -4229,7 +4251,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void startPomTimer() {
     setInitialTextSizeForRounds(pomMillis);
     long initialMillisValue = pomMillis;
-    syncTimerTextViewStringsForBeginningOfRounds();
+
+    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
 
     timer = new CountDownTimer(pomMillis, timerRunnableDelay) {
       @Override
@@ -4240,8 +4263,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-
+        updateDailyStatsTest(textViewDisplaySync);
         increaseTextSizeForTimers(pomMillis);
 
         dotDraws.reDraw();
