@@ -572,8 +572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Calories from daily/activity iterate at different rates.
-  //Todo: Activity time also iterates *slightly* faster than daily.
+  //Todo: Test 10 -> 50ms for runnables.
   //Todo: Size animation runs on first round even if text already correct size.
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
@@ -3901,6 +3900,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTotalActivityCaloriesToTextView();
   }
 
+//  private void updateCalorieTextViewsSimultaneously(TextViewDisplaySync textViewDisplaySync) {
+//    DecimalFormat df = new DecimalFormat("#.#");
+//
+//    textViewDisplaySync.setFirstTextView(df.format(totalCaloriesBurnedForCurrentDay));
+//
+//    Log.i("testSync", "global String is " + textViewDisplaySync.getFirstTextView());
+//
+//    if (textViewDisplaySync.areTextViewsDifferent()) {
+//      Log.i("testSync", "textView updated!");
+//
+//      textViewDisplaySync.setSecondTextView(df.format(totalCaloriesBurnedForCurrentDay));
+//
+//      setTotalDailyCaloriesToTextView();
+//      setTotalActivityCaloriesToTextView();
+//    }
+//  }
+
   private void setAllActivityTimesAndCaloriesToTextViews() {
     setTotalDailyTimeToTextView();
     setTotalDailyCaloriesToTextView();
@@ -3995,6 +4011,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
     textViewDisplaySync.setSecondTextView((String) timeLeft.getText());
 
+    TextViewDisplaySync textViewDisplaySyncTwo = new TextViewDisplaySync();
+    textViewDisplaySyncTwo.setFirstTextView((String) dailyTotalCaloriesTextView.getText());
+    textViewDisplaySyncTwo.setSecondTextView((String) dailyTotalCaloriesForSingleActivityTextView.getText());
+
+
     return new Runnable() {
       @Override
       public void run() {
@@ -4013,8 +4034,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
-//        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
         updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
+//        updateCalorieTextViewsSimultaneously(textViewDisplaySyncTwo);
 
         mHandler.postDelayed(this, 10);
       }
@@ -4182,8 +4203,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (setMillis < 500) timerDisabled = true;
 
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
-
         increaseTextSizeForTimers(setMillis);
 
         dotDraws.reDraw();
@@ -4210,8 +4229,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breakMillis = millisUntilFinished;
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
         if (breakMillis < 500) timerDisabled = true;
-
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         increaseTextSizeForTimers(breakMillis);
 
@@ -4241,7 +4258,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
         increaseTextSizeForTimers(pomMillis);
 
         dotDraws.reDraw();

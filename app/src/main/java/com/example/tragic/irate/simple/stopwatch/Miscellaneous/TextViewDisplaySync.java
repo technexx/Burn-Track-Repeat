@@ -1,8 +1,5 @@
 package com.example.tragic.irate.simple.stopwatch.Miscellaneous;
 
-import android.util.Log;
-import android.widget.TextView;
-
 public class TextViewDisplaySync {
     String mFirstTextView = "";
     String mSecondTextView = "";
