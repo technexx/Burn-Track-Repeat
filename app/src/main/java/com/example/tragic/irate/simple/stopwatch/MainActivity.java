@@ -3887,41 +3887,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
-  private void updateDailyStatsTest(TextViewDisplaySync textViewDisplaySync) {
+  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
 
-    if (textViewDisplaySync.areTextViewsDifferent(textViewDisplaySync.getFirstTextView(), textViewDisplaySync.getSecondTextView())) {
+    if (textViewDisplaySync.areTextViewsDifferent()) {
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
 
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
     }
 
-
     setTotalDailyCaloriesToTextView();
     setTotalActivityCaloriesToTextView();
   }
-//
-//  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated() {
-//    timerTextViewStringOne = (String) timeLeft.getText();
-//
-//    if (hasTimerTextViewChanged()) {
-//      timerTextViewStringTwo = timerTextViewStringOne;
-//
-//      setTotalDailyTimeToTextView();
-//      setTotalActivityTimeToTextView();
-//    }
-//
-//  }
-//
-//  private boolean hasTimerTextViewChanged() {
-//    return !timerTextViewStringTwo.equals(timerTextViewStringOne);
-//  }
-//
-//  private void syncTimerTextViewStringsForBeginningOfRounds() {
-//    timerTextViewStringOne = (String) timeLeft.getText();
-//    timerTextViewStringTwo = (String) timeLeft.getText();
-//  }
 
   private void setAllActivityTimesAndCaloriesToTextViews() {
     setTotalDailyTimeToTextView();
@@ -4036,7 +4014,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
 //        updateDailyStatTextViewsIfTimerHasAlsoUpdated();
-        updateDailyStatsTest(textViewDisplaySync);
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         mHandler.postDelayed(this, 10);
       }
@@ -4204,7 +4182,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (setMillis < 500) timerDisabled = true;
 
-        updateDailyStatsTest(textViewDisplaySync);
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         increaseTextSizeForTimers(setMillis);
 
@@ -4233,7 +4211,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
         if (breakMillis < 500) timerDisabled = true;
 
-        updateDailyStatsTest(textViewDisplaySync);
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         increaseTextSizeForTimers(breakMillis);
 
@@ -4263,7 +4241,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
-        updateDailyStatsTest(textViewDisplaySync);
+        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
         increaseTextSizeForTimers(pomMillis);
 
         dotDraws.reDraw();

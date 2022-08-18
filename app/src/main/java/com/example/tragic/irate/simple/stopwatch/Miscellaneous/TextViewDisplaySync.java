@@ -26,8 +26,8 @@ public class TextViewDisplaySync {
         this.mSecondTextView = secondTextView;
     }
 
-    public boolean areTextViewsDifferent(String textViewOne, String textViewTwo) {
-        return !textViewOne.equals(textViewTwo);
+    public boolean areTextViewsDifferent() {
+        return !mFirstTextView.equals(mSecondTextView);
     }
 
 }
