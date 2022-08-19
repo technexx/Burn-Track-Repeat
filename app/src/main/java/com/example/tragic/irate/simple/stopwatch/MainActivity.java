@@ -572,7 +572,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Test 10 -> 50ms for runnables.
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
@@ -3831,7 +3830,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String formatCalorieString(double calories) {
-    DecimalFormat df = new DecimalFormat("#.#");
+    DecimalFormat df = new DecimalFormat("#.##");
+    df.setMinimumFractionDigits(2);
     return df.format(calories);
   }
 
@@ -4035,7 +4035,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
-        mHandler.postDelayed(this, 10);
+        mHandler.postDelayed(this, 50);
       }
     };
   }
