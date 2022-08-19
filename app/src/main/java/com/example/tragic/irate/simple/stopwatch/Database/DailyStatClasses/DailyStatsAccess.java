@@ -175,6 +175,10 @@ public class DailyStatsAccess {
         return mStatsForEachActivityList;
     }
 
+    public List<CaloriesForEachFood> getCaloriesForEachFoodList() {
+        return mCaloriesForEachFoodList;
+    }
+
     public void setActivityListsForDatabaseObjects(List<Integer> integerListOfDaysSelected) {
         if (integerListOfDaysSelected.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfDaysSelected);
@@ -489,6 +493,14 @@ public class DailyStatsAccess {
 
     public void deleteAllDayHolderEntries() {
         cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
+    }
+
+    public void deleteMultipleFoodEntries(List<Long> listOfEntries) {
+        cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodForMultipleDays(listOfEntries);
+    }
+
+    public void deleteAllFoodEntries() {
+        cyclesDatabase.cyclesDao().deleteAllCaloriesForEachFoodEntries();
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(long setTime, double caloriesBurned) {

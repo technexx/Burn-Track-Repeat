@@ -77,6 +77,7 @@ import com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws;
 import com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas;
 import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
+import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CaloriesForEachFood;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DailyStatsAccess;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DailyStatsFragment;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
@@ -568,11 +569,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int SORTING_CYCLES = 0;
   int SORTING_STATS = 1;
 
+  int ON_STATS_ACTIVITY_TAB = 0;
+  int ON_STATS_FOOD_TAB = 1;
+
   boolean statsHaveBeenEdited;
 
   Toast mToast;
 
+  //Todo: Need to have foods delete in onOptions when tab is in foods.
+      //Todo: onOptions shouldn't have delete option in comparison tab.
+  //Todo: Foods need to overwrite duplicates, otherwise a long duration will have a huge list of duplicates.
+  //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
+      //Todo: How cancel vs. delete works on edit.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
@@ -677,11 +686,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case R.id.delete_single_day_from_daily_stats:
-        delete_all_text.setText(R.string.delete_single_day_from_stats);
+        delete_all_text.setText(R.string.delete_activity_from_single_day);
         deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
         break;
       case R.id.delete_all_days_from_daily_stats:
-        delete_all_text.setText(R.string.delete_all_stats);
+        delete_all_text.setText(R.string.delete_all_activities);
         deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
     }
     return super.onOptionsItemSelected(item);
@@ -1163,11 +1172,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
           deleteTotalCycleTimes();
 
-        } else if (delete_all_text.getText().equals(getString(R.string.delete_single_day_from_stats))) {
-          deleteDailyStatsForSelectedDays();
+        } else if (delete_all_text.getText().equals(getString(R.string.delete_activity_from_single_day))) {
+          if (dailyStatsFragment.getSelectedTab()==0) {
+            deleteActivityStatsForSelectedDays();
+          }
+          if (dailyStatsFragment.getSelectedTab()==1) {
+            deleteFoodStatsForSelectedDays();
+          }
 
-        } else if (delete_all_text.getText().equals(getString(R.string.delete_all_stats))) {
-          deleteDailyStatsForAllDays();
+        } else if (delete_all_text.getText().equals(getString(R.string.delete_all_activities))) {
+          if (dailyStatsFragment.getSelectedTab()==0) {
+            deleteActivityStatsForAllDays();
+          }
+          if (dailyStatsFragment.getSelectedTab()==1) {
+            deleteFoodStatsForAllDays();
+          }
         }
 
         runOnUiThread(()-> {
@@ -2397,7 +2416,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void deleteDailyStatsForSelectedDays() {
+  private void deleteActivityStatsForSelectedDays() {
     List<DayHolder> dayHolderList = dailyStatsFragment.getDayHolderList();
     List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
 
@@ -2426,11 +2445,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
   }
 
-  private void deleteDailyStatsForAllDays() {
+  private void deleteFoodStatsForSelectedDays() {
+    List<CaloriesForEachFood> caloriesForEachFoodList = dailyStatsFragment.getCaloriesForEachFoodList();
+
+    if (areAllDaysEmptyOfFoods(caloriesForEachFoodList)) {
+      runOnUiThread(()-> {
+        showToastIfNoneActive("Nothing to delete!");
+        return;
+      });
+    }
+
+    List<Long> longListOfFoodIdsToDelete = new ArrayList<>();
+
+    for (int i=0; i<longListOfFoodIdsToDelete.size(); i++) {
+      longListOfFoodIdsToDelete.add(caloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood());
+    }
+
+    dailyStatsAccess.deleteMultipleFoodEntries(longListOfFoodIdsToDelete);
+    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+  }
+
+  private void deleteActivityStatsForAllDays() {
     dailyStatsAccess.deleteAllDayHolderEntries();
     dailyStatsAccess.deleteAllStatsForEachActivityEntries();
 
     dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
+    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+  }
+
+  private void deleteFoodStatsForAllDays() {
+    dailyStatsAccess.deleteAllFoodEntries();
     dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
   }
 
@@ -2442,6 +2486,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     return listOfActivities.size()==0;
+  }
+
+  private boolean areAllDaysEmptyOfFoods(List<CaloriesForEachFood> caloriesForEachFoodList) {
+    List<String> listOfFoods = new ArrayList<>();
+
+    for (int i=0; i<caloriesForEachFoodList.size(); i++) {
+      listOfFoods.add(caloriesForEachFoodList.get(i).getTypeOfFood());
+    }
+
+    return listOfFoods.size()==0;
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {

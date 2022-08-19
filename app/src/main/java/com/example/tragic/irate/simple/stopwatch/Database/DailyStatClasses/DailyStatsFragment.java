@@ -38,6 +38,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.CaloriesConsumedAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
+import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CaloriesForEachFood;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayWithActivityDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CurrentCalendarDateDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
@@ -128,6 +129,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     List<CalendarDay> customCalendarDayList;
     List<DayHolder> dayHolderList;
     List<StatsForEachActivity> statsForEachActivityList;
+    List<CaloriesForEachFood> caloriesForEachFoodList;
 
     View dailyStatsExpandedView ;
     PopupWindow dailyStatsExpandedPopUpWindow;
@@ -224,6 +226,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     boolean fragmentIsAttached;
     boolean statsHaveBeenEditedForCurrentDay;
+
+    int mSelectedTab;
 
     @Override
     public void onDestroy() {
@@ -469,6 +473,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    private void setMultipleDayWarningTextViewForActivities(int addingOrEditing) {
+        if (addingOrEditing == ADDING_ACTIVITY) {
+            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_day_activity_addition_warning);
+        }
+        if (addingOrEditing == EDITING_ACTIVITY) {
+            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_day_activity_edit_warning);
+        }
+    }
+
     private void toggleFoodConsumedEditingForMultipleDaysTextViews() {
         if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
             multipleDayEditWarningForFoodConsumedTextView.setVisibility(View.VISIBLE);
@@ -477,13 +490,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    //Todo: For food as well.
-    private void setMultipleDayWarningTextView(int addingOrEditing) {
-        if (addingOrEditing == ADDING_ACTIVITY) {
-            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_day_addition_warning);
+    private void setMultipleDayWarningTextViewForFoodConsumption(int addingOrEditing) {
+        if (addingOrEditing == ADDING_FOOD) {
+            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_food_addition_warning);
         }
-        if (addingOrEditing == EDITING_ACTIVITY) {
-            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_day_edit_warning);
+        if (addingOrEditing == EDITING_FOOD) {
+            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_food_edit_warning);
         }
     }
 
@@ -645,7 +657,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
 
-        setListsOfDayHolderAndStatsPrimaryIds();
+        setListsOfDayHolderAndStatsForEachActivity();
+        setListOfFoods();
     }
 
     private void setStatDurationViews(int mode) {
@@ -694,7 +707,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         populateListsAndTextViewsFromEntityListsInDatabase();
     }
 
-    private void setListsOfDayHolderAndStatsPrimaryIds() {
+    private void setListsOfDayHolderAndStatsForEachActivity() {
         dayHolderList = dailyStatsAccess.getDayHolderList();
         statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityList();
     }
@@ -705,6 +718,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public List<StatsForEachActivity> getStatsForEachActivityList() {
         return statsForEachActivityList;
+    }
+
+    public void setListOfFoods() {
+        caloriesForEachFoodList = dailyStatsAccess.getCaloriesForEachFoodList();
+    }
+
+    public List<CaloriesForEachFood> getCaloriesForEachFoodList() {
+        return caloriesForEachFoodList;
     }
 
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
@@ -855,7 +876,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         activityInEditPopUpTextView.setText(activityToAdd);
         zeroOutActivityEditPopUpEditTexts();
-        setMultipleDayWarningTextView(ADDING_ACTIVITY);
+        setMultipleDayWarningTextViewForActivities(ADDING_ACTIVITY);
     }
 
     private void replaceActivityAddPopUpWithEmptyEditPopUp() {
@@ -945,7 +966,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setDefaultCustomActivityAdditionViews();
 
         toggleActivityEditingForMultipleDaysTextViews();
-        setMultipleDayWarningTextView(EDITING_ACTIVITY);
+        setMultipleDayWarningTextViewForActivities(EDITING_ACTIVITY);
     }
 
     private void editActivityStatsInDatabase() {
@@ -1345,6 +1366,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.cancel);
         toggleFoodConsumedEditingForMultipleDaysTextViews();
         clearFoodConsumedEditTexts();
+        setMultipleDayWarningTextViewForFoodConsumption(ADDING_FOOD);
 
         caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
@@ -1397,6 +1419,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.delete);
         toggleFoodConsumedEditingForMultipleDaysTextViews();
         launchFoodEditPopUpWithEditTextValuesSet(position);
+        setMultipleDayWarningTextViewForFoodConsumption(EDITING_FOOD);
     }
 
     private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
@@ -1570,6 +1593,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalFoodStatsValuesTextViewLayout.setLayoutParams(totalFoodStatsValuesTextViewLayoutParams);
             totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
         }
+
+        if (caloriesComparisonTabLayout.getSelectedTabPosition()==2) {
+
+        }
     }
 
     private void setCalendarMinimizationLayoutParams(ConstraintLayout.LayoutParams recyclerParams, ConstraintLayout.LayoutParams textViewParams) {
@@ -1732,6 +1759,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                         toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
                         toggleEditButtonView(false);
+                        setTabSelected(0);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
@@ -1739,6 +1767,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         simplifiedStatsLayout.setVisibility(View.INVISIBLE);
 
                         toggleEditButtonView(false);
+                        setTabSelected(1);
                         break;
                     case 2:
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
@@ -1746,6 +1775,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                         toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
                         toggleEditButtonView(true);
+                        setTabSelected(2);
                         break;
                 }
             }
@@ -1770,6 +1800,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             }
         });
+    }
+
+    private void setTabSelected(int selectedTab) {
+        this.mSelectedTab = selectedTab;
+    }
+
+    public int getSelectedTab() {
+        return mSelectedTab;
     }
 
     private void setDefaultCalorieTabViewsForFirstTab() {
