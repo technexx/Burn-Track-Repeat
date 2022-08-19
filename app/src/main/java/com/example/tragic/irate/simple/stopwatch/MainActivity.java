@@ -667,6 +667,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Set textView based on tab selection here, and proper method in delete_all_confirm will be set.
   @SuppressLint("NonConstantResourceId")
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
@@ -692,6 +693,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case R.id.delete_all_days_from_daily_stats:
         delete_all_text.setText(R.string.delete_all_activities);
         deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
+        break;
     }
     return super.onOptionsItemSelected(item);
   }
@@ -1166,27 +1168,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     delete_all_confirm.setOnClickListener(v-> {
       AsyncTask.execute(()-> {
-        if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
-          deleteAllCycles();
-
-        } else if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
+        if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
           deleteTotalCycleTimes();
-
-        } else if (delete_all_text.getText().equals(getString(R.string.delete_activity_from_single_day))) {
-          if (dailyStatsFragment.getSelectedTab()==0) {
-            deleteActivityStatsForSelectedDays();
-          }
-          if (dailyStatsFragment.getSelectedTab()==1) {
-            deleteFoodStatsForSelectedDays();
-          }
-
-        } else if (delete_all_text.getText().equals(getString(R.string.delete_all_activities))) {
-          if (dailyStatsFragment.getSelectedTab()==0) {
-            deleteActivityStatsForAllDays();
-          }
-          if (dailyStatsFragment.getSelectedTab()==1) {
-            deleteFoodStatsForAllDays();
-          }
+        }
+        if (delete_all_text.getText().equals(getString(R.string.delete_activity_from_single_day))) {
+          deleteActivityStatsForSelectedDays();
+        }
+        if (delete_all_text.getText().equals(getString(R.string.delete_all_activities))) {
+          deleteActivityStatsForAllDays();
+        }
+        if (delete_all_text.getText().equals(getString(R.string.delete_food_from_single_day))) {
+          deleteFoodStatsForSelectedDays();
+        }
+        if (delete_all_text.getText().equals(getString(R.string.delete_all_foods))) {
+          deleteFoodStatsForAllDays();
         }
 
         runOnUiThread(()-> {
