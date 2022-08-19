@@ -687,11 +687,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case R.id.delete_single_day_from_daily_stats:
-        delete_all_text.setText(R.string.delete_activity_from_single_day);
+        if (dailyStatsFragment.getSelectedTab()==0) {
+          delete_all_text.setText(R.string.delete_activity_from_single_day);
+        }
+        if (dailyStatsFragment.getSelectedTab()==1) {
+          delete_all_text.setText(R.string.delete_food_from_single_day);
+        }
+
         deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
         break;
       case R.id.delete_all_days_from_daily_stats:
-        delete_all_text.setText(R.string.delete_all_activities);
+        if (dailyStatsFragment.getSelectedTab()==0) {
+          delete_all_text.setText(R.string.delete_all_activities);
+        }
+        if (dailyStatsFragment.getSelectedTab()==1) {
+          delete_all_text.setText(R.string.delete_all_foods);
+        }
+
         deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
         break;
     }
