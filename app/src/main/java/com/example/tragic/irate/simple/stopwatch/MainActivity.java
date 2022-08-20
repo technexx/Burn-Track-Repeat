@@ -575,7 +575,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: "Sort" button disappeared when moving from settings frag back to main.
   //Todo: To remove activities w/ 0, just check and delete when coming from Main (we already don't allow 0 to be added).
   //Todo: Foods need to overwrite duplicates, otherwise a long duration will have a huge list of duplicates.
   //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
@@ -656,6 +655,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setTypeOFMenu(DEFAULT_MENU);
         toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
       }
+
+      sortButton.setVisibility(View.VISIBLE);
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || aboutFragment.isVisible()) {
@@ -722,7 +723,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mMenuType==STATS_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_options_menu, menu);
     }
-    //Todo: It's not the menu.
     if (mMenuType==FILLER_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_option_menu_comparison_tab, menu);
     }
