@@ -115,7 +115,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Menu onOptionsMenu;
   int mMenuType;
   int DEFAULT_MENU = 0;
-  int DAILY_SETTINGS_MENU = 1;
+  int STATS_MENU = 1;
   int SETTINGS_MENU = 2;
   int EMPTY_MENU = 3;
 
@@ -715,11 +715,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mMenuType==DEFAULT_MENU) {
       getMenuInflater().inflate(R.menu.main_options_menu, menu);
     }
-    if (mMenuType==DAILY_SETTINGS_MENU) {
+    if (mMenuType==STATS_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_options_menu, menu);
     }
     if (mMenuType==EMPTY_MENU) {
-//      getMenuInflater().inflate(R.menu.empty_menu_layout, menu);
+      getMenuInflater().inflate(R.menu.empty_menu_layout, menu);
     }
     return super.onPrepareOptionsMenu(menu);
   }
@@ -2414,7 +2414,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
             .commit();
 
-    setTypeOFMenu(DAILY_SETTINGS_MENU);
+//    invalidateOptionsMenu();
+    setTypeOFMenu(STATS_MENU);
     toggleSortMenuViewBetweenCyclesAndStats(SORTING_STATS);
 
     if (dailyStatsFragment.getIsFragmentAttached()) {
