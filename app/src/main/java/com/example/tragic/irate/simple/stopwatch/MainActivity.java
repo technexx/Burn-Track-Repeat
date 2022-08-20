@@ -576,10 +576,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Need to have foods delete in onOptions when tab is in foods.
-      //Todo: onOptions shouldn't have delete option in comparison tab.
+  //Todo: onOptions shouldn't have delete option in comparison tab.
   //Todo: Foods need to overwrite duplicates, otherwise a long duration will have a huge list of duplicates.
   //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
+
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
       //Todo: How cancel vs. delete works on edit.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
