@@ -660,6 +660,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || aboutFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
+              .setCustomAnimations(
+                      R.anim.slide_in_from_left_short,  // enter
+                      R.anim.slide_out_from_right  // exit
+              )
               .addToBackStack(null)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
@@ -732,6 +736,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testcall", "menu called back at " + menuNumber);
   }
 
+  private void launchGlobalSettingsFragment() {
+    if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
+      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
+      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+
+      if (rootSettingsFragment !=null) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
+                .commit();
+      }
+      sortButton.setVisibility(View.INVISIBLE);
+    }
+  }
 
   @Override
   public void settingsData(int settingNumber) {
@@ -742,6 +759,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (settingNumber==4) fragmentToReplace = aboutFragment;
 
     getSupportFragmentManager().beginTransaction()
+            .setCustomAnimations(
+                    R.anim.slide_in_from_left_short,  // enter
+                    R.anim.slide_out_from_right,  // exit
+                    R.anim.slide_in_from_left_short,   // popEnter (backstack)
+                    R.anim.slide_out_from_right  // popExit (backstack)
+            )
             .addToBackStack (null)
             .replace(R.id.settings_fragment_frameLayout, fragmentToReplace)
             .commit();
@@ -2390,20 +2413,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     userHeight = sp.getInt("tdeeHeight,", 66);
   }
 
-  private void launchGlobalSettingsFragment() {
-    if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
-      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
-
-      if (rootSettingsFragment !=null) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
-                .commit();
-      }
-      sortButton.setVisibility(View.INVISIBLE);
-    }
-  }
-
   private void launchDailyStatsFragment() {
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
       mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
@@ -2411,7 +2420,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
-    fragmentManager.beginTransaction()
+    getSupportFragmentManager().beginTransaction()
             .setCustomAnimations(
                     R.anim.slide_in_from_left,  // enter
                     R.anim.slide_out_from_right,  // exit
