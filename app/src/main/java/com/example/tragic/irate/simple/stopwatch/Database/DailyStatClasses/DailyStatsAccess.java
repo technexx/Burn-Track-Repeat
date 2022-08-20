@@ -1001,6 +1001,7 @@ public class DailyStatsAccess {
         return false;
     }
 
+    //Todo: May need an mFoodString to check against. Also a check call in fragment to prevent a single new activity from duplicating.
     public void insertCaloriesAndEachFoodIntoDatabase() {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 

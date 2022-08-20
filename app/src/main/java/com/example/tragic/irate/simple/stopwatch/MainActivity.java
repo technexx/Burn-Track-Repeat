@@ -667,7 +667,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Set textView based on tab selection here, and proper method in delete_all_confirm will be set.
   @SuppressLint("NonConstantResourceId")
   @Override
   public boolean onOptionsItemSelected(MenuItem item) {
@@ -1191,9 +1190,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         if (delete_all_text.getText().equals(getString(R.string.delete_food_from_single_day))) {
           deleteFoodStatsForSelectedDays();
+          Log.i("testDel", "deleting food for single day!");
         }
         if (delete_all_text.getText().equals(getString(R.string.delete_all_foods))) {
           deleteFoodStatsForAllDays();
+          Log.i("testDel", "deleting food for all days!");
         }
 
         runOnUiThread(()-> {
@@ -2464,7 +2465,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     List<Long> longListOfFoodIdsToDelete = new ArrayList<>();
 
-    for (int i=0; i<longListOfFoodIdsToDelete.size(); i++) {
+    for (int i=0; i<caloriesForEachFoodList.size(); i++) {
       longListOfFoodIdsToDelete.add(caloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood());
     }
 
