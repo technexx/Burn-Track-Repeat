@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/StatFragmentThemeDark"
-    android:background="@color/darker_grey">
+    android:background="@color/test_bg2">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/calorie_comparison_tab_layout"
@@ -13,7 +13,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/darker_grey"
+        android:background="@color/test_bg2"
         app:tabTextColor="@color/white"
         app:tabIndicatorColor="@color/off_white"
         app:tabSelectedTextColor="@color/blue_2"
@@ -28,7 +28,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="0dp"
         android:background="@drawable/daily_total_stats_border"
-        android:backgroundTint="@color/darker_grey">
+        android:backgroundTint="@color/test_bg2">
 
         <TextView
             android:id="@+id/activity_stats_duration_header_textView"
@@ -49,7 +49,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toStartOf="@id/activity_stats_duration_header_textView"
             android:layout_marginEnd="12dp"
-            android:backgroundTint="@color/darker_grey"
+            android:backgroundTint="@color/test_bg2"
             android:src="@drawable/double_arrow_left">
         </ImageButton>
 
@@ -60,7 +60,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toEndOf="@id/activity_stats_duration_header_textView"
             android:layout_marginStart="12dp"
-            android:backgroundTint="@color/darker_grey"
+            android:backgroundTint="@color/test_bg2"
             android:src="@drawable/double_arrow_right">
         </ImageButton>
 
@@ -147,7 +147,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="10dp"
         android:src="@drawable/collapse_1"
-        android:backgroundTint="@color/darker_grey">
+        android:backgroundTint="@color/test_bg2">
     </ImageButton>
 
     <ImageButton
@@ -158,7 +158,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/edit_icon"
         android:layout_marginEnd="10dp"
-        android:backgroundTint="@color/darker_grey">
+        android:backgroundTint="@color/test_bg2">
     </ImageButton>
 
     <androidx.recyclerview.widget.RecyclerView
