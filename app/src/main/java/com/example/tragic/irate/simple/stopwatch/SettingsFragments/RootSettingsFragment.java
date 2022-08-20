@@ -2,6 +2,9 @@ package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -26,6 +29,14 @@ public class RootSettingsFragment extends PreferenceFragmentCompat {
 
     public void sendSettingsData(onChangedSettings xOnChangedSettings) {
         this.mOnChangedSettings = xOnChangedSettings;
+    }
+
+    @Override
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = super.onCreateView(inflater, container, savedInstanceState);
+        view.setBackgroundColor(getResources().getColor(R.color.darker_grey));
+
+        return view;
     }
 
     @Override
