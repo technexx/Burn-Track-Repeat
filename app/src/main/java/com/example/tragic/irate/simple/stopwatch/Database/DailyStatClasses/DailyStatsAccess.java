@@ -44,9 +44,10 @@ public class DailyStatsAccess {
 
     List<String> totalFoodStringListForSelectedDuration;
     List<Double> totalCaloriesConsumedListForSelectedDuration;
+    double totalCaloriesConsumedForSelectedDuration;
 
     long totalSetTimeForSelectedDuration;
-    double totalCaloriesForSelectedDuration;
+    double totalActivityCaloriesForSelectedDuration;
     long totalUnassignedSetTimeForSelectedDuration;
     double totalUnassignedCaloriesForSelectedDuration;
     long totalAggregateTimeForSelectedDuration;
@@ -881,11 +882,12 @@ public class DailyStatsAccess {
     public void setTotalSetTimeVariableForSelectedDuration() {
         long valueToReturn = 0;
 
+        //Todo: This is list in adapter.
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
-            Log.i("testdb", "activity times being added are " + totalSetTimeListForEachActivityForSelectedDuration.get(i)/1000/60);
         }
 
+        //Todo: We're only using this for assigned/unassigned time. Not needed for food consumed.
         totalSetTimeForSelectedDuration = valueToReturn;
     }
 
@@ -904,11 +906,11 @@ public class DailyStatsAccess {
             valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
         }
 
-        totalCaloriesForSelectedDuration = valueToReturn;
+        totalActivityCaloriesForSelectedDuration = valueToReturn;
     }
 
     public double getTotalCalorieBurnedForSelectedDuration() {
-        return totalCaloriesForSelectedDuration;
+        return totalActivityCaloriesForSelectedDuration;
     }
 
     public long getTotalSetTimeFromDayHolderList() {
@@ -958,7 +960,7 @@ public class DailyStatsAccess {
     }
 
     public void setAggregateDailyCalories() {
-        totalAggregateCaloriesForSelectedDuration = totalCaloriesForSelectedDuration + getUnassignedDailyCalories();
+        totalAggregateCaloriesForSelectedDuration = totalActivityCaloriesForSelectedDuration + getUnassignedDailyCalories();
     }
 
     public double getAggregateDailyCalories() {
@@ -1103,9 +1105,9 @@ public class DailyStatsAccess {
         clearFoodConsumedArrayLists();
 
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            if (doesTotalFoodConsumedListContainSelectedString(mCaloriesForEachFoodList.get(i).getTypeOfFood())) {
+            if (!doesTotalFoodConsumedListContainSelectedString(mCaloriesForEachFoodList.get(i).getTypeOfFood())) {
 
-                totalActivitiesListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
+                totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
 
                 double caloriesToAdd = roundDownCalories(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
                 totalCaloriesConsumedListForSelectedDuration.add(caloriesToAdd);
@@ -1115,12 +1117,12 @@ public class DailyStatsAccess {
         }
     }
 
-    private void clearFoodConsumedArrayLists() {
+    public void clearFoodConsumedArrayLists() {
         totalFoodStringListForSelectedDuration.clear();
         totalCaloriesConsumedListForSelectedDuration.clear();
     }
 
-    private boolean doesTotalFoodConsumedListContainSelectedString(String stringToCheck) {
+    public boolean doesTotalFoodConsumedListContainSelectedString(String stringToCheck) {
         for (int i=0; i<totalFoodStringListForSelectedDuration.size(); i++) {
             if (totalFoodStringListForSelectedDuration.get(i).equalsIgnoreCase(stringToCheck)) {
                 duplicateStringPosition = i;
@@ -1231,7 +1233,7 @@ public class DailyStatsAccess {
     }
 
     private void logActivityCalorieValues() {
-        Log.i("testCals", "total assigned calories are " + totalCaloriesForSelectedDuration);
+        Log.i("testCals", "total assigned calories are " + totalActivityCaloriesForSelectedDuration);
         Log.i("testCals", "total unassigned calories are " + totalUnassignedCaloriesForSelectedDuration);
         Log.i("testCals", "total aggregate calories are " + totalAggregateCaloriesForSelectedDuration);
         Log.i("testCals", "decimal pct is " + decimalPercentageOfUnAssignedTime());

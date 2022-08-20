@@ -671,8 +671,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.clearStatsForEachActivityArrayLists();
         setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
 
-        dailyStatsAccess.setTotalFoodStringListForSelectedDuration();
-        dailyStatsAccess.setTotalCaloriesConsumedListForSelectedDuration();
+        dailyStatsAccess.clearFoodConsumedArrayLists();
+        dailyStatsAccess.setTotalFoodConsumedForSelectedDaysToArrayLists();
 
         dailyStatsAccess.setAggregateDailyTime();
         dailyStatsAccess.setUnassignedTotalCalories();
@@ -998,7 +998,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSelectedDays(finalNewActivityTime, finalNewCaloriesBurned);
 
             setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
-            setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
 
             //Multiple additions will always include daySelected.
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASingleDay(daySelectedFromCalendar);
@@ -1884,10 +1883,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         LinearLayoutManager lm = new LinearLayoutManager(getContext());
         dailyStatsRecyclerView.setLayoutManager(lm);
         dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
-
-//        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(dailyStatsRecyclerView.getContext(), lm.getOrientation());
-//        dividerItemDecoration.setDrawable(new ColorDrawable(getResources().getColor(R.color.white)));
-//        dailyStatsRecyclerView.addItemDecoration(dividerItemDecoration);
 
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
     }
