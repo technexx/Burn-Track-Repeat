@@ -229,6 +229,71 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     int mSelectedTab;
 
+    changeOnOptionsItemSelectedMenu mChangeOnOptionsItemSelectedMenu;
+
+    public void setOnOptionsMenu(changeOnOptionsItemSelectedMenu xChangeOnOptionsItemSelectedMenu) {
+        this.mChangeOnOptionsItemSelectedMenu = xChangeOnOptionsItemSelectedMenu;
+    }
+
+    private void instantiateCalorieTabLayoutListenerAndViews() {
+        setDefaultCalorieTabViewsForFirstTab();
+
+        caloriesComparisonTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (caloriesComparisonTabLayout.getSelectedTabPosition()) {
+                    case 0:
+                        dailyStatsRecyclerView.setVisibility(View.VISIBLE);
+                        totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+
+                        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
+                        toggleEditButtonView(false);
+                        setTabSelected(0);
+                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
+                        break;
+                    case 1:
+                        caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
+                        totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+                        simplifiedStatsLayout.setVisibility(View.INVISIBLE);
+
+                        toggleEditButtonView(false);
+                        setTabSelected(1);
+                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
+                        break;
+                    case 2:
+                        caloriesComparedLayout.setVisibility(View.VISIBLE);
+                        simplifiedStatsLayout.setVisibility(View.INVISIBLE);
+
+                        toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
+                        toggleEditButtonView(true);
+                        setTabSelected(2);
+                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(2);
+                        break;
+                }
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                dailyStatsRecyclerView.setVisibility(View.INVISIBLE);
+                caloriesConsumedRecyclerView.setVisibility(View.INVISIBLE);
+                totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
+                totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
+                caloriesComparedLayout.setVisibility(View.GONE);
+                simplifiedStatsLayout.setVisibility(View.INVISIBLE);
+
+                dailyStatsAdapter.turnOffEditMode();
+                dailyStatsAdapter.notifyDataSetChanged();
+                caloriesConsumedAdapter.turnOffEditMode();
+                caloriesConsumedAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+    }
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -1746,60 +1811,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalWeightDifferenceCompared = mRoot.findViewById(R.id.total_weight_difference_compared);
     }
 
-    private void instantiateCalorieTabLayoutListenerAndViews() {
-        setDefaultCalorieTabViewsForFirstTab();
-
-        caloriesComparisonTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                switch (caloriesComparisonTabLayout.getSelectedTabPosition()) {
-                    case 0:
-                        dailyStatsRecyclerView.setVisibility(View.VISIBLE);
-                        totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-
-                        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
-                        toggleEditButtonView(false);
-                        setTabSelected(0);
-                        break;
-                    case 1:
-                        caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
-                        totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-                        simplifiedStatsLayout.setVisibility(View.INVISIBLE);
-
-                        toggleEditButtonView(false);
-                        setTabSelected(1);
-                        break;
-                    case 2:
-                        caloriesComparedLayout.setVisibility(View.VISIBLE);
-                        simplifiedStatsLayout.setVisibility(View.INVISIBLE);
-
-                        toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
-                        toggleEditButtonView(true);
-                        setTabSelected(2);
-                        break;
-                }
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                dailyStatsRecyclerView.setVisibility(View.INVISIBLE);
-                caloriesConsumedRecyclerView.setVisibility(View.INVISIBLE);
-                totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
-                totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
-                caloriesComparedLayout.setVisibility(View.GONE);
-                simplifiedStatsLayout.setVisibility(View.INVISIBLE);
-
-                dailyStatsAdapter.turnOffEditMode();
-                dailyStatsAdapter.notifyDataSetChanged();
-                caloriesConsumedAdapter.turnOffEditMode();
-                caloriesConsumedAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
+    public interface changeOnOptionsItemSelectedMenu {
+        void onChangeOnOptionsMenu(int menuNumber);
     }
 
     private void setTabSelected(int selectedTab) {

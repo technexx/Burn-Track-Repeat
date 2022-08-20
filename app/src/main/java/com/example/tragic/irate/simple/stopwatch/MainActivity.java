@@ -107,7 +107,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu {
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
@@ -116,8 +116,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int mMenuType;
   int DEFAULT_MENU = 0;
   int STATS_MENU = 1;
-  int SETTINGS_MENU = 2;
-  int EMPTY_MENU = 3;
+  int FILLER_MENU = 2;
 
   DailyStatsAccess dailyStatsAccess;
   FragmentManager fragmentManager;
@@ -576,7 +575,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: onOptions shouldn't have delete option in comparison tab.
+  //Todo: "Sort" button disappeared when moving from settings frag back to main.
+  //Todo: To remove activities w/ 0, just check and delete when coming from Main (we already don't allow 0 to be added).
   //Todo: Foods need to overwrite duplicates, otherwise a long duration will have a huge list of duplicates.
   //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
 
@@ -718,11 +718,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mMenuType==STATS_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_options_menu, menu);
     }
-    if (mMenuType==EMPTY_MENU) {
-      getMenuInflater().inflate(R.menu.empty_menu_layout, menu);
+    //Todo: It's not the menu.
+    if (mMenuType==FILLER_MENU) {
+      getMenuInflater().inflate(R.menu.daily_stats_option_menu_comparison_tab, menu);
     }
     return super.onPrepareOptionsMenu(menu);
   }
+
+  @Override
+  public void onChangeOnOptionsMenu(int menuNumber) {
+    mMenuType = menuNumber;
+//    invalidateOptionsMenu();
+    Log.i("testcall", "menu called back at " + menuNumber);
+  }
+
 
   @Override
   public void settingsData(int settingNumber) {
@@ -1476,6 +1485,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     rootSettingsFragment.sendSettingsData(MainActivity.this);
     soundSettingsFragment.soundSetting(MainActivity.this);
     colorSettingsFragment.colorSetting(MainActivity.this);
+
+    dailyStatsFragment.setOnOptionsMenu(MainActivity.this);
 
     mainActivityFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
     mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
@@ -2379,10 +2390,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     userHeight = sp.getInt("tdeeHeight,", 66);
   }
 
-  private void setTypeOFMenu(int menuType) {
-    mMenuType = menuType;
-  }
-
   private void launchGlobalSettingsFragment() {
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
       mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
@@ -2425,6 +2432,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  public void setTypeOFMenu(int menuType) {
+    mMenuType = menuType;
+  }
   private void deleteActivityStatsForSelectedDays() {
     List<DayHolder> dayHolderList = dailyStatsFragment.getDayHolderList();
     List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
