@@ -32,12 +32,10 @@ public class DailyStatsAccess {
 
     DayHolder mDayHolder;
     StatsForEachActivity mStatsForEachActivity;
-    CalorieDayHolder mCalorieDayHolder;
     CaloriesForEachFood mCaloriesForEachFood;
 
     List<DayHolder> mDayHolderList;
     List<StatsForEachActivity> mStatsForEachActivityList;
-    List<CalorieDayHolder> mCalorieDayHolderList;
     List<CaloriesForEachFood> mCaloriesForEachFoodList;
 
     List<String> totalActivitiesListForSelectedDuration;
@@ -538,6 +536,17 @@ public class DailyStatsAccess {
         }
     }
 
+    public void setDoesActivityExistsForSpecificDayBoolean() {
+        doesActivityExistsInDatabaseForSelectedDay = false;
+
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
+                doesActivityExistsInDatabaseForSelectedDay = true;
+                return;
+            }
+        }
+    }
+
     public void setStatsForEachActivityEntityFromPosition(int position) {
         mStatsForEachActivity = mStatsForEachActivityList.get(position);
     }
@@ -637,7 +646,7 @@ public class DailyStatsAccess {
 
         listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
 
-        for (int i=0; i<listToPullDaysFrom.size(); i++) {
+        for (int i = 0; i < listToPullDaysFrom.size(); i++) {
             mDayHolder = new DayHolder();
             int daySelected = listToPullDaysFrom.get(i);
 
@@ -676,17 +685,6 @@ public class DailyStatsAccess {
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
-    }
-
-    public void setDoesActivityExistsForSpecificDayBoolean() {
-        doesActivityExistsInDatabaseForSelectedDay = false;
-
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
-                doesActivityExistsInDatabaseForSelectedDay = true;
-                return;
-            }
-        }
     }
 
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
@@ -832,7 +830,6 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    // These are the lists pulled by recyclerView.
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
         clearStatsForEachActivityArrayLists();
 
@@ -845,18 +842,12 @@ public class DailyStatsAccess {
 
                     double caloriesToAdd = roundDownCalories(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.add(caloriesToAdd);
-
-                    Log.i("testTotal", "individual activity calories for dayHolder in Retrieval are " +  mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
                 } else {
                     totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
-                    totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedCaloriesFromExistingAndRepeatingPositions(i));
+                    totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedActivityCaloriesFromExistingAndRepeatingPositions(i));
                 }
             }
         }
-    }
-
-    private double roundDownCalories(double calories) {
-        return Math.floor(calories);
     }
 
     public void clearStatsForEachActivityArrayLists() {
@@ -875,6 +866,18 @@ public class DailyStatsAccess {
         return false;
     }
 
+    private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
+        long iteratingValue = mStatsForEachActivityList.get(position).getTotalSetTimeForEachActivity();
+        long presentValue =  totalSetTimeListForEachActivityForSelectedDuration.get(duplicateStringPosition);
+        return iteratingValue + presentValue;
+    }
+
+    private double combinedActivityCaloriesFromExistingAndRepeatingPositions(int position) {
+        double iteratingValue = roundDownCalories(mStatsForEachActivityList.get(position).getTotalCaloriesBurnedForEachActivity());
+        double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDuration.get(duplicateStringPosition);
+        return iteratingValue + presentValue;
+    }
+
     public void setTotalSetTimeVariableForSelectedDuration() {
         long valueToReturn = 0;
 
@@ -884,6 +887,10 @@ public class DailyStatsAccess {
         }
 
         totalSetTimeForSelectedDuration = valueToReturn;
+    }
+
+    private double roundDownCalories(double calories) {
+        return Math.floor(calories);
     }
 
     public long getTotalSetTimeForSelectedDuration() {
@@ -968,18 +975,6 @@ public class DailyStatsAccess {
         return 1 - remainingTime;
     }
 
-    private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
-        long iteratingValue = mStatsForEachActivityList.get(position).getTotalSetTimeForEachActivity();
-        long presentValue =  totalSetTimeListForEachActivityForSelectedDuration.get(duplicateStringPosition);
-        return iteratingValue + presentValue;
-    }
-
-    private double combinedCaloriesFromExistingAndRepeatingPositions(int position) {
-        double iteratingValue = roundDownCalories(mStatsForEachActivityList.get(position).getTotalCaloriesBurnedForEachActivity());
-        double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDuration.get(duplicateStringPosition);
-        return iteratingValue + presentValue;
-    }
-
     public List<String> getTotalActivitiesListForSelectedDuration() {
         return totalActivitiesListForSelectedDuration;
     }
@@ -1001,7 +996,6 @@ public class DailyStatsAccess {
         return false;
     }
 
-    //Todo: May need an mFoodString to check against. Also a check call in fragment to prevent a single new activity from duplicating.
     public void insertCaloriesAndEachFoodIntoDatabase() {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
@@ -1105,6 +1099,43 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
+    public void setTotalFoodConsumedForSelectedDaysToArrayLists() {
+        clearFoodConsumedArrayLists();
+
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            if (doesTotalFoodConsumedListContainSelectedString(mCaloriesForEachFoodList.get(i).getTypeOfFood())) {
+
+                totalActivitiesListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
+
+                double caloriesToAdd = roundDownCalories(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
+                totalCaloriesConsumedListForSelectedDuration.add(caloriesToAdd);
+            } else {
+                totalCaloriesConsumedListForSelectedDuration.set(duplicateStringPosition, combinedFoodConsumedCaloriesFromExistingAndRepeatingPositions(i));
+            }
+        }
+    }
+
+    private void clearFoodConsumedArrayLists() {
+        totalFoodStringListForSelectedDuration.clear();
+        totalCaloriesConsumedListForSelectedDuration.clear();
+    }
+
+    private boolean doesTotalFoodConsumedListContainSelectedString(String stringToCheck) {
+        for (int i=0; i<totalFoodStringListForSelectedDuration.size(); i++) {
+            if (totalFoodStringListForSelectedDuration.get(i).equalsIgnoreCase(stringToCheck)) {
+                duplicateStringPosition = i;
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private double combinedFoodConsumedCaloriesFromExistingAndRepeatingPositions(int position) {
+        double iteratingValue = roundDownCalories(mCaloriesForEachFoodList.get(position).getCaloriesConsumedForEachFoodType());
+        double presetValue = totalCaloriesConsumedListForSelectedDuration.get(duplicateStringPosition);
+        return iteratingValue + presetValue;
+    }
+
     private long setZeroLowerBoundsOnLongValue(long value) {
         if (value<0) {
             return 0;
@@ -1125,9 +1156,7 @@ public class DailyStatsAccess {
         mDayHolderList = new ArrayList<>();
         mStatsForEachActivityList = new ArrayList<>();
 
-        mCalorieDayHolder = new CalorieDayHolder();
         mCaloriesForEachFood = new CaloriesForEachFood();
-        mCalorieDayHolderList = new ArrayList<>();
         mCaloriesForEachFoodList = new ArrayList<>();
     }
 

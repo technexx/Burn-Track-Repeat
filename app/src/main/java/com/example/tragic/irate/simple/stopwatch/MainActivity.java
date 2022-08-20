@@ -581,6 +581,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
       //Todo: How cancel vs. delete works on edit.
+      //Todo: Underlines/clearer contrast w/ food edit/addition.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
