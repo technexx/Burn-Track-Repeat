@@ -1422,12 +1422,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesBurnedInTdeeAdditionTextView.setText(getString(R.string.two_line_concat, getString(R.string.calories_burned_per_minute, caloriesBurnedPerMinute), getString(R.string.calories_burned_per_hour, caloriesBurnedPerHour)));
     }
 
-    private void saveFoodIfItDoesNotExistsAndToastIfItDoes(boolean foodExists) {
-        if (!foodExists) {
-
-        }
-    }
-
     @Override
     public void onAddingFood() {
         typeOfFoodEditText.requestFocus();
@@ -1508,16 +1502,26 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void editFoodInStats() {
+        if (getFoodStringFromEditText().isEmpty()) {
+            showToastIfNoneActive("Must enter a food!");
+            return;
+        }
+        if (getCaloriesForFoodItemFromEditText().isEmpty()) {
+            showToastIfNoneActive("Must enter a caloric value!");
+            return;
+        }
+
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
 
-            String food= getFoodStringFromEditText();
+            String food = getFoodStringFromEditText();
             double calories = Double.parseDouble(getCaloriesForFoodItemFromEditText());
             dailyStatsAccess.updateCaloriesAndEachFoodInDatabase(mPositionToEdit, food, calories);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
+                caloriesConsumedAddAndEditPopUpWindow.dismiss();
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
             });
         });

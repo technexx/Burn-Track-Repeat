@@ -1007,6 +1007,7 @@ public class DailyStatsAccess {
             mCaloriesForEachFood = new CaloriesForEachFood();
             int daySelected = listToPullDaysFrom.get(i);
 
+            //Todo: For insertion, we shouldn't have this conditional.
             if (mListOfActivityDaysWithPopulatedRows.contains(daySelected)) {
                 for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {
                     long uniqueIdToCheck = mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood();
@@ -1027,15 +1028,21 @@ public class DailyStatsAccess {
         }
     }
 
+    //Todo: Grabs entire list, not just ones containing unique IDs of duration days.
+    //Todo: Should not contain duplicates because we restrict String, but should have safeguards in place, anyway.
     public void updateCaloriesAndEachFoodInDatabase(int position, String food, double calories) {
         String foodToUpdate = totalFoodStringListForSelectedDuration.get(position);
 
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            Log.i("testUpdate", "list contains unique id of " + mCaloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood());
+
             if (mCaloriesForEachFoodList.get(i).getTypeOfFood().equalsIgnoreCase(foodToUpdate)) {
                 mCaloriesForEachFood = mCaloriesForEachFoodList.get(i);
 
                 mCaloriesForEachFood.setTypeOfFood(food);
                 mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(calories);
+
+//                Log.i("testUpdate", "day contains food from unique id of " + mCaloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood());
 
                 cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
             }

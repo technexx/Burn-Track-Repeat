@@ -575,11 +575,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Can't add for duration if activity exists on a single day.
   //Todo: To remove activities w/ 0, just check and delete when coming from Main (we already don't allow 0 to be added).
-  //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
 
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
+  //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
   //Todo: Splash screen on app start as a guide.
@@ -589,6 +590,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Consider having activity edit select multiple rows (like cycles) and long click for edit.
   //Todo: Add Day/Night modes.
+  //Todo: Maybe (can do post-launch) have different colorings for days w/ food.
+  //Todo: Possibly have all colors in last tab w/ overlap if day has both. Will likely cause blipping though.
 
   //Todo: Check sizes on long aspect for all layouts + menus.
 
