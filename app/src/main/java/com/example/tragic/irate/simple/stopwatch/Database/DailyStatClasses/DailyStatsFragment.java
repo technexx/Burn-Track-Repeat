@@ -250,6 +250,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         toggleEditButtonView(false);
                         setTabSelected(0);
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
+
+                        togggleTotalStatTextViewsWhenSwitchingTabs(0);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
@@ -259,6 +261,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         toggleEditButtonView(false);
                         setTabSelected(1);
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
+
+                        togggleTotalStatTextViewsWhenSwitchingTabs(1);
                         break;
                     case 2:
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
@@ -1643,7 +1647,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void toggleCalendarMinimizationLayouts() {
         if (caloriesComparisonTabLayout.getSelectedTabPosition()==0) {
-            setCalendarMinimizationLayoutParams(dailyStatsRecyclerViewLayoutParams, totalActivityStatsValuesTextViewsLayoutParams);
+            setCalendarMinimizationViews();
+            setCalendarMinimizationLayoutConstraints(dailyStatsRecyclerViewLayoutParams, totalActivityStatsValuesTextViewsLayoutParams);
 
             dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
             totalActivityStatsValuesTextViewLayout.setLayoutParams(totalActivityStatsValuesTextViewsLayoutParams);
@@ -1651,7 +1656,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         if (caloriesComparisonTabLayout.getSelectedTabPosition()==1) {
-            setCalendarMinimizationLayoutParams(caloriesConsumedRecyclerViewLayoutParams, totalFoodStatsValuesTextViewLayoutParams);
+            setCalendarMinimizationViews();
+            setCalendarMinimizationLayoutConstraints(caloriesConsumedRecyclerViewLayoutParams, totalFoodStatsValuesTextViewLayoutParams);
 
             caloriesConsumedRecyclerView.setLayoutParams(caloriesConsumedRecyclerViewLayoutParams);
             totalFoodStatsValuesTextViewLayout.setLayoutParams(totalFoodStatsValuesTextViewLayoutParams);
@@ -1663,19 +1669,39 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void setCalendarMinimizationLayoutParams(ConstraintLayout.LayoutParams recyclerParams, ConstraintLayout.LayoutParams textViewParams) {
-        if (!calendarIsMinimized) {
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
-            calendarView.startAnimation(slideInCalendarFromBottom);
+    private void setCalendarMinimizationViews() {
+        if (calendarIsMinimized) {
+            setCalendarViewMinimizationAnimation(true);
+            setCalendarMinimizationButton(true);
+        } else {
+            setCalendarViewMinimizationAnimation(false);
+            setCalendarMinimizationButton(false);
+        }
+    }
 
+    private void setCalendarMinimizationButton(boolean minimizing) {
+        if (minimizing) {
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
+        } else {
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
+        }
+    }
+
+    private void setCalendarViewMinimizationAnimation(boolean minimizing) {
+        if (minimizing) {
+            calendarView.startAnimation(slideOutCalendarToBottom);
+        } else {
+            calendarView.startAnimation(slideInCalendarFromBottom);
+        }
+    }
+
+    private void setCalendarMinimizationLayoutConstraints(ConstraintLayout.LayoutParams recyclerParams, ConstraintLayout.LayoutParams textViewParams) {
+        if (!calendarIsMinimized) {
             recyclerParams.height = dpToPxConv(275);
             recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
             textViewParams.bottomToTop = R.id.stats_calendar;
         } else {
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
-            calendarView.startAnimation(slideOutCalendarToBottom);
-
             recyclerParams.height = 0;
             recyclerParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
 
@@ -1688,6 +1714,25 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
         } else {
             activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(10);
+        }
+    }
+
+    private void togggleTotalStatTextViewsWhenSwitchingTabs(int tabPositionSelected) {
+        if (tabPositionSelected==0) {
+            totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+            totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
+        }
+        if (tabPositionSelected==1) {
+            totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+            totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
+        }
+
+        //Todo: Set layout params.
+        if (calendarIsMinimized) {
+            calendarView.setVisibility(View.INVISIBLE);
+
+        } else {
+            calendarView.setVisibility(View.VISIBLE);
         }
     }
 

@@ -579,7 +579,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
 
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
-      //Todo: How cancel vs. delete works on edit.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
