@@ -150,6 +150,8 @@
     <string name="empty_string"/>
     <string-array name="empty_array"/>
 
+    <string name="line">\n</string>
+
     <string-array name="sound_setting_options">
         <item>Silent</item>
         <item>Vibrate Once</item>

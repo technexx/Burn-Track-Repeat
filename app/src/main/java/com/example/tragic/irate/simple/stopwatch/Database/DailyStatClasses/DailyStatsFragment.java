@@ -557,10 +557,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setMultipleDayWarningTextViewForFoodConsumption(int addingOrEditing) {
         if (addingOrEditing == ADDING_FOOD) {
-            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_food_addition_warning);
+            multipleDayEditWarningForFoodConsumedTextView.setText(R.string.multiple_food_addition_warning);
         }
         if (addingOrEditing == EDITING_FOOD) {
-            multipleDayWarningForActivitiesTextView.setText(R.string.multiple_food_edit_warning);
+            multipleDayEditWarningForFoodConsumedTextView.setText(R.string.multiple_food_edit_warning);
         }
     }
 
