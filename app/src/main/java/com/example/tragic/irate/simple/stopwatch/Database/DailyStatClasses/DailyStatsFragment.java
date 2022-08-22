@@ -1444,49 +1444,51 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
-        dailyStatsAccess.setFoodString(getFoodStringFromEditText());
-        dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
+        AsyncTask.execute(() -> {
+            dailyStatsAccess.setFoodString(getFoodStringFromEditText());
+            dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
 
-        //Inserting with check to see if food exists. Only checking if on a single day.
-        if (dailyStatsAccess.getNumberOfDaysSelected() == 1) {
-            if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
-                AsyncTask.execute(()-> {
+            //Inserting with check to see if food exists. Only checking if on a single day.
+            if (dailyStatsAccess.getNumberOfDaysSelected() == 1) {
+                if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
+
                     dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(daySelectedFromCalendar);
-
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
                     getActivity().runOnUiThread(()-> {
                         caloriesConsumedAdapter.notifyDataSetChanged();
                         caloriesConsumedAddAndEditPopUpWindow.dismiss();
                     });
-                });
-            } else {
-                showToastIfNoneActive("Food exists!");
-            }
-        }
 
-        //Inserting without a check for multiple days, since we want to overwrite the food on days it exists.
-        if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
-            for (int i=0; i<dailyStatsAccess.getCaloriesForEachFoodList().size(); i++) {
-                long dayInLoop = dailyStatsAccess.getCaloriesForEachFoodList().get(i).getCaloriesForEachFoodId();
-
-                if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
-                    AsyncTask.execute(()-> {
-                        dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(dayInLoop);
-
-                    });
+                    Log.i("testFood", "updating single day with new food!");
                 } else {
-                    //Todo: Call update.
-                    dailyStatsAccess.updateCaloriesAndEachFoodInDatabaseFromDayId(dayInLoop);
+                    showToastIfNoneActive("Food exists!");
                 }
             }
-        }
 
-        populateListsAndTextViewsFromEntityListsInDatabase();
+            //Inserting without a check for multiple days, since we want to overwrite the food on days it exists.
+            Log.i("testFood", "number of days is " + dailyStatsAccess.getNumberOfDaysSelected());
+            if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+                for (int i=0; i<dailyStatsAccess.getCaloriesForEachFoodList().size(); i++) {
+                    long dayInLoop = dailyStatsAccess.getCaloriesForEachFoodList().get(i).getUniqueIdTiedToEachFood();
 
-        getActivity().runOnUiThread(()-> {
-            caloriesConsumedAdapter.notifyDataSetChanged();
-            caloriesConsumedAddAndEditPopUpWindow.dismiss();
+                    //Todo: Need to check only each unique ID from food list, not entire list.
+                    if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
+                        dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(dayInLoop);
+                        Log.i("testFood", "day " + dayInLoop + " does not exist and is inserting!");
+                    } else {
+                        dailyStatsAccess.updateCaloriesAndEachFoodInDatabaseFromDayId(dayInLoop);
+                        Log.i("testFood", "day " + dayInLoop + " exists and is updating!");
+                    }
+                }
+            }
+
+            populateListsAndTextViewsFromEntityListsInDatabase();
+
+            getActivity().runOnUiThread(()-> {
+                caloriesConsumedAdapter.notifyDataSetChanged();
+                caloriesConsumedAddAndEditPopUpWindow.dismiss();
+            });
         });
     }
 
