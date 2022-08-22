@@ -1445,6 +1445,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         AsyncTask.execute(() -> {
+            String foodString = getFoodStringFromEditText();
             dailyStatsAccess.setFoodString(getFoodStringFromEditText());
             dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
 
@@ -1469,16 +1470,32 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             //Inserting without a check for multiple days, since we want to overwrite the food on days it exists.
             Log.i("testFood", "number of days is " + dailyStatsAccess.getNumberOfDaysSelected());
             if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
-                for (int i=0; i<dailyStatsAccess.getCaloriesForEachFoodList().size(); i++) {
-                    long dayInLoop = dailyStatsAccess.getCaloriesForEachFoodList().get(i).getUniqueIdTiedToEachFood();
 
-                    //Todo: Need to check only each unique ID from food list, not entire list.
-                    if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
-                        dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(dayInLoop);
-                        Log.i("testFood", "day " + dayInLoop + " does not exist and is inserting!");
+//                for (int i=0; i<dailyStatsAccess.getListOfFoodDaysSelected().size(); i++) {
+//                    int uniqueDayIdToCheck = dailyStatsAccess.getListOfFoodDaysSelected().get(i);
+//
+//                    for (int k=0; k<dailyStatsAccess.getCaloriesForEachFoodList().size(); k++) {
+//                        if (dailyStatsAccess.getCaloriesForEachFoodList().get(i).getUniqueIdTiedToEachFood()==uniqueDayIdToCheck) {
+//                            if (foodString.equalsIgnoreCase(dailyStatsAccess.getCaloriesForEachFoodList().get(k).getTypeOfFood())) {
+//                                dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(uniqueDayIdToCheck);
+//                                Log.i("testFood", "day " + uniqueDayIdToCheck + " does not exist and is inserting!");
+//                            }
+//                        } else {
+//                            dailyStatsAccess.updateCaloriesAndEachFoodInDatabaseFromDayId(uniqueDayIdToCheck);
+//                            Log.i("testFood", "day " + uniqueDayIdToCheck + " exists and is updating!");
+//                        }
+//                    }
+//                }
+
+                for (int i=0; i<dailyStatsAccess.getListOfFoodDaysSelected().size(); i++) {
+                    int uniqueDayIdToCheck = dailyStatsAccess.getListOfFoodDaysSelected().get(i);
+
+                    if (!dailyStatsAccess.doesFoodExistInDatabaseForMultipleDaysBoolean(uniqueDayIdToCheck)) {
+                        dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(uniqueDayIdToCheck);
+                        Log.i("testFood", "day " + uniqueDayIdToCheck + " does not exist and is inserting!");
                     } else {
-                        dailyStatsAccess.updateCaloriesAndEachFoodInDatabaseFromDayId(dayInLoop);
-                        Log.i("testFood", "day " + dayInLoop + " exists and is updating!");
+                        dailyStatsAccess.updateCaloriesAndEachFoodInDatabaseFromDayId(uniqueDayIdToCheck);
+                        Log.i("testFood", "day " + uniqueDayIdToCheck + " exists and is updating!");
                     }
                 }
             }

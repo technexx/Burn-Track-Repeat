@@ -80,11 +80,11 @@ public class DailyStatsAccess {
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
 
-    List<Integer> mLongListOfActivityDaysSelected;
+    List<Integer> mListOfActivityDaysSelected;
     List<Integer> mListOfActivityDaysWithPopulatedRows;
     List<Integer> mListOfActivityDaysWithEmptyRows;
 
-    List<Integer> mLongListOfFoodDaysSelected;
+    List<Integer> mListOfFoodDaysSelected;
     List<Integer> mListOfFoodDaysWithPopulatedRows;
     List<Integer> mListOfFoodDaysWithEmptyRows;
 
@@ -335,22 +335,22 @@ public class DailyStatsAccess {
 
     private void setFullListOfActivityDaysFromDateSelection(int firstDay, int sizeOfList) {
         for (int i=0; i<sizeOfList; i++) {
-            mLongListOfActivityDaysSelected.add(firstDay + i);
+            mListOfActivityDaysSelected.add(firstDay + i);
         }
     }
 
     private void setFullListOfFoodDaysFromDateSelection(int firstDay, int sizeOfList) {
         for (int i=0; i<sizeOfList; i++) {
-            mLongListOfFoodDaysSelected.add(firstDay + i);
+            mListOfFoodDaysSelected.add(firstDay + i);
         }
     }
 
     private void clearFullListOfActivityDays() {
-        mLongListOfActivityDaysSelected.clear();
+        mListOfActivityDaysSelected.clear();
     }
 
     private void clearFullListOfFoodFays() {
-        mLongListOfFoodDaysSelected.clear();
+        mListOfFoodDaysSelected.clear();
     }
 
     private void setPopulatedAndEmptyListsOfActivityDays(int dayToCheck) {
@@ -505,7 +505,7 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(long setTime, double caloriesBurned) {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
-        listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
+        listToPullDaysFrom = new ArrayList<>(mListOfActivityDaysSelected);
 
         for (int i=0; i<listToPullDaysFrom.size(); i++) {
 
@@ -645,7 +645,7 @@ public class DailyStatsAccess {
     public void insertTotalTimesAndCaloriesBurnedForSelectedDays(long setTime, double caloriesBurned) {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
-        listToPullDaysFrom = new ArrayList<>(mLongListOfActivityDaysSelected);
+        listToPullDaysFrom = new ArrayList<>(mListOfActivityDaysSelected);
 
         for (int i = 0; i < listToPullDaysFrom.size(); i++) {
             mDayHolder = new DayHolder();
@@ -989,10 +989,31 @@ public class DailyStatsAccess {
         return totalCaloriesBurnedListForEachActivityForSelectedDuration;
     }
 
+    public List<Integer> getListOfFoodDaysSelected() {
+        return mListOfFoodDaysSelected;
+    }
+
     public boolean doesFoodExistsInDatabaseForSelectedDayBoolean(String foodString) {
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            if (foodString.equalsIgnoreCase(mCaloriesForEachFoodList.get(i).getTypeOfFood())) {
-                return true;
+            int uniqueDayIdToCheck = mListOfActivityDaysSelected.get(i);
+
+            for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {
+                if (mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood()==uniqueDayIdToCheck) {
+                    if (foodString.equalsIgnoreCase(mCaloriesForEachFoodList.get(k).getTypeOfFood())) {
+                        return true;
+                    }
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean doesFoodExistInDatabaseForMultipleDaysBoolean(int idToIterate) {
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            if (mCaloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood()==idToIterate) {
+                if (mFoodString.equalsIgnoreCase(mCaloriesForEachFoodList.get(i).getTypeOfFood())) {
+                    return true;
+                }
             }
         }
         return false;
@@ -1002,7 +1023,7 @@ public class DailyStatsAccess {
     public void insertCaloriesAndEachFoodIntoDatabase() {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
-        listToPullDaysFrom = new ArrayList<>(mLongListOfFoodDaysSelected);
+        listToPullDaysFrom = new ArrayList<>(mListOfFoodDaysSelected);
 
         for (int i=0; i<listToPullDaysFrom.size(); i++) {
             mCaloriesForEachFood = new CaloriesForEachFood();
@@ -1034,10 +1055,30 @@ public class DailyStatsAccess {
         mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
 
         cyclesDatabase.cyclesDao().insertCaloriesForEachFoodRow(mCaloriesForEachFood);
+
+//        Log.i("testFood", "day to insert is " + daySelected);
+//        Log.i("testFood", "food inserted is " + mFoodString);
     }
 
-    //Todo: Grabs entire list, not just ones containing unique IDs of duration days.
-    //Todo: Should not contain duplicates because we restrict String, but should have safeguards in place, anyway.
+    public void updateCaloriesAndEachFoodInDatabaseFromDayId(long day) {
+        //Todo: Need instance of mCalories with food AND unique ID.
+        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
+            if (mCaloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood()==day && mCaloriesForEachFoodList.get(i).getTypeOfFood().equalsIgnoreCase(mFoodString)) {
+                mCaloriesForEachFood = mCaloriesForEachFoodList.get(i);
+
+                mCaloriesForEachFood.setUniqueIdTiedToEachFood(day);
+                mCaloriesForEachFood.setTypeOfFood(mFoodString);
+                mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
+
+                cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
+                Log.i("testFood", "mFood instance retrieved with day of " + day + " and food of " + mFoodString);
+                return;
+            }
+        }
+
+        Log.i("testFood", "day to update is " + day);
+    }
+
     public void updateCaloriesAndEachFoodInDatabaseFromPosition(int position) {
         String foodToUpdate = totalFoodStringListForSelectedDuration.get(position);
 
@@ -1045,17 +1086,6 @@ public class DailyStatsAccess {
             if (mCaloriesForEachFoodList.get(i).getTypeOfFood().equalsIgnoreCase(foodToUpdate)) {
                 mCaloriesForEachFood = mCaloriesForEachFoodList.get(i);
 
-                mCaloriesForEachFood.setTypeOfFood(mFoodString);
-                mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
-
-                cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
-            }
-        }
-    }
-
-    public void updateCaloriesAndEachFoodInDatabaseFromDayId(long day) {
-        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            if (mCaloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood()==day) {
                 mCaloriesForEachFood.setTypeOfFood(mFoodString);
                 mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
 
@@ -1192,11 +1222,11 @@ public class DailyStatsAccess {
         totalFoodStringListForSelectedDuration = new ArrayList<>();
         totalCaloriesConsumedListForSelectedDuration = new ArrayList<>();
 
-        mLongListOfActivityDaysSelected = new ArrayList<>();
+        mListOfActivityDaysSelected = new ArrayList<>();
         mListOfActivityDaysWithPopulatedRows = new ArrayList<>();
         mListOfActivityDaysWithEmptyRows = new ArrayList<>();
 
-        mLongListOfFoodDaysSelected = new ArrayList<>();
+        mListOfFoodDaysSelected = new ArrayList<>();
         mListOfFoodDaysWithPopulatedRows = new ArrayList<>();
         mListOfFoodDaysWithEmptyRows = new ArrayList<>();
     }
@@ -1239,11 +1269,11 @@ public class DailyStatsAccess {
     }
 
     private void logIntegerAndEntityDayLists() {
-        Log.i("testList", "total activity list is " + mLongListOfActivityDaysSelected);
+        Log.i("testList", "total activity list is " + mListOfActivityDaysSelected);
         Log.i("testList", "populated activity list is " + mListOfActivityDaysWithPopulatedRows);
         Log.i("testList", "unpopulated activity list is " + mListOfActivityDaysWithEmptyRows);
 
-        Log.i("testList", "total food list is " + mLongListOfFoodDaysSelected);
+        Log.i("testList", "total food list is " + mListOfFoodDaysSelected);
         Log.i("testList", "populated food list is " + mListOfFoodDaysWithPopulatedRows);
         Log.i("testList", "unpopulated food list is " + mListOfFoodDaysWithEmptyRows);
     }
