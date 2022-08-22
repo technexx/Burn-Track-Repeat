@@ -88,7 +88,7 @@ CyclesDao {
 
     ///////////////////////////////////////////////////////////
 
-    @Insert(onConflict = OnConflictStrategy.IGNORE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertCaloriesForEachFoodRow(CaloriesForEachFood caloriesForEachFood);
 
     @Update

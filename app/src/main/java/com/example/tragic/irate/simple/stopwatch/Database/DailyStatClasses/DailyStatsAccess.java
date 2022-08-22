@@ -1050,18 +1050,15 @@ public class DailyStatsAccess {
     }
 
     public void insertCaloriesAndEachFoodForSingleDeterminedDay(long daySelected) {
+        mCaloriesForEachFood = new CaloriesForEachFood();
         mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
         mCaloriesForEachFood.setTypeOfFood(mFoodString);
         mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
 
         cyclesDatabase.cyclesDao().insertCaloriesForEachFoodRow(mCaloriesForEachFood);
-
-//        Log.i("testFood", "day to insert is " + daySelected);
-//        Log.i("testFood", "food inserted is " + mFoodString);
     }
 
     public void updateCaloriesAndEachFoodInDatabaseFromDayId(long day) {
-        //Todo: Need instance of mCalories with food AND unique ID.
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
             if (mCaloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood()==day && mCaloriesForEachFoodList.get(i).getTypeOfFood().equalsIgnoreCase(mFoodString)) {
                 mCaloriesForEachFood = mCaloriesForEachFoodList.get(i);
@@ -1071,12 +1068,9 @@ public class DailyStatsAccess {
                 mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
 
                 cyclesDatabase.cyclesDao().updateCaloriesForEachFoodRow(mCaloriesForEachFood);
-                Log.i("testFood", "mFood instance retrieved with day of " + day + " and food of " + mFoodString);
                 return;
             }
         }
-
-        Log.i("testFood", "day to update is " + day);
     }
 
     public void updateCaloriesAndEachFoodInDatabaseFromPosition(int position) {
