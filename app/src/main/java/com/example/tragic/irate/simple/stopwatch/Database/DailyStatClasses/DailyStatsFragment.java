@@ -1434,6 +1434,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void addFoodToStats() {
+        //Todo: For days w/ activity already, we don't want to create another instance because that will b0rk our update. If it exists, we update. If not, we add. This should be clear in UI though.
         if (getFoodStringFromEditText().isEmpty()) {
             showToastIfNoneActive("Must enter a food!");
             return;
@@ -1443,23 +1444,50 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
-        if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
-            AsyncTask.execute(()-> {
-                dailyStatsAccess.setFoodString(getFoodStringFromEditText());
-                dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
+        dailyStatsAccess.setFoodString(getFoodStringFromEditText());
+        dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
 
-                dailyStatsAccess.insertCaloriesAndEachFoodIntoDatabase();
-                populateListsAndTextViewsFromEntityListsInDatabase();
+        //Inserting with check to see if food exists. Only checking if on a single day.
+        if (dailyStatsAccess.getNumberOfDaysSelected() == 1) {
+            if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
+                AsyncTask.execute(()-> {
+                    dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(daySelectedFromCalendar);
 
-                getActivity().runOnUiThread(()-> {
-                    caloriesConsumedAdapter.notifyDataSetChanged();
-                    caloriesConsumedAddAndEditPopUpWindow.dismiss();
+                    populateListsAndTextViewsFromEntityListsInDatabase();
+
+                    getActivity().runOnUiThread(()-> {
+                        caloriesConsumedAdapter.notifyDataSetChanged();
+                        caloriesConsumedAddAndEditPopUpWindow.dismiss();
+                    });
                 });
-            });
-        } else {
-            showToastIfNoneActive("Food exists!");
+            } else {
+                showToastIfNoneActive("Food exists!");
+            }
         }
 
+        //Inserting without a check for multiple days, since we want to overwrite the food on days it exists.
+        if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+            for (int i=0; i<dailyStatsAccess.getCaloriesForEachFoodList().size(); i++) {
+                long dayInLoop = dailyStatsAccess.getCaloriesForEachFoodList().get(i).getCaloriesForEachFoodId();
+
+                if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
+                    AsyncTask.execute(()-> {
+                        dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(dayInLoop);
+
+                    });
+                } else {
+                    //Todo: Call update.
+                    dailyStatsAccess.updateCaloriesAndEachFoodInDatabaseFromDayId(dayInLoop);
+                }
+            }
+        }
+
+        populateListsAndTextViewsFromEntityListsInDatabase();
+
+        getActivity().runOnUiThread(()-> {
+            caloriesConsumedAdapter.notifyDataSetChanged();
+            caloriesConsumedAddAndEditPopUpWindow.dismiss();
+        });
     }
 
     private String getFoodStringFromEditText() {
@@ -1511,12 +1539,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
+        dailyStatsAccess.setFoodString(getFoodStringFromEditText());
+        dailyStatsAccess.setCaloriesInFoodItem(Double.parseDouble(getCaloriesForFoodItemFromEditText()));
+
         AsyncTask.execute(()-> {
             dailyStatsAccess.assignCaloriesForEachFoodItemEntityForSinglePosition(mPositionToEdit);
 
             String food = getFoodStringFromEditText();
             double calories = Double.parseDouble(getCaloriesForFoodItemFromEditText());
-            dailyStatsAccess.updateCaloriesAndEachFoodInDatabase(mPositionToEdit, food, calories);
+            dailyStatsAccess.updateCaloriesAndEachFoodInDatabaseFromPosition(mPositionToEdit);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 

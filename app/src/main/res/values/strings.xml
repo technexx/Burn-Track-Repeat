@@ -135,7 +135,8 @@
     <string name="current_day">Selected day</string>
     <string name="date_range">Date range</string>
 
-    <string name="food_name_header"><u>Food/Drink</u></string>
+    <string name="food_name_header">Food/Drink</string>
+    <string name="food_name_header_underlined"><u>Food/Drink</u></string>
     <string name="food_portion_header">Portion</string>
     <string name="calories_header"><u>Calories</u></string>
 
