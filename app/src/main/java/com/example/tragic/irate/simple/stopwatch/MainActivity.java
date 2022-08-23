@@ -575,14 +575,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Use same add/update methods we did on foods for activties.
-  //Todo: Consider removing "activity exists" restriction for single days. It's a bit confusing since we don't use it in any other duration.
-  //Todo: To remove activities w/ 0, just check and delete when coming from Main (we already don't allow 0 to be added).
 
-  //Todo: Test food consumption insert/update/delete. Should be mirroring activities.
+  //Todo: We should add a safeguard so no activity/food string exists as a duplicate for the same unique ID. We can set a method to delete if this is the case, alongside our check of 0, anytime our fragment is accessed.
+
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
+  //Todo: Consider removing "activity exists" restriction for single days. It's a bit confusing since we don't use it in any other duration.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.

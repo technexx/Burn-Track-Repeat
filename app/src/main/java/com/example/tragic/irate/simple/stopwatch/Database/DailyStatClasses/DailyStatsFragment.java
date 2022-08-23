@@ -345,6 +345,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setSimplifiedViewTextViews();
 
         AsyncTask.execute(()-> {
+            deleteActivitiesWithNoTimeElapsed();
+
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
             dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
 
@@ -496,8 +498,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
+    //Todo: Deletion means that if the timer is still counting up, the row is gone so nothing is added to.
+    //Todo: Hiding row in adapter would b0rk positional edit. Best solution is prolly to only insert into our Stats/Day classes if we have started our timer.
     private void deleteActivitiesWithNoTimeElapsed() {
-
+//        dailyStatsAccess.deleteTotalTimesAndCaloriesForSelectedActivityForSingleDay();
     }
 
     public void executeTurnOffEditModeMethod() {
@@ -903,14 +907,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 activityToAdd = addCustomActivityEditText.getText().toString().trim();
             }
 
-            if (activityToAdd.equalsIgnoreCase("")) {
-                getActivity().runOnUiThread(()-> {
-                    //Todo: Remove this at some point.
-                    Toast.makeText(getContext(), "Trying to add blank activity in setNewActivityVariablesAndCheckIfActivityExists()!", Toast.LENGTH_SHORT).show();
-                });
-                return;
-            }
-
             dailyStatsAccess.setActivityString(activityToAdd);
 
             if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
@@ -970,14 +966,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             return;
         }
 
-        if (dailyStatsAccess.getActivityStringVariable().equalsIgnoreCase("")) {
-            getActivity().runOnUiThread(()-> {
-                //Todo: Remove this at some point.
-                Toast.makeText(getContext(), "Trying to add blank activity in addActivityStatsInDatabase()!", Toast.LENGTH_SHORT).show();
-            });
-            return;
-        }
-
         long finalNewActivityTime = newActivityTime;
         double finalNewCaloriesBurned = newCaloriesBurned;
 
@@ -986,7 +974,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(daySelectedFromCalendar, finalNewActivityTime, finalNewCaloriesBurned);
             }
 
-            Log.i("testAct", "number of days is " + dailyStatsAccess.getNumberOfDaysSelected());
             if (dailyStatsAccess.numberOfDaysSelected > 1) {
                 for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
                     int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
@@ -1003,7 +990,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
-            //Todo: Don't think we'll need the same conditional here since we replace day(s) w/ total times/calories anyway.
             //Multiple additions will always include daySelected.
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
@@ -1085,14 +1071,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 newCaloriesBurned = calculateCaloriesForCustomActivityEdit(newActivityTime, caloriesBurnedPerHour);
             }
 
-            if (dailyStatsAccess.getActivityStringVariable().equalsIgnoreCase("")) {
-                getActivity().runOnUiThread(()-> {
-                    //Todo: Remove this at some point.
-                    Toast.makeText(getContext(), "Trying to add blank activity in editActivityStatsInDatabase()!", Toast.LENGTH_SHORT).show();
-                });
-                return;
-            }
-
             dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForMultipleDays(mPositionToEdit, newActivityTime, newCaloriesBurned);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
@@ -1116,7 +1094,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         numberOfDaysWithActivitiesHasChanged = true;
 
         AsyncTask.execute(() -> {
-            dailyStatsAccess.deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(position);
+            dailyStatsAccess.deleteTotalTimesAndCaloriesForSelectedActivityForSelectedDays(position);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
