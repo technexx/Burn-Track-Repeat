@@ -573,8 +573,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
+  //Todo: Remove "No time remaining in day" Toast for multiple day selection.
+  //Todo: "Delete selected days" from onOptions in Stats Fragment deletes entire duration.
+  //Todo: Can be laggy when switching to yearly/year-to-date. Remove yearly?
   //Todo: Denote base bmr calories burned in Calories Expended tab.
+  //Todo: Check calories compared. Deficit seems high.
+  //Todo: Layout ghost/blips when editing activity over multiple days.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
   //Todo: Remove/don't add activity if time is <1 second.
 
