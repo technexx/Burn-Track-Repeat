@@ -578,7 +578,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Remove/don't add activity if time is <1 second.
 
-  //Todo: Adapter not refreshing after multiple additions.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
