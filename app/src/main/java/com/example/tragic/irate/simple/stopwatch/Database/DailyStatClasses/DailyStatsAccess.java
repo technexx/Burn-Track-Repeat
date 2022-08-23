@@ -22,8 +22,10 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class DailyStatsAccess {
@@ -62,8 +64,6 @@ public class DailyStatsAccess {
 
     long mOldDayHolderId;
     boolean doesDayExistInDatabase;
-    boolean doesActivityExistsInDatabaseForSelectedDay;
-    boolean doesFoodExistsInDatabaseForSelectedDay;
 
     int activityPositionInListForCurrentDay;
     int mOldActivityPositionInListForCurrentDay;
@@ -97,6 +97,47 @@ public class DailyStatsAccess {
         instantiateEntitiesAndTheirLists();
         instantiateArrayLists();
         instantiateMiscellaneousClasses();
+    }
+
+    public Set<String> checkForDuplicateActivityAndUniqueIdRows() {
+        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllStatsForEachActivityRows();
+        List<Long> idList = new ArrayList<>();
+        List<String> activityList = new ArrayList<>();
+
+        Set<Long> idSetToPopulate = new HashSet<>();
+        Set<Integer> uniqueIdSet = new HashSet<>();
+
+        Set<String> activitySetToPopulate = new HashSet<>();
+        Set<String> duplicateStringSet = new HashSet<>();
+
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            idList.add(statsForEachActivityList.get(i).getStatsForActivityId());
+            activityList.add(statsForEachActivityList.get(i).getActivity());
+        }
+
+        for (long idToAdd: idList) {
+            if (!idSetToPopulate.add(idToAdd)) {
+                uniqueIdSet.add((int)idToAdd);
+            }
+        }
+
+        List<Integer> integerListOfUniqueIds = new ArrayList();
+        integerListOfUniqueIds.addAll(uniqueIdSet);
+
+        List<StatsForEachActivity> statsForEachActivityListWithOnlyUniqueIds = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(integerListOfUniqueIds);
+        List<String> stringListOfUniqueIdDays = new ArrayList<>();
+
+        for (int i=0; i<statsForEachActivityListWithOnlyUniqueIds.size(); i++) {
+            stringListOfUniqueIdDays.add(statsForEachActivityListWithOnlyUniqueIds.get(i).getActivity());
+        }
+
+        for (String stringToTest: stringListOfUniqueIdDays) {
+            if (activitySetToPopulate.add(stringToTest)) {
+                duplicateStringSet.add(stringToTest);
+            }
+        }
+
+        return duplicateStringSet;
     }
 
     public void setDoesDayExistInDatabase(boolean doesExist) {
@@ -506,18 +547,18 @@ public class DailyStatsAccess {
         return mListOfActivityDaysSelected;
     }
 
-    public void setDoesActivityExistsForSpecificDayBoolean() {
-        doesActivityExistsInDatabaseForSelectedDay = false;
+    public boolean doesActivityExistsForSpecificDay() {
+        boolean valueToReturn = false;
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
-                doesActivityExistsInDatabaseForSelectedDay = true;
-                return;
+                valueToReturn = true;
             }
         }
+        return valueToReturn;
     }
 
-    public boolean doesActivityExistInDatabaseForMultipleDaysBoolean(int idToIterate) {
+    public boolean doesActivityExistInDatabaseForMultipleDays(int idToIterate) {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==idToIterate) {
                 if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
@@ -527,7 +568,6 @@ public class DailyStatsAccess {
         }
         return false;
     }
-
 
     public void insertTotalTimesAndCaloriesForEachActivityForSingleDay(long daySelected, long setTime, double caloriesBurned) {
         mStatsForEachActivity = new StatsForEachActivity();
@@ -541,7 +581,7 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
         mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
 
-        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
+        cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
     }
 
     //Used by Main.
@@ -717,6 +757,7 @@ public class DailyStatsAccess {
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
     }
 
+    //Used by Main only.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
         mStatsForEachActivity = new StatsForEachActivity();
 
@@ -731,7 +772,7 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
-        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
+        cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
     }
 
     public void logActivityRetrievedAndItsPositionForExistingCycles() {
@@ -762,10 +803,6 @@ public class DailyStatsAccess {
 
     public void assignPositionOfActivityListForRetrieveActivityToStatsEntity() {
         mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
-    }
-
-    public boolean getDoesActivityExistsInDatabaseForSelectedDay () {
-        return doesActivityExistsInDatabaseForSelectedDay;
     }
 
     public int getActivityPosition() {

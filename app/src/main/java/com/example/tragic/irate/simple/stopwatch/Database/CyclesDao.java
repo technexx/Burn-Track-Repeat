@@ -42,7 +42,7 @@ CyclesDao {
     void insertMultipleDays (List<DayHolder> dayHolderList);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertStatsForEachActivityWithinCycle(StatsForEachActivity statsForEachActivity);
+    void insertStatsForEachActivity(StatsForEachActivity statsForEachActivity);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertMultipleActivities (List<StatsForEachActivity> statsForEachActivitiesList);
@@ -52,6 +52,9 @@ CyclesDao {
 
     @Delete
     void deleteStatsForEachActivity(StatsForEachActivity statsForEachActivity);
+
+    @Query("SELECT * from StatsForEachActivity")
+    List<StatsForEachActivity> loadAllStatsForEachActivityRows();
 
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:uniqueId")
     List<StatsForEachActivity> loadActivitiesForSpecificDate(long uniqueId);
@@ -97,6 +100,8 @@ CyclesDao {
     @Delete
     void deleteCaloriesForEachFoodRow(CaloriesForEachFood caloriesForEachFood);
 
+    @Query("SELECT * from CaloriesForEachFood")
+    List<CaloriesForEachFood> loadAllCaloriesForEachFoodRows();
 
     @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IS:uniqueId")
     List<CaloriesForEachFood> loadCaloriesForEachFoodForSpecificDay(long uniqueId);

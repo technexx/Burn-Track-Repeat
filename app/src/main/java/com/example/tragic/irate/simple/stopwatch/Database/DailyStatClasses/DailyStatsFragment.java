@@ -498,8 +498,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
-    //Todo: Deletion means that if the timer is still counting up, the row is gone so nothing is added to.
-    //Todo: Hiding row in adapter would b0rk positional edit. Best solution is prolly to only insert into our Stats/Day classes if we have started our timer.
     private void deleteActivitiesWithNoTimeElapsed() {
 //        dailyStatsAccess.deleteTotalTimesAndCaloriesForSelectedActivityForSingleDay();
     }
@@ -914,10 +912,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     populateActivityEditPopUpWithNewRow();
                 });
             } else {
-                dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
-
                 getActivity().runOnUiThread(()-> {
-                    launchEditPopUpIfActivityDoesNotExistAndToastIfItDoes(dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay());
+                    launchEditPopUpIfActivityDoesNotExistAndToastIfItDoes(dailyStatsAccess.doesActivityExistsForSpecificDay());
                 });
             }
         });
@@ -978,7 +974,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
                     int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
 
-                    if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDaysBoolean(uniqueIdToCheck)) {
+                    if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
                         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
                         Log.i("testAct", "day " + uniqueIdToCheck + " does not exist and is inserting!");
                     } else {

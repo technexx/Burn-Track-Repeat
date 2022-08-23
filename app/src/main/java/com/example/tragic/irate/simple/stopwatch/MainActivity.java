@@ -576,8 +576,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
 
-  //Todo: We should add a safeguard so no activity/food string exists as a duplicate for the same unique ID. We can set a method to delete if this is the case, alongside our check of 0, anytime our fragment is accessed.
+  //Todo: Remove/don't add activity if time is <1 second.
 
+  //Todo: Adapter not refreshing after multiple additions.
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
@@ -1966,6 +1967,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         if (trackActivityWithinCycle) {
+
           setAndUpdateDayHolderValuesInDatabase();
           setAndUpdateStatsForEachActivityValuesInDatabase();
         }
@@ -2011,7 +2013,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-    dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 
@@ -2928,6 +2929,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(()-> {
         if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
           insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
+          insertActivityIntoDatabaseAndAssignItsValueToObjects();
           dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
 
           Log.i("testChange", "Activity stats queried from Timer due to Stats Fragment change!");
@@ -3642,6 +3644,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (cycleHasActivityAssigned) {
         insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
+        insertActivityIntoDatabaseAndAssignItsValueToObjects();
       }
 
       saveAddedOrEditedCycleASyncRunnable();
@@ -3704,6 +3707,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects() {
     dailyStatsAccess.setDoesDayExistInDatabaseBoolean(dayOfYear);
+    dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
     if (dailyStatsAccess.getDoesDayExistInDatabase()) {
       dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
@@ -3712,18 +3716,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
+  }
 
+  private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
     dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
     dailyStatsAccess.setMetScoreFromSpinner(metScore);
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-    dailyStatsAccess.setDoesActivityExistsForSpecificDayBoolean();
 
-    if (dailyStatsAccess.getDoesActivityExistsInDatabaseForSelectedDay()) {
+    if (dailyStatsAccess.doesActivityExistsForSpecificDay()) {
       dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
       dailyStatsAccess.assignPositionOfActivityListForRetrieveActivityToStatsEntity();
-
-      dailyStatsAccess.logActivityRetrievedAndItsPositionForExistingCycles();
     } else {
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
       dailyStatsAccess.loadAllActivitiesToStatsListForSpecificDay(dayOfYear);
@@ -3732,8 +3735,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-
-    dailyStatsAccess.setOldDayHolderId(dayOfYear);
   }
 
   private String getCurrentDateAsSlashFormattedString() {
@@ -3983,23 +3984,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTotalDailyCaloriesToTextView();
     setTotalActivityCaloriesToTextView();
   }
-
-//  private void updateCalorieTextViewsSimultaneously(TextViewDisplaySync textViewDisplaySync) {
-//    DecimalFormat df = new DecimalFormat("#.#");
-//
-//    textViewDisplaySync.setFirstTextView(df.format(totalCaloriesBurnedForCurrentDay));
-//
-//    Log.i("testSync", "global String is " + textViewDisplaySync.getFirstTextView());
-//
-//    if (textViewDisplaySync.areTextViewsDifferent()) {
-//      Log.i("testSync", "textView updated!");
-//
-//      textViewDisplaySync.setSecondTextView(df.format(totalCaloriesBurnedForCurrentDay));
-//
-//      setTotalDailyCaloriesToTextView();
-//      setTotalActivityCaloriesToTextView();
-//    }
-//  }
 
   private void setAllActivityTimesAndCaloriesToTextViews() {
     setTotalDailyTimeToTextView();
