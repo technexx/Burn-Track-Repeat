@@ -575,7 +575,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Can't add for duration if activity exists on a single day.
+  //Todo: Use same add/update methods we did on foods for activties.
+  //Todo: Consider removing "activity exists" restriction for single days. It's a bit confusing since we don't use it in any other duration.
   //Todo: To remove activities w/ 0, just check and delete when coming from Main (we already don't allow 0 to be added).
 
   //Todo: Test food consumption insert/update/delete. Should be mirroring activities.

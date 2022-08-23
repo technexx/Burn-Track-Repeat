@@ -496,6 +496,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return root;
     }
 
+    private void deleteActivitiesWithNoTimeElapsed() {
+
+    }
+
     public void executeTurnOffEditModeMethod() {
         dailyStatsAdapter.turnOffEditMode();
     }
@@ -938,27 +942,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void populateActivityEditPopUpWithNewRow() {
-        replaceActivityAddPopUpWithEmptyEditPopUp();
-
-        String activityToAdd = dailyStatsAccess.getActivityStringVariable();
-
-        activityInEditPopUpTextView.setText(activityToAdd);
-        zeroOutActivityEditPopUpEditTexts();
-        setMultipleDayWarningTextViewForActivities(ADDING_ACTIVITY);
-    }
-
-    private void replaceActivityAddPopUpWithEmptyEditPopUp() {
-        addTdeePopUpWindow.dismiss();
-
-        setActivityEditPopUpTimeRemainingTextView();
-        toggleCancelOrDeleteButtonInEditPopUpTextView(ADDING_ACTIVITY);
-
-        tdeeEditTextHours.requestFocus();
-
-        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(-5));
-    }
-
     private void addActivityStatsInDatabase(boolean customActivity) {
         long newActivityTime = 0;
         double newCaloriesBurned = 0;
@@ -999,12 +982,30 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double finalNewCaloriesBurned = newCaloriesBurned;
 
         AsyncTask.execute(()-> {
-            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSelectedDays(finalNewActivityTime, finalNewCaloriesBurned);
+            if (dailyStatsAccess.numberOfDaysSelected == 1) {
+                dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(daySelectedFromCalendar, finalNewActivityTime, finalNewCaloriesBurned);
+            }
+
+            Log.i("testAct", "number of days is " + dailyStatsAccess.getNumberOfDaysSelected());
+            if (dailyStatsAccess.numberOfDaysSelected > 1) {
+                for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
+                    int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
+
+                    if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDaysBoolean(uniqueIdToCheck)) {
+                        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
+                        Log.i("testAct", "day " + uniqueIdToCheck + " does not exist and is inserting!");
+                    } else {
+                        dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
+                        Log.i("testAct", "day " + uniqueIdToCheck + " exists and is updating!");
+                    }
+                }
+            }
 
             setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
+            //Todo: Don't think we'll need the same conditional here since we replace day(s) w/ total times/calories anyway.
             //Multiple additions will always include daySelected.
-            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASingleDay(daySelectedFromCalendar);
+            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
             dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
@@ -1014,11 +1015,33 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             getActivity().runOnUiThread(()-> {
                 showToastIfNoneActive("Saved!");
+                dailyStatsAdapter.notifyDataSetChanged();
                 tdeeEditPopUpWindow.dismiss();
             });
         });
 
         numberOfDaysWithActivitiesHasChanged = true;
+    }
+
+    private void populateActivityEditPopUpWithNewRow() {
+        replaceActivityAddPopUpWithEmptyEditPopUp();
+
+        String activityToAdd = dailyStatsAccess.getActivityStringVariable();
+
+        activityInEditPopUpTextView.setText(activityToAdd);
+        zeroOutActivityEditPopUpEditTexts();
+        setMultipleDayWarningTextViewForActivities(ADDING_ACTIVITY);
+    }
+
+    private void replaceActivityAddPopUpWithEmptyEditPopUp() {
+        addTdeePopUpWindow.dismiss();
+
+        setActivityEditPopUpTimeRemainingTextView();
+        toggleCancelOrDeleteButtonInEditPopUpTextView(ADDING_ACTIVITY);
+
+        tdeeEditTextHours.requestFocus();
+
+        tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(-5));
     }
 
     private void setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
@@ -1074,7 +1097,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
-            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASingleDay(daySelectedFromCalendar);
+            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
             dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
@@ -1097,7 +1120,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             populateListsAndTextViewsFromEntityListsInDatabase();
 
-            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASingleDay(daySelectedFromCalendar);
+            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
             dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
@@ -1434,7 +1457,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void addFoodToStats() {
-        //Todo: For days w/ activity already, we don't want to create another instance because that will b0rk our update. If it exists, we update. If not, we add. This should be clear in UI though.
         if (getFoodStringFromEditText().isEmpty()) {
             showToastIfNoneActive("Must enter a food!");
             return;
@@ -1451,15 +1473,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             //Inserting with check to see if food exists. Only checking if on a single day.
             if (dailyStatsAccess.getNumberOfDaysSelected() == 1) {
+
                 if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
-
-                    dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(daySelectedFromCalendar);
-                    populateListsAndTextViewsFromEntityListsInDatabase();
-
-                    getActivity().runOnUiThread(()-> {
-                        caloriesConsumedAdapter.notifyDataSetChanged();
-                        caloriesConsumedAddAndEditPopUpWindow.dismiss();
-                    });
+                    dailyStatsAccess.insertCaloriesAndEachFoodForSingleDay(daySelectedFromCalendar);
 
                     Log.i("testFood", "updating single day with new food!");
                 } else {
@@ -1474,7 +1490,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     int uniqueDayIdToCheck = dailyStatsAccess.getListOfFoodDaysSelected().get(i);
 
                     if (!dailyStatsAccess.doesFoodExistInDatabaseForMultipleDaysBoolean(uniqueDayIdToCheck)) {
-                        dailyStatsAccess.insertCaloriesAndEachFoodForSingleDeterminedDay(uniqueDayIdToCheck);
+                        dailyStatsAccess.insertCaloriesAndEachFoodForSingleDay(uniqueDayIdToCheck);
                         Log.i("testFood", "day " + uniqueDayIdToCheck + " does not exist and is inserting!");
                     } else {
                         dailyStatsAccess.updateCaloriesAndEachFoodInDatabaseFromDayId(uniqueDayIdToCheck);

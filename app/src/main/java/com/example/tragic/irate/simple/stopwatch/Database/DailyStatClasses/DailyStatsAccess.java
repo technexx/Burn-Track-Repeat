@@ -502,6 +502,33 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllCaloriesForEachFoodEntries();
     }
 
+    public List<Integer> getListOfActivityDaySelected() {
+        return mListOfActivityDaysSelected;
+    }
+
+    public void setDoesActivityExistsForSpecificDayBoolean() {
+        doesActivityExistsInDatabaseForSelectedDay = false;
+
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
+                doesActivityExistsInDatabaseForSelectedDay = true;
+                return;
+            }
+        }
+    }
+
+    public boolean doesActivityExistInDatabaseForMultipleDaysBoolean(int idToIterate) {
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==idToIterate) {
+                if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    //May not need this, as with the same for food insertion method.
     public void insertTotalTimesAndCaloriesForEachActivityForSelectedDays(long setTime, double caloriesBurned) {
         List<Integer> listToPullDaysFrom = new ArrayList<>();
 
@@ -537,16 +564,71 @@ public class DailyStatsAccess {
         }
     }
 
-    public void setDoesActivityExistsForSpecificDayBoolean() {
-        doesActivityExistsInDatabaseForSelectedDay = false;
+    public void insertTotalTimesAndCaloriesForEachActivityForSingleDay(long daySelected, long setTime, double caloriesBurned) {
+        mStatsForEachActivity = new StatsForEachActivity();
+
+        mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(daySelected);
+        mStatsForEachActivity.setActivity(mActivityString);
+        mStatsForEachActivity.setMetScore(mMetScore);
+        mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+        mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
+        mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
+
+        cyclesDatabase.cyclesDao().insertStatsForEachActivityWithinCycle(mStatsForEachActivity);
+    }
+
+    //Used by Main.
+    public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(long setTime, double caloriesBurned) {
+        mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+        cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+    }
+
+    //Used by Stats Fragment.
+    public void updateTotalTimesAndCaloriesForEachActivityForMultipleDays(int position, long setTime, double caloriesBurned) {
+        String activityToUpdate = totalActivitiesListForSelectedDuration.get(position);
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
-                doesActivityExistsInDatabaseForSelectedDay = true;
-                return;
+            if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToUpdate)) {
+                mStatsForEachActivity = mStatsForEachActivityList.get(i);
+
+                mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+                mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+                cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
             }
         }
     }
+
+    public void updateTotalTimesAndCaloriesForEachActivityFromDayId(long day, long setTime, double caloriesBurned) {
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day && mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(mActivityString)) {
+                Log.i("testAct", "updating for day " + day);
+                mStatsForEachActivity = mStatsForEachActivityList.get(i);
+
+                mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(day);
+                mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
+                mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
+
+                cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
+            }
+        }
+    }
+
+    public void deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(int position) {
+        String activityToDelete = totalActivitiesListForSelectedDuration.get(position);
+
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToDelete)) {
+                mStatsForEachActivity = mStatsForEachActivityList.get(i);
+                cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
+            }
+        }
+    }
+
 
     public void setStatsForEachActivityEntityFromPosition(int position) {
         mStatsForEachActivity = mStatsForEachActivityList.get(position);
@@ -577,40 +659,6 @@ public class DailyStatsAccess {
         return mStatsForEachActivity.getCaloriesPerHour();
     }
 
-    //Used by Main.
-    public void updateTotalTimesAndCaloriesForEachActivityForSelectedDay(long setTime, double caloriesBurned) {
-        mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
-        mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
-
-        cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
-    }
-
-    //Used by Stats Fragment.
-    public void updateTotalTimesAndCaloriesForEachActivityForMultipleDays(int position, long setTime, double caloriesBurned) {
-        String activityToUpdate = totalActivitiesListForSelectedDuration.get(position);
-
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToUpdate)) {
-                mStatsForEachActivity = mStatsForEachActivityList.get(i);
-
-                mStatsForEachActivity.setTotalSetTimeForEachActivity(setTime);
-                mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(caloriesBurned);
-
-                cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
-            }
-        }
-    }
-
-    public void deleteTotalTimesAndCaloriesForEachActivityForSelectedDays(int position) {
-        String activityToDelete = totalActivitiesListForSelectedDuration.get(position);
-
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToDelete)) {
-                mStatsForEachActivity = mStatsForEachActivityList.get(i);
-                cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
-            }
-        }
-    }
 
     public void setDoesDayExistInDatabaseBoolean(int daySelected) {
         List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
@@ -787,7 +835,7 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllStatsForEachActivityEntries();
     }
 
-    public long getTotalActivityTimeForAllActivitiesOnASingleDay(int day) {
+    public long getTotalActivityTimeForAllActivitiesOnASelectedDay(int day) {
         long valueToReturn = 0;
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
@@ -882,12 +930,10 @@ public class DailyStatsAccess {
     public void setTotalSetTimeVariableForSelectedDuration() {
         long valueToReturn = 0;
 
-        //Todo: This is list in adapter.
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
         }
 
-        //Todo: We're only using this for assigned/unassigned time. Not needed for food consumed.
         totalSetTimeForSelectedDuration = valueToReturn;
     }
 
@@ -1049,7 +1095,7 @@ public class DailyStatsAccess {
         }
     }
 
-    public void insertCaloriesAndEachFoodForSingleDeterminedDay(long daySelected) {
+    public void insertCaloriesAndEachFoodForSingleDay(long daySelected) {
         mCaloriesForEachFood = new CaloriesForEachFood();
         mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
         mCaloriesForEachFood.setTypeOfFood(mFoodString);
