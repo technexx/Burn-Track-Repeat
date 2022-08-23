@@ -574,12 +574,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
 
-  //Todo: Remove/don't add activity if time is <1 second.
 
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
+  //Todo: Remove/don't add activity if time is <1 second.
 
-  //Todo: onBack w/ Setting Fragments should do slide left, as we do when we dismiss the FrameLayout.
   //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
 
   //Todo: Splash screen on app start as a guide.
@@ -660,8 +659,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || disclaimerFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
               .setCustomAnimations(
-                      R.anim.slide_in_from_left_short,  // enter
-                      R.anim.slide_out_from_right  // exit
+                      0,  // enter
+                      R.anim.slide_out_from_left_mid  // exit
               )
               .addToBackStack(null)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
@@ -765,9 +764,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     getSupportFragmentManager().beginTransaction()
             .setCustomAnimations(
                     R.anim.slide_in_from_left_short,  // enter
-                    R.anim.slide_out_from_right,  // exit
-                    R.anim.slide_in_from_left_short,   // popEnter (backstack)
-                    R.anim.slide_out_from_right  // popExit (backstack)
+                    R.anim.slide_out_from_right  // exit
+//                    R.anim.slide_in_from_left_short,   // popEnter (backstack)
+//                    R.anim.slide_out_from_right  // popExit (backstack)
             )
             .addToBackStack (null)
             .replace(R.id.settings_fragment_frameLayout, fragmentToReplace)
