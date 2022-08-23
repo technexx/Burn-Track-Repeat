@@ -690,7 +690,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setAggregateDailyCalories();
         dailyStatsAccess.setUnassignedDailyTotalTime();
 
-//        Log.i("duplicateActivityList", "Duplicate list is " + dailyStatsAccess.getDuplicateActivityAndUniqueIdRows());
+        Log.i("duplicateActivityList", "Duplicate list is " + dailyStatsAccess.getDuplicateActivityAndUniqueIdRows());
 
         getActivity().runOnUiThread(()-> {
 
@@ -940,7 +940,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double newCaloriesBurned = 0;
             double caloriesBurnedPerHour;
 
-            newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY, dailyStatsAccess.getNumberOfDaysSelected());
+            newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
 
             if (!customActivity) {
                 //Activity String is already set from our spinner popUp.
@@ -1042,7 +1042,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
-            long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY, dailyStatsAccess.getNumberOfDaysSelected());
+            long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
 
             if (newActivityTime == 0) {
                 getActivity().runOnUiThread(()-> {
@@ -1108,7 +1108,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private double calculateCaloriesForSpinnerActivity() {
         int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
-        long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity, dailyStatsAccess.getNumberOfDaysSelected());
+        long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity);
 
         double newCaloriesForActivity = 0;
 
@@ -1146,9 +1146,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return caloriesPerHour * hoursInActivity;
     }
 
-    private long newActivityTimeFromEditText(int addingOrEditingActivity, int numberOfDaysToDivideBy) {
+    private long newActivityTimeFromEditText(int addingOrEditingActivity) {
         long timeSetInEditText = getMillisValueToSaveFromEditTextString();
-        long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime() / numberOfDaysToDivideBy;
+        long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
         long timeInEditedRow = 0;
 
         if (addingOrEditingActivity==EDITING_ACTIVITY) {
