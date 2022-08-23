@@ -1,7 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch;
 
 import android.animation.ObjectAnimator;
-import android.animation.PropertyValuesHolder;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -35,7 +34,6 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewPropertyAnimator;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
@@ -90,13 +88,12 @@ import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivit
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TextViewDisplaySync;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TimerIteration;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
-import com.example.tragic.irate.simple.stopwatch.SettingsFragments.AboutFragment;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.DisclaimerFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ChangeSettingsValues;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ColorSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.RootSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.tdeeSettingsFragment;
-import com.google.android.material.button.MaterialButton;
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
@@ -117,6 +114,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int DEFAULT_MENU = 0;
   int STATS_MENU = 1;
   int FILLER_MENU = 2;
+  int SETTINGS_MENU = 3;
 
   DailyStatsAccess dailyStatsAccess;
   FragmentManager fragmentManager;
@@ -510,7 +508,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   SoundSettingsFragment soundSettingsFragment;
   ColorSettingsFragment colorSettingsFragment;
   tdeeSettingsFragment tdeeSettingsFragment;
-  AboutFragment aboutFragment;
+  DisclaimerFragment disclaimerFragment;
 
   ChangeSettingsValues changeSettingsValues;
 
@@ -579,26 +577,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Remove/don't add activity if time is <1 second.
 
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
-  //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
-  //Todo: Consider removing "activity exists" restriction for single days. It's a bit confusing since we don't use it in any other duration.
+
+  //Todo: onBack w/ Setting Fragments should do slide left, as we do when we dismiss the FrameLayout.
+  //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
 
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
-  //Todo: OnOptionsSelected should change/be disabled while in Settings (or have a single backup option).
-  //Todo: Calendar blip w/ activityExists boolean.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
-  //Todo: Consider having activity edit select multiple rows (like cycles) and long click for edit.
   //Todo: Add Day/Night modes.
   //Todo: Maybe (can do post-launch) have different colorings for days w/ food.
-  //Todo: Possibly have all colors in last tab w/ overlap if day has both. Will likely cause blipping though.
+      //Todo: Possibly have all colors in last tab w/ overlap if day has both. Will likely cause blipping though.
 
   //Todo: Check sizes on long aspect for all layouts + menus.
 
-  //Todo: Test all notifications.
+  //Todo: Test all notifications + sound/vibrations + settings.
   //Todo: Test dates from future years.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
-
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
@@ -662,7 +657,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortButton.setVisibility(View.VISIBLE);
     }
 
-    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || aboutFragment.isVisible()) {
+    if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || disclaimerFragment.isVisible()) {
       getSupportFragmentManager().beginTransaction()
               .setCustomAnimations(
                       R.anim.slide_in_from_left_short,  // enter
@@ -720,6 +715,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
     menu.clear();
+
     if (mMenuType==DEFAULT_MENU) {
       getMenuInflater().inflate(R.menu.main_options_menu, menu);
     }
@@ -728,6 +724,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (mMenuType==FILLER_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_option_menu_comparison_tab, menu);
+    }
+    if (mMenuType==SETTINGS_MENU) {
+      getMenuInflater().inflate(R.menu.settings_menu, menu);
     }
     return super.onPrepareOptionsMenu(menu);
   }
@@ -750,6 +749,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 .commit();
       }
       sortButton.setVisibility(View.INVISIBLE);
+
+      setTypeOFMenu(SETTINGS_MENU);
     }
   }
 
@@ -759,7 +760,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (settingNumber==1) fragmentToReplace = soundSettingsFragment;
     if (settingNumber==2) fragmentToReplace = colorSettingsFragment;
     if (settingNumber==3) fragmentToReplace = tdeeSettingsFragment;
-    if (settingNumber==4) fragmentToReplace = aboutFragment;
+    if (settingNumber==4) fragmentToReplace = disclaimerFragment;
 
     getSupportFragmentManager().beginTransaction()
             .setCustomAnimations(
@@ -1506,7 +1507,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     soundSettingsFragment = new SoundSettingsFragment();
     colorSettingsFragment = new ColorSettingsFragment();
     tdeeSettingsFragment = new tdeeSettingsFragment();
-    aboutFragment = new AboutFragment();
+    disclaimerFragment = new DisclaimerFragment();
 
     rootSettingsFragment.sendSettingsData(MainActivity.this);
     soundSettingsFragment.soundSetting(MainActivity.this);

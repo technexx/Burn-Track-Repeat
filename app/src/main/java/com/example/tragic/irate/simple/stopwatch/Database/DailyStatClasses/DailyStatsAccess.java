@@ -99,7 +99,7 @@ public class DailyStatsAccess {
         instantiateMiscellaneousClasses();
     }
 
-    public Set<String> checkForDuplicateActivityAndUniqueIdRows() {
+    public Set<String> getDuplicateActivityAndUniqueIdRows() {
         List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllStatsForEachActivityRows();
         List<Long> idList = new ArrayList<>();
         List<String> activityList = new ArrayList<>();
@@ -256,7 +256,6 @@ public class DailyStatsAccess {
         numberOfDaysSelected = 1;
     }
 
-    //Todo: Calls correct week at first, and then runs again w/ next week.
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         int lastDayOfDuration = firstDayOfDuration + 6;

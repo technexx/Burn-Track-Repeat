@@ -22,6 +22,6 @@
 
     <PreferenceScreen
         android:key="aboutPref"
-        android:title="About"/>
+        android:title="Disclaimer"/>
 
 </PreferenceScreen>

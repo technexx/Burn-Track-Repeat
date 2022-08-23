@@ -690,7 +690,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setAggregateDailyCalories();
         dailyStatsAccess.setUnassignedDailyTotalTime();
 
-        dailyStatsAccess.logNonZeroTimeDayHolderDays();
+        Log.i("duplicateActivityList", "Duplicate list is " + dailyStatsAccess.getDuplicateActivityAndUniqueIdRows());
 
         getActivity().runOnUiThread(()-> {
 
@@ -984,8 +984,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     }
                 }
             }
-
-//            setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
             //Multiple additions will always include daySelected.
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
