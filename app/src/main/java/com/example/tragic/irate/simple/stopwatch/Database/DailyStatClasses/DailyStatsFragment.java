@@ -64,7 +64,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View mRoot;
     SharedPreferences sharedPref;
     SharedPreferences.Editor prefEdit;
-    Calendar calendar;
+    Calendar mCalendar;
     com.prolificinteractive.materialcalendarview.MaterialCalendarView calendarView;
     CalendarDayWithActivityDecorator calendarDayWithActivityDecorator;
     CurrentCalendarDateDecorator currentCalendarDateDecorator;
@@ -350,7 +350,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
             dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
 
-            daySelectedAsACalendarDayObject = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+            daySelectedAsACalendarDayObject = CalendarDay.from(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH) + 1, mCalendar.get(Calendar.DAY_OF_MONTH));
             customCalendarDayList = Collections.singletonList(daySelectedAsACalendarDayObject);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
@@ -367,8 +367,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             @Override
             public void onDateSelected(@NonNull MaterialCalendarView widget, @NonNull CalendarDay date, boolean selected) {
                 AsyncTask.execute(()->{
-                    calendar = Calendar.getInstance(Locale.getDefault());
-                    calendar.set(date.getYear(), date.getMonth()-1, date.getDay());
+                    mCalendar = Calendar.getInstance(Locale.getDefault());
+                    mCalendar.set(date.getYear(), date.getMonth()-1, date.getDay());
                     customCalendarDayList = Collections.singletonList(date);
 
                     daySelectedFromCalendar = aggregateDayIdFromCalendar();
@@ -392,11 +392,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             @Override
             public void onRangeSelected(@NonNull MaterialCalendarView widget, @NonNull List<CalendarDay> dates) {
                 AsyncTask.execute(()->{
-                    calendar = Calendar.getInstance(Locale.getDefault());
+                    mCalendar = Calendar.getInstance(Locale.getDefault());
                     customCalendarDayList = dates;
                     daySelectedAsACalendarDayObject = dates.get(0);
 
-                    calendar.set(daySelectedAsACalendarDayObject.getYear(), daySelectedAsACalendarDayObject.getMonth()-1, daySelectedAsACalendarDayObject.getDay());
+                    mCalendar.set(daySelectedAsACalendarDayObject.getYear(), daySelectedAsACalendarDayObject.getMonth()-1, daySelectedAsACalendarDayObject.getDay());
 
                     daySelectedFromCalendar = aggregateDayIdFromCalendar();
                     dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
@@ -515,7 +515,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay() {
-        calendar = Calendar.getInstance(Locale.getDefault());
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
         int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
 
         List<DayHolder> dayHolderList = dailyStatsAccess.getDayHolderList();
@@ -710,19 +710,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setAllDayAndStatListsForSingleDay(daySelectedFromCalendar);
         }
         if (mode==WEEKLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForWeek(calendar.get(Calendar.DAY_OF_WEEK), calendar.get(Calendar.DAY_OF_YEAR));
+            dailyStatsAccess.setAllDayAndStatListsForWeek(mCalendar.get(Calendar.DAY_OF_WEEK), mCalendar.get(Calendar.DAY_OF_YEAR));
         }
         if (mode==MONTHLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForMonth((calendar.get(Calendar.DAY_OF_MONTH)), calendar.getActualMaximum(Calendar.DAY_OF_MONTH), calendar.get(Calendar.DAY_OF_YEAR));
+            dailyStatsAccess.setAllDayAndStatListsForMonth((mCalendar.get(Calendar.DAY_OF_MONTH)), mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH), mCalendar.get(Calendar.DAY_OF_YEAR));
         }
         if (mode==YEAR_TO_DATE_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR), true);
+            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR), true);
         }
         if (mode==YEARLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(calendar.getActualMaximum(Calendar.DAY_OF_YEAR), false);
+            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR), false);
         }
         if (mode==CUSTOM_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, calendar.get(Calendar.DAY_OF_YEAR));
+            dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, mCalendar.get(Calendar.DAY_OF_YEAR));
         }
 
         if (numberOfDaysWithActivitiesHasChanged) {
@@ -857,8 +857,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private int aggregateDayIdFromCalendar() {
-        int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
-        int year = calendar.get(Calendar.YEAR);
+        int currentDay = mCalendar.get(Calendar.DAY_OF_YEAR);
+        int year = mCalendar.get(Calendar.YEAR);
         int additionModifier = (year - 2022) * 365;
         return currentDay + additionModifier;
     }
@@ -1761,10 +1761,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateCalendarObjects() {
-        calendar = Calendar.getInstance(Locale.getDefault());
+        mCalendar = Calendar.getInstance(Locale.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
 
-        CalendarDay calendarDay = CalendarDay.from(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1, calendar.get(Calendar.DAY_OF_MONTH));
+        CalendarDay calendarDay = CalendarDay.from(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH) + 1, mCalendar.get(Calendar.DAY_OF_MONTH));
 
         calendarView.state().edit()
                 .setMinimumDate(CalendarDay.from(2022, 1, 1))

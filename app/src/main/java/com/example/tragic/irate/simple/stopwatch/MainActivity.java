@@ -573,9 +573,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-
-
   //Todo: Watch total daily time being <=24 hours if adding/editing across multiple days.
+  //Todo: Denote base bmr calories burned in Calories Expended tab.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
   //Todo: Remove/don't add activity if time is <1 second.
 

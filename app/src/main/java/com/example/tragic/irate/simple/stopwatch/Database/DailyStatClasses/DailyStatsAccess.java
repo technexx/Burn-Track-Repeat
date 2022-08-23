@@ -138,6 +138,7 @@ public class DailyStatsAccess {
         }
 
         return duplicateStringSet;
+
     }
 
     public void setDoesDayExistInDatabase(boolean doesExist) {
@@ -253,6 +254,8 @@ public class DailyStatsAccess {
         setActivityListsForDatabaseObjects(singleItemList);
         setFoodListsForDatabaseObjects(singleItemList);
 
+        Log.i("testWeek", "day selected is " + daySelected);
+
         numberOfDaysSelected = 1;
     }
 
@@ -260,6 +263,8 @@ public class DailyStatsAccess {
         int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         int lastDayOfDuration = firstDayOfDuration + 6;
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
+
+        Log.i("testWeek", "first day of duration is " + firstAggregatedDayOfYearToUse);
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
