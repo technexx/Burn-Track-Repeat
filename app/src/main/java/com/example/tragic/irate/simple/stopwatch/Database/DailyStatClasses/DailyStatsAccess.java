@@ -1044,9 +1044,17 @@ public class DailyStatsAccess {
     public List<Long> totalActivitySetTimeForSelectedDurationIncludingBlankRows() {
         List<Long> listToReturn = new ArrayList<>();
 
+        //Todo: Value is too high because we've allowed >24 to be added.
+        //Todo: We can also just cap the time here!
         for (int i=0; i<mListOfActivityDaysWithPopulatedRows.size(); i++) {
             long setTimeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
+
+            if (setTimeToAdd > getTwentyFourHoursInMillis()) {
+                setTimeToAdd = getTwentyFourHoursInMillis();
+            }
             listToReturn.add(setTimeToAdd);
+
+            Log.i("testTime", "time added is " + setTimeToAdd/1000/60);
         }
 
         for (int i=0; i<mListOfActivityDaysWithEmptyRows.size(); i++) {
@@ -1056,7 +1064,8 @@ public class DailyStatsAccess {
         return listToReturn;
     }
 
-    public List<Long> getListOfUnassignedCaloriesForMultipleDays() {
+
+    public List<Long> getListOfUnassignedTimeForMultipleDays() {
         List<Long> listToReturn = new ArrayList<>();
 
         for (int i=0; i<totalActivitySetTimeForSelectedDurationIncludingBlankRows().size(); i++) {

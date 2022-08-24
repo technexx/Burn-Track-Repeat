@@ -692,17 +692,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         Log.i("duplicateActivityList", "Duplicate list is " + dailyStatsAccess.getDuplicateActivityAndUniqueIdRows());
 
-        List<Long> assignedTimeForDuration = new ArrayList<>();
-        List<Long> unassignedTimeForDuration = new ArrayList<>();
-
-        for (long setTime: dailyStatsAccess.totalActivitySetTimeForSelectedDurationIncludingBlankRows()) {
-            assignedTimeForDuration.add(setTime/1000/60);
-        }
-        for (long emptyTime: dailyStatsAccess.getListOfUnassignedCaloriesForMultipleDays()) {
-            unassignedTimeForDuration.add(emptyTime/1000/60);
-        }
-        Log.i("testList", "list of set times is " + assignedTimeForDuration);
-        Log.i("testList", "list of unassigned time is " + unassignedTimeForDuration);
+        logAssignedAndUnassignedTimesForMultipleDays();
 
         getActivity().runOnUiThread(()-> {
             dailyStatsAdapter.notifyDataSetChanged();
@@ -893,9 +883,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void onAddingActivity(int position) {
-        if (dailyStatsAccess.getUnassignedDailyTotalTime() == 0) {
-            showToastIfNoneActive("No time remaining in day!");
-            return;
+        if (dailyStatsAccess.numberOfDaysSelected==1) {
+            if (dailyStatsAccess.getUnassignedDailyTotalTime() == 0) {
+                showToastIfNoneActive("No time remaining in day!");
+                return;
+            }
         }
 
         setDefaultCustomActivityAdditionViews();
@@ -951,7 +943,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double newCaloriesBurned = 0;
             double caloriesBurnedPerHour;
 
-            newActivityTime = newActivityTimeFromEditText(ADDING_ACTIVITY);
+            //Todo: Each day will require a different cap.
+            if (dailyStatsAccess.numberOfDaysSelected==1) {
+                newActivityTime = newActivityTimeFromEditTextForSingleDay(ADDING_ACTIVITY);
+            } else {
+                newActivityTime = getMillisValueToSaveFromEditTextString();
+            }
 
             if (!customActivity) {
                 //Activity String is already set from our spinner popUp.
@@ -967,7 +964,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.setIsActivityCustomBoolean(true);
             }
 
-            if (newActivityTime==0) {
+            if (newActivityTime==0 && dailyStatsAccess.getNumberOfDaysSelected()==1) {
                 getActivity().runOnUiThread(()-> {
                     showToastIfNoneActive("Time cannot be empty!");
                 });
@@ -977,7 +974,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long finalNewActivityTime = newActivityTime;
             double finalNewCaloriesBurned = newCaloriesBurned;
 
-
             if (dailyStatsAccess.numberOfDaysSelected == 1) {
                 dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(daySelectedFromCalendar, finalNewActivityTime, finalNewCaloriesBurned);
             }
@@ -985,6 +981,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (dailyStatsAccess.numberOfDaysSelected > 1) {
                 for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
                     int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
+
+                    Log.i("testCap", "first time is " + finalNewActivityTime);
+
+                    long unassignedTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
+                    finalNewActivityTime = newActivityTimeForMultipleDays(finalNewActivityTime, unassignedTime);
+
+                    Log.i("testCap", "capped time is " + finalNewActivityTime);
+                    Log.i("testCap", "unassigned time is " + unassignedTime);
 
                     if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
                         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
@@ -1053,9 +1057,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
-            long newActivityTime = newActivityTimeFromEditText(EDITING_ACTIVITY);
+            long newActivityTime = newActivityTimeFromEditTextForSingleDay(EDITING_ACTIVITY);
 
-            if (newActivityTime == 0) {
+            if (newActivityTime == 0 && dailyStatsAccess.getNumberOfDaysSelected() == 1) {
                 getActivity().runOnUiThread(()-> {
                     showToastIfNoneActive("Time cannot be empty!");
                 });
@@ -1119,7 +1123,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private double calculateCaloriesForSpinnerActivity() {
         int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
-        long newActivityTimeToUse = newActivityTimeFromEditText(addingOrEditActivity);
+        long newActivityTimeToUse = newActivityTimeFromEditTextForSingleDay(addingOrEditActivity);
 
         double newCaloriesForActivity = 0;
 
@@ -1157,7 +1161,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return caloriesPerHour * hoursInActivity;
     }
 
-    private long newActivityTimeFromEditText(int addingOrEditingActivity) {
+    private long newActivityTimeFromEditTextForSingleDay(int addingOrEditingActivity) {
         long timeSetInEditText = getMillisValueToSaveFromEditTextString();
         long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
         long timeInEditedRow = 0;
@@ -1170,6 +1174,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         timeSetInEditText = cappedActivityTimeInMillis(timeSetInEditText, remainingDailyTime);
 
         return timeSetInEditText;
+    }
+
+    private long newActivityTimeForMultipleDays(long timeToAdd, long unassignedTime) {
+        if (timeToAdd > unassignedTime) {
+            timeToAdd = unassignedTime;
+        }
+        return timeToAdd;
     }
 
 
@@ -2060,4 +2071,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
         Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
     }
+
+    private void logAssignedAndUnassignedTimesForMultipleDays() {
+        List<Long> assignedTimeForDuration = new ArrayList<>();
+        List<Long> unassignedTimeForDuration = new ArrayList<>();
+
+        for (long setTime: dailyStatsAccess.totalActivitySetTimeForSelectedDurationIncludingBlankRows()) {
+            assignedTimeForDuration.add(setTime/1000/60);
+        }
+        for (long emptyTime: dailyStatsAccess.getListOfUnassignedTimeForMultipleDays()) {
+            unassignedTimeForDuration.add(emptyTime/1000/60);
+        }
+        Log.i("testList", "list of set times is " + assignedTimeForDuration);
+        Log.i("testList", "list of unassigned time is " + unassignedTimeForDuration);
+    }
+
 }
