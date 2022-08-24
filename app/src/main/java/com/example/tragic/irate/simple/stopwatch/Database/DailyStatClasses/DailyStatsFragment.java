@@ -679,6 +679,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
         dailyStatsAccess.clearStatsForEachActivityArrayLists();
+        //Todo: This is what sets our totalSetTimeForEachActivityInSelectedDuraton/Cals vars
         setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
 
         dailyStatsAccess.clearFoodConsumedArrayLists();
@@ -987,7 +988,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     Log.i("testCap", "capped time is " + finalNewActivityTime);
                     Log.i("testCap", "new calories are " + finalNewCaloriesBurned);
-//                    Log.i("testCap", "unassigned time is " + unassignedTime);
 
                     if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
                         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
@@ -998,6 +998,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     }
                 }
             }
+
+            //Latest times/calories to save to DayHolder.
+            populateListsAndTextViewsFromEntityListsInDatabase();
 
             //Multiple additions will always include daySelected.
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
@@ -1081,6 +1084,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForMultipleDays(mPositionToEdit, newActivityTime, newCaloriesBurned);
 
+            //Latest times/calories to save to DayHolder.
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);

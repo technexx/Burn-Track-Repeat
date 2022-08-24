@@ -573,7 +573,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Calories compared did not update on a weekly addition.
   //Todo: Correct 24 hrs in edit as well.
   //Todo: "Delete selected" from onOptions in Stats Fragment deletes duration, not selected days.
   //Todo: Denote base bmr calories burned in Calories Expended tab.

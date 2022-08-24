@@ -1044,8 +1044,6 @@ public class DailyStatsAccess {
     public List<Long> totalActivitySetTimeForSelectedDurationIncludingBlankRows() {
         List<Long> listToReturn = new ArrayList<>();
 
-        //Todo: Value is too high because we've allowed >24 to be added.
-        //Todo: We can also just cap the time here!
         for (int i=0; i<mListOfActivityDaysWithPopulatedRows.size(); i++) {
             long setTimeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
 
@@ -1196,24 +1194,8 @@ public class DailyStatsAccess {
         mCaloriesForEachFood = mCaloriesForEachFoodList.get(position);
     }
 
-    public void setTotalFoodStringListForSelectedDuration() {
-        totalFoodStringListForSelectedDuration.clear();
-
-        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            totalFoodStringListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getTypeOfFood());
-        }
-    }
-
     public List<String> getTotalFoodStringListForSelectedDuration() {
         return totalFoodStringListForSelectedDuration;
-    }
-
-    public void setTotalCaloriesConsumedListForSelectedDuration() {
-        totalCaloriesConsumedListForSelectedDuration.clear();
-
-        for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            totalCaloriesConsumedListForSelectedDuration.add(mCaloriesForEachFoodList.get(i).getCaloriesConsumedForEachFoodType());
-        }
     }
 
     public List<Double> getTotalCaloriesConsumedListForSelectedDuration() {
