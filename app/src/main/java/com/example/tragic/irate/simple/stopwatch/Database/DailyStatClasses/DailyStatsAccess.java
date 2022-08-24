@@ -57,6 +57,8 @@ public class DailyStatsAccess {
 
     int mDaySelectedFromCalendar;
     int numberOfDaysSelected;
+    int firstDayOfDuration;
+    int lastDayOfDuration;
 
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
@@ -136,10 +138,10 @@ public class DailyStatsAccess {
                 duplicateStringSet.add(stringToTest);
             }
         }
-
         return duplicateStringSet;
-
     }
+
+
 
     public void setDoesDayExistInDatabase(boolean doesExist) {
         this.doesDayExistInDatabase = doesExist;
@@ -260,8 +262,8 @@ public class DailyStatsAccess {
     }
 
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
-        int firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
-        int lastDayOfDuration = firstDayOfDuration + 6;
+        firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
+        lastDayOfDuration = firstDayOfDuration + 6;
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         Log.i("testWeek", "first day of duration is " + firstAggregatedDayOfYearToUse);
@@ -288,8 +290,8 @@ public class DailyStatsAccess {
     }
 
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
-        int firstDayOfDuration = dayOfYear - (dayOfMonth-1);
-        int lastDayOfDuration = firstDayOfDuration + (numberOfDaysInMonth-1);
+        firstDayOfDuration = dayOfYear - (dayOfMonth-1);
+        lastDayOfDuration = firstDayOfDuration + (numberOfDaysInMonth-1);
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
@@ -314,8 +316,7 @@ public class DailyStatsAccess {
     }
 
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear, boolean yearToDate) {
-        int firstDayOfDuration = 1;
-        int lastDayOfDuration;
+        firstDayOfDuration = 1;
 
         if (yearToDate) {
             lastDayOfDuration = getCurrentDayOfYear();
@@ -347,8 +348,8 @@ public class DailyStatsAccess {
     }
 
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
-        int firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
-        int lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
+        firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
+        lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
         int firstAggregatedDayOfYearToUse = dayOfYear + valueToAddToStartingDurationDayForFutureYears();
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
@@ -920,6 +921,7 @@ public class DailyStatsAccess {
                 }
             }
         }
+        Log.i("testHours", "list size is " + mStatsForEachActivityList.size());
     }
 
     public void clearStatsForEachActivityArrayLists() {
@@ -1018,10 +1020,13 @@ public class DailyStatsAccess {
         return totalUnassignedCaloriesForSelectedDuration;
     }
 
-    public void setAggregateDailyTime() {
+    public long getTwentyFourHoursInMillis() {
         long twoHours = 7200000;
-        long fullDay = twoHours * 12;
-        totalAggregateTimeForSelectedDuration = fullDay * numberOfDaysSelected;
+        return twoHours * 12;
+    }
+
+    public void setAggregateDailyTime() {
+        totalAggregateTimeForSelectedDuration = getTwentyFourHoursInMillis() * numberOfDaysSelected;
     }
 
     public long getAggregateDailyTime() {
@@ -1034,6 +1039,34 @@ public class DailyStatsAccess {
 
     public double getAggregateDailyCalories() {
         return totalAggregateCaloriesForSelectedDuration;
+    }
+
+    public List<Long> totalActivitySetTimeForSelectedDurationIncludingBlankRows() {
+        List<Long> listToReturn = new ArrayList<>();
+
+        for (int i=0; i<mListOfActivityDaysWithPopulatedRows.size(); i++) {
+            long setTimeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
+            listToReturn.add(setTimeToAdd);
+        }
+
+        for (int i=0; i<mListOfActivityDaysWithEmptyRows.size(); i++) {
+            listToReturn.add((long) 0);
+        }
+
+        return listToReturn;
+    }
+
+    public List<Long> getListOfUnassignedCaloriesForMultipleDays() {
+        List<Long> listToReturn = new ArrayList<>();
+
+        for (int i=0; i<totalActivitySetTimeForSelectedDurationIncludingBlankRows().size(); i++) {
+            long assignedTimeForDay = totalActivitySetTimeForSelectedDurationIncludingBlankRows().get(i);
+            long unassignedTimeForDay = getTwentyFourHoursInMillis() - assignedTimeForDay;
+
+            listToReturn.add(unassignedTimeForDay);
+        }
+
+        return listToReturn;
     }
 
     public int bmrCaloriesBurned() {

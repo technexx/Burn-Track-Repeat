@@ -692,8 +692,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         Log.i("duplicateActivityList", "Duplicate list is " + dailyStatsAccess.getDuplicateActivityAndUniqueIdRows());
 
-        getActivity().runOnUiThread(()-> {
+        List<Long> assignedTimeForDuration = new ArrayList<>();
+        List<Long> unassignedTimeForDuration = new ArrayList<>();
 
+        for (long setTime: dailyStatsAccess.totalActivitySetTimeForSelectedDurationIncludingBlankRows()) {
+            assignedTimeForDuration.add(setTime/1000/60);
+        }
+        for (long emptyTime: dailyStatsAccess.getListOfUnassignedCaloriesForMultipleDays()) {
+            unassignedTimeForDuration.add(emptyTime/1000/60);
+        }
+        Log.i("testList", "list of set times is " + assignedTimeForDuration);
+        Log.i("testList", "list of unassigned time is " + unassignedTimeForDuration);
+
+        getActivity().runOnUiThread(()-> {
             dailyStatsAdapter.notifyDataSetChanged();
             caloriesConsumedAdapter.notifyDataSetChanged();
 
