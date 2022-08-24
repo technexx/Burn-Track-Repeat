@@ -943,7 +943,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double newCaloriesBurned = 0;
             double caloriesBurnedPerHour;
 
-            //Todo: Each day will require a different cap.
             if (dailyStatsAccess.numberOfDaysSelected==1) {
                 newActivityTime = newActivityTimeFromEditTextForSingleDay(ADDING_ACTIVITY);
             } else {
@@ -952,7 +951,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             if (!customActivity) {
                 //Activity String is already set from our spinner popUp.
-                newCaloriesBurned = calculateCaloriesForSpinnerActivity();
+                newCaloriesBurned = calculateCaloriesForSpinnerActivityForSingleDay();
                 dailyStatsAccess.setIsActivityCustomBoolean(false);
             } else {
                 dailyStatsAccess.setActivityString(addCustomActivityEditText.getText().toString().trim());
@@ -982,13 +981,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
                     int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
 
-                    Log.i("testCap", "first time is " + finalNewActivityTime);
-
                     long unassignedTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
                     finalNewActivityTime = newActivityTimeForMultipleDays(finalNewActivityTime, unassignedTime);
+                    finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
 
                     Log.i("testCap", "capped time is " + finalNewActivityTime);
-                    Log.i("testCap", "unassigned time is " + unassignedTime);
+                    Log.i("testCap", "new calories are " + finalNewCaloriesBurned);
+//                    Log.i("testCap", "unassigned time is " + unassignedTime);
 
                     if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
                         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
@@ -1074,7 +1073,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             if (!dailyStatsAccess.getIsActivityCustomBooleanFromDatabaseInstance()) {
                 dailyStatsAccess.setActivityString(dailyStatsAccess.getActivityStringFromSelectedActivity());
-                newCaloriesBurned = calculateCaloriesForSpinnerActivity();
+                newCaloriesBurned = calculateCaloriesForSpinnerActivityForSingleDay();
             } else {
                 double caloriesBurnedPerHour = dailyStatsAccess.getCaloriesBurnedPerHourForSelectedDay();
                 newCaloriesBurned = calculateCaloriesForCustomActivityEdit(newActivityTime, caloriesBurnedPerHour);
@@ -1121,15 +1120,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private double calculateCaloriesForSpinnerActivity() {
+    private double calculateCaloriesForSpinnerActivityForSingleDay() {
         int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
         long newActivityTimeToUse = newActivityTimeFromEditTextForSingleDay(addingOrEditActivity);
 
+        return calculateCaloriesFromMillisValue(newActivityTimeToUse);
+    }
+
+    private double calculateCaloriesFromMillisValue(long millis) {
         double newCaloriesForActivity = 0;
 
         double retrievedMetScore = dailyStatsAccess.getMetScore();
         double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
-        newCaloriesForActivity = ((double) (newActivityTimeToUse/1000) * caloriesBurnedPerSecond);
+        newCaloriesForActivity = ((double) (millis/1000) * caloriesBurnedPerSecond);
 
         return newCaloriesForActivity;
     }
