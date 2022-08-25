@@ -126,8 +126,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int WEEKLY_STATS = 1;
     int MONTHLY_STATS = 2;
     int YEAR_TO_DATE_STATS = 3;
-    int YEARLY_STATS = 4;
-    int CUSTOM_STATS = 5;
+//    int YEARLY_STATS = 4;
+    int CUSTOM_STATS = 4;
     boolean numberOfDaysWithActivitiesHasChanged;
 
     List<CalendarDay> customCalendarDayList;
@@ -724,9 +724,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==YEAR_TO_DATE_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR), true);
         }
-        if (mode==YEARLY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR), false);
-        }
+//        if (mode==YEARLY_STATS) {
+//            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR), false);
+//        }
         if (mode==CUSTOM_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, mCalendar.get(Calendar.DAY_OF_YEAR));
         }
@@ -762,10 +762,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalStatsHeaderTextView.setText(R.string.year_to_date_header);
             convertAndSetDateRangeStringOnTextView();
         }
-        if (mode==YEARLY_STATS) {
-            totalStatsHeaderTextView.setText(R.string.yearly_total_header);
-            convertAndSetDateRangeStringOnTextView();
-        }
+//        if (mode==YEARLY_STATS) {
+//            totalStatsHeaderTextView.setText(R.string.yearly_total_header);
+//            convertAndSetDateRangeStringOnTextView();
+//        }
         if (mode==CUSTOM_STATS) {
             totalStatsHeaderTextView.setText(R.string.custom_total_header);
             calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
@@ -828,7 +828,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
         if (directionOfIteration==ITERATING_ACTIVITY_STATS_UP) {
-            if (currentStatDurationMode<5) {
+            if (currentStatDurationMode<4) {
                 currentStatDurationMode++;
             } else {
                 currentStatDurationMode=0;
@@ -837,7 +837,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (currentStatDurationMode>0) {
                 currentStatDurationMode--;
             } else {
-                currentStatDurationMode=5;
+                currentStatDurationMode=4;
             }
         }
     }
@@ -875,9 +875,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private int aggregateDayIdFromCalendar() {
-        int currentDay = mCalendar.get(Calendar.DAY_OF_YEAR);
-        int year = mCalendar.get(Calendar.YEAR);
-        int additionModifier = (year - 2022) * 365;
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
+        int year = calendar.get(Calendar.YEAR);
+
+        int additionModifier = 0;
+        int numberOfYearsToAdd = (year - 2022);
+
+        for (int i=0; i<numberOfYearsToAdd; i++) {
+            calendar.set(2022 + i, 1, 1);
+            additionModifier += calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
+        }
+
         return currentDay + additionModifier;
     }
 
