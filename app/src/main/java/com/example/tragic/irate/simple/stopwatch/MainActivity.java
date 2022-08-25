@@ -573,9 +573,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Avg. calories/day for simplified mode.
+      //Todo: Longer durations show huge deficits w/ an average bmr but not calories consumed.
+      //Todo: Avg. can apply if no foods are added for day.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
-  //Todo: Remove/don't add activity if time is <1 second.
-  //Todo: aggregateDayIdFromCalendar() will b0rk since leap years have 366 days. Just get daysOfYear from current year and use that.
 
   //Todo: Need to fix tab switching w/ calendar minimization and deal w/ comparison tab.
 
@@ -660,7 +661,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       0,  // enter
                       R.anim.slide_out_from_left_mid  // exit
               )
-              .addToBackStack(null)
+//              .addToBackStack(null)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
       setEditPopUpTimerHeaders(1);
@@ -760,13 +761,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (settingNumber==4) fragmentToReplace = disclaimerFragment;
 
     getSupportFragmentManager().beginTransaction()
-            .setCustomAnimations(
-                    R.anim.slide_in_from_left_short,  // enter
-                    R.anim.slide_out_from_right  // exit
-//                    R.anim.slide_in_from_left_short,   // popEnter (backstack)
-//                    R.anim.slide_out_from_right  // popExit (backstack)
-            )
-            .addToBackStack (null)
+//            .setCustomAnimations(
+//                    R.anim.slide_in_from_left_mid ,  // enter
+//                    R.anim.slide_out_from_right// exit
+//            )
+////            .addToBackStack (null)
             .replace(R.id.settings_fragment_frameLayout, fragmentToReplace)
             .commit();
   }
