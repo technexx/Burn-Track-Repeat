@@ -3,10 +3,13 @@ package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.text.TextUtils;
 import android.util.Log;
 import android.widget.Toast;
+
+import androidx.core.content.ContextCompat;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CalorieDayHolder;
@@ -14,6 +17,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.Ca
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
+import com.example.tragic.irate.simple.stopwatch.R;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.text.SimpleDateFormat;
@@ -921,7 +925,6 @@ public class DailyStatsAccess {
                 }
             }
         }
-        Log.i("testHours", "list size is " + mStatsForEachActivityList.size());
     }
 
     public void clearStatsForEachActivityArrayLists() {
@@ -1008,7 +1011,7 @@ public class DailyStatsAccess {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
     }
 
-    public long getUnassignedDailyTotalTime() {
+    public long getUnassignedSetTimeForSelectedDuration() {
         return totalUnassignedSetTimeForSelectedDuration;
     }
 
@@ -1016,7 +1019,7 @@ public class DailyStatsAccess {
         totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
     }
 
-    public double getUnassignedDailyCalories() {
+    public double getUnassignedCaloriesForSelectedDuration() {
         return totalUnassignedCaloriesForSelectedDuration;
     }
 
@@ -1034,7 +1037,7 @@ public class DailyStatsAccess {
     }
 
     public void setAggregateDailyCalories() {
-        totalAggregateCaloriesForSelectedDuration = totalActivityCaloriesForSelectedDuration + getUnassignedDailyCalories();
+        totalAggregateCaloriesForSelectedDuration = totalActivityCaloriesForSelectedDuration + getUnassignedCaloriesForSelectedDuration();
     }
 
     public double getAggregateDailyCalories() {

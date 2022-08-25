@@ -574,6 +574,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Denote base bmr calories burned in Calories Expended tab.
+      //Todo: Can we do a base "calories consumed?"
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
   //Todo: Remove/don't add activity if time is <1 second.
 

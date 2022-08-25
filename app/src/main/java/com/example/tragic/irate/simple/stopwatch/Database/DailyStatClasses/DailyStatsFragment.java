@@ -102,8 +102,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     ConstraintLayout totalActivityStatsValuesTextViewLayout;
     ConstraintLayout.LayoutParams totalActivityStatsValuesTextViewsLayoutParams;
-    TextView dailyStatsTotalSetTimeTextView;
-    TextView dailyStatsTotalCaloriesBurnedTextView;
+    TextView dailyStatsBmrTimeTextView;
+    TextView dailyStatsBmrCaloriesTextView;
+    TextView dailyStatsTotalActivityTimeTextView;
+    TextView dailyStatsTotalActivityCaloriesBurnedTextView;
+    TextView dailyCaloriesExpendedTimeElapsedTextView;
+    TextView dailyCaloriesExpendedCaloriesBurnedTextView;
 
     ConstraintLayout totalFoodStatsValuesTextViewLayout;
     ConstraintLayout.LayoutParams totalFoodStatsValuesTextViewLayoutParams;
@@ -851,11 +855,23 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setTotalActivityStatsFooterTextViews() {
-        String totalSetTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTotalActivityTimeForSelectedDuration());
-        double totalCaloriesBurned = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
+        String totalBmrTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getUnassignedSetTimeForSelectedDuration());
+        String totalBmrCalories = formatDoubleToStringWithoutDecimals(dailyStatsAccess.getUnassignedCaloriesForSelectedDuration());
 
-        dailyStatsTotalSetTimeTextView.setText(totalSetTime);
-        dailyStatsTotalCaloriesBurnedTextView.setText(formatDoubleToStringWithoutDecimals(totalCaloriesBurned));
+        String totalActivitySetTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTotalActivityTimeForSelectedDuration());
+        String totalActivityCaloriesBurned = formatDoubleToStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration());
+
+        String totalCaloriesExpendedTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTwentyFourHoursInMillis());
+        String totalCaloriesExpendedCaloriesBurned = formatDoubleToStringWithoutDecimals(dailyStatsAccess.getAggregateDailyCalories());
+
+        dailyStatsBmrTimeTextView.setText(totalBmrTime);
+        dailyStatsBmrCaloriesTextView.setText(totalBmrCalories);
+
+        dailyStatsTotalActivityTimeTextView.setText(totalActivitySetTime);
+        dailyStatsTotalActivityCaloriesBurnedTextView.setText(totalActivityCaloriesBurned);
+
+        dailyCaloriesExpendedTimeElapsedTextView.setText(totalCaloriesExpendedTime);
+        dailyCaloriesExpendedCaloriesBurnedTextView.setText(totalCaloriesExpendedCaloriesBurned);
     }
 
     private int aggregateDayIdFromCalendar() {
@@ -885,7 +901,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     @Override
     public void onAddingActivity(int position) {
         if (dailyStatsAccess.getNumberOfDaysSelected()==1) {
-            if (dailyStatsAccess.getUnassignedDailyTotalTime() == 0) {
+            if (dailyStatsAccess.getUnassignedSetTimeForSelectedDuration() == 0) {
                 showToastIfNoneActive("No time remaining in day!");
                 return;
             }
@@ -1199,7 +1215,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private long newActivityTimeFromEditTextForSingleDay(int addingOrEditingActivity) {
         long timeSetInEditText = getMillisValueToSaveFromEditTextString();
-        long remainingDailyTime = dailyStatsAccess.getUnassignedDailyTotalTime();
+        long remainingDailyTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
         long timeInEditedRow = 0;
 
         if (addingOrEditingActivity==EDITING_ACTIVITY) {
@@ -1265,7 +1281,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setActivityEditPopUpTimeRemainingTextView() {
-        String timeLeftInDay = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getUnassignedDailyTotalTime());
+        String timeLeftInDay = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getUnassignedSetTimeForSelectedDuration());
         String timeLeftInDayConcatString = getString(R.string.day_time_remaining, timeLeftInDay);
         unassignedTimeInEditPopUpTextView.setText(timeLeftInDayConcatString);
     }
@@ -1630,7 +1646,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setTotalCaloriesComparedTextViews(boolean statsAreSimplified) {
         double caloriesConsumed = dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration();
         double caloriesExpendedFromActivities = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
-        double unassignedCalories = dailyStatsAccess.getUnassignedDailyCalories();
+        double unassignedCalories = dailyStatsAccess.getUnassignedCaloriesForSelectedDuration();
 
         double totalCaloriesExpended = 0;
 
@@ -1647,7 +1663,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         totalConsumedCaloriesCompared.setText(formatDoubleToStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration()));
 
         totalExpendedCaloriesCompared.setText(formatDoubleToStringWithoutDecimals(totalCaloriesExpended));
-        totalExpendedCaloriesComparedBmr.setText(formatDoubleToStringWithoutDecimals(dailyStatsAccess.getUnassignedDailyCalories()));
+        totalExpendedCaloriesComparedBmr.setText(formatDoubleToStringWithoutDecimals(dailyStatsAccess.getUnassignedCaloriesForSelectedDuration()));
         totalExpendedCaloriesComparedActivities.setText(formatDoubleToStringWithoutDecimals(caloriesExpendedFromActivities));
 
         String signToUse = getPlusOrMinusSignForDoubleDifference(caloriesConsumed, totalCaloriesExpended);
@@ -1930,19 +1946,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private void instantiateCaloriesComparedViews() {
-        totalExpendedCaloriesComparedBmrHeader = mRoot.findViewById(R.id.total_expended_calories_compared_bmr_header);
-        totalExpendedCaloriesComparedActivitiesHeader = mRoot.findViewById(R.id.total_expended_calories_compared_activities_header);
-
-        caloriesComparedLayout = mRoot.findViewById(R.id.calories_compared_layout);
-        totalConsumedCaloriesCompared = mRoot.findViewById(R.id.total_consumed_calories_compared);
-        totalExpendedCaloriesCompared = mRoot.findViewById(R.id.total_expended_calories_compared);
-        totalExpendedCaloriesComparedBmr = mRoot.findViewById(R.id.total_expended_calories_compared_bmr);
-        totalExpendedCaloriesComparedActivities = mRoot.findViewById(R.id.total_expended_calories_compared_activities);
-        totalCaloriesDifferenceCompared = mRoot.findViewById(R.id.total_calories_difference_compared);
-        totalWeightDifferenceCompared = mRoot.findViewById(R.id.total_weight_difference_compared);
-    }
-
     public interface changeOnOptionsItemSelectedMenu {
         void onChangeOnOptionsMenu(int menuNumber);
     }
@@ -1986,8 +1989,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         totalActivityStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_activity_stats_values_textView_layout);
         totalActivityStatsValuesTextViewsLayoutParams = (ConstraintLayout.LayoutParams) totalActivityStatsValuesTextViewLayout.getLayoutParams();
-        dailyStatsTotalSetTimeTextView = mRoot.findViewById(R.id.daily_stats_total_set_time_textView);
-        dailyStatsTotalCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_calories_burned_textView);
+        dailyStatsBmrTimeTextView = mRoot.findViewById(R.id.total_bmr_stats_time_textView);
+        dailyStatsBmrCaloriesTextView = mRoot.findViewById(R.id.total_bmr_stats_calories_textView);
+        dailyStatsTotalActivityTimeTextView = mRoot.findViewById(R.id.daily_stats_total_activity_time_textView);
+        dailyStatsTotalActivityCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_activity_calories_burned_textView);
+        dailyCaloriesExpendedTimeElapsedTextView = mRoot.findViewById(R.id.total_calories_expended_stats_time_elapsed_textView);
+        dailyCaloriesExpendedCaloriesBurnedTextView = mRoot.findViewById(R.id.total_calories_expended_stats_calories_burned_textView);
 
         totalFoodStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_food_stats_values_textView_layout);
         totalFoodStatsValuesTextViewLayoutParams = (ConstraintLayout.LayoutParams) totalFoodStatsValuesTextViewLayout.getLayoutParams();
@@ -2004,6 +2011,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dayHolderList = new ArrayList<>();
         statsForEachActivityList = new ArrayList<>();
+    }
+
+    private void instantiateExpansionPopUpViews() {
+        dailyStatsExpandedView = inflater.inflate(R.layout.daily_stats_expanded_popup, null);
+        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(420), false);
+        dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     }
 
     private void instantiateActivityRecyclerViewAndItsAdapter() {
@@ -2034,10 +2047,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) caloriesConsumedRecyclerView.getLayoutParams();
     }
 
-    private void instantiateExpansionPopUpViews() {
-        dailyStatsExpandedView = inflater.inflate(R.layout.daily_stats_expanded_popup, null);
-        dailyStatsExpandedPopUpWindow = new PopupWindow(dailyStatsExpandedView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(420), false);
-        dailyStatsExpandedPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+    private void instantiateCaloriesComparedViews() {
+        totalExpendedCaloriesComparedBmrHeader = mRoot.findViewById(R.id.total_expended_calories_compared_bmr_header);
+        totalExpendedCaloriesComparedActivitiesHeader = mRoot.findViewById(R.id.total_expended_calories_compared_activities_header);
+
+        caloriesComparedLayout = mRoot.findViewById(R.id.calories_compared_layout);
+        totalConsumedCaloriesCompared = mRoot.findViewById(R.id.total_consumed_calories_compared);
+        totalExpendedCaloriesCompared = mRoot.findViewById(R.id.total_expended_calories_compared);
+        totalExpendedCaloriesComparedBmr = mRoot.findViewById(R.id.total_expended_calories_compared_bmr);
+        totalExpendedCaloriesComparedActivities = mRoot.findViewById(R.id.total_expended_calories_compared_activities);
+        totalCaloriesDifferenceCompared = mRoot.findViewById(R.id.total_calories_difference_compared);
+        totalWeightDifferenceCompared = mRoot.findViewById(R.id.total_weight_difference_compared);
     }
 
     private void instantiateCalendarAnimations() {
@@ -2108,9 +2128,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void logUnassignedAndAggregatesTimesAndCalories() {
-        Log.i("testTotal", "unassigned time is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getUnassignedDailyTotalTime()));
+        Log.i("testTotal", "unassigned time is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getUnassignedSetTimeForSelectedDuration()));
         Log.i("testTotal", "aggregate time is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getAggregateDailyTime()));
-        Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedDailyCalories());
+        Log.i("testTotal", "unassigned calories are " + dailyStatsAccess.getUnassignedCaloriesForSelectedDuration());
         Log.i("testTotal", "aggregate calories are " + dailyStatsAccess.getAggregateDailyCalories());
     }
 
