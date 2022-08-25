@@ -349,8 +349,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setSimplifiedViewTextViews();
 
         AsyncTask.execute(()-> {
-            deleteActivitiesWithNoTimeElapsed();
-
             daySelectedFromCalendar = aggregateDayIdFromCalendar();
             dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
 
@@ -500,10 +498,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         return root;
-    }
-
-    private void deleteActivitiesWithNoTimeElapsed() {
-//        dailyStatsAccess.deleteTotalTimesAndCaloriesForSelectedActivityForSingleDay();
     }
 
     public void executeTurnOffEditModeMethod() {
@@ -683,7 +677,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
         dailyStatsAccess.clearStatsForEachActivityArrayLists();
-        //Todo: This is what sets our totalSetTimeForEachActivityInSelectedDuraton/Cals vars
         setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
 
         dailyStatsAccess.clearFoodConsumedArrayLists();
@@ -875,18 +868,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private int aggregateDayIdFromCalendar() {
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
-        int year = calendar.get(Calendar.YEAR);
+        int currentDay = mCalendar.get(Calendar.DAY_OF_YEAR);
+        int year = mCalendar.get(Calendar.YEAR);
 
         int additionModifier = 0;
         int numberOfYearsToAdd = (year - 2022);
 
         for (int i=0; i<numberOfYearsToAdd; i++) {
-            calendar.set(2022 + i, 1, 1);
-            additionModifier += calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
+            mCalendar.set(2022 + i, 1, 1);
+            additionModifier += mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR);
         }
-
+        Log.i("testAgg", "agg id is " + (currentDay + additionModifier));
         return currentDay + additionModifier;
     }
 

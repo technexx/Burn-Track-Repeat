@@ -230,9 +230,6 @@ public class DailyStatsAccess {
         if (integerListOfDaysSelected.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfDaysSelected);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfDaysSelected);
-            for (int i=0; i<mDayHolderList.size(); i++) {
-                Log.i("testCheck", "dayHolder list fetched from Access contains " + mDayHolderList.get(i).getDayId());
-            }
         } else {
             mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
@@ -259,8 +256,6 @@ public class DailyStatsAccess {
         List<Integer> singleItemList = Collections.singletonList(daySelected);
         setActivityListsForDatabaseObjects(singleItemList);
         setFoodListsForDatabaseObjects(singleItemList);
-
-        Log.i("testWeek", "day selected is " + daySelected);
 
         numberOfDaysSelected = 1;
     }
