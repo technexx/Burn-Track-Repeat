@@ -28,10 +28,10 @@
     <string name="delete_cycles_times_and_completed_cycles">Delete time and cycle totals?</string>
     <string name="delete_all_cycles">Are you sure? This will delete all cycles!</string>
 
-    <string name="delete_activity_from_single_day">Delete activities from selected date(s)?</string>
+    <string name="delete_activity_from_single_day">Delete all activities in current date range?</string>
     <string name="delete_all_activities">Delete all activities from all days?\nThis cannot be undone!</string>
 
-    <string name="delete_food_from_single_day">Delete food from selected date(s)?</string>
+    <string name="delete_food_from_single_day">Delete all foods in current date range?</string>
     <string name="delete_all_foods">Delete all foods from all days?\nThis cannot be undone!</string>
 
     <string name="lap">New Lap</string>

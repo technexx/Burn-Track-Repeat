@@ -1052,7 +1052,7 @@ public class DailyStatsAccess {
             }
             listToReturn.add(setTimeToAdd);
 
-            Log.i("testTime", "time added is " + setTimeToAdd/1000/60);
+//            Log.i("testTime", "time added is " + setTimeToAdd/1000/60);
         }
 
         for (int i=0; i<mListOfActivityDaysWithEmptyRows.size(); i++) {

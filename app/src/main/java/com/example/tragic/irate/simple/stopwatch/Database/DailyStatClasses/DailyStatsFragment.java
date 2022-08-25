@@ -983,20 +983,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
 
                     finalNewActivityTime = newActivityTime;
+                    Log.i("testTime", "pre-cap time is " + finalNewActivityTime);
 
                     long unassignedTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
-                    finalNewActivityTime = cappedActivityTimeInMillis(finalNewActivityTime, unassignedTime);
+                    finalNewActivityTime = cappedActivityTimeForOverwritingInsertions(finalNewActivityTime);
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
 
-                    //Does not insert/update if there is no unassigned time.
-                    if (unassignedTime != 0) {
-                        if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
-                            dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
-                            Log.i("testAct", "day " + uniqueIdToCheck + " does not exist and is inserting!");
-                        } else {
-                            dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
-                            Log.i("testAct", "day " + uniqueIdToCheck + " exists and is updating!");
-                        }
+                    Log.i("testTime", "post-cap time is " + finalNewActivityTime);
+
+                    if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
+                        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
+                        Log.i("testAct", "day " + uniqueIdToCheck + " does not exist and is inserting!");
+                    } else {
+                        dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
+                        Log.i("testAct", "day " + uniqueIdToCheck + " exists and is updating!");
                     }
                 }
             }
@@ -1104,14 +1104,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     finalNewCaloriesBurned = newCaloriesBurned;
                     Log.i("testCap", "capped time in EDIT before cap is " + finalNewActivityTime);
 
-                    finalNewActivityTime = cappedActivityTimeInMillis(finalNewActivityTime, unassignedTime);
+                    finalNewActivityTime = cappedActivityTimeForOverwritingInsertions(finalNewActivityTime);
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
 
                     Log.i("testCap", "capped time in EDIT after cap is " + finalNewActivityTime);
 
-                    if (unassignedTime != 0) {
-                        dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
-                    }
+                    dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
                 }
             }
 
@@ -1206,15 +1204,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         if (addingOrEditingActivity==EDITING_ACTIVITY) {
             timeInEditedRow = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(mPositionToEdit);
+            timeSetInEditText = cappedActivityTimeForOverwritingInsertions(timeSetInEditText);
         }
-
-        remainingDailyTime += timeInEditedRow;
-        timeSetInEditText = cappedActivityTimeInMillis(timeSetInEditText, remainingDailyTime);
+        if (addingOrEditingActivity==ADDING_ACTIVITY) {
+            remainingDailyTime += timeInEditedRow;
+            timeSetInEditText = cappedActivityTimeForNonOverwritingInsertions(timeSetInEditText, remainingDailyTime);
+        }
 
         return timeSetInEditText;
     }
 
-    private long cappedActivityTimeInMillis(long activityTime, long remainingTime) {
+    private long cappedActivityTimeForNonOverwritingInsertions(long activityTime, long remainingTime) {
         if (remainingTime > 0) {
             if (activityTime > remainingTime) {
                 activityTime = remainingTime;
@@ -1223,6 +1223,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             activityTime = 0;
         }
 
+        return activityTime;
+    }
+
+    private long cappedActivityTimeForOverwritingInsertions(long activityTime) {
+        if (activityTime > dailyStatsAccess.getTwentyFourHoursInMillis()) {
+            activityTime = dailyStatsAccess.getTwentyFourHoursInMillis();
+        }
         return activityTime;
     }
 
