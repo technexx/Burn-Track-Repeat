@@ -213,6 +213,7 @@
             android:text="@string/metabolic_rate"
             android:textColor="@color/red"
             android:textStyle="bold"
+            android:textSize="17sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider">
         </TextView>
@@ -226,6 +227,7 @@
             android:minWidth="100dp"
             android:textColor="@color/green"
             android:textStyle="bold"
+            android:textSize="17sp"
             app:layout_constraintEnd_toStartOf="@id/total_bmr_stats_calories_textView"
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider">
         </TextView>
@@ -240,6 +242,7 @@
             android:minWidth="100dp"
             android:textColor="@color/purple_200"
             android:textStyle="bold"
+            android:textSize="17sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider">
         </TextView>
@@ -251,6 +254,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
+            android:textSize="17sp"
             android:paddingStart="6dp"
             android:paddingEnd="6dp"
             android:textStyle="bold"
@@ -263,6 +267,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toStartOf="@id/daily_stats_total_activity_calories_burned_textView"
             app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
+            android:textSize="17sp"
             android:gravity="center"
             android:textStyle="bold"
             android:textColor="@color/green"
@@ -276,6 +281,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
+            android:textSize="17sp"
             android:gravity="center"
             android:layout_marginEnd="8dp"
             android:textStyle="bold"
@@ -286,6 +292,7 @@
 
         <TextView
             android:id="@+id/total_calories_expended_stats_header_textView"
+            android:text="@string/total_assigned_stats"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
             android:paddingStart="6dp"
@@ -338,7 +345,7 @@
             android:layout_width="match_parent"
             android:layout_height="2dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/daily_stats_total_activity_calories_burned_textView"
+            app:layout_constraintTop_toBottomOf="@id/total_calories_expended_stats_header_textView"
             app:layout_constraintBottom_toBottomOf="parent"
             android:layout_marginTop="0dp"
             android:background="@color/black">
@@ -352,7 +359,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:mcv_tileHeight="34dp"
+        app:mcv_tileHeight="30dp"
         app:mcv_tileWidth="52dp"
         app:mcv_showOtherDates="other_months"
         app:mcv_selectionColor="@color/teal"
