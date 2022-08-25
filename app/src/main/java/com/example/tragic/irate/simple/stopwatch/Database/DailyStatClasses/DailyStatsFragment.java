@@ -250,7 +250,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         dailyStatsRecyclerView.setVisibility(View.VISIBLE);
                         totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
 
-                        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
                         toggleEditButtonView(false);
                         setTabSelected(0);
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
@@ -272,12 +271,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
                         simplifiedStatsLayout.setVisibility(View.INVISIBLE);
 
-                        toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
                         toggleEditButtonView(true);
                         setTabSelected(2);
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(2);
                         break;
                 }
+
+                toggleCalendarMinimizationLayouts();
+                toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
             }
 
             @Override
@@ -475,7 +476,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         minimizeCalendarButton.setOnClickListener(v-> {
-            calendarMinimizationLogic(false);
+            calendarMinimizationButtonLogic(false);
         });
 
         dailyStatsExpandedButton.setOnClickListener(v-> {
@@ -1148,6 +1149,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
+    private void setEditActivityPopUpButtonsLayoutParams(boolean constrainedToTop) {
+        if (!constrainedToTop) {
+            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
+        } else {
+            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(10);
+        }
+    }
+
     private void deleteActivityFromStats(int position) {
         numberOfDaysWithActivitiesHasChanged = true;
 
@@ -1735,7 +1744,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return calculateCaloriesBurnedPerMinute(metValue) / 60;
     }
 
-    private void calendarMinimizationLogic(boolean restoreOnly) {
+    private void calendarMinimizationButtonLogic(boolean restoreOnly) {
         if (restoreOnly) {
             if (!calendarIsMinimized) {
                 return;
@@ -1752,7 +1761,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void toggleCalendarMinimizationLayouts() {
         if (caloriesComparisonTabLayout.getSelectedTabPosition()==0) {
-            setCalendarMinimizationViews();
             setCalendarMinimizationLayoutConstraints(dailyStatsRecyclerViewLayoutParams, totalActivityStatsValuesTextViewsLayoutParams);
 
             dailyStatsRecyclerView.setLayoutParams(dailyStatsRecyclerViewLayoutParams);
@@ -1761,7 +1769,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         if (caloriesComparisonTabLayout.getSelectedTabPosition()==1) {
-            setCalendarMinimizationViews();
             setCalendarMinimizationLayoutConstraints(caloriesConsumedRecyclerViewLayoutParams, totalFoodStatsValuesTextViewLayoutParams);
 
             caloriesConsumedRecyclerView.setLayoutParams(caloriesConsumedRecyclerViewLayoutParams);
@@ -1769,18 +1776,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
         }
 
-        if (caloriesComparisonTabLayout.getSelectedTabPosition()==2) {
-
-        }
+        setCalendarMinimizationViews();
     }
 
     private void setCalendarMinimizationViews() {
         if (calendarIsMinimized) {
-            setCalendarViewMinimizationAnimation(true);
             setCalendarMinimizationButton(true);
+            calendarView.setVisibility(View.INVISIBLE);
         } else {
-            setCalendarViewMinimizationAnimation(false);
             setCalendarMinimizationButton(false);
+            calendarView.setVisibility(View.VISIBLE);
+
         }
     }
 
@@ -1789,14 +1795,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
         } else {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
-        }
-    }
-
-    private void setCalendarViewMinimizationAnimation(boolean minimizing) {
-        if (minimizing) {
-            calendarView.startAnimation(slideOutCalendarToBottom);
-        } else {
-            calendarView.startAnimation(slideInCalendarFromBottom);
         }
     }
 
@@ -1814,14 +1812,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void setEditActivityPopUpButtonsLayoutParams(boolean constrainedToTop) {
-        if (!constrainedToTop) {
-            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
-        } else {
-            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(10);
-        }
-    }
-
     private void togggleTotalStatTextViewsWhenSwitchingTabs(int tabPositionSelected) {
         if (tabPositionSelected==0) {
             totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
@@ -1830,14 +1820,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (tabPositionSelected==1) {
             totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
             totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
-        }
-
-        //Todo: Set layout params.
-        if (calendarIsMinimized) {
-            calendarView.setVisibility(View.INVISIBLE);
-
-        } else {
-            calendarView.setVisibility(View.VISIBLE);
         }
     }
 
