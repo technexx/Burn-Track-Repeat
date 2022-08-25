@@ -1752,6 +1752,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         toggleCalendarMinimizationState();
+        setCalendarMinimizationAnimations();
         toggleCalendarMinimizationLayouts();
     }
 
@@ -1787,6 +1788,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setCalendarMinimizationButton(false);
             calendarView.setVisibility(View.VISIBLE);
 
+        }
+    }
+
+    private void setCalendarMinimizationAnimations() {
+        if (calendarIsMinimized) {
+            calendarView.startAnimation(slideOutCalendarToBottom);
+        } else {
+            calendarView.startAnimation(slideInCalendarFromBottom);
         }
     }
 
