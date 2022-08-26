@@ -553,14 +553,12 @@ public class DailyStatsAccess {
     }
 
     public boolean doesActivityExistsForSpecificDay() {
-        boolean valueToReturn = false;
-
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
-                valueToReturn = true;
+                return true;
             }
         }
-        return valueToReturn;
+        return false;
     }
 
     public boolean doesActivityExistInDatabaseForMultipleDays(int idToIterate) {
@@ -1102,14 +1100,8 @@ public class DailyStatsAccess {
 
     public boolean doesFoodExistsInDatabaseForSelectedDayBoolean(String foodString) {
         for (int i=0; i<mCaloriesForEachFoodList.size(); i++) {
-            int uniqueDayIdToCheck = mListOfActivityDaysSelected.get(i);
-
-            for (int k=0; k<mCaloriesForEachFoodList.size(); k++) {
-                if (mCaloriesForEachFoodList.get(k).getUniqueIdTiedToEachFood()==uniqueDayIdToCheck) {
-                    if (foodString.equalsIgnoreCase(mCaloriesForEachFoodList.get(k).getTypeOfFood())) {
-                        return true;
-                    }
-                }
+            if (mFoodString.equalsIgnoreCase(mCaloriesForEachFoodList.get(i).getTypeOfFood())) {
+                return true;
             }
         }
         return false;

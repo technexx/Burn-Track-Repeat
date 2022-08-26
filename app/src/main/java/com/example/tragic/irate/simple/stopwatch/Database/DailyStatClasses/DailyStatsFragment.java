@@ -252,9 +252,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                         toggleEditButtonView(false);
                         setTabSelected(0);
-                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
 
+                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
                         togggleTotalStatTextViewsWhenSwitchingTabs(0);
+
+                        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
@@ -274,6 +276,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         toggleEditButtonView(true);
                         setTabSelected(2);
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(2);
+
+                        toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
                         break;
                 }
 
@@ -1976,7 +1980,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         minimizeCalendarButton = mRoot.findViewById(R.id.minimize_calendarView_button);
         recyclerAndTotalStatsDivider =  mRoot.findViewById(R.id.recycler_and_total_stats_divider);
         topOfRecyclerViewAnchor = mRoot.findViewById(R.id.top_of_recyclerView_anchor);
-        bottomOfRecyclerViewAnchor = mRoot.findViewById(R.id.bottom_of_recyclerView_anchor);
         totalStatsHeaderTextView = mRoot.findViewById(R.id.activity_stats_duration_header_textView);
 
         totalActivityStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_activity_stats_values_textView_layout);
