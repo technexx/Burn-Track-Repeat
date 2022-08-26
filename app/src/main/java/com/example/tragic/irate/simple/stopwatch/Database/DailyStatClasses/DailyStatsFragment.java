@@ -1813,7 +1813,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setCalendarMinimizationLayoutConstraints(ConstraintLayout.LayoutParams recyclerParams, ConstraintLayout.LayoutParams textViewParams) {
         if (!calendarIsMinimized) {
-            recyclerParams.height = dpToPxConv(275);
+            if (caloriesComparisonTabLayout.getSelectedTabPosition()==0) {
+                recyclerParams.height = dpToPxConv(265);
+            }
+            if (caloriesComparisonTabLayout.getSelectedTabPosition()==1) {
+                recyclerParams.height = dpToPxConv(310);
+            }
             recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
 
             textViewParams.bottomToTop = R.id.stats_calendar;
