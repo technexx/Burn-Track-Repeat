@@ -507,6 +507,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public void executeTurnOffEditModeMethod() {
         dailyStatsAdapter.turnOffEditMode();
+        caloriesConsumedAdapter.turnOffEditMode();
     }
 
     public void setStatsHaveBeenEditedForCurrentDay(boolean haveBeenEdited) {
@@ -636,7 +637,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     public void scrollToBottomOfCaloriesConsumedRecycler() {
-        dailyStatsRecyclerView.smoothScrollToPosition(caloriesConsumedAdapter.getItemCount()-1);
+        caloriesConsumedRecyclerView.smoothScrollToPosition(caloriesConsumedAdapter.getItemCount()-1);
     }
 
     private void addOrEditFoodInStats() {

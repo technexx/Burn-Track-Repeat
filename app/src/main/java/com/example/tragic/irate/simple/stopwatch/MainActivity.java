@@ -573,9 +573,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Can add more than 24hrs for Daily.
-  //Todo: Will need to change recyclerView height for calories expended since we have 3 rows on totals now.
-      //Todo: Also for calories consumed since we've changed calendarView size.
+  //Todo: Can add more than 24hrs for activities in Daily.
   //Todo: Avg. calories/day for simplified mode.
       //Todo: Longer durations show huge deficits w/ an average bmr but not calories consumed.
       //Todo: Avg. can apply if no foods are added for day.
