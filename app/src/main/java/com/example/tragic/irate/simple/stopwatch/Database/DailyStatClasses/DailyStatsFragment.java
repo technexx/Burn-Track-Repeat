@@ -385,6 +385,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     calendarDateChangeLogic();
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
+                    Log.i("testTime", "list of remaining time is " + dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(0)/1000/60);
+
                     getActivity().runOnUiThread(()-> {
                         setActivityStatsDurationRangeTextView();
                         setSelectionDayIfSelectingSingleDayFromCustomDuration();
@@ -772,6 +774,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
+        for (int i=0; i<dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().size(); i++) {
+            Log.i("testTime", "list of remaining time is " + dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i)/1000/60);
+        }
     }
 
     public void setNumberOfDaysWithActivitiesHasChangedBoolean(boolean numberOfDaysHaveChanged) {
@@ -996,54 +1001,47 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.setIsActivityCustomBoolean(true);
             }
 
-            long finalNewActivityTime = newActivityTime;
+            //Sets their pre-capped values.
+            long finalNewActivityTimeForInsertion = newActivityTime;
+            long finalNewActivityTimeForEditing = newActivityTime;
             double finalNewCaloriesBurned = newCaloriesBurned;
 
             if (dailyStatsAccess.getNumberOfDaysSelected() == 1) {
-                dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(daySelectedFromCalendar, finalNewActivityTime, finalNewCaloriesBurned);
+                dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(daySelectedFromCalendar, finalNewActivityTimeForInsertion, finalNewCaloriesBurned);
             }
 
             if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
                 for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
                     int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
 
-                    //Todo: getStatsForEachActivityListForSelectedDay() only gets a list of activities for the day iterated. We need the saved, "old" time of the SPECIFIC activity within the day. Test method below.
-
-                    //Todo: Should be sep. method.
-                    List<StatsForEachActivity> statsForEachActivityListForDay = dailyStatsAccess.getStatsForEachActivityListForSelectedDay(uniqueIdToCheck);
-                    for (int k=0; i<statsForEachActivityListForDay.size(); k++) {
-                        if (statsForEachActivityListForDay.get(k).getActivity().equalsIgnoreCase(dailyStatsAccess.getActivityStringVariable())) {
-                            oldTime = statsForEachActivityListForDay.get(i).getTotalSetTimeForEachActivity();
-                        }
-                    }
-
                     long activityTime = newActivityTime;
+                    //Todo: Remaining time returning wrong.
                     remainingTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
-
-                    finalNewActivityTime = cappedActivityTimeForMultipleDayEdits(oldTime, activityTime, remainingTime);
-
-                    finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
-
-                    Log.i("testTime", "post-cap time is " + finalNewActivityTime);
+                    Log.i("testTime", "remaining time for day " + uniqueIdToCheck + " is " + remainingTime/1000/60);
 
                     if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
-                        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
+
+                        finalNewActivityTimeForInsertion = cappedActivityTimeForMultipleDayAdditions(activityTime, remainingTime);
+                        finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTimeForInsertion);
+
+                        Log.i("testTime", "capped value for day " + uniqueIdToCheck + " is " + finalNewActivityTimeForInsertion/1000/60);
+
+                        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTimeForInsertion, finalNewCaloriesBurned);
+
                     } else {
-                        dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
+                        oldTime = getOldActivityTimeForSpecificActivityOnSelectedDay(uniqueIdToCheck);
+                        finalNewActivityTimeForEditing = cappedActivityTimeForMultipleDayEdits(oldTime, activityTime, remainingTime);
+                        finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTimeForEditing);
+
+                        dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTimeForEditing, finalNewCaloriesBurned);
                     }
                 }
             }
 
             //Latest times/calories to save to DayHolder.
             populateListsAndTextViewsFromEntityListsInDatabase();
-
-            //Multiple additions will always include daySelected.
-            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
-            double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
-
-            dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
-
-            checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
+            replaceDayHolderRowTotalAfterUpdatingActivities();
+            //Called again to update lists + ui after dayHolder updates.
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             numberOfDaysWithActivitiesHasChanged = true;
@@ -1053,6 +1051,30 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 tdeeEditPopUpWindow.dismiss();
             });
         });
+    }
+
+    private long getOldActivityTimeForSpecificActivityOnSelectedDay(int daySelected) {
+        long valueToReturn = 0;
+
+        List<StatsForEachActivity> statsForEachActivityListForDay = dailyStatsAccess.getStatsForEachActivityListForSelectedDay(daySelected);
+
+        for (int i=0; i<statsForEachActivityListForDay.size(); i++) {
+            if (statsForEachActivityListForDay.get(i).getActivity().equalsIgnoreCase(dailyStatsAccess.getActivityStringVariable())) {
+                valueToReturn = statsForEachActivityListForDay.get(i).getTotalSetTimeForEachActivity();
+            }
+        }
+
+        return valueToReturn;
+    }
+
+    private void replaceDayHolderRowTotalAfterUpdatingActivities() {
+        //Multiple additions will always include daySelected.
+        long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
+        double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
+
+        dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
+
+        checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
     }
 
     private void populateActivityEditPopUpWithNewRow() {
@@ -1141,12 +1163,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     long unassignedTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
 
                     finalNewCaloriesBurned = newCaloriesBurned;
-                    Log.i("testCap", "capped time in EDIT before cap is " + finalNewActivityTime);
 
                     finalNewActivityTime = cappedActivityTimeForOverwritingInsertions(finalNewActivityTime);
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
 
-                    Log.i("testCap", "capped time in EDIT after cap is " + finalNewActivityTime);
 
                     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
                 }
@@ -1285,6 +1305,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private long cappedActivityTimeForMultipleDayEdits(long oldTime, long activityTime, long remainingTime) {
         long modifiedRemainingTime = oldTime + remainingTime;
 
+        Log.i("testTime", "old time is " + oldTime/1000/60);
+        Log.i("testTime", "activity time is " + activityTime/1000/60);
+        Log.i("testTime", "remaining time is " + remainingTime/1000/60);
+
         if (remainingTime > 0) {
             if (activityTime > modifiedRemainingTime) {
                 activityTime = modifiedRemainingTime;
@@ -1292,6 +1316,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         } else {
             activityTime = 0;
         }
+
+        return activityTime;
+    }
+
+    private long cappedActivityTimeForMultipleDayAdditions(long activityTime, long remainingTime) {
+        if (remainingTime > 0) {
+            if (activityTime > remainingTime) {
+                activityTime = remainingTime;
+            }
+        } else {
+            activityTime = 0;
+        }
+
+//        Log.i("testTime", "activity time is " + activityTime/1000/60);
+//        Log.i("testTime", "remaining time is " + remainingTime/1000/60);
 
         return activityTime;
     }

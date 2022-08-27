@@ -1035,6 +1035,7 @@ public class DailyStatsAccess {
         return totalAggregateCaloriesForSelectedDuration;
     }
 
+    //Todo: Should this not use global var w/ all selected days, not ones w/ just populated rows?
     public List<Long> totalActivitySetTimeForSelectedDurationIncludingBlankRows() {
         List<Long> listToReturn = new ArrayList<>();
 

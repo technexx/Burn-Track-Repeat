@@ -573,7 +573,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Can EDIT more than 24hrs for activities in Daily. Adding is fine.
+  //Todo: Final "Total" row only shows 24:00:00 even for longer durations.
   //Todo: Avg. calories/day for simplified mode.
       //Todo: Longer durations show huge deficits w/ an average bmr but not calories consumed.
       //Todo: Avg. can apply if no foods are added for day.
