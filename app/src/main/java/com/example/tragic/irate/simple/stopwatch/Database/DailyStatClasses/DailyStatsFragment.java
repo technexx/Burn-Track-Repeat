@@ -963,14 +963,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void addActivityStatsInDatabase(boolean customActivity) {
         AsyncTask.execute(()-> {
+            long oldTime = 0;
+            long remainingTime = 0;
             long newActivityTime = 0;
             double newCaloriesBurned = 0;
             double caloriesBurnedPerHour;
 
+            newActivityTime = getMillisValueToSaveFromEditTextString();
+
             if (dailyStatsAccess.getNumberOfDaysSelected()==1) {
                 newActivityTime = newActivityTimeFromEditTextForSingleDay(ADDING_ACTIVITY);
-            } else {
-                newActivityTime = getMillisValueToSaveFromEditTextString();
             }
 
             if (newActivityTime==0) {
@@ -1005,16 +1007,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
                     int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
 
-                    //Todo: Need sep. corrective methods for insert/update.
-                    //New instance of entered time for each iteration of loop.
-                    finalNewActivityTime = newActivityTime;
+                    //Todo: getStatsForEachActivityListForSelectedDay() only gets a list of activities for the day iterated. We need the saved, "old" time of the SPECIFIC activity within the day. Test method below.
 
-                    long activityTime = finalNewActivityTime;
-                    //Todo: Fetch mStats list w/ all rows w/ our unique ID for day, and grab setTime from it
-                    long oldTime =
-                    long remainingTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
+                    //Todo: Should be sep. method.
+                    List<StatsForEachActivity> statsForEachActivityListForDay = dailyStatsAccess.getStatsForEachActivityListForSelectedDay(uniqueIdToCheck);
+                    for (int k=0; i<statsForEachActivityListForDay.size(); k++) {
+                        if (statsForEachActivityListForDay.get(k).getActivity().equalsIgnoreCase(dailyStatsAccess.getActivityStringVariable())) {
+                            oldTime = statsForEachActivityListForDay.get(i).getTotalSetTimeForEachActivity();
+                        }
+                    }
 
-//                    finalNewActivityTime = cappedActivityTimeForOverwritingInsertions(finalNewActivityTime);
+                    long activityTime = newActivityTime;
+                    remainingTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
+
+                    finalNewActivityTime = cappedActivityTimeForMultipleDayEdits(oldTime, activityTime, remainingTime);
+
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
 
                     Log.i("testTime", "post-cap time is " + finalNewActivityTime);
@@ -1275,7 +1282,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return activityTime;
     }
 
-    private long cappedActivityTimeForMultipleDayEdits(long activityTime, long oldTime, long remainingTime) {
+    private long cappedActivityTimeForMultipleDayEdits(long oldTime, long activityTime, long remainingTime) {
         long modifiedRemainingTime = oldTime + remainingTime;
 
         if (remainingTime > 0) {

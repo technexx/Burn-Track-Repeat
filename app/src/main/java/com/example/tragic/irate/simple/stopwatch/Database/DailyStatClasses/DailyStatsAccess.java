@@ -222,6 +222,10 @@ public class DailyStatsAccess {
         return mStatsForEachActivityList;
     }
 
+    public List<StatsForEachActivity> getStatsForEachActivityListForSelectedDay(int dayId) {
+        return cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(dayId);
+    }
+
     public List<CaloriesForEachFood> getCaloriesForEachFoodList() {
         return mCaloriesForEachFoodList;
     }
@@ -670,7 +674,6 @@ public class DailyStatsAccess {
         this.mIsActivityCustom = isCustom;
     }
 
-
     public boolean getIsActivityCustomBooleanFromDatabaseInstance() {
         return mStatsForEachActivity.getIsCustomActivity();
     }
@@ -776,11 +779,6 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
-    }
-
-    public void logActivityRetrievedAndItsPositionForExistingCycles() {
-        Log.i("testActivityInsert", "activity retrieved for EXISTING activity is " + mStatsForEachActivity.getActivity());
-        Log.i("testActivityInsert", "activity position for EXISTING activity is " + activityPositionInListForCurrentDay);
     }
 
     public void loadAllActivitiesToStatsListForSpecificDay(int daySelected) {
