@@ -1085,14 +1085,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void editActivityStatsInDatabase() {
         AsyncTask.execute(()-> {
             String newActivityString = "";
+            long activityTimeInEditText = 0;
             long newActivityTime = 0;
             double newCaloriesBurned = 0;
 
             dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
             dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
+            //Todo: Can't use oldActivityTime unless we use the pulled value from database - editText is not an anchor because we only fetched what the user has typed in. We need formerly used value any way we slice it.
             if (dailyStatsAccess.getNumberOfDaysSelected()==1) {
-                newActivityTime = newActivityTimeFromEditTextForSingleDay(EDITING_ACTIVITY);
+                activityTimeInEditText = getMillisValueToSaveFromEditTextString();
+                newActivityTime = cappedActivityTimeForEdits(activityTimeInEditText);
+
+                Log.i("testCap", "new capped time is " + newActivityTime/1000/60);
             } else {
                 newActivityTime = getMillisValueToSaveFromEditTextString();
             }
@@ -1243,6 +1248,27 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         return timeSetInEditText;
+    }
+
+    private long cappedActivityTimeForEdits(long activityTime) {
+        long oldTime = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
+        long remainingTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
+        long modifiedRemainingTime = oldTime + remainingTime;
+
+        Log.i("testCap", "activity time is " + activityTime/1000/60);
+        Log.i("testCap", "old time is " + oldTime/1000/60);
+        Log.i("testCap", "remaining time is " + remainingTime/1000/60);
+        Log.i("testCap", "modified remaining time is " + modifiedRemainingTime/1000/60);
+
+        if (remainingTime > 0) {
+            if (activityTime > modifiedRemainingTime) {
+                activityTime = modifiedRemainingTime;
+            }
+        } else {
+            activityTime = 0;
+        }
+
+        return activityTime;
     }
 
     private long cappedActivityTimeForNonOverwritingInsertions(long activityTime, long remainingTime) {
