@@ -1005,21 +1005,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
                     int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
 
+                    //Todo: Need sep. corrective methods for insert/update.
+                    //New instance of entered time for each iteration of loop.
                     finalNewActivityTime = newActivityTime;
-                    Log.i("testTime", "pre-cap time is " + finalNewActivityTime);
 
-                    long unassignedTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
-                    finalNewActivityTime = cappedActivityTimeForOverwritingInsertions(finalNewActivityTime);
+                    long activityTime = finalNewActivityTime;
+                    //Todo: Fetch mStats list w/ all rows w/ our unique ID for day, and grab setTime from it
+                    long oldTime =
+                    long remainingTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
+
+//                    finalNewActivityTime = cappedActivityTimeForOverwritingInsertions(finalNewActivityTime);
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
 
                     Log.i("testTime", "post-cap time is " + finalNewActivityTime);
 
                     if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
                         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
-                        Log.i("testAct", "day " + uniqueIdToCheck + " does not exist and is inserting!");
                     } else {
                         dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
-                        Log.i("testAct", "day " + uniqueIdToCheck + " exists and is updating!");
                     }
                 }
             }
@@ -1093,11 +1096,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
             //Todo: Can't use oldActivityTime unless we use the pulled value from database - editText is not an anchor because we only fetched what the user has typed in. We need formerly used value any way we slice it.
+
+            //Todo: Needs to go in >1 duration, in add method during insertion conditional, and in food stuffs.
+                    //Todo: Add method in both ADD and EDIT caps at 24 for single activity, but does not account for rest of activity times.
             if (dailyStatsAccess.getNumberOfDaysSelected()==1) {
                 activityTimeInEditText = getMillisValueToSaveFromEditTextString();
-                newActivityTime = cappedActivityTimeForEdits(activityTimeInEditText);
-
-                Log.i("testCap", "new capped time is " + newActivityTime/1000/60);
+                newActivityTime = cappedActivityTimeForSingleDayEdits(activityTimeInEditText);
             } else {
                 newActivityTime = getMillisValueToSaveFromEditTextString();
             }
@@ -1250,7 +1254,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return timeSetInEditText;
     }
 
-    private long cappedActivityTimeForEdits(long activityTime) {
+    private long cappedActivityTimeForSingleDayEdits(long activityTime) {
         long oldTime = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
         long remainingTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
         long modifiedRemainingTime = oldTime + remainingTime;
@@ -1259,6 +1263,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         Log.i("testCap", "old time is " + oldTime/1000/60);
         Log.i("testCap", "remaining time is " + remainingTime/1000/60);
         Log.i("testCap", "modified remaining time is " + modifiedRemainingTime/1000/60);
+
+        if (remainingTime > 0) {
+            if (activityTime > modifiedRemainingTime) {
+                activityTime = modifiedRemainingTime;
+            }
+        } else {
+            activityTime = 0;
+        }
+
+        return activityTime;
+    }
+
+    private long cappedActivityTimeForMultipleDayEdits(long activityTime, long oldTime, long remainingTime) {
+        long modifiedRemainingTime = oldTime + remainingTime;
 
         if (remainingTime > 0) {
             if (activityTime > modifiedRemainingTime) {
