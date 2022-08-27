@@ -1035,11 +1035,29 @@ public class DailyStatsAccess {
         return totalAggregateCaloriesForSelectedDuration;
     }
 
-    //Todo: Should this not use global var w/ all selected days, not ones w/ just populated rows?
-    public List<Long> totalActivitySetTimeForSelectedDurationIncludingBlankRows() {
+
+
+    public List<Long> getListOfUnassignedTimeForMultipleDays() {
         List<Long> listToReturn = new ArrayList<>();
 
-        for (int i=0; i<mListOfActivityDaysWithPopulatedRows.size(); i++) {
+        List<Long> listOfDays = totalActivitySetTimeListForSelectedDurationIncludingBlankRows();
+
+        for (int i=0; i<listOfDays.size(); i++) {
+            long assignedTimeForDay = listOfDays.get(i);
+            long unassignedTimeForDay = getTwentyFourHoursInMillis() - assignedTimeForDay;
+            Log.i("testFetch", "list of activity time in day is " + assignedTimeForDay/1000/60);
+            Log.i("testFetch", "list of unassigned time in day is " + unassignedTimeForDay/1000/60);
+
+            listToReturn.add(unassignedTimeForDay);
+        }
+
+        return listToReturn;
+    }
+
+    public List<Long> totalActivitySetTimeListForSelectedDurationIncludingBlankRows() {
+        List<Long> listToReturn = new ArrayList<>();
+
+        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             long setTimeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
 
             if (setTimeToAdd > getTwentyFourHoursInMillis()) {
@@ -1047,25 +1065,11 @@ public class DailyStatsAccess {
             }
             listToReturn.add(setTimeToAdd);
 
-//            Log.i("testTime", "time added is " + setTimeToAdd/1000/60);
+            Log.i("testFetch", "activity times being added are " + setTimeToAdd/1000/60);
         }
 
         for (int i=0; i<mListOfActivityDaysWithEmptyRows.size(); i++) {
             listToReturn.add((long) 0);
-        }
-
-        return listToReturn;
-    }
-
-
-    public List<Long> getListOfUnassignedTimeForMultipleDays() {
-        List<Long> listToReturn = new ArrayList<>();
-
-        for (int i=0; i<totalActivitySetTimeForSelectedDurationIncludingBlankRows().size(); i++) {
-            long assignedTimeForDay = totalActivitySetTimeForSelectedDurationIncludingBlankRows().get(i);
-            long unassignedTimeForDay = getTwentyFourHoursInMillis() - assignedTimeForDay;
-
-            listToReturn.add(unassignedTimeForDay);
         }
 
         return listToReturn;

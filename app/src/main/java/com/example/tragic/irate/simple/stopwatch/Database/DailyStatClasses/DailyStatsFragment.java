@@ -385,8 +385,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     calendarDateChangeLogic();
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
-                    Log.i("testTime", "list of remaining time is " + dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(0)/1000/60);
-
                     getActivity().runOnUiThread(()-> {
                         setActivityStatsDurationRangeTextView();
                         setSelectionDayIfSelectingSingleDayFromCustomDuration();
@@ -774,9 +772,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
-        for (int i=0; i<dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().size(); i++) {
-            Log.i("testTime", "list of remaining time is " + dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i)/1000/60);
-        }
     }
 
     public void setNumberOfDaysWithActivitiesHasChangedBoolean(boolean numberOfDaysHaveChanged) {
@@ -1016,7 +1011,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     long activityTime = newActivityTime;
                     //Todo: Remaining time returning wrong.
-                    remainingTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
+                    remainingTime = dailyStatsAccess.getUnassignedTimeForMultipleDays().get(i);
                     Log.i("testTime", "remaining time for day " + uniqueIdToCheck + " is " + remainingTime/1000/60);
 
                     if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
@@ -1158,9 +1153,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double finalNewCaloriesBurned = newCaloriesBurned;
 
             if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+                List<Long> listOfUnassignedTimes = dailyStatsAccess.getUnassignedTimeForMultipleDays();
+
                 for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
                     int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
-                    long unassignedTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
+                    long unassignedTime = listOfUnassignedTimes.get(i);
 
                     finalNewCaloriesBurned = newCaloriesBurned;
 
@@ -2229,10 +2226,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         List<Long> assignedTimeForDuration = new ArrayList<>();
         List<Long> unassignedTimeForDuration = new ArrayList<>();
 
-        for (long setTime: dailyStatsAccess.totalActivitySetTimeForSelectedDurationIncludingBlankRows()) {
+        for (long setTime: dailyStatsAccess.totalActivitySetTimeListForSelectedDurationIncludingBlankRows()) {
             assignedTimeForDuration.add(setTime/1000/60);
         }
-        for (long emptyTime: dailyStatsAccess.getListOfUnassignedTimeForMultipleDays()) {
+        for (long emptyTime: dailyStatsAccess.getUnassignedTimeForMultipleDays()) {
             unassignedTimeForDuration.add(emptyTime/1000/60);
         }
         Log.i("testList", "list of set times is " + assignedTimeForDuration);
