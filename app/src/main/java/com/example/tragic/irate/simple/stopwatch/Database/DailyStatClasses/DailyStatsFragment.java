@@ -1015,7 +1015,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
 
-                        finalNewActivityTimeForInsertion = cappedActivityTimeForMultipleDayAdditions(activityTime, remainingTime);
+                        finalNewActivityTimeForInsertion = cappedActivityTimeForNonOverwritingInsertions(activityTime, remainingTime);
                         finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTimeForInsertion);
 
                         Log.i("testTime", "capped value for day " + uniqueIdToCheck + " is " + finalNewActivityTimeForInsertion/1000/60);
@@ -1140,30 +1140,28 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 newCaloriesBurned = calculateCaloriesForCustomActivityEdit(newActivityTime, caloriesBurnedPerHour);
             }
 
-            if (dailyStatsAccess.getNumberOfDaysSelected() == 1) {
-                dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForMultipleDays(mPositionToEdit, newActivityTime, newCaloriesBurned);
-            }
-
             long finalNewActivityTime = newActivityTime;
             double finalNewCaloriesBurned = newCaloriesBurned;
 
-            if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
-                List<Integer> listOfActivityDaysSelected = dailyStatsAccess.getListOfActivityDaysSelected();
-                List<Long> listOfUnassignedTimes = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays();
+            List<Integer> listOfActivityDaysSelected = dailyStatsAccess.getListOfActivityDaysSelected();
+            List<Long> listOfUnassignedTimes = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays();
 
-                for (int i=0; i<listOfActivityDaysSelected.size(); i++) {
-                    int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaysSelected().get(i);
-                    long unassignedTime = listOfUnassignedTimes.get(i);
+            for (int i=0; i<listOfActivityDaysSelected.size(); i++) {
+                int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaysSelected().get(i);
+                long unassignedTime = listOfUnassignedTimes.get(i);
 
-                    //New instance to be capped for each iteration of loop.
-                    finalNewActivityTime = newActivityTime;
+                //New instance to be capped for each iteration of loop.
+                finalNewActivityTime = newActivityTime;
 
-                    finalNewActivityTime = cappedActivityTimeForOverwritingInsertions(finalNewActivityTime);
-                    finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
+                //Todo: For multiple days, capping @ 24 hours, not unassigned time. Duh, we're using a bad cap method.
+                finalNewActivityTime = cappedActivityTimeForOverwritingInsertions(finalNewActivityTime);
+                finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
+
+                Log.i("testFetch", "day " + uniqueIdToCheck + " unassigned activity time is " +  unassignedTime/1000/60);
+                Log.i("testFetch", "day " + uniqueIdToCheck + " capped activity time is " +  finalNewActivityTime/1000/60);
 
 
-                    dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
-                }
+                dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
             }
 
             //Latest times/calories to save to DayHolder.
@@ -1319,20 +1317,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return activityTime;
     }
 
-    private long cappedActivityTimeForMultipleDayAdditions(long activityTime, long remainingTime) {
-        if (remainingTime > 0) {
-            if (activityTime > remainingTime) {
-                activityTime = remainingTime;
-            }
-        } else {
-            activityTime = 0;
-        }
-
-//        Log.i("testTime", "activity time is " + activityTime/1000/60);
-//        Log.i("testTime", "remaining time is " + remainingTime/1000/60);
-
-        return activityTime;
-    }
+//    private long cappedActivityTimeForMultipleDayEdits(long activityTime, long remainingTime) {
+//
+//    }
 
     private long cappedActivityTimeForNonOverwritingInsertions(long activityTime, long remainingTime) {
         if (remainingTime > 0) {

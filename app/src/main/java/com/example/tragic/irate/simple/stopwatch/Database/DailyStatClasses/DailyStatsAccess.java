@@ -1035,7 +1035,9 @@ public class DailyStatsAccess {
         return totalAggregateCaloriesForSelectedDuration;
     }
 
-    //Todo: Here we iterate through each DAY, in getAggregatedActivityTime...() we iterate through activity times to get an aggregate for each day here.
+    //Here we iterate through each DAY, in getAggregatedActivityTime...() we iterate through activity times to get an aggregate for each day here.
+    //Todo: We may need a List<Long> return of assigned time for day, as well, in order to cap for multiple days.
+
     public List<Long> getListOfUnassignedTimeForMultipleDays() {
         List<Long> listToReturn = new ArrayList<>();
 
@@ -1044,8 +1046,8 @@ public class DailyStatsAccess {
             long assignedTimeForDay = getAggregatedActivityTimeListForSelectedActivity(dayFromList);
             long unassignedTimeForDay = getTwentyFourHoursInMillis() - assignedTimeForDay;
 
-            Log.i("testFetch", "list of activity time in day is " + assignedTimeForDay/1000/60);
-            Log.i("testFetch", "list of unassigned time in day is " + unassignedTimeForDay/1000/60);
+//            Log.i("testFetch", "list of activity time in day is " + assignedTimeForDay/1000/60);
+//            Log.i("testFetch", "list of unassigned time in day is " + unassignedTimeForDay/1000/60);
 
             listToReturn.add(unassignedTimeForDay);
         }
@@ -1064,7 +1066,7 @@ public class DailyStatsAccess {
                 valueToReturn = getTwentyFourHoursInMillis();
             }
 
-            Log.i("testFetch", "activity times being added are " + valueToReturn/1000/60);
+//            Log.i("testFetch", "activity times being added are " + valueToReturn/1000/60);
         }
 
         return valueToReturn;
