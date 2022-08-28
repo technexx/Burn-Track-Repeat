@@ -1036,20 +1036,30 @@ public class DailyStatsAccess {
     }
 
     //Here we iterate through each DAY, in getAggregatedActivityTime...() we iterate through activity times to get an aggregate for each day here.
-    //Todo: We may need a List<Long> return of assigned time for day, as well, in order to cap for multiple days.
-
     public List<Long> getListOfUnassignedTimeForMultipleDays() {
+        List<Long> listOfAssignedTimes = getListOfAssignedTimesForMultipleDays();
+        List<Long> listToReturn = new ArrayList<>();
+
+        for (int i=0; i<listOfAssignedTimes.size(); i++) {
+            long unassignedTimeForDay = getTwentyFourHoursInMillis() - listOfAssignedTimes.get(i);
+            listToReturn.add(unassignedTimeForDay);
+
+//            Log.i("testFetch", "list of unassigned time in day is " + unassignedTimeForDay/1000/60);
+        }
+
+        return listToReturn;
+    }
+
+    public List<Long> getListOfAssignedTimesForMultipleDays() {
         List<Long> listToReturn = new ArrayList<>();
 
         for (int i=0; i<mListOfActivityDaysSelected.size(); i++) {
             int dayFromList = mListOfActivityDaysSelected.get(i);
+
             long assignedTimeForDay = getAggregatedActivityTimeListForSelectedActivity(dayFromList);
-            long unassignedTimeForDay = getTwentyFourHoursInMillis() - assignedTimeForDay;
+            listToReturn.add(assignedTimeForDay);
 
 //            Log.i("testFetch", "list of activity time in day is " + assignedTimeForDay/1000/60);
-//            Log.i("testFetch", "list of unassigned time in day is " + unassignedTimeForDay/1000/60);
-
-            listToReturn.add(unassignedTimeForDay);
         }
 
         return listToReturn;
