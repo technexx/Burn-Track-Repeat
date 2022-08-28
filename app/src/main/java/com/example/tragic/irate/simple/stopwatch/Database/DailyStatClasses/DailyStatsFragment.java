@@ -1006,12 +1006,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             }
 
             if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
-                for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
-                    int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
+                for (int i=0; i<dailyStatsAccess.getListOfActivityDaysSelected().size(); i++) {
+                    int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaysSelected().get(i);
 
                     long activityTime = newActivityTime;
-                    //Todo: Remaining time returning wrong.
-                    remainingTime = dailyStatsAccess.getUnassignedTimeForMultipleDays().get(i);
+                    remainingTime = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays().get(i);
                     Log.i("testTime", "remaining time for day " + uniqueIdToCheck + " is " + remainingTime/1000/60);
 
                     if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
@@ -1119,10 +1118,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
             dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
-            //Todo: Can't use oldActivityTime unless we use the pulled value from database - editText is not an anchor because we only fetched what the user has typed in. We need formerly used value any way we slice it.
-
-            //Todo: Needs to go in >1 duration, in add method during insertion conditional, and in food stuffs.
-                    //Todo: Add method in both ADD and EDIT caps at 24 for single activity, but does not account for rest of activity times.
             if (dailyStatsAccess.getNumberOfDaysSelected()==1) {
                 activityTimeInEditText = getMillisValueToSaveFromEditTextString();
                 newActivityTime = cappedActivityTimeForSingleDayEdits(activityTimeInEditText);
@@ -1153,13 +1148,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double finalNewCaloriesBurned = newCaloriesBurned;
 
             if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
-                List<Long> listOfUnassignedTimes = dailyStatsAccess.getUnassignedTimeForMultipleDays();
+                List<Integer> listOfActivityDaysSelected = dailyStatsAccess.getListOfActivityDaysSelected();
+                List<Long> listOfUnassignedTimes = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays();
 
-                for (int i=0; i<dailyStatsAccess.getListOfActivityDaySelected().size(); i++) {
-                    int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaySelected().get(i);
+                for (int i=0; i<listOfActivityDaysSelected.size(); i++) {
+                    int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaysSelected().get(i);
                     long unassignedTime = listOfUnassignedTimes.get(i);
 
-                    finalNewCaloriesBurned = newCaloriesBurned;
+                    //New instance to be capped for each iteration of loop.
+                    finalNewActivityTime = newActivityTime;
 
                     finalNewActivityTime = cappedActivityTimeForOverwritingInsertions(finalNewActivityTime);
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
@@ -1186,6 +1183,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             });
         });
     }
+
 
     private void setEditActivityPopUpButtonsLayoutParams(boolean constrainedToTop) {
         if (!constrainedToTop) {
@@ -2223,17 +2221,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void logAssignedAndUnassignedTimesForMultipleDays() {
-        List<Long> assignedTimeForDuration = new ArrayList<>();
         List<Long> unassignedTimeForDuration = new ArrayList<>();
 
-        for (long setTime: dailyStatsAccess.totalActivitySetTimeListForSelectedDurationIncludingBlankRows()) {
-            assignedTimeForDuration.add(setTime/1000/60);
-        }
-        for (long emptyTime: dailyStatsAccess.getUnassignedTimeForMultipleDays()) {
-            unassignedTimeForDuration.add(emptyTime/1000/60);
-        }
-        Log.i("testList", "list of set times is " + assignedTimeForDuration);
-        Log.i("testList", "list of unassigned time is " + unassignedTimeForDuration);
+        Log.i("testList", "list of unassigned time is " + dailyStatsAccess.getListOfUnassignedTimeForMultipleDays());
     }
 
 }

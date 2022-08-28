@@ -552,7 +552,7 @@ public class DailyStatsAccess {
         cyclesDatabase.cyclesDao().deleteAllCaloriesForEachFoodEntries();
     }
 
-    public List<Integer> getListOfActivityDaySelected() {
+    public List<Integer> getListOfActivityDaysSelected() {
         return mListOfActivityDaysSelected;
     }
 
@@ -1035,16 +1035,15 @@ public class DailyStatsAccess {
         return totalAggregateCaloriesForSelectedDuration;
     }
 
-
-
+    //Todo: Here we iterate through each DAY, in getAggregatedActivityTime...() we iterate through activity times to get an aggregate for each day here.
     public List<Long> getListOfUnassignedTimeForMultipleDays() {
         List<Long> listToReturn = new ArrayList<>();
 
-        List<Long> listOfDays = totalActivitySetTimeListForSelectedDurationIncludingBlankRows();
-
-        for (int i=0; i<listOfDays.size(); i++) {
-            long assignedTimeForDay = listOfDays.get(i);
+        for (int i=0; i<mListOfActivityDaysSelected.size(); i++) {
+            int dayFromList = mListOfActivityDaysSelected.get(i);
+            long assignedTimeForDay = getAggregatedActivityTimeListForSelectedActivity(dayFromList);
             long unassignedTimeForDay = getTwentyFourHoursInMillis() - assignedTimeForDay;
+
             Log.i("testFetch", "list of activity time in day is " + assignedTimeForDay/1000/60);
             Log.i("testFetch", "list of unassigned time in day is " + unassignedTimeForDay/1000/60);
 
@@ -1054,25 +1053,25 @@ public class DailyStatsAccess {
         return listToReturn;
     }
 
-    public List<Long> totalActivitySetTimeListForSelectedDurationIncludingBlankRows() {
-        List<Long> listToReturn = new ArrayList<>();
+    public long getAggregatedActivityTimeListForSelectedActivity(long daySelected) {
+        List<StatsForEachActivity> statsForEachActivityList = getStatsForEachActivityListForSpecificDay(daySelected);
+        long valueToReturn = 0;
 
-        for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            long setTimeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            valueToReturn += statsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
 
-            if (setTimeToAdd > getTwentyFourHoursInMillis()) {
-                setTimeToAdd = getTwentyFourHoursInMillis();
+            if (valueToReturn > getTwentyFourHoursInMillis()) {
+                valueToReturn = getTwentyFourHoursInMillis();
             }
-            listToReturn.add(setTimeToAdd);
 
-            Log.i("testFetch", "activity times being added are " + setTimeToAdd/1000/60);
+            Log.i("testFetch", "activity times being added are " + valueToReturn/1000/60);
         }
 
-        for (int i=0; i<mListOfActivityDaysWithEmptyRows.size(); i++) {
-            listToReturn.add((long) 0);
-        }
+        return valueToReturn;
+    }
 
-        return listToReturn;
+    public List<StatsForEachActivity> getStatsForEachActivityListForSpecificDay(long daySelected) {
+        return cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
     }
 
     public int bmrCaloriesBurned() {
