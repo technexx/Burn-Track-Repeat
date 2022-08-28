@@ -1168,20 +1168,24 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             //Latest times/calories to save to DayHolder.
             populateListsAndTextViewsFromEntityListsInDatabase();
-
-            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
-            double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
-
-            dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
-
+            updatedDayHolderWithEditedTimesFromActivities();
+            //Refreshing after DayHolder update.
             populateListsAndTextViewsFromEntityListsInDatabase();
-            checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Saved!", Toast.LENGTH_SHORT).show();
                 tdeeEditPopUpWindow.dismiss();
             });
         });
+    }
+
+    private void updatedDayHolderWithEditedTimesFromActivities() {
+        long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
+        double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
+
+        dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
+
+        checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
     }
 
 

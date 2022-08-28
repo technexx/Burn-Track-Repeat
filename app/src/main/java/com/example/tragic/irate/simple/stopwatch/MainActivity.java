@@ -573,13 +573,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Final "Total" row only shows 24:00:00 even for longer durations.
   //Todo: Avg. calories/day for simplified mode.
       //Todo: Longer durations show huge deficits w/ an average bmr but not calories consumed.
       //Todo: Avg. can apply if no foods are added for day.
       //Todo: Whichever method you use in simplified toggle button, add to tab switch as well.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
+  //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
