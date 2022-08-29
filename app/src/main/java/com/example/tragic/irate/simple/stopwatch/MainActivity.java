@@ -573,8 +573,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Make sure cap methods addresses "0" in unassigned time correctly (i.e. we don't want our edit to zero out the activity if there is unassigned time, but simply leave its value as is).
+
   //Todo: Total last row uses 24 hrs even when on longer duration.
+  //Todo: We'll need to address how timer adds to activiity when activity time is maxed for day.
+      //Todo: Easy/best solution: Display stats but don't iterate up - have a message that indicated max-out.
 
   //Todo: Avg. calories/day for simplified mode.
       //Todo: Longer durations show huge deficits w/ an average bmr but not calories consumed.
@@ -582,9 +584,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Whichever method you use in simplified toggle button, add to tab switch as well.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
-  //Todo: Crashed during tracking timer cycle.
-  //Todo: We'll need to address how timer adds to activiity when activity time is maxed for day.
-      //Todo: Easy/best solution: Display stats but don't iterate up - have a message that indicated max-out.
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
