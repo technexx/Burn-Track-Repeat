@@ -106,8 +106,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TextView dailyStatsBmrCaloriesTextView;
     TextView dailyStatsTotalActivityTimeTextView;
     TextView dailyStatsTotalActivityCaloriesBurnedTextView;
-    TextView dailyCaloriesExpendedTimeElapsedTextView;
-    TextView dailyCaloriesExpendedCaloriesBurnedTextView;
+    TextView dailyTotalExpendedTimeElapsedTextView;
+    TextView dailyTotalExpendedCaloriesBurnedTextView;
 
     ConstraintLayout totalFoodStatsValuesTextViewLayout;
     ConstraintLayout.LayoutParams totalFoodStatsValuesTextViewLayoutParams;
@@ -693,10 +693,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.clearFoodConsumedArrayLists();
         dailyStatsAccess.setTotalFoodConsumedForSelectedDaysToArrayLists();
 
-        dailyStatsAccess.setAggregateDailyTime();
+        dailyStatsAccess.setAggregateTimeForSelectedDuration();
         dailyStatsAccess.setUnassignedTotalCalories();
 
-        dailyStatsAccess.setAggregateDailyCalories();
+        dailyStatsAccess.setAggregateCaloriesForSelectedDuration();
         dailyStatsAccess.setUnassignedDailyTotalTime();
 
         Log.i("duplicateActivityList", "Duplicate list is " + dailyStatsAccess.getDuplicateActivityAndUniqueIdRows());
@@ -863,8 +863,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String totalActivitySetTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTotalActivityTimeForSelectedDuration());
         String totalActivityCaloriesBurned = formatDoubleToStringWithoutDecimals(dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration());
 
-        String totalCaloriesExpendedTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTwentyFourHoursInMillis());
-        String totalCaloriesExpendedCaloriesBurned = formatDoubleToStringWithoutDecimals(dailyStatsAccess.getAggregateDailyCalories());
+        String totalExpendedTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getAggregateTimeForSelectedDuration());
+        String totalExpendedCaloriesBurned = formatDoubleToStringWithoutDecimals(dailyStatsAccess.getAggregateCaloriesForSelectedDuration());
 
         dailyStatsBmrTimeTextView.setText(totalBmrTime);
         dailyStatsBmrCaloriesTextView.setText(totalBmrCalories);
@@ -872,8 +872,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsTotalActivityTimeTextView.setText(totalActivitySetTime);
         dailyStatsTotalActivityCaloriesBurnedTextView.setText(totalActivityCaloriesBurned);
 
-        dailyCaloriesExpendedTimeElapsedTextView.setText(totalCaloriesExpendedTime);
-        dailyCaloriesExpendedCaloriesBurnedTextView.setText(totalCaloriesExpendedCaloriesBurned);
+        dailyTotalExpendedTimeElapsedTextView.setText(totalExpendedTime);
+        dailyTotalExpendedCaloriesBurnedTextView.setText(totalExpendedCaloriesBurned);
     }
 
     private int aggregateDayIdFromCalendar() {
@@ -2062,8 +2062,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsBmrCaloriesTextView = mRoot.findViewById(R.id.total_bmr_stats_calories_textView);
         dailyStatsTotalActivityTimeTextView = mRoot.findViewById(R.id.daily_stats_total_activity_time_textView);
         dailyStatsTotalActivityCaloriesBurnedTextView = mRoot.findViewById(R.id.daily_stats_total_activity_calories_burned_textView);
-        dailyCaloriesExpendedTimeElapsedTextView = mRoot.findViewById(R.id.total_calories_expended_stats_time_elapsed_textView);
-        dailyCaloriesExpendedCaloriesBurnedTextView = mRoot.findViewById(R.id.total_calories_expended_stats_calories_burned_textView);
+        dailyTotalExpendedTimeElapsedTextView = mRoot.findViewById(R.id.total_expended_stats_time_elapsed_textView);
+        dailyTotalExpendedCaloriesBurnedTextView = mRoot.findViewById(R.id.total_expended_stats_calories_burned_textView);
 
         totalFoodStatsValuesTextViewLayout = mRoot.findViewById(R.id.total_food_stats_values_textView_layout);
         totalFoodStatsValuesTextViewLayoutParams = (ConstraintLayout.LayoutParams) totalFoodStatsValuesTextViewLayout.getLayoutParams();

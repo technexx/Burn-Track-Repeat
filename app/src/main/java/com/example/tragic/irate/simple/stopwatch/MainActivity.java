@@ -574,8 +574,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
 
-  //Todo: Test custom activities + don't insert and/or toast if no time left in multiple days.
-  //Todo: Total last row uses 24 hrs even when on longer duration.
+  //Todo: Test custom activities.
+  //Todo: Replicate activity multiples for food.
   //Todo: We'll need to address how timer adds to activiity when activity time is maxed for day.
       //Todo: Easy/best solution: Display stats but don't iterate up - have a message that indicated max-out.
 

@@ -1019,19 +1019,19 @@ public class DailyStatsAccess {
         return twoHours * 12;
     }
 
-    public void setAggregateDailyTime() {
+    public void setAggregateTimeForSelectedDuration() {
         totalAggregateTimeForSelectedDuration = getTwentyFourHoursInMillis() * numberOfDaysSelected;
     }
 
-    public long getAggregateDailyTime() {
+    public long getAggregateTimeForSelectedDuration() {
         return totalAggregateTimeForSelectedDuration;
     }
 
-    public void setAggregateDailyCalories() {
+    public void setAggregateCaloriesForSelectedDuration() {
         totalAggregateCaloriesForSelectedDuration = totalActivityCaloriesForSelectedDuration + getUnassignedCaloriesForSelectedDuration();
     }
 
-    public double getAggregateDailyCalories() {
+    public double getAggregateCaloriesForSelectedDuration() {
         return totalAggregateCaloriesForSelectedDuration;
     }
 
