@@ -1043,8 +1043,6 @@ public class DailyStatsAccess {
         for (int i=0; i<listOfAssignedTimes.size(); i++) {
             long unassignedTimeForDay = getTwentyFourHoursInMillis() - listOfAssignedTimes.get(i);
             listToReturn.add(unassignedTimeForDay);
-
-//            Log.i("testFetch", "list of unassigned time in day is " + unassignedTimeForDay/1000/60);
         }
 
         return listToReturn;
@@ -1056,16 +1054,14 @@ public class DailyStatsAccess {
         for (int i=0; i<mListOfActivityDaysSelected.size(); i++) {
             int dayFromList = mListOfActivityDaysSelected.get(i);
 
-            long assignedTimeForDay = getAggregatedActivityTimeListForSelectedActivity(dayFromList);
+            long assignedTimeForDay = getAggregatedActivityTimeForSelectedActivity(dayFromList);
             listToReturn.add(assignedTimeForDay);
-
-//            Log.i("testFetch", "list of activity time in day is " + assignedTimeForDay/1000/60);
         }
 
         return listToReturn;
     }
 
-    public long getAggregatedActivityTimeListForSelectedActivity(int daySelected) {
+    public long getAggregatedActivityTimeForSelectedActivity(int daySelected) {
         List<StatsForEachActivity> statsForEachActivityList = getStatsForEachActivityListForSelectedDay(daySelected);
         long valueToReturn = 0;
 
@@ -1075,8 +1071,6 @@ public class DailyStatsAccess {
             if (valueToReturn > getTwentyFourHoursInMillis()) {
                 valueToReturn = getTwentyFourHoursInMillis();
             }
-
-//            Log.i("testFetch", "activity times being added are " + valueToReturn/1000/60);
         }
 
         return valueToReturn;
