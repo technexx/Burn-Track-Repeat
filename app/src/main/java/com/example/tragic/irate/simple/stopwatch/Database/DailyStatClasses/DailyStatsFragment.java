@@ -1011,10 +1011,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 }
 
                 if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
-                    finalNewActivityTime = cappedActivityTimeForNonOverwritingInsertions(finalNewActivityTime, unassignedTime);
+                    finalNewActivityTime = cappedActivityTimeForStatInsertions(finalNewActivityTime, unassignedTime);
                     finalNewCaloriesBurned = activityCaloriesForSpinnerOrCustom(customActivity, finalNewActivityTime);
 
-                    dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
+                    if (!isTimeToSaveZero(finalNewActivityTime)) {
+                        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
+                    }
 
                 } else {
                     finalNewActivityTime = cappedTimeForStatEdits(finalNewActivityTime, assignedTime, unassignedTime);
@@ -1050,6 +1052,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return valueToReturn;
     }
 
+    private boolean isTimeToSaveZero(long activityTime) {
+        return activityTime == 0;
+    }
 
     private long getOldActivityTimeForSpecificActivityOnSelectedDay(int daySelected) {
         long valueToReturn = 0;
@@ -1261,13 +1266,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private double calculateCaloriesForSpinnerActivityForSingleDay() {
-        int addingOrEditActivity = dailyStatsAdapter.getAddingOrEditingActivityVariable();
-        long newActivityTimeToUse = newActivityTimeFromEditTextForSingleDay(addingOrEditActivity);
-
-        return calculateCaloriesFromMillisValueUsingMetScore(newActivityTimeToUse);
-    }
-
     private double calculateCaloriesFromMillisValueUsingMetScore(long millis) {
         double newCaloriesForActivity = 0;
 
@@ -1305,23 +1303,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return caloriesPerHour * hoursInActivity;
     }
 
-    private long newActivityTimeFromEditTextForSingleDay(int addingOrEditingActivity) {
-        long timeSetInEditText = getMillisValueToSaveFromEditTextString();
-        long remainingDailyTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
-        long timeInEditedRow = 0;
-
-        if (addingOrEditingActivity==EDITING_ACTIVITY) {
-            timeInEditedRow = dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration().get(mPositionToEdit);
-            timeSetInEditText = cappedActivityTimeForOverwritingInsertions(timeSetInEditText);
-        }
-        if (addingOrEditingActivity==ADDING_ACTIVITY) {
-            remainingDailyTime += timeInEditedRow;
-            timeSetInEditText = cappedActivityTimeForNonOverwritingInsertions(timeSetInEditText, remainingDailyTime);
-        }
-
-        return timeSetInEditText;
-    }
-
     private long cappedTimeForStatEdits(long activityTime, long assignedTime, long unassignedTime) {
         long modifiedRemainingTime = assignedTime + unassignedTime;
 
@@ -1332,7 +1313,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return activityTime;
     }
 
-    private long cappedActivityTimeForNonOverwritingInsertions(long activityTime, long remainingTime) {
+    private long cappedActivityTimeForStatInsertions(long activityTime, long remainingTime) {
         if (remainingTime > 0) {
             if (activityTime > remainingTime) {
                 activityTime = remainingTime;
