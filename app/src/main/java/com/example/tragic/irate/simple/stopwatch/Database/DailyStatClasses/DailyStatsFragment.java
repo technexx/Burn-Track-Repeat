@@ -1024,7 +1024,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     } else {
                         oldTime = getOldActivityTimeForSpecificActivityOnSelectedDay(uniqueIdToCheck);
-                        finalNewActivityTimeForEditing = cappedActivityTimeForMultipleDayEdits(activityTime, oldTime, remainingTime);
+                        finalNewActivityTimeForEditing = cappedTimeForStatEdits(activityTime, oldTime, remainingTime);
                         finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTimeForEditing);
 
                         dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTimeForEditing, finalNewCaloriesBurned);
@@ -1144,11 +1144,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double finalNewCaloriesBurned = newCaloriesBurned;
 
             List<Integer> listOfActivityDaysSelected = dailyStatsAccess.getListOfActivityDaysSelected();
-//            List<Long> listOfAssignedTimes = getAssignedTimesFromSpecificActivityForSelectedDays();
             String activityString = dailyStatsAccess.getActivityStringVariable();
             List<Long> listOfUnassignedTimes = dailyStatsAccess.getListOfUnassignedTimeForMultipleDays();
-
-            Log.i("testFetch", "activity string is " + activityString);
 
             for (int i=0; i<listOfActivityDaysSelected.size(); i++) {
                 int uniqueIdToCheck = dailyStatsAccess.getListOfActivityDaysSelected().get(i);
@@ -1157,14 +1154,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 //New instance to be capped for each iteration of loop.
                 finalNewActivityTime = newActivityTime;
-//                Log.i("testFetch", "day " + uniqueIdToCheck + " activity time pre-cap is " + finalNewActivityTime/1000/60);
                 Log.i("testFetch", "day " + uniqueIdToCheck + " assigned time for activity is " + assignedTime/1000/60);
                 Log.i("testFetch", "day " + uniqueIdToCheck + " unassigned time for activity is " + unassignedTime/1000/60);
 
-                finalNewActivityTime = cappedActivityTimeForMultipleDayEdits(finalNewActivityTime, assignedTime, unassignedTime);
+                finalNewActivityTime = cappedTimeForStatEdits(finalNewActivityTime, assignedTime, unassignedTime);
                 finalNewCaloriesBurned = calculateCaloriesFromMillisValue(finalNewActivityTime);
-
-//                Log.i("testFetch", "day " + uniqueIdToCheck + " activity time post-cap is " + finalNewActivityTime/1000/60);
 
                 dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
             }
@@ -1298,24 +1292,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return timeSetInEditText;
     }
 
-    private long cappedActivityTimeForSingleDayEdits(long activityTime) {
-        long oldTime = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
-        long remainingTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
-        long modifiedRemainingTime = oldTime + remainingTime;
-
-        if (remainingTime > 0) {
-            if (activityTime > modifiedRemainingTime) {
-                activityTime = modifiedRemainingTime;
-            }
-        } else {
-            activityTime = 0;
-        }
-
-        return activityTime;
-    }
-
-    //Todo: We just modified this. Should work.
-    private long cappedActivityTimeForMultipleDayEdits(long activityTime, long assignedTime, long unassignedTime) {
+    private long cappedTimeForStatEdits(long activityTime, long assignedTime, long unassignedTime) {
         long modifiedRemainingTime = assignedTime + unassignedTime;
 
         if (activityTime > modifiedRemainingTime) {
