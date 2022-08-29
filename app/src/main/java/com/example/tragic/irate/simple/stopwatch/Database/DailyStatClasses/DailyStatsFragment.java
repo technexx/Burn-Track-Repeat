@@ -1182,11 +1182,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    //Todo: Assigned time needs to be for specific activity for specific day, not general total for day.
-    //Todo: List is set above to have all IDs for all selected days.
     private long getAssignedTimesFromSpecificActivityForSelectedDays(long uniqueId, String activity) {
         List<StatsForEachActivity> statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityList();
-//        List<Long> listToReturn = new ArrayList<>();
         long valueToReturn = 0;
 
         for (int i=0; i<statsForEachActivityList.size(); i++) {
@@ -1306,11 +1303,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         long remainingTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
         long modifiedRemainingTime = oldTime + remainingTime;
 
-        Log.i("testCap", "activity time is " + activityTime/1000/60);
-        Log.i("testCap", "old time is " + oldTime/1000/60);
-        Log.i("testCap", "remaining time is " + remainingTime/1000/60);
-        Log.i("testCap", "modified remaining time is " + modifiedRemainingTime/1000/60);
-
         if (remainingTime > 0) {
             if (activityTime > modifiedRemainingTime) {
                 activityTime = modifiedRemainingTime;
@@ -1322,15 +1314,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return activityTime;
     }
 
+    //Todo: We just modified this. Should work.
     private long cappedActivityTimeForMultipleDayEdits(long activityTime, long assignedTime, long unassignedTime) {
-        long modifiedRemainingTime = activityTime + unassignedTime;
+        long modifiedRemainingTime = assignedTime + unassignedTime;
 
-        if (unassignedTime > 0) {
-            if (activityTime > modifiedRemainingTime) {
-                activityTime = modifiedRemainingTime;
-            }
-        } else {
-            activityTime = 0;
+        if (activityTime > modifiedRemainingTime) {
+            activityTime = modifiedRemainingTime;
         }
 
         return activityTime;
