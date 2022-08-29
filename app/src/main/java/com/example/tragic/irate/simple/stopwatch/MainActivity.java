@@ -694,7 +694,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case R.id.delete_single_day_from_daily_stats:
         if (dailyStatsFragment.getSelectedTab()==0) {
-          delete_all_text.setText(R.string.delete_activity_from_single_day);
+          delete_all_text.setText(R.string.delete_activities_from_selected_duration);
         }
         if (dailyStatsFragment.getSelectedTab()==1) {
           delete_all_text.setText(R.string.delete_food_from_single_day);
@@ -1220,7 +1220,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
           deleteTotalCycleTimes();
         }
-        if (delete_all_text.getText().equals(getString(R.string.delete_activity_from_single_day))) {
+        if (delete_all_text.getText().equals(getString(R.string.delete_activities_from_selected_duration))) {
           deleteActivityStatsForSelectedDays();
         }
         if (delete_all_text.getText().equals(getString(R.string.delete_all_activities))) {
@@ -1228,11 +1228,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         if (delete_all_text.getText().equals(getString(R.string.delete_food_from_single_day))) {
           deleteFoodStatsForSelectedDays();
-          Log.i("testDel", "deleting food for single day!");
         }
         if (delete_all_text.getText().equals(getString(R.string.delete_all_foods))) {
           deleteFoodStatsForAllDays();
-          Log.i("testDel", "deleting food for all days!");
         }
 
         runOnUiThread(()-> {
@@ -1816,7 +1814,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup, null);
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, convertDensityPixelsToScalable(250), convertDensityPixelsToScalable(450), true);
-    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, convertDensityPixelsToScalable(275), convertDensityPixelsToScalable(150), true);
+    deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, convertDensityPixelsToScalable(300), convertDensityPixelsToScalable(150), true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
@@ -2454,13 +2452,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     List<DayHolder> dayHolderList = dailyStatsFragment.getDayHolderList();
     List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
 
-    if (areAllDaysEmptyOfActivities(statsForEachActivityList)) {
-      runOnUiThread(()-> {
-        showToastIfNoneActive("Nothing to delete!");
-        return;
-      });
-    }
-
     List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
     List<Long> longListOfStatsForEachIdsToDelete = new ArrayList<>();
 
@@ -2481,13 +2472,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void deleteFoodStatsForSelectedDays() {
     List<CaloriesForEachFood> caloriesForEachFoodList = dailyStatsFragment.getCaloriesForEachFoodList();
-
-    if (areAllDaysEmptyOfFoods(caloriesForEachFoodList)) {
-      runOnUiThread(()-> {
-        showToastIfNoneActive("Nothing to delete!");
-        return;
-      });
-    }
 
     List<Long> longListOfFoodIdsToDelete = new ArrayList<>();
 

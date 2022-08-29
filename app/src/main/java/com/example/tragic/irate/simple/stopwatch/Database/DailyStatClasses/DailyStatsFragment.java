@@ -979,6 +979,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 return;
             }
 
+            //These are the same across all days, so we can just set them once here.
             if (!customActivity) {
                 //Activity String is already set from our spinner popUp.
                 dailyStatsAccess.setIsActivityCustomBoolean(false);
@@ -988,7 +989,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             }
 
             //Strings set in Access class above.
-            String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(mPositionToEdit);
+            String activityString = dailyStatsAccess.getActivityStringVariable();
             long finalNewActivityTime = newActivityTime;
             double finalNewCaloriesBurned = newCaloriesBurned;
 
