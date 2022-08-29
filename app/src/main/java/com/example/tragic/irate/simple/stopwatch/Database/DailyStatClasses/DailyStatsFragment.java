@@ -1142,11 +1142,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 //New instance to be capped for each iteration of loop.
                 finalNewActivityTime = newActivityTime;
-                Log.i("testFetch", "day " + uniqueIdToCheck + " assigned time for activity is " + assignedTime/1000/60);
-                Log.i("testFetch", "day " + uniqueIdToCheck + " unassigned time for activity is " + unassignedTime/1000/60);
+//                Log.i("testFetch", "day " + uniqueIdToCheck + " assigned time for activity is " + assignedTime/1000/60);
+//                Log.i("testFetch", "day " + uniqueIdToCheck + " unassigned time for activity is " + unassignedTime/1000/60);
 
                 finalNewActivityTime = cappedTimeForStatEdits(finalNewActivityTime, assignedTime, unassignedTime);
-                finalNewCaloriesBurned = caloriesBurnedForEditedActivity(finalNewActivityTime, isCustomActivity);
+
+                if (!isCustomActivity) {
+                    finalNewCaloriesBurned = calculateCaloriesFromMillisValueUsingMetScore(finalNewActivityTime);
+                } else {
+                    double caloriesPerHour = getIsCaloriesPerHourFromSpecifiCustomActivityForSelecteDays(uniqueIdToCheck, activityString);
+                    finalNewCaloriesBurned = calculateCaloriesForCustomActivityEdit(finalNewActivityTime, caloriesPerHour);
+                    Log.i("testFetch", "day " + uniqueIdToCheck + " calories per hour for custom activity is " + caloriesPerHour);
+                }
 
                 dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
             }
@@ -1164,6 +1171,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
+    //These methods simply fetch the mStatsForEachActivity list that has been already pulled from database.
     private long getAssignedTimesFromSpecificActivityForSelectedDays(long uniqueId, String activity) {
         List<StatsForEachActivity> statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityList();
         long valueToReturn = 0;
@@ -1192,13 +1200,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return valueToReturn;
     }
 
-    private double caloriesBurnedForEditedActivity(long activityTime, boolean isCustomActivity) {
+    private double getIsCaloriesPerHourFromSpecifiCustomActivityForSelecteDays(long uniqueId, String activity) {
+        List<StatsForEachActivity> statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityList();
         double valueToReturn = 0;
 
-        if (!isCustomActivity) {
-            valueToReturn = calculateCaloriesFromMillisValueUsingMetScore(activityTime);
-        } else {
-            valueToReturn = calculateCaloriesForCustomActivityAddition(activityTime);
+        for (int i=0; i<statsForEachActivityList.size(); i++) {
+            if (statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==uniqueId) {
+                if (statsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activity)) {
+                    valueToReturn = statsForEachActivityList.get(i).getCaloriesPerHour();
+                }
+            }
         }
         return valueToReturn;
     }
