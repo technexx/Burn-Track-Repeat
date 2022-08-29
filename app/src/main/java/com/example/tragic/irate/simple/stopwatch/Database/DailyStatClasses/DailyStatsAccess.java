@@ -230,7 +230,7 @@ public class DailyStatsAccess {
         return mCaloriesForEachFoodList;
     }
 
-    public void setActivityListsForDatabaseObjects(List<Integer> integerListOfDaysSelected) {
+    public void setActivityListsForDatabaseObjectsForStatsFragment(List<Integer> integerListOfDaysSelected) {
         if (integerListOfDaysSelected.size()>0) {
             mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfDaysSelected);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfDaysSelected);
@@ -258,7 +258,7 @@ public class DailyStatsAccess {
         setPopulatedAndEmptyListsOfFoodDays(daySelected);
 
         List<Integer> singleItemList = Collections.singletonList(daySelected);
-        setActivityListsForDatabaseObjects(singleItemList);
+        setActivityListsForDatabaseObjectsForStatsFragment(singleItemList);
         setFoodListsForDatabaseObjects(singleItemList);
 
         numberOfDaysSelected = 1;
@@ -286,7 +286,7 @@ public class DailyStatsAccess {
             }
         }
 
-        setActivityListsForDatabaseObjects(mListOfActivityDaysWithPopulatedRows);
+        setActivityListsForDatabaseObjectsForStatsFragment(mListOfActivityDaysWithPopulatedRows);
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = 7;
@@ -312,7 +312,7 @@ public class DailyStatsAccess {
             }
         }
 
-        setActivityListsForDatabaseObjects(mListOfActivityDaysWithPopulatedRows);
+        setActivityListsForDatabaseObjectsForStatsFragment(mListOfActivityDaysWithPopulatedRows);
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = numberOfDaysInMonth;
@@ -346,7 +346,7 @@ public class DailyStatsAccess {
             }
         }
 
-        setActivityListsForDatabaseObjects(mListOfActivityDaysWithPopulatedRows);
+        setActivityListsForDatabaseObjectsForStatsFragment(mListOfActivityDaysWithPopulatedRows);
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
     }
 
@@ -368,7 +368,7 @@ public class DailyStatsAccess {
             setPopulatedAndEmptyListsOfFoodDays(dayFromList);
         }
 
-        setActivityListsForDatabaseObjects(mListOfActivityDaysWithPopulatedRows);
+        setActivityListsForDatabaseObjectsForStatsFragment(mListOfActivityDaysWithPopulatedRows);
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = calendarDayList.size();
@@ -1065,8 +1065,8 @@ public class DailyStatsAccess {
         return listToReturn;
     }
 
-    public long getAggregatedActivityTimeListForSelectedActivity(long daySelected) {
-        List<StatsForEachActivity> statsForEachActivityList = getStatsForEachActivityListForSpecificDay(daySelected);
+    public long getAggregatedActivityTimeListForSelectedActivity(int daySelected) {
+        List<StatsForEachActivity> statsForEachActivityList = getStatsForEachActivityListForSelectedDay(daySelected);
         long valueToReturn = 0;
 
         for (int i=0; i<statsForEachActivityList.size(); i++) {
@@ -1080,10 +1080,6 @@ public class DailyStatsAccess {
         }
 
         return valueToReturn;
-    }
-
-    public List<StatsForEachActivity> getStatsForEachActivityListForSpecificDay(long daySelected) {
-        return cyclesDatabase.cyclesDao().loadActivitiesForSpecificDate(daySelected);
     }
 
     public int bmrCaloriesBurned() {
