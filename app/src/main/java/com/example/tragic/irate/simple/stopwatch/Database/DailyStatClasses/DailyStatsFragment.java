@@ -1608,19 +1608,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             //Inserting with check to see if food exists. Only checking if on a single day.
             if (dailyStatsAccess.getNumberOfDaysSelected() == 1) {
-
-                if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
-                    dailyStatsAccess.insertCaloriesAndEachFoodForSingleDay(daySelectedFromCalendar);
-
-                    Log.i("testFood", "updating single day with new food!");
-                } else {
-                    showToastIfNoneActive("Food exists!");
-                }
-            }
-
-            //Inserting without a check for multiple days, since we want to overwrite the food on days it exists.
-            Log.i("testFood", "number of days is " + dailyStatsAccess.getNumberOfDaysSelected());
-            if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+                insertFoodIfItDoesNotExistAndReturnIfItDoesNot();
+            } else if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
                 for (int i=0; i<dailyStatsAccess.getListOfFoodDaysSelected().size(); i++) {
                     int uniqueDayIdToCheck = dailyStatsAccess.getListOfFoodDaysSelected().get(i);
 
@@ -1632,14 +1621,35 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         Log.i("testFood", "day " + uniqueDayIdToCheck + " exists and is updating!");
                     }
                 }
+
+                populateListsAndTextViewsFromEntityListsInDatabase();
+
+                getActivity().runOnUiThread(()-> {
+                    caloriesConsumedAddAndEditPopUpWindow.dismiss();
+                });
             }
 
+
+        });
+    }
+
+    private void insertFoodIfItDoesNotExistAndReturnIfItDoesNot() {
+        if (!dailyStatsAccess.doesFoodExistsInDatabaseForSelectedDayBoolean(getFoodStringFromEditText())) {
+            dailyStatsAccess.insertCaloriesAndEachFoodForSingleDay(daySelectedFromCalendar);
             populateListsAndTextViewsFromEntityListsInDatabase();
 
-            getActivity().runOnUiThread(()-> {
+            getActivity().runOnUiThread(() ->{
+                showToastIfNoneActive("Added!");
                 caloriesConsumedAddAndEditPopUpWindow.dismiss();
             });
-        });
+
+        } else {
+            getActivity().runOnUiThread(() ->{
+                showToastIfNoneActive("Food exists!");
+            });
+
+            return;
+        }
     }
 
     private String getFoodStringFromEditText() {
