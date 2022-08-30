@@ -584,7 +584,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Whichever method you use in simplified toggle button, add to tab switch as well.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
-  //Todo: Infinity rounds layout issue w/ icon + dots pushing each other up/down.
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -1949,7 +1948,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalSaveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
-        if (mode==1){
+        if (mode==1) {
           cycles.setTotalSetTime(totalCycleSetTimeInMillis);
           cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
           cycles.setCyclesCompleted(cyclesCompleted);
