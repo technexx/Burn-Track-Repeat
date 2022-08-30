@@ -10,9 +10,9 @@ import java.util.List;
 public class TDEEChosenActivitySpinnerValues {
 
     Context mContext;
-    public ArrayList<String> category_list;
-    public ArrayList<String[]> subCategoryListOfStringArrays;
-    public ArrayList<String[]> subValueListOfStringArrays;
+    ArrayList<String> category_list;
+    ArrayList<String[]> subCategoryListOfStringArrays;
+    ArrayList<String[]> subValueListOfStringArrays;
 
     String[] bicycling;
     String[] conditioning;
@@ -150,4 +150,17 @@ public class TDEEChosenActivitySpinnerValues {
         subValueListOfStringArrays.add(water_values);
         subValueListOfStringArrays.add(winter_values);
     }
+
+    public ArrayList<String> getCategoryList() {
+        return category_list;
+    }
+
+    public ArrayList<String[]> getSubCategoryListOfStringArrays() {
+        return subCategoryListOfStringArrays;
+    }
+
+    public ArrayList<String[]> getSubValueListOfStringArrays() {
+        return subValueListOfStringArrays;
+    }
+
 }

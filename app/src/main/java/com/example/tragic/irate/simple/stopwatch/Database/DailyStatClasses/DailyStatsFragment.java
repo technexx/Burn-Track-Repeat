@@ -938,7 +938,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             String activityToAdd = "";
 
             if (!customActivity) {
-                activityToAdd = tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
+                activityToAdd = tdeeChosenActivitySpinnerValues.getSubCategoryListOfStringArrays().get(selectedTdeeCategoryPosition)[selectedTdeeSubCategoryPosition];
 
                 dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
             } else {
@@ -1344,7 +1344,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private double retrieveMetScoreFromSubCategoryPosition() {
-        String[] valueArray = tdeeChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
+        String[] valueArray = tdeeChosenActivitySpinnerValues.getSubValueListOfStringArrays().get(selectedTdeeCategoryPosition);
         double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
         return preRoundedMet;
     }
@@ -1524,7 +1524,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdee_category_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                ArrayList<String> spinnerList = tdeeChosenActivitySpinnerValues.category_list;
+                ArrayList<String> spinnerList = tdeeChosenActivitySpinnerValues.getCategoryList();
                 int lastPosition = spinnerList.size() - 1;
 
                 if (position != lastPosition) {
@@ -1567,7 +1567,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
 
         tdeeSubCategoryAdapter.clear();
-        tdeeSubCategoryAdapter.addAll(tdeeChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
+        tdeeSubCategoryAdapter.addAll(tdeeChosenActivitySpinnerValues.getSubCategoryListOfStringArrays().get(selectedTdeeCategoryPosition));
 
         tdee_sub_category_spinner.setSelection(0);
         selectedTdeeSubCategoryPosition = 0;
@@ -1944,7 +1944,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateActivityAdditionSpinnersAndAdapters() {
-        tdeeCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_category_spinner_layout, tdeeChosenActivitySpinnerValues.category_list);
+        tdeeCategoryAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_category_spinner_layout, tdeeChosenActivitySpinnerValues.getCategoryList());
         tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
 

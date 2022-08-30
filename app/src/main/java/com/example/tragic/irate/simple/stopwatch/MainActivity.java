@@ -578,15 +578,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Custom activity edits can reset calorie count.
 
   //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
-  //Todo: We'll need to address how timer adds to activiity when activity time is maxed for day.
-      //Todo: Easy/best solution: Display stats but don't iterate up - have a message that indicated max-out.
-
   //Todo: Avg. calories/day for simplified mode.
       //Todo: Longer durations show huge deficits w/ an average bmr but not calories consumed.
       //Todo: Avg. can apply if no foods are added for day.
       //Todo: Whichever method you use in simplified toggle button, add to tab switch as well.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
+  //Todo: Infinity rounds layout issue w/ icon + dots pushing each other up/down.
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -1937,7 +1935,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateTdeeSpinnersAndSetThemOnAdapters() {
-    tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tDEEChosenActivitySpinnerValues.category_list);
+    tdeeCategoryAdapter = new ArrayAdapter<>(getApplicationContext(), R.layout.tdee_category_spinner_layout, tDEEChosenActivitySpinnerValues.getCategoryList());
     tdeeCategoryAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     tdee_category_spinner.setAdapter(tdeeCategoryAdapter);
 
@@ -5255,7 +5253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public String getTdeeActivityStringFromArrayPosition() {
-    ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays;
+    ArrayList<String[]> subCategoryArray = tDEEChosenActivitySpinnerValues.getSubCategoryListOfStringArrays();
     String[] subCategoryList = subCategoryArray.get(selectedTdeeCategoryPosition);
     return (String) subCategoryList[selectedTdeeSubCategoryPosition];
   }
@@ -5264,7 +5262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     selectedTdeeCategoryPosition = tdee_category_spinner.getSelectedItemPosition();
 
     tdeeSubCategoryAdapter.clear();
-    tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.subCategoryListOfStringArrays.get(selectedTdeeCategoryPosition));
+    tdeeSubCategoryAdapter.addAll(tDEEChosenActivitySpinnerValues.getSubCategoryListOfStringArrays().get(selectedTdeeCategoryPosition));
 
     tdee_sub_category_spinner.setSelection(0);
     selectedTdeeSubCategoryPosition = 0;
@@ -5287,8 +5285,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void retrieveCycleActivityPositionAndMetScoreFromCycleList() {
-//    cycles = cyclesList.get(positionOfSelectedCycle);
-
     selectedTdeeCategoryPosition = cycles.getTdeeCatPosition();
     selectedTdeeSubCategoryPosition = cycles.getTdeeSubCatPosition();
 
@@ -5301,7 +5297,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private double retrieveMetScoreFromSubCategoryPosition() {
-    String[] valueArray = tDEEChosenActivitySpinnerValues.subValueListOfStringArrays.get(selectedTdeeCategoryPosition);
+    String[] valueArray = tDEEChosenActivitySpinnerValues.getSubValueListOfStringArrays().get(selectedTdeeCategoryPosition);
     double preRoundedMet = Double.parseDouble(valueArray[selectedTdeeSubCategoryPosition]);
 
     return preRoundedMet;
