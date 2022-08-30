@@ -570,10 +570,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int ON_STATS_FOOD_TAB = 1;
 
   boolean statsHaveBeenEdited;
+  boolean dailyActivityTimeMaxed;
 
   Toast mToast;
 
-  //Todo: Test custom activities.
+  //Todo: Custom should be an option in both timer additions and stats frag, or not implemented at moment.
+      //Todo: Custom activity edits can reset calorie count.
+
+  //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
   //Todo: We'll need to address how timer adds to activiity when activity time is maxed for day.
       //Todo: Easy/best solution: Display stats but don't iterate up - have a message that indicated max-out.
 
@@ -584,6 +588,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
+  //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
@@ -1965,9 +1970,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         if (trackActivityWithinCycle) {
+          checkAndSetDailyActivityMaxedBoolean();
 
-          setAndUpdateDayHolderValuesInDatabase();
-          setAndUpdateStatsForEachActivityValuesInDatabase();
+          if (!dailyActivityTimeMaxed) {
+            setAndUpdateDayHolderValuesInDatabase();
+            setAndUpdateStatsForEachActivityValuesInDatabase();
+          }
         }
 
         if (!timerIsPaused) {
@@ -1997,8 +2005,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void checkAndSetDailyActivityMaxedBoolean() {
+    if (!dailyActivityTimeMaxed) {
+      if (totalSetTimeForCurrentDayInMillis >= dailyStatsAccess.getTwentyFourHoursInMillis()) {
+        dailyActivityTimeMaxed = true;
+      }
+    }
+  }
+
   private void setAndUpdateDayHolderValuesInDatabase() {
-//    dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
     dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
   }
 
@@ -3961,12 +3976,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (textViewDisplaySync.areTextViewsDifferent()) {
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
 
-      setTotalDailyTimeToTextView();
-      setTotalActivityTimeToTextView();
+      if (!dailyActivityTimeMaxed) {
+        setTotalDailyTimeToTextView();
+        setTotalActivityTimeToTextView();
+      }
     }
 
-    setTotalDailyCaloriesToTextView();
-    setTotalActivityCaloriesToTextView();
+    if (!dailyActivityTimeMaxed) {
+      setTotalDailyCaloriesToTextView();
+      setTotalActivityCaloriesToTextView();
+    }
   }
 
   private void setAllActivityTimesAndCaloriesToTextViews() {

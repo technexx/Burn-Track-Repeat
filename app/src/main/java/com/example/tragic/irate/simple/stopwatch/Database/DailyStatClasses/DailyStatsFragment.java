@@ -362,7 +362,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             customCalendarDayList = Collections.singletonList(daySelectedAsACalendarDayObject);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
-            colorDaysWithAtLeastOneActivity();
+//            colorDaysWithAtLeastOneActivity();
 
             getActivity().runOnUiThread(()-> {
                 currentCalendarDateDecorator.setCurrentDay(customCalendarDayList);
@@ -744,7 +744,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         if (numberOfDaysWithActivitiesHasChanged) {
-            colorDaysWithAtLeastOneActivity();
+//            colorDaysWithAtLeastOneActivity();
             numberOfDaysWithActivitiesHasChanged = false;
         }
 
@@ -985,6 +985,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (newActivityTime==0) {
                 getActivity().runOnUiThread(()-> {
                     showToastIfNoneActive("Time cannot be empty!");
+//                    Log.i("testAdd", "returning from empty activity time!");
                 });
                 return;
             }
