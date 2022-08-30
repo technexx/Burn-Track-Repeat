@@ -185,10 +185,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int mActivitySortMode;
     int mPositionToEdit;
 
-    int SINGLE_DAY = 0;
-    int MULTIPLE_DAYS = 1;
-    int SINGLE_OR_MULTIPLE_DAYS_TO_ADD_OR_EDIT;
-
     int ADDING_ACTIVITY = 0;
     int EDITING_ACTIVITY = 1;
 
@@ -196,6 +192,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     View caloriesConsumedAddAndEditView;
     PopupWindow caloriesConsumedAddAndEditPopUpWindow;
+    TextView typeOfFoodHeaderTextView;
+    TextView caloriesConsumedHeaderTextView;
     EditText typeOfFoodEditText;
     EditText caloriesConsumedEditText;
     TextView multipleDayEditWarningForFoodConsumedTextView;
@@ -569,8 +567,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void toggleFoodConsumedEditingForMultipleDaysTextViews() {
         if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
             multipleDayEditWarningForFoodConsumedTextView.setVisibility(View.VISIBLE);
+            setTextViewSizesForMultipleDayWarningForFoodConsumption(true);
         } else {
             multipleDayEditWarningForFoodConsumedTextView.setVisibility(View.GONE);
+            setTextViewSizesForMultipleDayWarningForFoodConsumption(false);
         }
     }
 
@@ -580,6 +580,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         if (addingOrEditing == EDITING_FOOD) {
             multipleDayEditWarningForFoodConsumedTextView.setText(R.string.multiple_food_edit_warning);
+        }
+    }
+
+    private void setTextViewSizesForMultipleDayWarningForFoodConsumption(boolean warningIsVisible) {
+        if (!warningIsVisible) {
+            typeOfFoodHeaderTextView.setTextSize(28f);
+            caloriesConsumedHeaderTextView.setTextSize(28f);
+        } else {
+            typeOfFoodHeaderTextView.setTextSize(24f);
+            caloriesConsumedHeaderTextView.setTextSize(24f);
         }
     }
 
@@ -2009,9 +2019,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateCaloriesConsumedEditPopUpViews() {
         caloriesConsumedAddAndEditView = inflater.inflate(R.layout.calories_consumed_add_and_edit_popup, null);
-        caloriesConsumedAddAndEditPopUpWindow = new PopupWindow(caloriesConsumedAddAndEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(275), true);
+        caloriesConsumedAddAndEditPopUpWindow = new PopupWindow(caloriesConsumedAddAndEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(315), true);
         caloriesConsumedAddAndEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
+        typeOfFoodHeaderTextView = caloriesConsumedAddAndEditView.findViewById(R.id.add_food_name_header);
+        caloriesConsumedHeaderTextView = caloriesConsumedAddAndEditView.findViewById(R.id.add_calories_consumed_header);
         typeOfFoodEditText = caloriesConsumedAddAndEditView.findViewById(R.id.food_name_add_text);
         caloriesConsumedEditText = caloriesConsumedAddAndEditView.findViewById(R.id.add_calories_consumed_editText);
         multipleDayEditWarningForFoodConsumedTextView = caloriesConsumedAddAndEditView.findViewById(R.id.multiple_day_edit_warning_for_food_consumed_textView);
