@@ -570,18 +570,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int ON_STATS_FOOD_TAB = 1;
 
   boolean statsHaveBeenEdited;
-  boolean dailyActivityTimeMaxed;
 
   Toast mToast;
 
-  //Todo: Custom should be an option in both timer additions and stats frag, or not implemented at moment.
-      //Todo: Custom activity edits can reset calorie count.
-
-  //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
-  //Todo: Avg. calories/day for simplified mode.
-      //Todo: Longer durations show huge deficits w/ an average bmr but not calories consumed.
-      //Todo: Avg. can apply if no foods are added for day.
-      //Todo: Whichever method you use in simplified toggle button, add to tab switch as well.
+  //Todo: Resetting cycles count/set time in middle of cycle (even when paused) de-syncs times. Re-syncs if "reset" clicked.
+  //Todo: Presence of activity textView in main recycler disallows clicks to launch cycle (even when no activity exists)
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
@@ -595,9 +588,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Check sizes on long aspect for all layouts + menus.
 
+  //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
   //Todo: Test all notifications + sound/vibrations + settings.
   //Todo: Test dates from future years.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
+
+  //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
+  //Todo: Custom activity edits can reset calorie count.
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
@@ -1967,9 +1964,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         if (trackActivityWithinCycle) {
-          checkAndSetDailyActivityMaxedBoolean();
-
-          if (!dailyActivityTimeMaxed) {
+          if (!isDailyActivityTimeMaxed()) {
             setAndUpdateDayHolderValuesInDatabase();
             setAndUpdateStatsForEachActivityValuesInDatabase();
           }
@@ -2002,12 +1997,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void checkAndSetDailyActivityMaxedBoolean() {
-    if (!dailyActivityTimeMaxed) {
-      if (totalSetTimeForCurrentDayInMillis >= dailyStatsAccess.getTwentyFourHoursInMillis()) {
-        dailyActivityTimeMaxed = true;
-      }
+  private boolean isDailyActivityTimeMaxed() {
+    long dividedDailyTotal = totalSetTimeForCurrentDayInMillis/1000/60;
+    long dividedDailyCap = dailyStatsAccess.getTwentyFourHoursInMillis()/1000/60;
+    if (dividedDailyTotal >= dividedDailyCap) {
+      return true;
     }
+
+    return false;
   }
 
   private void setAndUpdateDayHolderValuesInDatabase() {
@@ -3972,17 +3969,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
-
-      if (!dailyActivityTimeMaxed) {
-        setTotalDailyTimeToTextView();
-        setTotalActivityTimeToTextView();
-      }
+      setTotalDailyTimeToTextView();
+      setTotalActivityTimeToTextView();
     }
 
-    if (!dailyActivityTimeMaxed) {
-      setTotalDailyCaloriesToTextView();
-      setTotalActivityCaloriesToTextView();
-    }
+    setTotalDailyCaloriesToTextView();
+    setTotalActivityCaloriesToTextView();
   }
 
   private void setAllActivityTimesAndCaloriesToTextViews() {
@@ -4736,10 +4728,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
     if (trackingActivity) {
-      infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
+      if (!isDailyActivityTimeMaxed()) {
+        infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
 
-      if (!mHandler.hasCallbacks(infinityRunnableForDailyActivityTimer)) {
-        mHandler.post(infinityRunnableForDailyActivityTimer);
+        if (!mHandler.hasCallbacks(infinityRunnableForDailyActivityTimer)) {
+          mHandler.post(infinityRunnableForDailyActivityTimer);
+        }
       }
     } else {
       infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
