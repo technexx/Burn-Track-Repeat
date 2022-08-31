@@ -1298,27 +1298,6 @@ public class DailyStatsAccess {
         return simpleDateFormat.format(calendar.getTime());
     }
 
-    public void logNonZeroTimeDayHolderDays() {
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadAllDayHolderRows();
-
-        List<Long> daysWithNonZeroTime = new ArrayList<>();
-        List<Long> timesForDaysWithNonZeroTime = new ArrayList<>();
-
-        for (int i=0; i<dayHolderList.size(); i++) {
-            if (dayHolderList.get(i).getTotalSetTime()>0) {
-                daysWithNonZeroTime.add(dayHolderList.get(i).getDayId());
-                timesForDaysWithNonZeroTime.add(dayHolderList.get(i).getTotalSetTime());
-            }
-        }
-
-        String joinedList = TextUtils.join(", ", daysWithNonZeroTime);
-        Log.i("testDayHolder", "list of days with non-zero time are " + joinedList);
-
-        for (int i=0; i<daysWithNonZeroTime.size(); i++) {
-            Log.i("testDayHolder", "time for day " + daysWithNonZeroTime.get(i) + " in minutes is " + timesForDaysWithNonZeroTime.get(i)/1000/60);
-        }
-    }
-
     private void logIntegerAndEntityDayLists() {
         Log.i("testList", "total activity list is " + mListOfActivityDaysSelected);
         Log.i("testList", "populated activity list is " + mListOfActivityDaysWithPopulatedRows);

@@ -573,7 +573,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Resetting cycles count/set time in middle of cycle (even when paused) de-syncs times. Re-syncs if "reset" clicked.
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
@@ -763,11 +762,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (settingNumber==4) fragmentToReplace = disclaimerFragment;
 
     getSupportFragmentManager().beginTransaction()
-//            .setCustomAnimations(
-//                    R.anim.slide_in_from_left_mid ,  // enter
-//                    R.anim.slide_out_from_right// exit
-//            )
-////            .addToBackStack (null)
             .replace(R.id.settings_fragment_frameLayout, fragmentToReplace)
             .commit();
   }
@@ -1147,10 +1141,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    dotDraws.setMode(mode);
-    dotDraws.onAlphaSend(MainActivity.this);
-    progressBar.setProgress(maxProgress);
-
     endFade = new Runnable() {
       @Override
       public void run() {
@@ -1382,6 +1372,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread();
 
     setAllSortTextViewsOntoClickListeners();
+
+    dotDraws.setMode(mode);
+    dotDraws.onAlphaSend(MainActivity.this);
+    progressBar.setProgress(maxProgress);
   }
 
   private void instantiateGlobalClasses() {
@@ -4697,7 +4691,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
           }
-
           timerResumeLogic();
           postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
         }
@@ -4714,15 +4707,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (timer != null) timer.cancel();
     if (objectAnimator != null) objectAnimator.pause();
-
-    reset_total_cycle_times.setEnabled(true);
   }
 
   private void timerResumeLogic() {
     activeCycle = true;
     timerIsPaused = false;
+    enableOrDisableCycleResetButton(false);
     reset.setVisibility(View.INVISIBLE);
-    reset_total_cycle_times.setEnabled(false);
   }
 
   private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
@@ -4780,14 +4771,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerIsPaused = true;
     reset.setText(R.string.reset);
     reset.setVisibility(View.VISIBLE);
-    reset_total_cycle_times.setEnabled(true);
   }
 
   private void pomTimerResumeLogic() {
     activeCycle = true;
     timerIsPaused = false;
+    enableOrDisableCycleResetButton(false);
     reset.setVisibility(View.INVISIBLE);
-    reset_total_cycle_times.setEnabled(false);
   }
 
   private void postPomCycleTimeRunnable() {
@@ -4800,6 +4790,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void removePomCycleTimeRunnable() {
     mHandler.removeCallbacks(infinityRunnableForPomCyclesTimer);
+  }
+
+  private void enableOrDisableCycleResetButton(boolean enable) {
+    if (enable) {
+      reset_total_cycle_times.setEnabled(true);
+      reset_total_cycle_times.setAlpha(1.0f);
+    } else {
+      if (reset_total_cycle_times.isEnabled()) {
+        reset_total_cycle_times.setEnabled(false);
+        reset_total_cycle_times.setAlpha(0.3f);
+      }
+    }
   }
 
   private void pauseAndResumeStopwatch (int pausing) {
@@ -5049,7 +5051,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     reset.setText(R.string.reset);
     reset.setVisibility(View.INVISIBLE);
-    reset_total_cycle_times.setEnabled(true);
+    enableOrDisableCycleResetButton(true);
 
     cycles_completed_textView.setText(R.string.cycles_done);
 
