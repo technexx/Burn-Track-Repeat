@@ -573,6 +573,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Dot alpha can be faded on first round when switching cycles.
+
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -3998,6 +4000,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) {
       total_set_time.setText(convertSeconds(totalCycleWorkTimeInMillis/1000));
       total_break_time.setText(convertSeconds(totalCycleRestTimeInMillis/1000));
+
     }
   }
 
@@ -4103,6 +4106,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable infinityRunnableForCyclesTimer() {
+    setCycleTimeToIterate();
+
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
 
@@ -4134,7 +4139,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  //Runs work/rest time, which iterates up.
   private Runnable infinityRunnableForPomCyclesTimer() {
+    setCycleTimeToIterate();
+
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
 
@@ -4152,12 +4160,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         long timeToIterate = timerIteration.getDifference();
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
 
+        Log.i("testPom", "time to iterate is " + timeToIterate);
+        Log.i("testPom", "previous total is " + timerIteration.getPreviousTotal());
+
         if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
           totalCycleWorkTimeInMillis = timerIteration.getNewTotal();
         }
         if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
           totalCycleRestTimeInMillis = timerIteration.getNewTotal();
         }
+
+        setTotalCycleTimeValuesToTextView();
+
+        mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
   }
@@ -4193,7 +4208,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.reDraw();
 
         decreaseTextSizeForTimers(setMillis);
-
         setNotificationValues();
 
         mHandler.postDelayed(this, timerRunnableDelay);
@@ -4763,6 +4777,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             startObjectAnimatorAndTotalCycleTimeCounters();
             startPomTimer();
           }
+
           pomTimerResumeLogic();
           postPomCycleTimeRunnable();
         }
@@ -4792,7 +4807,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void postPomCycleTimeRunnable() {
     infinityRunnableForPomCyclesTimer = infinityRunnableForPomCyclesTimer();
 
-    if (mHandler.hasCallbacks(infinityRunnableForPomCyclesTimer)) {
+    if (!mHandler.hasCallbacks(infinityRunnableForPomCyclesTimer)) {
       mHandler.post(infinityRunnableForPomCyclesTimer);
     }
   }
