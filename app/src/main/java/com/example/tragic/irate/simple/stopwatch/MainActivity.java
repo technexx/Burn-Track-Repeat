@@ -573,8 +573,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
-
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -2917,8 +2915,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
           insertActivityIntoDatabaseAndAssignItsValueToObjects();
           dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
-
-          Log.i("testChange", "Activity stats queried from Timer due to Stats Fragment change!");
         }
 
        runOnUiThread(()->{
@@ -2928,6 +2924,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
            setCyclesCompletedTextView();
          }
          toggleCycleTimeTextViewSizes(trackActivityWithinCycle);
+
+         if (mode==1) {
+           changeTextSizeWithoutAnimator(workoutTime.get(0));
+         }
+         if (mode==3) {
+           changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+         }
 
          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
        });
@@ -3683,10 +3686,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
     if (mode==1) {
-      setInitialTextSizeForRounds(workoutTime.get(0));
+      changeTextSizeWithoutAnimator(workoutTime.get(0));
     }
     if (mode==3) {
-      setInitialTextSizeForRounds(pomValuesTime.get(0));
+      changeTextSizeWithoutAnimator(pomValuesTime.get(0));
     }
 
     if (editCyclesPopupWindow.isShowing()) {
@@ -4426,15 +4429,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void changeTextSizeWithoutAnimator(boolean sizeIncrease) {
+  private void changeTextSizeWithoutAnimator(long millis) {
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-      if (sizeIncrease) {
+
+      if (millis < 60000) {
         timeLeft.setTextSize(90f);
       } else {
         timeLeft.setTextSize(70f);
       }
     } else {
-      if (sizeIncrease) {
+      if (millis < 60000) {
         timeLeft.setTextSize(120f);
       } else {
         timeLeft.setTextSize(90f);
