@@ -574,7 +574,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Toast mToast;
 
   //Todo: Resetting cycles count/set time in middle of cycle (even when paused) de-syncs times. Re-syncs if "reset" clicked.
-  //Todo: Presence of activity textView in main recycler disallows clicks to launch cycle (even when no activity exists)
   //Todo: Test modes 1/2/4 all running at once, paused/resumed, etc.
 
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
