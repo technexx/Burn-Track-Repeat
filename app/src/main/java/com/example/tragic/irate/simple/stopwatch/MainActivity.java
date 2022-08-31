@@ -3177,17 +3177,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void clearRoundAndCycleAdapterArrayLists() {
-    convertedWorkoutTime.clear();
-    workoutStringListOfRoundValuesForFirstAdapter.clear();
-    workoutStringListOfRoundValuesForSecondAdapter.clear();
-    workoutIntegerListOfRoundTypeForFirstAdapter.clear();
-    workoutIntegerListOfRoundTypeForSecondAdapter.clear();
+    Log.i("testClear", "arrays being cleared!");
+    if (mode==1) {
+      convertedWorkoutTime.clear();
+      workoutStringListOfRoundValuesForFirstAdapter.clear();
+      workoutStringListOfRoundValuesForSecondAdapter.clear();
+      workoutIntegerListOfRoundTypeForFirstAdapter.clear();
+      workoutIntegerListOfRoundTypeForSecondAdapter.clear();
 
-    workoutTime.clear();
-    typeOfRound.clear();
-    pomValuesTime.clear();
+      workoutTime.clear();
+      typeOfRound.clear();
+    }
 
-    pomStringListOfRoundValues.clear();
+    if (mode==3) {
+      pomValuesTime.clear();
+      pomStringListOfRoundValues.clear();
+    }
 
     cycleRoundsAdapter.notifyDataSetChanged();
     cycleRoundsAdapterTwo.notifyDataSetChanged();
