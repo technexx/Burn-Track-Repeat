@@ -1,5 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch.Canvas;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -35,13 +36,11 @@ public class DotDraws extends View {
   ArrayList<String> mPomTime;
 
   int mAlpha = 255;
-  int mAlpha2;
   int cycle;
   int mMode;
   int mPomDotCounter;
 
   sendAlpha mSendAlpha;
-  boolean mAddSubFade;
   boolean mFadeUp;
 
   ChangeSettingsValues changeSettingsValues = new ChangeSettingsValues();
@@ -54,6 +53,33 @@ public class DotDraws extends View {
   ScreenRatioLayoutChanger screenRatioLayoutChanger;
   float mPhoneHeight;
   float mPhoneWidth;
+
+  int savedModeOneAlpha = 255;
+  int savedModeThreeAlpha = 255;
+
+  public void saveModeOneDotAlpha() {
+    savedModeOneAlpha = mAlpha;
+  }
+
+  public void saveModeThreeDotAlpha() {
+    savedModeThreeAlpha = mAlpha;
+  }
+
+  public void setModeOneDotAlpha() {
+    mAlpha = savedModeOneAlpha;
+  }
+
+  public void setModeThreeDotAlpha() {
+    mAlpha = savedModeThreeAlpha;
+  }
+
+  public void resetModeOneAlpha() {
+    savedModeOneAlpha = 255;
+  }
+
+  public void resetModeThreeAlpha() {
+    savedModeThreeAlpha = 255;
+  }
 
   public interface sendAlpha {
     void sendAlphaValue(int alpha);
@@ -360,7 +386,6 @@ public class DotDraws extends View {
               if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
               mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, pomRadiusLarge, mPaint);
 
-              if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
               drawTextInCircles(mPomTime, dotTextDrawForX, yCircleTextPositionForOneRow, i);
               break;
             case 1: case 3: case 5:
@@ -368,7 +393,6 @@ public class DotDraws extends View {
               if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
               mCanvas.drawCircle(xCirclePositionForAllRows, yCirclePositionForOneRow, pomRadiusSmall , mPaint);
 
-              if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
               drawTextInCircles(mPomTime, dotTextDrawForX, yCircleTextPositionForOneRow, i);
               break;
             case 7:
@@ -376,7 +400,6 @@ public class DotDraws extends View {
               if (fadeDot) fadeDot(false); else mPaint.setAlpha(alphaValue);
               mCanvas.drawRect(xRectangleStart, yRectangleTop, xRectangleEnd, yRectangleBottom, mPaint);
 
-              if (mAddSubFade) mPaintText.setAlpha(mAlpha2);
               drawTextInCircles(mPomTime, xRectangleStart + dpConv(8), yCircleTextPositionForOneRow, i);
               break;
           }

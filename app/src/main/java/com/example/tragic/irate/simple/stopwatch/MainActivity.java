@@ -1423,11 +1423,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             mode = 1;
             cycleRoundsAdapter.setMode(1);
             dotDraws.setMode(1);
+            dotDraws.setModeOneDotAlpha();
             break;
           case 1:
             mode = 3;
             cycleRoundsAdapter.setMode(3);
             dotDraws.setMode(3);
+            dotDraws.setModeThreeDotAlpha();
             break;
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -1445,12 +1447,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             removeCycleHighlights();
             savedCycleAdapter.notifyDataSetChanged();
           }
+          dotDraws.saveModeOneDotAlpha();
         }
         if (savedCyclesTab.getPosition()==1) {
           if (savedPomCycleAdapter.isCycleHighlighted()==true) {
             removeCycleHighlights();
             savedPomCycleAdapter.notifyDataSetChanged();
           }
+          dotDraws.saveModeThreeDotAlpha();
         }
       }
       @Override
@@ -1464,7 +1468,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (!sortButton.isEnabled()) fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
     if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
-
 
     receivedHighlightPositions.clear();
   }
@@ -4582,7 +4585,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-        dotDraws.resetDotAlpha();
+        dotDraws.resetModeOneAlpha();
+        dotDraws.setModeOneDotAlpha();
         dotDraws.reDraw();
 
         setMillis = 0;
@@ -4639,7 +4643,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         dotDraws.pomDraw(pomDotCounter, pomValuesTime);
-        dotDraws.resetDotAlpha();
+        dotDraws.resetModeThreeAlpha();
+        dotDraws.setModeThreeDotAlpha();
         dotDraws.reDraw();
 
         if (pomDotCounter<=7) {
@@ -5137,7 +5142,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
 
-        dotDraws.resetDotAlpha();
+        dotDraws.resetModeOneAlpha();
+        dotDraws.setModeOneDotAlpha();
         dotDraws.reDraw();
 
         cyclesTextSizeHasChanged = false;
@@ -5164,6 +5170,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleCycleTimeTextViewSizes(false);
 
       pomCyclesTextSizeHasChanged = false;
+
+      dotDraws.resetModeThreeAlpha();
+      dotDraws.setModeThreeDotAlpha();
+      dotDraws.reDraw();
     }
 
     setNotificationValues();
