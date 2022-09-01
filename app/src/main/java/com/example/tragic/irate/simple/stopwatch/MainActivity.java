@@ -576,13 +576,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test all notifications + sound/vibrations + settings.
   //Todo: Test dates from future years.
 
-  //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
-
 
   //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.

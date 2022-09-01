@@ -1036,12 +1036,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     finalNewCaloriesBurned = calculateCaloriesForCustomActivityAddition(finalNewActivityTime);
                 }
 
-                if (!dailyStatsAccess.doesActivityExistInDatabaseForMultipleDays(uniqueIdToCheck)) {
+                if (!dailyStatsAccess.doesActivityExistInDatabaseForSelectedDay(uniqueIdToCheck)) {
                     finalNewActivityTime = cappedActivityTimeForStatInsertions(finalNewActivityTime, unassignedTime);
                     finalNewCaloriesBurned = activityCaloriesForSpinnerOrCustom(customActivity, finalNewActivityTime);
 
                     if (!isTimeToSaveZero(finalNewActivityTime)) {
-                        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityForSingleDay(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
+                        dailyStatsAccess.insertStatsForEachActivityRow(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
                     }
 
                 } else {
