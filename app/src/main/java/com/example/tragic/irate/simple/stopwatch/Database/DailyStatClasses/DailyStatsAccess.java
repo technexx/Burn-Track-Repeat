@@ -492,14 +492,6 @@ public class DailyStatsAccess {
         this.mOldDayHolderId = oldId;
     }
 
-    public void deleteMultipleDayHolderEntries(List<Long> listOfEntries) {
-        cyclesDatabase.cyclesDao().deleteMultipleDays(listOfEntries);
-    }
-
-    public void deleteAllDayHolderEntries() {
-        cyclesDatabase.cyclesDao().deleteAllDayHolderEntries();
-    }
-
     public void deleteMultipleFoodEntries(List<Long> listOfEntries) {
         cyclesDatabase.cyclesDao().deleteCaloriesForEachFoodForMultipleDays(listOfEntries);
     }

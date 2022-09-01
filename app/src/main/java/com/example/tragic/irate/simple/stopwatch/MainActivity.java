@@ -2445,7 +2445,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       longListOfStatsForEachIdsToDelete.add(statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
     }
 
-    dailyStatsAccess.deleteMultipleDayHolderEntries(longListOfDayIdsToToDelete);
     dailyStatsAccess.deleteMultipleStatsForEachActivityEntries(longListOfStatsForEachIdsToDelete);
 
     dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
@@ -2466,7 +2465,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteActivityStatsForAllDays() {
-    dailyStatsAccess.deleteAllDayHolderEntries();
     dailyStatsAccess.deleteAllStatsForEachActivityEntries();
 
     dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);

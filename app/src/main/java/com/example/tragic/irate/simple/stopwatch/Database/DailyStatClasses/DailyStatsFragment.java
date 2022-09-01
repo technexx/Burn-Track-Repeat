@@ -756,7 +756,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
 
-        setListsOfDayHolderAndStatsForEachActivity();
+        setListOfStatsForEachActivity();
         setListOfFoods();
     }
 
@@ -806,7 +806,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         populateListsAndTextViewsFromEntityListsInDatabase();
     }
 
-    private void setListsOfDayHolderAndStatsForEachActivity() {
+    private void setListOfStatsForEachActivity() {
         statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityList();
     }
 
@@ -1034,7 +1034,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 }
             }
 
-            //Latest times/calories to save to DayHolder.
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             numberOfDaysWithActivitiesHasChanged = true;
