@@ -573,8 +573,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: DayHolder not updating w/ stat deletions in fragment.
   //Todo: Test all notifications + sound/vibrations + settings.
-  //Todo: Test dates from future years.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.

@@ -272,10 +272,6 @@ public class DailyStatsAccess {
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
-        Log.i("testInsert", "first day of duration is " + firstDayOfDuration);
-        Log.i("testInsert", "day of week received is " + dayOfWeek);
-        Log.i("testInsert", "day of year received is " + dayOfYear);
-
         clearAllActivityAndFoodIntegerDayLists();
 
         setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, 7);
@@ -597,7 +593,6 @@ public class DailyStatsAccess {
     public void updateTotalTimesAndCaloriesForEachActivityFromDayId(long day, long setTime, double caloriesBurned) {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day && mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(mActivityString)) {
-                Log.i("testAct", "updating for day " + day);
                 mStatsForEachActivity = mStatsForEachActivityList.get(i);
 
                 mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(day);

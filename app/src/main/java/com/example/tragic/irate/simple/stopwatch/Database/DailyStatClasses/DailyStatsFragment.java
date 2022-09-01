@@ -377,7 +377,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             customCalendarDayList = Collections.singletonList(daySelectedAsACalendarDayObject);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
-//            colorDaysWithAtLeastOneActivity();
+            colorDaysWithAtLeastOneActivity();
 
             getActivity().runOnUiThread(()-> {
                 currentCalendarDateDecorator.setCurrentDay(customCalendarDayList);
@@ -399,6 +399,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
                     dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
+
                     daySelectedAsACalendarDayObject = date;
 
                     customCalendarDayList = Collections.singletonList(date);
@@ -410,9 +411,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         setActivityStatsDurationRangeTextView();
                         setSelectionDayIfSelectingSingleDayFromCustomDuration();
                     });
-
                 });
-                Log.i("testCall", "onDateSelected called!");
             }
         });
 
@@ -441,7 +440,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         convertAndSetDateRangeStringOnTextView();
                     });
                 });
-                Log.i("testCall", "onRangeSelected called!");
             }
         });
 
@@ -771,7 +769,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         if (numberOfDaysWithActivitiesHasChanged) {
-//            colorDaysWithAtLeastOneActivity();
+            colorDaysWithAtLeastOneActivity();
             numberOfDaysWithActivitiesHasChanged = false;
         }
 
