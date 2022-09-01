@@ -878,29 +878,13 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    public long getTotalActivityTimeForSelectedDuration() {
-        long valueToReturn = 0;
-
-        for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
-            valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
-        }
-
-        return valueToReturn;
-    }
-
-    public double getTotalCaloriesBurnedForSelectedDuration() {
-        double valueToReturn = 0;
-
-        for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
-            valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
-        }
-
-        return valueToReturn;
+    public void clearStatsForEachActivityArrayLists() {
+        totalActivitiesListForSelectedDuration.clear();
+        totalSetTimeListForEachActivityForSelectedDuration.clear();
+        totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
     }
 
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
-        clearStatsForEachActivityArrayLists();
-
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getActivity()!=null) {
                 if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
@@ -916,12 +900,6 @@ public class DailyStatsAccess {
                 }
             }
         }
-    }
-
-    public void clearStatsForEachActivityArrayLists() {
-        totalActivitiesListForSelectedDuration.clear();
-        totalSetTimeListForEachActivityForSelectedDuration.clear();
-        totalCaloriesBurnedListForEachActivityForSelectedDuration.clear();
     }
 
     private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
@@ -956,12 +934,14 @@ public class DailyStatsAccess {
         totalSetTimeForSelectedDuration = valueToReturn;
     }
 
-    private double roundDownCalories(double calories) {
-        return Math.floor(calories);
-    }
+    public long getTotalActivityTimeForSelectedDuration() {
+        long valueToReturn = 0;
 
-    public long getTotalSetTimeForSelectedDuration() {
-        return totalSetTimeForSelectedDuration;
+        for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
+            valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
+        }
+
+        return valueToReturn;
     }
 
     public void setTotalCaloriesVariableForSelectedDuration() {
@@ -974,8 +954,18 @@ public class DailyStatsAccess {
         totalActivityCaloriesForSelectedDuration = valueToReturn;
     }
 
-    public double getTotalCalorieBurnedForSelectedDuration() {
-        return totalActivityCaloriesForSelectedDuration;
+    public double getTotalCaloriesBurnedForSelectedDuration() {
+        double valueToReturn = 0;
+
+        for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
+            valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
+        }
+
+        return valueToReturn;
+    }
+
+    private double roundDownCalories(double calories) {
+        return Math.floor(calories);
     }
 
     public long getTotalSetTimeFromDayHolderList() {

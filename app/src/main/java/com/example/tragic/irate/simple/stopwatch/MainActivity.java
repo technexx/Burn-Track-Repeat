@@ -573,7 +573,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Dot alpha can be faded on first round when switching cycles.
+  //Todo: Test all notifications + sound/vibrations + settings.
+  //Todo: Test dates from future years.
 
   //Todo: RecyclerView crash when switching durations quickly. Delay in population/notifyData set may be helpful, or removing Year-to-Date.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -587,8 +588,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Check sizes on long aspect for all layouts + menus.
 
   //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
-  //Todo: Test all notifications + sound/vibrations + settings.
-  //Todo: Test dates from future years.
   //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
 
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.

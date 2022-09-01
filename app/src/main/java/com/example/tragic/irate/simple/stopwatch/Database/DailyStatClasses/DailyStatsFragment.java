@@ -698,7 +698,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
         dailyStatsAccess.clearStatsForEachActivityArrayLists();
-        setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues();
+        dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
+        dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
+        dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
 
         dailyStatsAccess.clearFoodConsumedArrayLists();
         dailyStatsAccess.setTotalFoodConsumedForSelectedDaysToArrayLists();
@@ -1109,12 +1111,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeEditTextHours.requestFocus();
 
         tdeeEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(-5));
-    }
-
-    private void setStatsForEachActivityTimeAndCalorieVariablesAsAnAggregateOfActivityValues() {
-        dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-        dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
-        dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
     }
 
     @Override
