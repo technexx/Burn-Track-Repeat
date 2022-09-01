@@ -582,17 +582,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Put disclaimer in "About" section.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
-  //Todo: Maybe (can do post-launch) have different colorings for days w/ food.
-      //Todo: Possibly have all colors in last tab w/ overlap if day has both. Will likely cause blipping though.
 
-  //Todo: Check sizes on long aspect for all layouts + menus.
 
   //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
-  //Todo: Consider a separate uniqueID for year in Daily + StatsForEach. Then we don't have to do this weird math stuff.
-
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
   //Todo: Custom activity edits can reset calorie count.
 
+  //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ diff. emulator phones and Moto phone (for diff aspect ratios/resolutions).

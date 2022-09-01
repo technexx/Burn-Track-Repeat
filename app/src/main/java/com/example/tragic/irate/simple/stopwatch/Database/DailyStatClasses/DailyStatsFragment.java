@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.util.Log;
@@ -61,6 +62,8 @@ import java.util.Locale;
 
 public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.tdeeEditedItemIsSelected, DailyStatsAdapter.tdeeActivityAddition, CaloriesConsumedAdapter.caloriesConsumedEdit, CaloriesConsumedAdapter.caloriesConsumedAddition {
 
+    Handler mHandler = new Handler();
+    Runnable notifyDataSetChangedRunnable;
     View mRoot;
     SharedPreferences sharedPref;
     SharedPreferences.Editor prefEdit;
@@ -319,6 +322,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         mRoot = root;
+
+        notifyDataSetChangedRunnable = new Runnable() {
+            @Override
+            public void run() {
+                dailyStatsAdapter.notifyDataSetChanged();
+                caloriesConsumedAdapter.notifyDataSetChanged();
+
+                mHandler.removeCallbacks(this);
+            }
+        };
 
         fragmentIsAttached = true;
 
@@ -714,8 +727,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         Log.i("duplicateActivityList", "Duplicate list is " + dailyStatsAccess.getDuplicateActivityAndUniqueIdRows());
 
         getActivity().runOnUiThread(()-> {
-            dailyStatsAdapter.notifyDataSetChanged();
-            caloriesConsumedAdapter.notifyDataSetChanged();
+            mHandler.post(notifyDataSetChangedRunnable);
 
             setTotalActivityStatsFooterTextViews();
             setTotalCaloriesConsumedFooterTextViews();
@@ -724,6 +736,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setSimplifiedViewTextViews();
         });
     }
+
+
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
