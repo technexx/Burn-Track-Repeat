@@ -2,27 +2,15 @@ package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.content.pm.PackageManager;
-import android.content.res.Resources;
 import android.os.AsyncTask;
-import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
-
-import androidx.core.content.ContextCompat;
 
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
-import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CalorieDayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CaloriesForEachFood;
-import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
-import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
-import com.example.tragic.irate.simple.stopwatch.R;
 import com.prolificinteractive.materialcalendarview.CalendarDay;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -30,17 +18,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.stream.Collectors;
 
 public class DailyStatsAccess {
     Context mContext;
     CyclesDatabase cyclesDatabase;
 
-    DayHolder mDayHolder;
     StatsForEachActivity mStatsForEachActivity;
     CaloriesForEachFood mCaloriesForEachFood;
 
-    List<DayHolder> mDayHolderList;
     List<StatsForEachActivity> mStatsForEachActivityList;
     List<CaloriesForEachFood> mCaloriesForEachFoodList;
 
@@ -215,10 +200,6 @@ public class DailyStatsAccess {
         return listToReturn;
     }
 
-    public List<DayHolder> getDayHolderList() {
-        return mDayHolderList;
-    }
-
     public List<StatsForEachActivity> getStatsForEachActivityList() {
         return mStatsForEachActivityList;
     }
@@ -233,10 +214,8 @@ public class DailyStatsAccess {
 
     public void setActivityListsForDatabaseObjectsForStatsFragment(List<Integer> integerListOfDaysSelected) {
         if (integerListOfDaysSelected.size()>0) {
-            mDayHolderList = cyclesDatabase.cyclesDao().loadMultipleDays(integerListOfDaysSelected);
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfDaysSelected);
         } else {
-            mDayHolderList = new ArrayList<>();
             mStatsForEachActivityList = new ArrayList<>();
         }
     }
@@ -513,18 +492,6 @@ public class DailyStatsAccess {
         this.mOldDayHolderId = oldId;
     }
 
-    public long getTotalSetTimeFromDayHolderEntity() {
-        return mDayHolder.getTotalSetTime();
-    }
-
-    public long getTotalBreakTimeFromDayHolderEntity() {
-        return mDayHolder.getTotalBreakTime();
-    }
-
-    public double getTotalCaloriesBurnedFromDayHolderEntity() {
-        return mDayHolder.getTotalCaloriesBurned();
-    }
-
     public void deleteMultipleDayHolderEntries(List<Long> listOfEntries) {
         cyclesDatabase.cyclesDao().deleteMultipleDays(listOfEntries);
     }
@@ -631,82 +598,12 @@ public class DailyStatsAccess {
         this.mIsActivityCustom = isCustom;
     }
 
-    public void setDoesDayExistInDatabaseBoolean(int daySelected) {
-        List<DayHolder> dayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(daySelected);
-        if (dayHolderList.size()==0) {
-            doesDayExistInDatabase = false;
-        } else {
-            doesDayExistInDatabase = true;
-        }
-        Log.i("testDayInsert", "doesDayExist boolean is " + doesDayExistInDatabase);
-    }
-
-    public void insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(int daySelected) {
-        String date = getDateString();
-
-        mDayHolder = new DayHolder();
-
-        mDayHolder.setDayId(daySelected);
-        mDayHolder.setDate(date);
-
-        mDayHolder.setTotalSetTime(0);
-        mDayHolder.setTotalBreakTime(0);
-        mDayHolder.setTotalCaloriesBurned(0);
-
-        cyclesDatabase.cyclesDao().insertDay(mDayHolder);
-    }
-
-    public void assignDayHolderInstanceForSelectedDay(int selectedDay) {
-        mDayHolderList = cyclesDatabase.cyclesDao().loadSingleDay(selectedDay);
-        mDayHolder = mDayHolderList.get(0);
-    }
-
-    public void insertTotalTimesAndCaloriesBurnedForSelectedDays(long setTime, double caloriesBurned) {
-        List<Integer> listToPullDaysFrom = new ArrayList<>();
-
-        listToPullDaysFrom = new ArrayList<>(mListOfActivityDaysSelected);
-
-        for (int i = 0; i < listToPullDaysFrom.size(); i++) {
-            mDayHolder = new DayHolder();
-            int daySelected = listToPullDaysFrom.get(i);
-
-            mDayHolder.setDayId(daySelected);
-            mDayHolder.setTotalSetTime(setTime);
-            mDayHolder.setTotalCaloriesBurned(caloriesBurned);
-
-            cyclesDatabase.cyclesDao().insertDay(mDayHolder);
-        }
-    }
-
-    //Used by Main.
-    public void updateTotalTimesAndCaloriesForSelectedDay(long setTime, double caloriesBurned) {
-        mDayHolder.setTotalSetTime(setTime);
-        mDayHolder.setTotalCaloriesBurned(caloriesBurned);
-
-        Log.i("testUpdate", "dayHolder Id updating is " + mDayHolder.getDayId());
-        Log.i("testUpdate", "updated dayHolder set time in minutes are " + setTime/1000/60);
-
-        cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
-    }
-
-    //Used by Stats Fragment.
-    public void updateTotalTimesAndCaloriesForMultipleDays(long setTime, double caloriesBurned) {
-        for (int i=0; i<mDayHolderList.size(); i++) {
-            mDayHolder = mDayHolderList.get(i);
-
-            mDayHolder.setTotalSetTime(setTime);
-            mDayHolder.setTotalCaloriesBurned(caloriesBurned);
-
-            cyclesDatabase.cyclesDao().updateDayHolder(mDayHolder);
-        }
-    }
-
-
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
     }
 
+    //Todo: Check if activity exists for selected day.
     //Used by Main only.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
         mStatsForEachActivity = new StatsForEachActivity();
@@ -910,26 +807,6 @@ public class DailyStatsAccess {
 
     private double roundDownCalories(double calories) {
         return Math.floor(calories);
-    }
-
-    public long getTotalSetTimeFromDayHolderList() {
-        long valueToReturn = 0;
-
-        for (int i=0; i<mDayHolderList.size(); i++) {
-            valueToReturn += mDayHolderList.get(i).getTotalSetTime();
-        }
-
-        return valueToReturn;
-    }
-
-    public double getTotalCaloriesBurnedFromDayHolderList() {
-        double valueToReturn = 0;
-
-        for (int i=0; i<mDayHolderList.size(); i++) {
-            valueToReturn += mDayHolderList.get(i).getTotalCaloriesBurned();
-        }
-
-        return valueToReturn;
     }
 
     public void setUnassignedDailyTotalTime() {
@@ -1190,9 +1067,7 @@ public class DailyStatsAccess {
     }
 
     private void instantiateEntitiesAndTheirLists() {
-        mDayHolder = new DayHolder();
         mStatsForEachActivity = new StatsForEachActivity();
-        mDayHolderList = new ArrayList<>();
         mStatsForEachActivityList = new ArrayList<>();
 
         mCaloriesForEachFood = new CaloriesForEachFood();

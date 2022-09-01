@@ -7,7 +7,6 @@ import androidx.room.RoomDatabase;
 
 import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CalorieDayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CaloriesForEachFood;
-import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
 
 @Database(entities = {Cycles.class, PomCycles.class, DayHolder.class, StatsForEachActivity.class, CalorieDayHolder.class, CaloriesForEachFood.class}, version = 1, exportSchema =  false)

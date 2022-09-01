@@ -78,7 +78,6 @@ import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CaloriesForEachFood;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DailyStatsAccess;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DailyStatsFragment;
-import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.DayHolder;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalorieIteration;
@@ -1977,9 +1976,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
-      //Inserting new row into database for new day. Update methods below pull that from current day and update.
-      dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
-
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
       Log.i("testActivityInsert", "added blank from save runnable!");
@@ -1994,10 +1990,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     return false;
-  }
-
-  private void setAndUpdateDayHolderValuesInDatabase() {
-    dailyStatsAccess.updateTotalTimesAndCaloriesForSelectedDay(totalSetTimeForCurrentDayInMillis,totalCaloriesBurnedForCurrentDay);
   }
 
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
@@ -2445,15 +2437,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mMenuType = menuType;
   }
   private void deleteActivityStatsForSelectedDays() {
-    List<DayHolder> dayHolderList = dailyStatsFragment.getDayHolderList();
     List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
 
     List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
     List<Long> longListOfStatsForEachIdsToDelete = new ArrayList<>();
-
-    for (int i=0; i<dayHolderList.size(); i++) {
-      longListOfDayIdsToToDelete.add(dayHolderList.get(i).getDayId());
-    }
 
     for (int i=0; i<statsForEachActivityList.size(); i++) {
       longListOfStatsForEachIdsToDelete.add(statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
@@ -3698,14 +3685,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects() {
-    dailyStatsAccess.setDoesDayExistInDatabaseBoolean(dayOfYear);
     dailyStatsAccess.setOldDayHolderId(dayOfYear);
-
-    if (dailyStatsAccess.getDoesDayExistInDatabase()) {
-      dailyStatsAccess.assignDayHolderInstanceForSelectedDay(dayOfYear);
-    } else {
-      dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
-    }
 
     assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
   }
@@ -3749,6 +3729,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       calendar = Calendar.getInstance(Locale.getDefault());
       dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
+      //Todo: Simply use StatsForEach method used in Fragment.
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
       totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
       totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderEntity();
@@ -3768,6 +3749,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+  }
+
+  private void retrieveTotalDailySetAndBreakTimes() {
+    if (mode == 1) {
+      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
+      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
+    }
+  }
+
+  private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
+    if (mode == 1) {
+      totalCycleSetTimeInMillis = cycles.getTotalSetTime();
+      totalCycleBreakTimeInMillis = cycles.getTotalBreakTime();
+
+      cyclesCompleted = cycles.getCyclesCompleted();
+    }
+
+    if (mode == 3) {
+      totalCycleWorkTimeInMillis = pomCycles.getTotalWorkTime();
+      totalCycleRestTimeInMillis = pomCycles.getTotalRestTime();
+
+      cyclesCompleted = pomCycles.getCyclesCompleted();
+    }
   }
 
   private void setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(int position) {
@@ -3859,29 +3863,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     runOnUiThread(()-> {
       cycle_title_textView.setText(cycleTitle);
     });
-  }
-
-  private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
-    if (mode == 1) {
-      totalCycleSetTimeInMillis = cycles.getTotalSetTime();
-      totalCycleBreakTimeInMillis = cycles.getTotalBreakTime();
-
-      cyclesCompleted = cycles.getCyclesCompleted();
-    }
-
-    if (mode == 3) {
-      totalCycleWorkTimeInMillis = pomCycles.getTotalWorkTime();
-      totalCycleRestTimeInMillis = pomCycles.getTotalRestTime();
-
-      cyclesCompleted = pomCycles.getCyclesCompleted();
-    }
-  }
-
-  private void retrieveTotalDailySetAndBreakTimes() {
-    if (mode == 1) {
-      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
-      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
-    }
   }
 
   private double calculateCaloriesBurnedPerMinute(double metValue) {
@@ -5412,7 +5393,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
       List<StatsForEachActivity> listOfActivities = new ArrayList<>();
-      List<DayHolder> listOfDays = new ArrayList<>();
 
       for (int i=0; i<listOfActivities.size(); i++) {
         Log.i("testStatsDb", "entry position is " + i);
@@ -5425,9 +5405,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Log.i("testStatsDb", "Empty list!");
       }
 
-      for (int i=0; i<listOfDays.size(); i++) {
-        Log.i("testStatsDb", "For day " + listOfDays.get(i).getDayId() + " total set time is " + listOfDays.get(i).getTotalSetTime());
-      }
     });
   }
 }

@@ -543,6 +543,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return statsHaveBeenEditedForCurrentDay;
     }
 
+    //Todo: Simply use StatsForEach.
     private void checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay() {
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         int currentDay = calendar.get(Calendar.DAY_OF_YEAR);
@@ -826,12 +827,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setListsOfDayHolderAndStatsForEachActivity() {
-        dayHolderList = dailyStatsAccess.getDayHolderList();
         statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityList();
-    }
-
-    public List<DayHolder> getDayHolderList() {
-        return dayHolderList;
     }
 
     public List<StatsForEachActivity> getStatsForEachActivityList() {
@@ -1107,8 +1103,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
         double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
-        dailyStatsAccess.insertTotalTimesAndCaloriesBurnedForSelectedDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
-
         checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
     }
 
@@ -1196,10 +1190,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
             }
 
-            //Latest times/calories to save to DayHolder.
-            populateListsAndTextViewsFromEntityListsInDatabase();
-            updatedDayHolderWithEditedTimesFromActivities();
-            //Refreshing after DayHolder update.
             populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
@@ -1252,16 +1242,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return valueToReturn;
     }
 
-    private void updatedDayHolderWithEditedTimesFromActivities() {
-        long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
-        double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
-
-        dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
-
-        checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
-    }
-
-
     private void setEditActivityPopUpButtonsLayoutParams(boolean constrainedToTop) {
         if (!constrainedToTop) {
             activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
@@ -1281,10 +1261,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
             double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
-            dailyStatsAccess.updateTotalTimesAndCaloriesForMultipleDays(totalSetTimeFromAllActivities, totalCaloriesBurnedFromAllActivities);
-
             checkAndSetBooleanForHaveStatsBeenEditedForCurrentDay();
-            populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
                 Toast.makeText(getContext(), "Deleted!", Toast.LENGTH_SHORT).show();
@@ -1655,8 +1632,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     caloriesConsumedAddAndEditPopUpWindow.dismiss();
                 });
             }
-
-
         });
     }
 
@@ -1765,7 +1740,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setTotalCaloriesComparedTextViews(boolean statsAreSimplified) {
         double caloriesConsumed = dailyStatsAccess.getTotalCaloriesConsumedForSelectedDuration();
-        double caloriesExpendedFromActivities = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList();
+        double caloriesExpendedFromActivities = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
         double unassignedCalories = dailyStatsAccess.getUnassignedCaloriesForSelectedDuration();
 
         double totalCaloriesExpended = 0;
@@ -2117,7 +2092,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         customCalendarDayList = new ArrayList<>();
 
-        dayHolderList = new ArrayList<>();
         statsForEachActivityList = new ArrayList<>();
     }
 
@@ -2213,11 +2187,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
         mToast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         mToast.show();
-    }
-
-    private void logTotalDayHolderTimesAndCalories() {
-        Log.i("testTotal", "DayHolder set time is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(dailyStatsAccess.getTotalSetTimeFromDayHolderList()));
-        Log.i("testTotal", "DayHolder calories burned are " + dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderList());
     }
 
     private void logTotalActivityTimesAndCalories() {
