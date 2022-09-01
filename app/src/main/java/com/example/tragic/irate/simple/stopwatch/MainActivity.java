@@ -1953,7 +1953,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (trackActivityWithinCycle) {
           if (!isDailyActivityTimeMaxed()) {
-            setAndUpdateDayHolderValuesInDatabase();
             setAndUpdateStatsForEachActivityValuesInDatabase();
           }
         }
@@ -2897,7 +2896,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       AsyncTask.execute(()-> {
         if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
-          insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
+          //Todo: Should remove insertion and simply get most recent mStats list and assign values
           insertActivityIntoDatabaseAndAssignItsValueToObjects();
           dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
         }
@@ -3621,8 +3620,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
       }
 
+      //Todo: In this method, we set StatsForEach list to day selected. From assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(), we can fetch stat values.
       if (cycleHasActivityAssigned) {
-        insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects();
         insertActivityIntoDatabaseAndAssignItsValueToObjects();
       }
 
@@ -3652,7 +3651,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTimerLaunchLogic(boolean trackingActivity) {
     toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
 
-    retrieveTotalDailySetAndBreakTimes();
+//    retrieveTotalDailySetAndBreakTimes();
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
     clearRoundAndCycleAdapterArrayLists();
@@ -3684,13 +3683,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
-  private void insertDayAndActivityIntoDatabaseAndAssignTheirValuesToObjects() {
+  private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
     dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
-    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
-  }
-
-  private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
     dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
     dailyStatsAccess.setMetScoreFromSpinner(metScore);
 
@@ -3707,17 +3702,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-  }
-
-  private String getCurrentDateAsSlashFormattedString() {
-    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-    calendar = Calendar.getInstance(Locale.getDefault());
-    return simpleDateFormat.format(calendar.getTime());
-  }
-
-  private String getCurrentDateAsFullTextString() {
-    calendar = Calendar.getInstance(Locale.getDefault());
-    return (String.valueOf(calendar.getTime()));
+    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
   }
 
   private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() {
@@ -3730,9 +3715,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
       //Todo: Simply use StatsForEach method used in Fragment.
-      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
-      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
-      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedFromDayHolderEntity();
+      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
+      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(dayOfYear);
 
       totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
       totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
@@ -3751,12 +3735,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
   }
 
-  private void retrieveTotalDailySetAndBreakTimes() {
-    if (mode == 1) {
-      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
-      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
-    }
-  }
+//  private void retrieveTotalDailySetAndBreakTimes() {
+//    if (mode == 1) {
+//      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
+//      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
+//    }
+//  }
 
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
     if (mode == 1) {
@@ -5161,6 +5145,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     phoneWidth = metrics.widthPixels;
 
     dotDraws.receivePhoneDimensions(phoneHeight, phoneWidth);
+  }
+
+  private String getCurrentDateAsSlashFormattedString() {
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+    calendar = Calendar.getInstance(Locale.getDefault());
+    return simpleDateFormat.format(calendar.getTime());
+  }
+
+  private String getCurrentDateAsFullTextString() {
+    calendar = Calendar.getInstance(Locale.getDefault());
+    return (String.valueOf(calendar.getTime()));
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

@@ -15,29 +15,6 @@ import java.util.List;
 @Dao
 public interface
 CyclesDao {
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertDay(DayHolder dayHolder);
-
-    @Update
-    void updateDayHolder(DayHolder dayHolder);
-
-    @Query("DELETE from DayHolder")
-    void deleteAllDayHolderEntries();
-
-    @Query("SELECT * from DayHolder")
-    List<DayHolder> loadAllDayHolderRows();
-
-    @Query("SELECT * from DayHolder WHERE daySelectedId IS:listID")
-    List<DayHolder> loadSingleDay(long listID);
-
-    @Query("SELECT * from DayHolder WHERE daySelectedId IN (:listIDs)")
-    List<DayHolder> loadMultipleDays(List<Integer> listIDs);
-
-    @Query("DELETE from DayHolder WHERE daySelectedId IN (:listIDs)")
-    void deleteMultipleDays(List<Long> listIDs);
-
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insertMultipleDays (List<DayHolder> dayHolderList);
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     void insertStatsForEachActivity(StatsForEachActivity statsForEachActivity);
