@@ -63,6 +63,7 @@ public class DailyStatsAccess {
     int numberOfDaysSelected;
     int firstDayOfDuration;
     int lastDayOfDuration;
+    int valueAddedForFutureYears;
 
     String mSingleDayAsString;
     String mFirstDayInDurationAsString;
@@ -267,11 +268,13 @@ public class DailyStatsAccess {
     public void setAllDayAndStatListsForWeek(int dayOfWeek, int dayOfYear) {
         firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         lastDayOfDuration = firstDayOfDuration + 6;
-        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
-
-        Log.i("testWeek", "first day of duration is " + firstAggregatedDayOfYearToUse);
+        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueAddedForFutureYears;
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
+
+        Log.i("testInsert", "first day of duration is " + firstDayOfDuration);
+        Log.i("testInsert", "day of week received is " + dayOfWeek);
+        Log.i("testInsert", "day of year received is " + dayOfYear);
 
         clearAllActivityAndFoodIntegerDayLists();
 
@@ -295,7 +298,7 @@ public class DailyStatsAccess {
     public void setAllDayAndStatListsForMonth(int dayOfMonth, int numberOfDaysInMonth, int dayOfYear) {
         firstDayOfDuration = dayOfYear - (dayOfMonth-1);
         lastDayOfDuration = firstDayOfDuration + (numberOfDaysInMonth-1);
-        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
+        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueAddedForFutureYears;
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
@@ -329,7 +332,7 @@ public class DailyStatsAccess {
             numberOfDaysSelected = daysInYear;
         }
 
-        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueToAddToStartingDurationDayForFutureYears();
+        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueAddedForFutureYears;
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
@@ -353,7 +356,7 @@ public class DailyStatsAccess {
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
         firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
         lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
-        int firstAggregatedDayOfYearToUse = dayOfYear + valueToAddToStartingDurationDayForFutureYears();
+        int firstAggregatedDayOfYearToUse = dayOfYear + valueAddedForFutureYears;
 
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
@@ -387,6 +390,7 @@ public class DailyStatsAccess {
         for (int i=0; i<sizeOfList; i++) {
             mListOfActivityDaysSelected.add(firstDay + i);
         }
+        Log.i("testInsert", "list of days selected is " + mListOfActivityDaysSelected);
     }
 
     private void setFullListOfFoodDaysFromDateSelection(int firstDay, int sizeOfList) {
@@ -487,20 +491,9 @@ public class DailyStatsAccess {
         return calendar.get(Calendar.DAY_OF_YEAR);
     }
 
-    private int valueToAddToStartingDurationDayForFutureYears() {
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-
-        int year = calendar.get(Calendar.YEAR);
-        int numberOfYearsAfter2022 = year - 2022;
-        int totalValueToReturn = 0;
-
-        for (int i=0; i<numberOfYearsAfter2022; i++) {
-            calendar.set(2022+(i+1), 1, 1);
-            int numberOfDaysInYear = calendar.getActualMaximum(Calendar.DAY_OF_YEAR);
-            totalValueToReturn += numberOfDaysInYear;
-        }
-
-        return totalValueToReturn;
+    public void setValueAddedToSelectedDaysForFutureYears(int valueToAdd) {
+//        Log.i("testInsert", "value added is " + valueToAdd);
+        this.valueAddedForFutureYears = valueToAdd;
     }
 
     public List<Integer> getListOfDaysWithAtLeastOneActivity() {
@@ -589,6 +582,8 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
+
+        Log.i("testInsert", "day id inserted is " + daySelected);
     }
 
     //Used by Main.

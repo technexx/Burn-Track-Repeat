@@ -368,7 +368,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setSimplifiedViewTextViews();
 
         AsyncTask.execute(()-> {
-            daySelectedFromCalendar = aggregateDayIdFromCalendar();
+            int selectedDay = mCalendar.get(Calendar.DAY_OF_YEAR);
+            int valueToAddForFutureYears = valueToAddForFutureYears();
+            daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
             dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
 
             daySelectedAsACalendarDayObject = CalendarDay.from(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH) + 1, mCalendar.get(Calendar.DAY_OF_MONTH));
@@ -390,16 +392,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 AsyncTask.execute(()->{
                     mCalendar = Calendar.getInstance(Locale.getDefault());
                     mCalendar.set(date.getYear(), date.getMonth()-1, date.getDay());
-                    customCalendarDayList = Collections.singletonList(date);
 
-                    daySelectedFromCalendar = aggregateDayIdFromCalendar();
+                    int selectedDay = mCalendar.get(Calendar.DAY_OF_YEAR);
+                    int valueToAddForFutureYears = valueToAddForFutureYears();
+                    dailyStatsAccess.setValueAddedToSelectedDaysForFutureYears(valueToAddForFutureYears);
+
+                    daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
                     dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
                     daySelectedAsACalendarDayObject = date;
 
+                    customCalendarDayList = Collections.singletonList(date);
+
                     calendarDateChangeLogic();
                     populateListsAndTextViewsFromEntityListsInDatabase();
-
-//                    logAssignedAndUnassignedTimes();
 
                     getActivity().runOnUiThread(()-> {
                         setActivityStatsDurationRangeTextView();
@@ -421,8 +426,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     mCalendar.set(daySelectedAsACalendarDayObject.getYear(), daySelectedAsACalendarDayObject.getMonth()-1, daySelectedAsACalendarDayObject.getDay());
 
-                    daySelectedFromCalendar = aggregateDayIdFromCalendar();
+                    int selectedDay = mCalendar.get(Calendar.DAY_OF_YEAR);
+                    int valueToAddForFutureYears = valueToAddForFutureYears();
+                    dailyStatsAccess.setValueAddedToSelectedDaysForFutureYears(valueToAddForFutureYears);
+
+                    daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
                     dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
+
+                    dailyStatsAccess.setValueAddedToSelectedDaysForFutureYears(valueToAddForFutureYears());
 
                     populateListsAndTextViewsFromEntityListsInDatabase();
 
@@ -902,19 +913,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyTotalExpendedCaloriesBurnedTextView.setText(totalExpendedCaloriesBurned);
     }
 
-    private int aggregateDayIdFromCalendar() {
-        int currentDay = mCalendar.get(Calendar.DAY_OF_YEAR);
-        int year = mCalendar.get(Calendar.YEAR);
-
+    private int valueToAddForFutureYears() {
         int additionModifier = 0;
+        int year = mCalendar.get(Calendar.YEAR);
         int numberOfYearsToAdd = (year - 2022);
 
         for (int i=0; i<numberOfYearsToAdd; i++) {
-            mCalendar.set(2022 + i, 1, 1);
             additionModifier += mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR);
         }
-        Log.i("testAgg", "agg id is " + (currentDay + additionModifier));
-        return currentDay + additionModifier;
+
+        return additionModifier;
     }
 
     public void colorDaysWithAtLeastOneActivity() {
