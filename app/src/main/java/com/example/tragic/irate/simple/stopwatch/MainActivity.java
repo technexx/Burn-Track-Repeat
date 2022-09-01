@@ -3635,7 +3635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
-
+//
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -3649,7 +3649,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTimerLaunchLogic(boolean trackingActivity) {
     toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
 
-//    retrieveTotalDailySetAndBreakTimes();
+    retrieveTotalDailySetAndBreakTimes();
+    retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
     roundDownAllTotalTimeValuesToEnsureSyncing();
 
     clearRoundAndCycleAdapterArrayLists();
@@ -3699,7 +3700,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setActivityPositionInListForCurrentDayForNewActivity();
     }
 
-    assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+    retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
     assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
   }
 
@@ -3721,7 +3722,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void assignValuesToTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
+  private void retrieveTotalDailySetAndBreakTimes() {
+    if (mode == 1) {
+      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
+      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(dayOfYear);
+    }
+  }
+
+  private void retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
@@ -3729,16 +3737,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
     totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
 
-    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+//    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+//    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
   }
-
-//  private void retrieveTotalDailySetAndBreakTimes() {
-//    if (mode == 1) {
-//      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeFromDayHolderEntity();
-//      totalBreakTimeForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeFromDayHolderEntity();
-//    }
-//  }
 
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
     if (mode == 1) {
