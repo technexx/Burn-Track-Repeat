@@ -3119,18 +3119,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void fadeEditCycleButtonsInAndOut(int typeOfFade) {
     if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
+      delete_highlighted_cycle.setEnabled(true);
+      cancelHighlight.setEnabled(true);
+    }
+    if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
       edit_highlighted_cycle.clearAnimation();
       delete_highlighted_cycle.clearAnimation();
       cancelHighlight.clearAnimation();
       appHeader.clearAnimation();
       sortButton.clearAnimation();
-
-      delete_highlighted_cycle.setEnabled(true);
-      cancelHighlight.setEnabled(true);
-    }
-    if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
-      sortButton.setVisibility(View.VISIBLE);
-      delete_highlighted_cycle.setVisibility(View.INVISIBLE);
 
       delete_highlighted_cycle.setEnabled(false);
       sortButton.setEnabled(true);
@@ -3156,7 +3153,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       appHeader.startAnimation(fadeIn);
       sortButton.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeOut);
-      cancelHighlight.setVisibility(View.GONE);
 
       sortButton.setEnabled(true);
       edit_highlighted_cycle.setEnabled(false);
