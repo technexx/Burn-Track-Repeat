@@ -3700,28 +3700,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setActivityPositionInListForCurrentDayForNewActivity();
     }
 
+    retrieveTotalDailySetAndBreakTimes();
     retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-//    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
   }
 
-//  private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() {
-//    if (!dailyStatsAccess.getDoesDayExistInDatabase()) {
-//      totalSetTimeForCurrentDayInMillis = 0;
-//      totalBreakTimeForCurrentDayInMillis = 0;
-//      totalCaloriesBurnedForCurrentDay = 0;
-//    } else {
-//      calendar = Calendar.getInstance(Locale.getDefault());
-//      dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-//
-//      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
-//      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(dayOfYear);
-//
-//      totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
-//      totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
-//    }
-//  }
-
-  //Todo: This goes w/ launchTimer, so will overwrite assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() even if those return 0. But for active cycle, that 0 return will hold.
   private void retrieveTotalDailySetAndBreakTimes() {
     if (mode == 1) {
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
