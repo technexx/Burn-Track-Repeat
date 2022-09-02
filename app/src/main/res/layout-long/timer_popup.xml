@@ -110,8 +110,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tracking_daily_stats_header_textView"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="85dp"
+        app:layout_constraintStart_toStartOf="@id/tracking_daily_stats_header_textView"
         android:layout_marginTop="4dp">
 
         <TextView
@@ -175,15 +174,14 @@
         android:id="@+id/timer_total_single_activity_stats_layout"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="4dp"
+        app:layout_constraintStart_toStartOf="@id/daily_single_activity_string_header"
         app:layout_constraintTop_toBottomOf="@id/daily_single_activity_string_header">
 
         <TextView
             android:id="@+id/daily_total_time_for_single_activity_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="85dp"
             android:gravity="center"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
@@ -206,7 +204,6 @@
             android:id="@+id/daily_total_calories_for_single_activity_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="85dp"
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:textSize="22sp"

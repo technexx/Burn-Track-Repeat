@@ -572,6 +572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Pencil icon ghosting/reamining after highlight mode.
   //Todo: Pause/reset repeating will not iterate total times but calories will continue.
   //Todo: Test all notifications + sound/vibrations + settings.
 
