@@ -572,7 +572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: DayHolder not updating w/ stat deletions in fragment.
+  //Todo: Pause/reset repeating will not iterate total times but calories will continue.
   //Todo: Test all notifications + sound/vibrations + settings.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -2894,8 +2894,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       AsyncTask.execute(()-> {
         if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
-          //Todo: Should remove insertion and simply get most recent mStats list and assign values
+          Log.i("testChange", "stats have changed boolean is " + dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay());
           insertActivityIntoDatabaseAndAssignItsValueToObjects();
+
           dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
         }
 
@@ -3618,7 +3619,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
       }
 
-      //Todo: In this method, we set StatsForEach list to day selected. From assignValuesToTotalTimesAndCaloriesForCurrentDayVariables(), we can fetch stat values.
       if (cycleHasActivityAssigned) {
         insertActivityIntoDatabaseAndAssignItsValueToObjects();
       }
@@ -3635,7 +3635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
-//
+
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -3701,27 +3701,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
+//    assignValuesToTotalTimesAndCaloriesForCurrentDayVariables();
   }
 
-  private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() {
-    if (!dailyStatsAccess.getDoesDayExistInDatabase()) {
-      totalSetTimeForCurrentDayInMillis = 0;
-      totalBreakTimeForCurrentDayInMillis = 0;
-      totalCaloriesBurnedForCurrentDay = 0;
-    } else {
-      calendar = Calendar.getInstance(Locale.getDefault());
-      dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+//  private void assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() {
+//    if (!dailyStatsAccess.getDoesDayExistInDatabase()) {
+//      totalSetTimeForCurrentDayInMillis = 0;
+//      totalBreakTimeForCurrentDayInMillis = 0;
+//      totalCaloriesBurnedForCurrentDay = 0;
+//    } else {
+//      calendar = Calendar.getInstance(Locale.getDefault());
+//      dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+//
+//      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
+//      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(dayOfYear);
+//
+//      totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
+//      totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
+//    }
+//  }
 
-      //Todo: Simply use StatsForEach method used in Fragment.
-      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
-      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(dayOfYear);
-
-      totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
-      totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
-    }
-  }
-
+  //Todo: This goes w/ launchTimer, so will overwrite assignValuesToTotalTimesAndCaloriesForCurrentDayVariables() even if those return 0. But for active cycle, that 0 return will hold.
   private void retrieveTotalDailySetAndBreakTimes() {
     if (mode == 1) {
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
