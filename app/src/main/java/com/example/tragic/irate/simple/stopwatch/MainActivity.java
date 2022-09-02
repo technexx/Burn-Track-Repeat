@@ -2566,14 +2566,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void editCyclesPopUpDismissalLogic() {
     if (currentlyEditingACycle) {
+      fadeEditCycleButtonsInAndOut(FADE_OUT_EDIT_CYCLE);
+      currentlyEditingACycle = false;
 
       if (mode==1) {
         savedCycleAdapter.removeHighlight();
+        savedCycleAdapter.notifyDataSetChanged();
       } else if (mode==3) {
+        savedPomCycleAdapter.notifyDataSetChanged();
         savedPomCycleAdapter.removeHighlight();
       }
-      fadeEditCycleButtonsInAndOut(FADE_OUT_EDIT_CYCLE);
-      currentlyEditingACycle = false;
     }
 
     fab.setEnabled(true);
