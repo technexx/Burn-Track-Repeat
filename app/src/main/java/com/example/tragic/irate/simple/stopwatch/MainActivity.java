@@ -2573,8 +2573,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.removeHighlight();
         savedCycleAdapter.notifyDataSetChanged();
       } else if (mode==3) {
-        savedPomCycleAdapter.notifyDataSetChanged();
         savedPomCycleAdapter.removeHighlight();
+        savedPomCycleAdapter.notifyDataSetChanged();
       }
     }
 
