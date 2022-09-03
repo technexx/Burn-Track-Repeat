@@ -94,11 +94,11 @@
 
     <TextView
         android:id="@+id/tracking_daily_stats_header_textView"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:gravity="center_horizontal"
         android:layout_marginTop="4dp"
         android:textColor="@color/teal_200"
         android:textStyle="bold"
@@ -111,6 +111,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/tracking_daily_stats_header_textView"
         app:layout_constraintStart_toStartOf="@id/tracking_daily_stats_header_textView"
+        app:layout_constraintEnd_toEndOf="@id/tracking_daily_stats_header_textView"
         android:layout_marginTop="4dp">
 
         <TextView
@@ -159,13 +160,12 @@
 
     <TextView
         android:id="@+id/daily_single_activity_string_header"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
-        android:gravity="center"
+        android:gravity="center_horizontal"
         android:textColor="@color/light_blue"
         android:textSize="22sp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/timer_total_daily_stats_layout">
     </TextView>
@@ -175,14 +175,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="4dp"
-        app:layout_constraintStart_toStartOf="@id/daily_single_activity_string_header"
+        app:layout_constraintEnd_toEndOf="@id/tracking_daily_stats_header_textView"
+        app:layout_constraintStart_toStartOf="@id/tracking_daily_stats_header_textView"
         app:layout_constraintTop_toBottomOf="@id/daily_single_activity_string_header">
 
         <TextView
             android:id="@+id/daily_total_time_for_single_activity_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:gravity="center"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -205,7 +205,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:gravity="center"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header">

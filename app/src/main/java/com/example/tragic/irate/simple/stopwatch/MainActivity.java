@@ -572,8 +572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Pencil icon ghosting/reamining after highlight mode.
-  //Todo: Pause/reset repeating will not iterate total times but calories will continue.
+  //Todo: Activity String in Main starts unselected for cycle that recently had tracking.
   //Todo: Test all notifications + sound/vibrations + settings.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -582,6 +581,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
 
+  //Todo: Pause/reset repeating will not iterate total times but calories will continue.
+  //Todo: No real way to change this and keep set time + timer in sync, if we're resetting timer.
   //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
   //Todo: Custom activity edits can reset calorie count.
