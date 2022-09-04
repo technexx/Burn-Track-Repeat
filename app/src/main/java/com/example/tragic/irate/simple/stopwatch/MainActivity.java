@@ -572,7 +572,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Daily stats iterate up on breaks.
   //Todo: Activity String in Main starts unselected for cycle that recently had tracking.
+  //Todo: When editing cycle w/ w/ activity in non-tracking mode, on re-launch it tracks.
+  //Todo: Settings popUps should be darker color (not white).
+  //Todo: Full row of 8 dots should have end margins closed slightly.
   //Todo: Test all notifications + sound/vibrations + settings.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -4683,6 +4687,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
   }
 
+  //Todo: Separate methods here since we only want to track on Sets.
   private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
     if (trackingActivity) {
       if (!isDailyActivityTimeMaxed()) {
@@ -4700,6 +4705,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
   }
+
+  private void
 
   private void removeActivityOrCycleTimeRunnables(boolean trackingActivity) {
     if (trackingActivity) {
