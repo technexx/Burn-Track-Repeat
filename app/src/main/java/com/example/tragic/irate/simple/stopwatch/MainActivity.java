@@ -4170,11 +4170,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
-    timerIteration.setPreviousTotal(setMillis);
+    timerIteration.setPreviousTotal(breakMillis);
 
     return new Runnable() {
       @Override
       public void run() {
+        timerIteration.setCurrentTime(System.currentTimeMillis());
         long timeToIterate = timerIteration.getDifference();
 
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
@@ -4186,12 +4187,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
         }
 
-        decreaseTextSizeForTimers(breakMillis);
-
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.reDraw();
 
+        decreaseTextSizeForTimers(breakMillis);
         setNotificationValues();
         mHandler.postDelayed(this, timerRunnableDelay);
       }
@@ -4437,12 +4437,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
+        removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
         setEndOfRoundSounds(vibrationSettingForSets, false);
         break;
       case 2:
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
         mHandler.removeCallbacks(infinityTimerForSetsRunnable);
+        removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
         setEndOfRoundSounds(vibrationSettingForSets, false);
         break;
       case 3:
@@ -4458,7 +4460,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
     }
 
-    removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
     mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
   }
 
@@ -4708,7 +4709,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
   }
-
 
   private void removeActivityOrCycleTimeRunnables(boolean trackingActivity) {
     if (trackingActivity) {
