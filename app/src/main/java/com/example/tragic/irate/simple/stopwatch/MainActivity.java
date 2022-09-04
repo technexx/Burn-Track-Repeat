@@ -572,8 +572,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Daily stats iterate up on breaks.
-  //Todo: Activity String in Main starts unselected for cycle that recently had tracking.
   //Todo: When editing cycle w/ w/ activity in non-tracking mode, on re-launch it tracks.
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Full row of 8 dots should have end margins closed slightly.
@@ -4428,11 +4426,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       isAlertRepeating = true;
     }
 
-    numberOfRoundsLeft--;
-    if (currentRound < typeOfRound.size()-1) {
-      currentRound++;
-    }
-
     switch (typeOfRound.get(currentRound)) {
       case 1:
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
@@ -4458,6 +4451,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setEndOfRoundSounds(vibrationSettingForBreaks, false);
         break;
+    }
+
+    numberOfRoundsLeft--;
+    if (currentRound < typeOfRound.size()-1) {
+      currentRound++;
     }
 
     mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
