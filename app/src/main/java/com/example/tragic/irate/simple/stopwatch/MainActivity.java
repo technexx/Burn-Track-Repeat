@@ -4440,9 +4440,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setEndOfRoundSounds(vibrationSettingForSets, false);
         break;
       case 2:
-        mHandler.removeCallbacks(infinityTimerForSetsRunnable);
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
+        mHandler.removeCallbacks(infinityTimerForSetsRunnable);
         setEndOfRoundSounds(vibrationSettingForSets, false);
         break;
       case 3:
@@ -4459,7 +4459,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
-
     mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
   }
 
@@ -4546,11 +4545,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startSetTimer();
               }
+
+              postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
               break;
             case 2:
               timeLeft.setText("0");
+              //Do not want to consolidate infinityTimer runnable methods, since we only want its global re-instantiated here, not in our pause/resume option.
               infinityTimerForSetsRunnable = infinityRunnableForSets();
               mHandler.post(infinityTimerForSetsRunnable);
+
+              postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
               break;
             case 3:
               breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
@@ -4567,7 +4571,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               mHandler.post(infinityTimerForBreaksRunnable);
               break;
           }
-          postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
         } else {
           animateEnding();
           currentRound = 0;
@@ -4644,11 +4647,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startSetTimer();
               }
+              postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
               break;
             case 2:
               if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
                 mHandler.post(infinityTimerForSetsRunnable);
               }
+              postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
               break;
             case 3:
               if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
@@ -4663,7 +4668,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
           }
           timerResumeLogic();
-          postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       } else {
@@ -4687,7 +4691,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
   }
 
-  //Todo: Separate methods here since we only want to track on Sets.
   private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
     if (trackingActivity) {
       if (!isDailyActivityTimeMaxed()) {
@@ -4706,7 +4709,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void
 
   private void removeActivityOrCycleTimeRunnables(boolean trackingActivity) {
     if (trackingActivity) {
