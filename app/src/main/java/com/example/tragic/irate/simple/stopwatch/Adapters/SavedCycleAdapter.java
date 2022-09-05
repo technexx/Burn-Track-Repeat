@@ -143,12 +143,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public boolean getBooleanDeterminingIfCycleHasActivity(int position) {
-    Log.i("testActivity", "boolean list is " + mTdeeActivityExistsInCycleList);
     return mTdeeActivityExistsInCycleList.get(position);
   }
 
   //This is accessed by Main when launching timer to determine whether we are tracking.
   public boolean getBooleanDeterminingIfWeAreTrackingActivity(int position) {
+    Log.i("testActivity", "boolean list is " + mActiveTdeeModeBooleanList);
     return mActiveTdeeModeBooleanList.get(position);
   }
 
@@ -205,8 +205,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
       workoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
-
-    Log.i("testActivity", "does exist list is " + mTdeeActivityExistsInCycleList);
 
     workoutHolder.fullView.setOnClickListener(v -> {
       boolean changed = false;

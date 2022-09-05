@@ -572,9 +572,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Highlight mode on/off w/ selecting cycles quickly caused an index exception.
+  //Todo: New day shows previous day's total time.
 
-  //Todo: When editing cycle w/ w/ activity in non-tracking mode, on re-launch it tracks.
+  //Todo: When editing cycle w/ activity in non-tracking mode, on re-launch it tracks.
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Full row of 8 dots should have end margins closed slightly.
   //Todo: Test all notifications + sound/vibrations + settings.
@@ -3781,8 +3781,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
         if (!isNewCycle) {
-          boolean trackingToggle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
-          cycles.setCurrentlyTrackingCycle(trackingToggle);
+//          boolean trackingToggle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
+          cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
         } else {
           cycles.setCurrentlyTrackingCycle(true);
         }
