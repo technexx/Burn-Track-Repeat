@@ -3,10 +3,11 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:layout_marginTop="2.5dp"
+    android:layout_marginTop="1.5dp"
     android:layout_marginBottom="3dp"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginEnd="32dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/workout_recycler_layout">
 

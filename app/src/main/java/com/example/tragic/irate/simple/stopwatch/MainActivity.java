@@ -572,6 +572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: All Fragments/PopUps for diff. aspect ratios need checking/modding.
   //Todo: Full row of 8 dots should have end margins closed slightly.
   //Todo: Test all notifications + sound/vibrations + settings.
 
@@ -584,7 +585,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
 
-  //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ diff. emulator phones and Moto phone (for diff aspect ratios/resolutions).
@@ -2609,7 +2609,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(setColor);
 
-        Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_large_green);
+        Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_green);
         newDraw.setColorFilter(setColor, PorterDuff.Mode.SRC_IN);
         toggleInfinityRounds.setImageDrawable(newDraw);
         toggleInfinityModeAndSetRoundType();
@@ -2633,7 +2633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode==1) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(breakColor);
 
-        Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_large_green);
+        Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_green);
         newDraw.setColorFilter(breakColor, PorterDuff.Mode.SRC_IN);
         toggleInfinityRounds.setImageDrawable(newDraw);
         toggleInfinityModeAndSetRoundType();
