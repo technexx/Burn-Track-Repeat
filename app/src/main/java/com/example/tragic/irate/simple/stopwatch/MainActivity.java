@@ -3451,8 +3451,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundListDivider.setVisibility(View.VISIBLE);
 
         if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
-          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
-          roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(10);
+          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
+          roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(20);
+          roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(140);
 
         } else {
           roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
