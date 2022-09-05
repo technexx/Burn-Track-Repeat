@@ -7,7 +7,7 @@
     android:layout_marginBottom="3dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/workout_recycler_layout"
-    android:layout_marginTop="1.5dp">
+    android:layout_marginTop="1dp">
 
     <TextView
         android:id="@+id/round_count"
@@ -16,7 +16,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="2dp"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textColor="@color/white">
     </TextView>
 
@@ -27,7 +27,7 @@
         app:layout_constraintStart_toEndOf="@id/round_count"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="3dp"
-        android:textSize="24sp">
+        android:textSize="22sp">
     </TextView>
 
     <ImageView
