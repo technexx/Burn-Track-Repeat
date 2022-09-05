@@ -572,30 +572,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: New day shows previous day's total time.
-
-  //Todo: When editing cycle w/ activity in non-tracking mode, on re-launch it tracks.
-  //Todo: Settings popUps should be darker color (not white).
   //Todo: Full row of 8 dots should have end margins closed slightly.
   //Todo: Test all notifications + sound/vibrations + settings.
 
+  //Todo: Test new day starting total times.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
 
-  //Todo: Pause/reset repeating will not iterate total times but calories will continue.
-  //Todo: No real way to change this and keep set time + timer in sync, if we're resetting timer.
   //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
-  //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
-  //Todo: Custom activity edits can reset calorie count.
 
   //Todo: Check sizes on long aspect for all layouts + menus.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test layouts w/ diff. emulator phones and Moto phone (for diff aspect ratios/resolutions).
   //Todo: Test everything 10x. Incl. round selection/replacement.
+
+  //Todo: Settings popUps should be darker color (not white).
+  //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
+  //Todo: Custom activity edits can reset calorie count.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
@@ -3493,9 +3490,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
       }
-
-//      Log.i("testActivity", "hasAssigned in repop is " + cycleHasActivityAssigned);
-//      Log.i("testActivity", "tracking in repop is " + trackActivityWithinCycle);
     }
     if (mode==3 || forAllModes) {
       pomArray.clear();

@@ -148,7 +148,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   //This is accessed by Main when launching timer to determine whether we are tracking.
   public boolean getBooleanDeterminingIfWeAreTrackingActivity(int position) {
-    Log.i("testActivity", "boolean list is " + mActiveTdeeModeBooleanList);
     return mActiveTdeeModeBooleanList.get(position);
   }
 
