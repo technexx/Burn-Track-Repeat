@@ -134,10 +134,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mActiveCycle = false;
   }
 
-  public boolean retrieveActiveTdeeModeBoolean(int positionToCheckForToggle) {
-    return mActiveTdeeModeBooleanList.get(positionToCheckForToggle);
-  }
-
   public void modifyActiveTdeeModeToggleList(int positionToToggle) {
     if (mActiveTdeeModeBooleanList.get(positionToToggle)) {
       mActiveTdeeModeBooleanList.set(positionToToggle, false);
@@ -147,6 +143,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public boolean getBooleanDeterminingIfCycleHasActivity(int position) {
+    Log.i("testActivity", "boolean list is " + mTdeeActivityExistsInCycleList);
     return mTdeeActivityExistsInCycleList.get(position);
   }
 
@@ -174,16 +171,16 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
-    workoutHolder.tdeeToggle.setOnClickListener(v-> {
+    workoutHolder.tdeeActivityStringToggle.setOnClickListener(v-> {
       if (!mActiveCycle && !mHighlightMode) {
         mOnTdeeModeToggle.toggleTdeeMode(position);
       }
     });
 
     if (mActiveTdeeModeBooleanList.get(position)) {
-      workoutHolder.tdeeToggle.setAlpha(1.0f);
+      workoutHolder.tdeeActivityStringToggle.setAlpha(1.0f);
     } else {
-    workoutHolder.tdeeToggle.setAlpha(0.3f);
+    workoutHolder.tdeeActivityStringToggle.setAlpha(0.3f);
     }
 
     if (mActiveCycle) {
@@ -197,20 +194,19 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     if (mTdeeActivityExistsInCycleList.get(position)) {
-      workoutHolder.tdeeToggle.setText(mWorkoutActivityString.get(position));
-//      workoutHolder.tdeeToggle.setEnabled(true);
+      workoutHolder.tdeeActivityStringToggle.setText(mWorkoutActivityString.get(position));
+      workoutHolder.tdeeActivityStringToggle.setVisibility(View.VISIBLE);
 
       workoutHolder.workoutNameLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
       workoutHolder.workoutCyclesLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
 
     } else {
-//      workoutHolder.tdeeToggle.setText("");
-//      workoutHolder.tdeeToggle.setEnabled(false);
-
-      workoutHolder.tdeeToggle.setVisibility(View.GONE);
+      workoutHolder.tdeeActivityStringToggle.setVisibility(View.GONE);
       workoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
       workoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
+
+    Log.i("testActivity", "does exist list is " + mTdeeActivityExistsInCycleList);
 
     workoutHolder.fullView.setOnClickListener(v -> {
       boolean changed = false;
@@ -378,7 +374,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public TextView workoutName;
     public TextView workOutCycle;
     public TextView resetCycle;
-    public TextView tdeeToggle;
+    public TextView tdeeActivityStringToggle;
 
     ConstraintLayout.LayoutParams workoutNameLayoutParams;
     ConstraintLayout.LayoutParams workoutCyclesLayoutParams;
@@ -390,7 +386,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
-      tdeeToggle = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
+      tdeeActivityStringToggle = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
 
       workoutNameLayoutParams = (ConstraintLayout.LayoutParams) workoutName.getLayoutParams();
       workoutCyclesLayoutParams = (ConstraintLayout.LayoutParams) workOutCycle.getLayoutParams();

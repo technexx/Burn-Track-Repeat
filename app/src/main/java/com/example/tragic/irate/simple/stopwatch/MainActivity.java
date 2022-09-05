@@ -572,6 +572,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
+  //Todo: Highlight mode on/off w/ selecting cycles quickly caused an index exception.
+
   //Todo: When editing cycle w/ w/ activity in non-tracking mode, on re-launch it tracks.
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Full row of 8 dots should have end margins closed slightly.
@@ -805,6 +807,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     this.statsHaveBeenEdited = haveBeenEdited;
   }
 
+
   @Override
   public void toggleTdeeMode(int positionToToggle) {
     savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
@@ -819,7 +822,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==1) {
       cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
-      trackActivityWithinCycle = savedCycleAdapter.retrieveActiveTdeeModeBoolean(position);
+      trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(position);
     }
 
     setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(position);
@@ -2205,7 +2208,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     isNewCycle = false;
 
     positionOfSelectedCycle = (receivedHighlightPositions.get(0));
+
     cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
+
     toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
 
     if (cycleHasActivityAssigned) {
@@ -3488,6 +3493,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
       }
+
+//      Log.i("testActivity", "hasAssigned in repop is " + cycleHasActivityAssigned);
+//      Log.i("testActivity", "tracking in repop is " + trackActivityWithinCycle);
     }
     if (mode==3 || forAllModes) {
       pomArray.clear();
@@ -3773,7 +3781,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
         if (!isNewCycle) {
-          boolean trackingToggle = (savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle));
+          boolean trackingToggle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
           cycles.setCurrentlyTrackingCycle(trackingToggle);
         } else {
           cycles.setCurrentlyTrackingCycle(true);
