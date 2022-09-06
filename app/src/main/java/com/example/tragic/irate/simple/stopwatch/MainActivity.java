@@ -572,7 +572,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: All Fragments/PopUps for diff. aspect ratios need checking/modding.
   //Todo: Full row of 8 dots should have end margins closed slightly.
   //Todo: Test all notifications + sound/vibrations + settings.
 
@@ -587,7 +586,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
-  //Todo: Test layouts w/ diff. emulator phones and Moto phone (for diff aspect ratios/resolutions).
+  //Todo: Test w/ fresh install for all default values.
   //Todo: Test everything 10x. Incl. round selection/replacement.
 
   //Todo: Settings popUps should be darker color (not white).

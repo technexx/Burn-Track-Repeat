@@ -129,8 +129,8 @@ public class tdeeSettingsFragment extends Fragment {
             saveUpdatedBmrSettings();
             showToastIfNoneActive("Updated");
 
-            Log.i("testBmr", "bmr from settings class is " + calculateBMR());
-            Log.i("testBmr", "metric mode is " + metricMode);
+//            Log.i("testBmr", "bmr from settings class is " + calculateBMR());
+//            Log.i("testBmr", "metric mode is " + metricMode);
 
         });
 
@@ -203,14 +203,14 @@ public class tdeeSettingsFragment extends Fragment {
 
         if (selectingMetric) {
             genderPosition = sharedPreferences.getInt("genderPositionMetric", 0);
-            agePosition = sharedPreferences.getInt("agePositionMetric", 0);
-            weightPosition = sharedPreferences.getInt("weightPositionMetric", 0);
-            heightPosition = sharedPreferences.getInt("heightPositionMetric", 0);
+            agePosition = sharedPreferences.getInt("agePositionMetric", 18);
+            weightPosition = sharedPreferences.getInt("weightPositionMetric", 68);
+            heightPosition = sharedPreferences.getInt("heightPositionMetric", 182);
         } else {
             genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
-            agePosition = sharedPreferences.getInt("agePositionImperial", 0);
-            weightPosition = sharedPreferences.getInt("weightPositionImperial", 0);
-            heightPosition = sharedPreferences.getInt("heightPositionImperial", 0);
+            agePosition = sharedPreferences.getInt("agePositionImperial", 18);
+            weightPosition = sharedPreferences.getInt("weightPositionImperial", 150);
+            heightPosition = sharedPreferences.getInt("heightPositionImperial", 72);
         }
 
 //        gender_spinner.setSelection(genderPosition);

@@ -35,7 +35,6 @@ public class DailyStatsAccess {
 
     List<String> totalFoodStringListForSelectedDuration;
     List<Double> totalCaloriesConsumedListForSelectedDuration;
-    double totalCaloriesConsumedForSelectedDuration;
 
     long totalSetTimeForSelectedDuration;
     double totalActivityCaloriesForSelectedDuration;
@@ -810,7 +809,21 @@ public class DailyStatsAccess {
     }
 
     public void setUnassignedTotalCalories() {
+        Log.i("testbmr", "calories in access are " + bmrCaloriesBurned());
+        Log.i("testbmr", "decimal value in access are " + decimalPercentageOfUnAssignedTime());
         totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
+    }
+
+    public int bmrCaloriesBurned() {
+        int savedBmr = sharedPreferences.getInt("savedBmr", 1819);
+        return savedBmr * numberOfDaysSelected;
+    }
+
+    private double decimalPercentageOfUnAssignedTime() {
+        Log.i("testbmr", "set time for duration is " + totalSetTimeForSelectedDuration);
+        Log.i("testbmr", "total aggregate time for duration is " + totalAggregateTimeForSelectedDuration);
+        double remainingTime = (double) totalSetTimeForSelectedDuration / totalAggregateTimeForSelectedDuration;
+        return 1 - remainingTime;
     }
 
     public double getUnassignedCaloriesForSelectedDuration() {
@@ -877,16 +890,6 @@ public class DailyStatsAccess {
         }
 
         return valueToReturn;
-    }
-
-    public int bmrCaloriesBurned() {
-        int savedBmr = sharedPreferences.getInt("savedBmr", 0);
-        return savedBmr * numberOfDaysSelected;
-    }
-
-    private double decimalPercentageOfUnAssignedTime() {
-        double remainingTime = (double) totalSetTimeForSelectedDuration / totalAggregateTimeForSelectedDuration;
-        return 1 - remainingTime;
     }
 
     public List<String> getTotalActivitiesListForSelectedDuration() {
