@@ -164,18 +164,20 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/daily_stats_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="265dp"
+        android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/total_activity_stats_values_textView_layout"
         app:layout_constraintTop_toBottomOf="@id/activity_duration_header_layout">
     </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/calories_consumed_recyclerView"
         android:layout_width="match_parent"
-        android:layout_height="305dp"
+        android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/total_activity_stats_values_textView_layout"
         app:layout_constraintTop_toBottomOf="@id/activity_duration_header_layout">
     </androidx.recyclerview.widget.RecyclerView>
 

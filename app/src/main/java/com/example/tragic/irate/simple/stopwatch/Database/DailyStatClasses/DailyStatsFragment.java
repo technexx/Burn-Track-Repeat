@@ -1855,28 +1855,23 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setCalendarMinimizationButton(boolean minimizing) {
         if (minimizing) {
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
-        } else {
             minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
+        } else {
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
         }
     }
 
     private void setCalendarMinimizationLayoutConstraints(ConstraintLayout.LayoutParams recyclerParams, ConstraintLayout.LayoutParams textViewParams) {
         if (!calendarIsMinimized) {
-            if (caloriesComparisonTabLayout.getSelectedTabPosition()==0) {
-                recyclerParams.height = dpToPxConv(265);
-            }
-            if (caloriesComparisonTabLayout.getSelectedTabPosition()==1) {
-                recyclerParams.height = dpToPxConv(310);
-            }
-            recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
             textViewParams.bottomToTop = R.id.stats_calendar;
-        } else {
-            recyclerParams.height = 0;
-            recyclerParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
 
+            recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+            recyclerParams.bottomToTop = R.id.total_activity_stats_values_textView_layout;
+        } else {
             textViewParams.bottomToTop = R.id.minimize_calendarView_button;
+
+            recyclerParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            recyclerParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
         }
     }
 
