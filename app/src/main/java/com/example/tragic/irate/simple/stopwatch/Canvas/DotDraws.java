@@ -159,10 +159,6 @@ public class DotDraws extends View {
     invalidate();
   }
 
-  public void resetDotAlpha() {
-    mAlpha = 255; cycle = 0;
-  }
-
   //Used to clear or filled dot for counting up/counting down.
   public void setDotStyle(boolean countingUp) {
     if (countingUp) {
@@ -227,33 +223,33 @@ public class DotDraws extends View {
     int yRoundNumberTextPositionForOneOfTwoRows = dpConv(97);
     int yRoundNumberTextPositionForSecondOfTwoRows = dpConv(172);
 
-//    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
-//      circleRadius = (int) dpConv((float) circleCircumference/2);
-//      xMovementOfCirclePositionBetweenEachDrawing = (int) dpConv((float) circleCircumference) + dpConv(3);
-//
-//      xMovementOfCircleTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
-//      xMovementOfRoundNumberTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
-//
-//      yStartingEnclosurePositionWithOneRow = dpConv(40);
-//      yEndingEnclosurePositionWithOneRow = dpConv(140);
-//      yStartingEnclosurePositionWithTwoRows = dpConv(10);
-//      yEndingEnclosurePositionWithTwoRows = dpConv(170);
-//
-//      xCirclePositionForAllRows = dpConv(28);
-//      yCirclePositionForOneRow = dpConv(82);
-//      yCirclePositionForFirstOfTwoRows = dpConv(48);
-//      yCirclePositionForSecondOfTwoRows = dpConv(120);
-//
-//      xCircleTextPositionForAllRows = dpConv(11);
-//      yCircleTextPositionForOneRow = dpConv(92);
-//      yCircleTextPositionForOneOfTwoRows= dpConv(58);
-//      yCircleTextPositionForSecondOfTwoRows = dpConv(130);
-//
-//      xRoundNumberTextPositionForAllRows = dpConv(25);
-//      yRoundNumberTextPositionForOneRow = dpConv(125);
-//      yRoundNumberTextPositionForOneOfTwoRows = dpConv(88);
-//      yRoundNumberTextPositionForSecondOfTwoRows = dpConv(160);
-//    }
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8f) {
+      circleRadius = (int) dpConv((float) circleCircumference/2);
+      xMovementOfCirclePositionBetweenEachDrawing = (int) dpConv((float) circleCircumference) + dpConv(3);
+
+      xMovementOfCircleTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
+      xMovementOfRoundNumberTextBetweenEachDrawing = xMovementOfCirclePositionBetweenEachDrawing;
+
+      yStartingEnclosurePositionWithOneRow = dpConv(40);
+      yEndingEnclosurePositionWithOneRow = dpConv(140);
+      yStartingEnclosurePositionWithTwoRows = dpConv(10);
+      yEndingEnclosurePositionWithTwoRows = dpConv(170);
+
+      xCirclePositionForAllRows = dpConv(28);
+      yCirclePositionForOneRow = dpConv(82);
+      yCirclePositionForFirstOfTwoRows = dpConv(48);
+      yCirclePositionForSecondOfTwoRows = dpConv(120);
+
+      xCircleTextPositionForAllRows = dpConv(11);
+      yCircleTextPositionForOneRow = dpConv(92);
+      yCircleTextPositionForOneOfTwoRows= dpConv(58);
+      yCircleTextPositionForSecondOfTwoRows = dpConv(130);
+
+      xRoundNumberTextPositionForAllRows = dpConv(25);
+      yRoundNumberTextPositionForOneRow = dpConv(125);
+      yRoundNumberTextPositionForOneOfTwoRows = dpConv(88);
+      yRoundNumberTextPositionForSecondOfTwoRows = dpConv(160);
+    }
 
     switch (mMode) {
       case 1:

@@ -189,7 +189,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="20dp"
         android:layout_marginTop="12dp"
-        style="@style/EditButtonTextColor">
+        style="@style/EditButtonTextColor"
+        app:layout_constraintVertical_weight="1">
 
         <TextView
             android:id="@+id/one_button"
@@ -356,8 +357,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@id/round_recycler_layout"
         app:layout_constraintEnd_toEndOf="@id/round_recycler_layout"
-        android:layout_marginBottom="0dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintTop_toBottomOf="@+id/number_pad_layout"
+        android:layout_marginBottom="0dp"
         android:textColor="@color/white"
         app:layout_constraintWidth_max="320dp"
         android:gravity="center_horizontal"
@@ -369,25 +371,27 @@
         android:id="@+id/cancel_activity_for_cycle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:src="@drawable/cancel_square"
-        android:background="@drawable/ripple_effect_2"
         app:layout_constraintStart_toEndOf="@id/tdee_add_textView"
         app:layout_constraintTop_toTopOf="@id/tdee_add_textView"
         app:layout_constraintBottom_toBottomOf="@id/tdee_add_textView"
         android:layout_marginTop="2dp"
-        android:layout_marginStart="10dp">
+        android:layout_marginStart="10dp"
+        android:background="@drawable/ripple_effect_2"
+        android:src="@drawable/cancel_square">
     </ImageView>
 
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/round_recycler_layout"
         android:layout_width="240dp"
-        android:layout_height="190dp"
+        android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tdee_add_textView"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="50dp"
+        android:maxHeight="200dp"
         android:layout_marginEnd="14dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:background="@drawable/recycler_border">
 
         <androidx.recyclerview.widget.RecyclerView

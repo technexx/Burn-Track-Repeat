@@ -17,7 +17,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@color/teal_200"
-        android:textSize="26sp"
+        android:textSize="24sp"
         android:fontFamily="@font/open_sans">
     </TextView>
 
@@ -30,7 +30,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp"
         android:textColor="@color/white"
-        android:textSize="24sp">
+        android:textSize="22sp">
     </TextView>
 
     <TextView
@@ -41,7 +41,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/reset_total_cycle_times"
         android:layout_marginTop="32dp"
-        android:textSize="22sp">
+        android:textSize="20sp">
     </TextView>
 
     <TextView
@@ -52,7 +52,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/reset_total_cycle_times"
         android:layout_marginTop="32dp"
-        android:textSize="22sp">
+        android:textSize="20sp">
     </TextView>
 
     <TextView
@@ -98,8 +98,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="4dp"
         android:gravity="center_horizontal"
+        android:layout_marginTop="4dp"
         android:textColor="@color/teal_200"
         android:textStyle="bold"
         android:textSize="22sp">
@@ -246,8 +246,8 @@
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -260,8 +260,8 @@
 
     <View
         android:id="@+id/pauseResumeButton"
-        android:layout_width="260dp"
-        android:layout_height="260dp"
+        android:layout_width="220dp"
+        android:layout_height="220dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
