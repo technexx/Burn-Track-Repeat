@@ -129,9 +129,6 @@ public class tdeeSettingsFragment extends Fragment {
             saveUpdatedBmrSettings();
             showToastIfNoneActive("Updated");
 
-//            Log.i("testBmr", "bmr from settings class is " + calculateBMR());
-//            Log.i("testBmr", "metric mode is " + metricMode);
-
         });
 
         return root;

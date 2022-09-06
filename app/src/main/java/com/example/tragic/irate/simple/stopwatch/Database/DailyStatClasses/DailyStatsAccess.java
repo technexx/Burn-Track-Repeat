@@ -809,8 +809,6 @@ public class DailyStatsAccess {
     }
 
     public void setUnassignedTotalCalories() {
-        Log.i("testbmr", "calories in access are " + bmrCaloriesBurned());
-        Log.i("testbmr", "decimal value in access are " + decimalPercentageOfUnAssignedTime());
         totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
     }
 
@@ -819,9 +817,7 @@ public class DailyStatsAccess {
         return savedBmr * numberOfDaysSelected;
     }
 
-    private double decimalPercentageOfUnAssignedTime() {
-        Log.i("testbmr", "set time for duration is " + totalSetTimeForSelectedDuration);
-        Log.i("testbmr", "total aggregate time for duration is " + totalAggregateTimeForSelectedDuration);
+    private double decimalPercentageOfUnAssignedTime() { ;
         double remainingTime = (double) totalSetTimeForSelectedDuration / totalAggregateTimeForSelectedDuration;
         return 1 - remainingTime;
     }

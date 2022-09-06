@@ -572,7 +572,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   Toast mToast;
 
-  //Todo: Full row of 8 dots should have end margins closed slightly.
+  //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12".
   //Todo: Test all notifications + sound/vibrations + settings.
 
   //Todo: Test new day starting total times.
@@ -3595,6 +3595,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+    Log.i("testDay", "day of year is " + dayOfYear);
+
+//    dayOfYear = 250;
 
     if (savedCycleAdapter.isCycleActive()) {
       savedCycleAdapter.removeActiveCycleLayout();
@@ -3716,9 +3719,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
-    Calendar calendar = Calendar.getInstance(Locale.getDefault());
-    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
     totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
     totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
@@ -5222,20 +5222,38 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleCycleTimeTextViewSizes(boolean trackingActivity) {
-    if (!trackingActivity) {
-      cycles_completed_textView.setTextSize(28);
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
+      if (!trackingActivity) {
+        cycles_completed_textView.setTextSize(24);
 
-      total_set_header.setTextSize(28);
-      total_set_time.setTextSize(26);
-      total_break_header.setTextSize(28);
-      total_break_time.setTextSize(26);
+        total_set_header.setTextSize(24);
+        total_set_time.setTextSize(22);
+        total_break_header.setTextSize(24);
+        total_break_time.setTextSize(22);
+      } else {
+        cycles_completed_textView.setTextSize(20);
+
+        total_set_header.setTextSize(18);
+        total_set_time.setTextSize(16);
+        total_break_header.setTextSize(18);
+        total_break_time.setTextSize(16);
+      }
     } else {
-      cycles_completed_textView.setTextSize(24);
+      if (!trackingActivity) {
+        cycles_completed_textView.setTextSize(28);
 
-      total_set_header.setTextSize(22);
-      total_set_time.setTextSize(20);
-      total_break_header.setTextSize(22);
-      total_break_time.setTextSize(20);
+        total_set_header.setTextSize(28);
+        total_set_time.setTextSize(26);
+        total_break_header.setTextSize(28);
+        total_break_time.setTextSize(26);
+      } else {
+        cycles_completed_textView.setTextSize(24);
+
+        total_set_header.setTextSize(22);
+        total_set_time.setTextSize(20);
+        total_break_header.setTextSize(22);
+        total_break_time.setTextSize(20);
+      }
     }
   }
 
@@ -5374,9 +5392,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void logStatsForEachActivityDatabase() {
     AsyncTask.execute(()->{
-      Calendar calendar = Calendar.getInstance(Locale.getDefault());
-      dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
       List<StatsForEachActivity> listOfActivities = new ArrayList<>();
 
       for (int i=0; i<listOfActivities.size(); i++) {
