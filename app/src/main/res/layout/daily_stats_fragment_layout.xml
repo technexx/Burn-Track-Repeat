@@ -433,8 +433,9 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/calories_compared_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintTop_toBottomOf="@id/activity_duration_header_layout"
+        app:layout_constraintBottom_toTopOf="@+id/stats_calendar"
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
@@ -447,7 +448,19 @@
             android:layout_marginTop="6dp"
             android:layout_marginStart="2dp"
             android:textColor="@color/lighter_grey"
-            android:textSize="24sp">
+            android:textSize="20sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_consumed_calories_compared"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="2dp"
+            android:textColor="@color/light_red"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
         </TextView>
 
         <TextView
@@ -457,10 +470,22 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
-            android:layout_marginTop="48dp"
+            android:layout_marginTop="32dp"
             android:layout_marginStart="2dp"
             android:textColor="@color/lighter_grey"
-            android:textSize="22sp">
+            android:textSize="20sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_expended_calories_compared"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:layout_marginEnd="2dp"
+            android:textColor="@color/light_green"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared">
         </TextView>
 
         <TextView
@@ -477,6 +502,18 @@
         </TextView>
 
         <TextView
+            android:id="@+id/total_expended_calories_compared_bmr"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="2dp"
+            android:textColor="@color/yellow_3"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared">
+        </TextView>
+
+        <TextView
             android:id="@+id/total_expended_calories_compared_activities_header"
             android:text="@string/expended_calories_activities"
             android:layout_width="wrap_content"
@@ -490,16 +527,40 @@
         </TextView>
 
         <TextView
+            android:id="@+id/total_expended_calories_compared_activities"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="6dp"
+            android:layout_marginEnd="2dp"
+            android:textColor="@color/yellow_3"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_bmr">
+        </TextView>
+
+        <TextView
             android:id="@+id/total_calories_difference_compared_header"
             android:text="@string/difference_calories"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_activities_header"
-            android:layout_marginStart="2dp"
-            android:layout_marginTop="48dp"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="4dp"
+            android:textSize="20sp"
             android:textColor="@color/lighter_grey"
-            android:textSize="22sp">
+            app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_calories_difference_compared"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="2dp"
+            android:layout_marginBottom="4dp"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared"
+            app:layout_constraintEnd_toEndOf="parent">
         </TextView>
 
         <TextView
@@ -508,71 +569,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_calories_difference_compared_header"
+            android:textSize="20sp"
             android:layout_marginStart="2dp"
-            android:layout_marginTop="6dp"
             android:textColor="@color/lighter_grey"
-            android:textSize="22sp">
-        </TextView>
-
-        <TextView
-            android:id="@+id/total_consumed_calories_compared"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="2dp"
-            android:textSize="22sp"
-            android:textColor="@color/light_red">
-        </TextView>
-
-        <TextView
-            android:id="@+id/total_expended_calories_compared"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
-            android:layout_marginTop="48dp"
-            android:layout_marginEnd="2dp"
-            android:textSize="22sp"
-            android:textColor="@color/light_green">
-        </TextView>
-
-        <TextView
-            android:id="@+id/total_expended_calories_compared_bmr"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="2dp"
-            android:textSize="18sp"
-            android:textColor="@color/yellow_3">
-        </TextView>
-
-        <TextView
-            android:id="@+id/total_expended_calories_compared_activities"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_bmr"
-            android:layout_marginTop="6dp"
-            android:layout_marginEnd="2dp"
-            android:textSize="18sp"
-            android:textColor="@color/yellow_3">
-        </TextView>
-
-        <TextView
-            android:id="@+id/total_calories_difference_compared"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_activities"
-            android:layout_marginEnd="2dp"
-            android:layout_marginTop="48dp"
-            android:textSize="22sp"
-            android:textStyle="bold">
+            app:layout_constraintBottom_toBottomOf="parent">
         </TextView>
 
         <TextView
@@ -580,12 +580,12 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/total_calories_difference_compared"
+            android:textSize="20sp"
             android:layout_marginEnd="2dp"
-            android:layout_marginTop="6dp"
-            android:textSize="22sp"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:textStyle="bold">
         </TextView>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageButton
