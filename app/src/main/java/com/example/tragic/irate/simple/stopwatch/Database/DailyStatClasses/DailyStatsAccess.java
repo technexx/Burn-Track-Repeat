@@ -594,7 +594,6 @@ public class DailyStatsAccess {
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
     }
 
-    //Todo: Check if activity exists for selected day.
     //Used by Main only.
     public void insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(int selectedDay) {
         mStatsForEachActivity = new StatsForEachActivity();

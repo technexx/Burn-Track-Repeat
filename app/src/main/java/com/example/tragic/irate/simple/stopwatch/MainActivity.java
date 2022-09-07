@@ -342,12 +342,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView empty_laps;
   TextView stopwatchReset;
 
-  TextView dailySingleActivityStringHeader;
   TextView dailyTotalTimeTextViewHeader;
   TextView dailyTotalTimeTextView;
   TextView dailyTotalCaloriesTextViewHeader;
   TextView dailyTotalCaloriesTextView;
 
+  TextView dailySingleActivityStringHeader;
   TextView dailyTotalTimeForSingleActivityTextViewHeader;
   TextView dailyTotalTimeForSingleActivityTextView;
   TextView dailyTotalCaloriesForSingleActivityTextViewHeader;
@@ -2909,11 +2909,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
        runOnUiThread(()->{
          if (trackActivityWithinCycle) {
+           toggleCycleTimeTextViewSizes();
            setAllActivityTimesAndCaloriesToTextViews();
          } else {
+           toggleDailyStatsTimerTextViewSizes();
            setCyclesCompletedTextView();
          }
-         toggleCycleTimeTextViewSizes(trackActivityWithinCycle);
 
          if (mode==1) {
            changeTextSizeWithoutAnimator(workoutTime.get(0));
@@ -5075,7 +5076,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedCycleAdapter.removeActiveCycleLayout();
           savedCycleAdapter.notifyDataSetChanged();
         }
-        toggleCycleTimeTextViewSizes(trackActivityWithinCycle);
+        toggleCycleTimeTextViewSizes();
+        toggleDailyStatsTimerTextViewSizes();
 
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
@@ -5115,7 +5117,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setInitialTextSizeForRounds(pomMillis);
       }
-      toggleCycleTimeTextViewSizes(false);
+      toggleCycleTimeTextViewSizes();
 
       pomCyclesTextSizeHasChanged = false;
 
@@ -5221,39 +5223,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void toggleCycleTimeTextViewSizes(boolean trackingActivity) {
+  private void toggleCycleTimeTextViewSizes() {
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
-      if (!trackingActivity) {
-        cycles_completed_textView.setTextSize(24);
+      cycles_completed_textView.setTextSize(24);
 
-        total_set_header.setTextSize(24);
-        total_set_time.setTextSize(22);
-        total_break_header.setTextSize(24);
-        total_break_time.setTextSize(22);
-      } else {
-        cycles_completed_textView.setTextSize(20);
-
-        total_set_header.setTextSize(18);
-        total_set_time.setTextSize(16);
-        total_break_header.setTextSize(18);
-        total_break_time.setTextSize(16);
-      }
+      total_set_header.setTextSize(24);
+      total_set_time.setTextSize(22);
+      total_break_header.setTextSize(24);
+      total_break_time.setTextSize(22);
     } else {
-      if (!trackingActivity) {
-        cycles_completed_textView.setTextSize(28);
+      cycles_completed_textView.setTextSize(28);
 
-        total_set_header.setTextSize(28);
-        total_set_time.setTextSize(26);
-        total_break_header.setTextSize(28);
-        total_break_time.setTextSize(26);
-      } else {
-        cycles_completed_textView.setTextSize(24);
+      total_set_header.setTextSize(28);
+      total_set_time.setTextSize(26);
+      total_break_header.setTextSize(28);
+      total_break_time.setTextSize(26);
+    }
+  }
 
-        total_set_header.setTextSize(22);
-        total_set_time.setTextSize(20);
-        total_break_header.setTextSize(22);
-        total_break_time.setTextSize(20);
-      }
+  private void toggleDailyStatsTimerTextViewSizes() {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
+      tracking_daily_stats_header_textView.setTextSize(22);
+
+      dailyTotalTimeTextViewHeader.setTextSize(22);
+      dailyTotalTimeTextView.setTextSize(22);
+      dailyTotalCaloriesTextViewHeader.setTextSize(22);
+      dailyTotalCaloriesTextView.setTextSize(22);
+
+      dailySingleActivityStringHeader.setTextSize(20);
+      dailyTotalTimeForSingleActivityTextViewHeader.setTextSize(20);
+      dailyTotalCaloriesForSingleActivityTextView.setTextSize(20);
+      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextSize(20);
+      dailyTotalCaloriesForSingleActivityTextView.setTextSize(20);
+
     }
   }
 
