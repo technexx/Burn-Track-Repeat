@@ -63,11 +63,13 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapterTwo;
+import com.example.tragic.irate.simple.stopwatch.Adapters.DotsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.LapAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.SavedCycleAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.SavedPomCycleAdapter;
@@ -342,6 +344,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView empty_laps;
   TextView stopwatchReset;
 
+  ConstraintLayout nonTrackingTimerHeaderLayout;
+  ConstraintLayout trackingTimerHeaderLayout;
+
   TextView dailyTotalTimeTextViewHeader;
   TextView dailyTotalTimeTextView;
   TextView dailyTotalCaloriesTextViewHeader;
@@ -569,9 +574,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int ON_STATS_FOOD_TAB = 1;
 
   boolean statsHaveBeenEdited;
-
   Toast mToast;
 
+  RecyclerView dotsRecycler;
+  DotsAdapter dotsAdapter;
+  List<String> roundListForDots;
+
+  //Todo: For DotDraws replacement: Single recyclerView w/ 0dp height, horiztonal row(s) of textViews w/ background circle.
+  //Todo: Test extra-large screens as well.
+  //Todo: Sizes for stopwatch as well.
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12".
   //Todo: Test all notifications + sound/vibrations + settings.
 
@@ -1560,9 +1571,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void assignTimerPopUpLayoutClassesToTheirIds() {
     dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     reset = timerPopUpView.findViewById(R.id.reset);
+
+    nonTrackingTimerHeaderLayout = timerPopUpView.findViewById(R.id.non_tracking_timer_stat_headers_layout);
+    trackingTimerHeaderLayout = timerPopUpView.findViewById(R.id.tracking_timer_header_layout);
+
     tracking_daily_stats_header_textView = timerPopUpView.findViewById(R.id.tracking_daily_stats_header_textView);
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
-
     cycles_completed_textView = timerPopUpView.findViewById(R.id.cycles_completed_textView);
 
     total_set_header = timerPopUpView.findViewById(R.id.total_set_header);
@@ -1711,6 +1725,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapAdapter = new LapAdapter(getApplicationContext(), currentLapList, savedLapList);
     lapRecycler.setAdapter(lapAdapter);
     lapRecycler.setLayoutManager(lapRecyclerLayoutManager);
+  }
+
+  private void instantiateDotsRecyclerAndAdapter() {
+    roundListForDots = new ArrayList<>();
+    for (int i=0; i<8; i++) {
+      roundListForDots.add(String.valueOf(i));
+    }
+
+    LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+
+    GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
+    gridLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
+    dotsAdapter = new DotsAdapter(getApplicationContext(), roundListForDots);
+
+    dotsRecycler = findViewById(R.id.dots_recyclerView);
+    dotsRecycler.setAdapter(dotsAdapter);
+    dotsRecycler.setLayoutManager(gridLayoutManager);
   }
 
   private void instantiateAnimationAndColorMethods() {
@@ -5177,6 +5208,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleViewsForTotalDailyAndCycleTimes(boolean trackingCycle) {
     if (!trackingCycle) {
+//      nonTrackingTimerHeaderLayout.setVisibility(View.VISIBLE);
+//      trackingTimerHeaderLayout.setVisibility(View.GONE);
+
+      setTotalCycleTimeValuesToTextView();
+
       cycle_title_textView.setVisibility(View.VISIBLE);
       tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
       cycles_completed_textView.setVisibility(View.VISIBLE);
@@ -5197,9 +5233,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalTimeForSingleActivityTextView.setVisibility(View.INVISIBLE);
       dailyTotalCaloriesForSingleActivityTextViewHeader.setVisibility(View.INVISIBLE);
       dailyTotalCaloriesForSingleActivityTextView.setVisibility(View.INVISIBLE);
-
-      setTotalCycleTimeValuesToTextView();
     } else {
+//      nonTrackingTimerHeaderLayout.setVisibility(View.GONE);
+//      trackingTimerHeaderLayout.setVisibility(View.VISIBLE);
+
       cycle_title_textView.setVisibility(View.GONE);
       tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
@@ -5243,12 +5280,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleDailyStatsTimerTextViewSizes() {
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
-      tracking_daily_stats_header_textView.setTextSize(22);
+      tracking_daily_stats_header_textView.setTextSize(20);
 
-      dailyTotalTimeTextViewHeader.setTextSize(22);
-      dailyTotalTimeTextView.setTextSize(22);
-      dailyTotalCaloriesTextViewHeader.setTextSize(22);
-      dailyTotalCaloriesTextView.setTextSize(22);
+      dailyTotalTimeTextViewHeader.setTextSize(20);
+      dailyTotalTimeTextView.setTextSize(20);
+      dailyTotalCaloriesTextViewHeader.setTextSize(20);
+      dailyTotalCaloriesTextView.setTextSize(20);
 
       dailySingleActivityStringHeader.setTextSize(20);
       dailyTotalTimeForSingleActivityTextViewHeader.setTextSize(20);

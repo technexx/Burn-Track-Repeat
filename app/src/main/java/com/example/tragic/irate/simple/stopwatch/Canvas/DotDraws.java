@@ -36,7 +36,6 @@ public class DotDraws extends View {
   ArrayList<String> mPomTime;
 
   int mAlpha = 255;
-  int cycle;
   int mMode;
   int mPomDotCounter;
 
