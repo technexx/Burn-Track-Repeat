@@ -13,7 +13,6 @@
         android:layout_height="wrap_content"
         android:background="@drawable/circle_shape"
         android:textColor="@color/white"
-        android:textSize="30sp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent">
     </TextView>

@@ -1740,6 +1740,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
+
     dotsAdapter = new DotsAdapter(getApplicationContext(), roundListForDots);
 
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
