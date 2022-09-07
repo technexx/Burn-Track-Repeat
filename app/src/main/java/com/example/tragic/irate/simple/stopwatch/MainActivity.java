@@ -45,6 +45,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -580,10 +581,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   DotsAdapter dotsAdapter;
   List<String> roundListForDots;
 
+  ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
+
   //Todo: For DotDraws replacement: Single recyclerView w/ 0dp height, horiztonal row(s) of textViews w/ background circle.
   //Todo: Test extra-large screens as well.
   //Todo: Sizes for stopwatch as well.
-  //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12".
+  //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
   //Todo: Test all notifications + sound/vibrations + settings.
 
   //Todo: Test new day starting total times.
@@ -1377,6 +1380,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateSaveTotalTimesAndCaloriesInDatabaseRunnable();
     instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread();
 
+    instantiateDotsRecyclerAndAdapter();
+
     setAllSortTextViewsOntoClickListeners();
 
     dotDraws.setMode(mode);
@@ -1729,19 +1734,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void instantiateDotsRecyclerAndAdapter() {
     roundListForDots = new ArrayList<>();
-    for (int i=0; i<8; i++) {
-      roundListForDots.add(String.valueOf(i));
+    for (int i=0; i<16; i++) {
+      roundListForDots.add(String.valueOf(i+1));
     }
 
-    LinearLayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
-
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
-    gridLayoutManager.setOrientation(RecyclerView.HORIZONTAL);
+    gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
     dotsAdapter = new DotsAdapter(getApplicationContext(), roundListForDots);
 
-    dotsRecycler = findViewById(R.id.dots_recyclerView);
+    dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
+    dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
+
     dotsRecycler.setAdapter(dotsAdapter);
     dotsRecycler.setLayoutManager(gridLayoutManager);
+  }
+
+  private void adjustDotRecyclerViewSize(int numberOfRows) {
+    if (numberOfRows<=8) {
+      dotsRecyclerLayoutParams.topToBottom = R.id.third_guideline;
+      dotsRecyclerLayoutParams.bottomToTop = R.id.fourth_guideline;
+    } else {
+      dotsRecyclerLayoutParams.topToBottom = R.id.first_guideline;
+      dotsRecyclerLayoutParams.bottomToTop = R.id.second_guideline;
+    }
   }
 
   private void instantiateAnimationAndColorMethods() {
@@ -3552,6 +3567,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
+
+          adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
+          dotsAdapter.setRoundList(convertedWorkoutRoundList);
+          dotsAdapter.notifyDataSetChanged();
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
         }

@@ -21,6 +21,10 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         this.mContext = context; this.mRoundList = roundList;
     }
 
+    public void setRoundList(List<String> roundList) {
+        this.mRoundList = roundList;
+    }
+
     @NonNull
     @Override
     public DotsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
