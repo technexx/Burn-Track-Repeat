@@ -1746,6 +1746,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
     dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
 
+
     dotsRecycler.setAdapter(dotsAdapter);
     dotsRecycler.setLayoutManager(gridLayoutManager);
   }

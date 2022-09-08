@@ -1,6 +1,8 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Typeface;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -8,6 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.R;
@@ -19,9 +22,13 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     Context mContext;
     List<String> mRoundList;
     List<Integer> mCharactersInRoundList;
+    Typeface narrowFont;
+    Typeface narrowFontBold;
+    Typeface bigShouldersFont;
 
     public DotsAdapter(Context context, List<String> roundList) {
         this.mContext = context; this.mRoundList = roundList;
+        instantiateMiscObjects();
     }
 
     public void setRoundList(List<String> roundList) {
@@ -56,13 +63,16 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
         holder.roundText.setText(mRoundList.get(position));
         holder.roundText.setTextSize(textSizeForEachRound(mCharactersInRoundList.get(position)));
+
+        if (mCharactersInRoundList.get(position) >=4) {
+            holder.roundText.setTypeface(bigShouldersFont);
+        }
     }
 
     @Override
     public int getItemCount() {
         return mRoundList.size();
     }
-
 
     public class DotsViewHolder extends RecyclerView.ViewHolder {
         public TextView roundText;
@@ -71,5 +81,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             super(itemView);
             roundText = itemView.findViewById(R.id.round_string_textView);
         }
+    }
+
+    private void instantiateMiscObjects() {
+        narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
+        narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
+        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
     }
 }

@@ -422,7 +422,7 @@ public class DotDraws extends View {
   }
 
   private void drawTextInCircles(ArrayList<String> list, float x, float y, int i) {
-//    Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
+    Typeface narrow = ResourcesCompat.getFont(getContext(), R.font.archivo_narrow);
 
     float modeOneTextSizeForLowDigits = dpConvFloat(30f);
     float modeOneTextSizeForMediumDigits = dpConvFloat(23f);
@@ -482,8 +482,7 @@ public class DotDraws extends View {
         mPaintText.setTextSize(modeOneTextSizeForLowDigits);
         mCanvas.drawText(list.get(i), x, y, mPaintText);
       } else if (list.get(i).length()<=4){
-        //Todo: Uncomment both of these.
-//        mPaintText.setTypeface(narrow);
+        mPaintText.setTypeface(narrow);
         switch (mMode) {
           case 1:
             mPaintText.setTextSize(modeOneTextSizeForMediumDigits);
@@ -499,7 +498,7 @@ public class DotDraws extends View {
             }
         }
       } else {
-//        mPaintText.setTypeface(narrow);
+        mPaintText.setTypeface(narrow);
         switch (mMode) {
           case 1:
             mPaintText.setTextSize(modeOneTextSizeForLargeDigits);
