@@ -28,6 +28,7 @@
         app:layout_constraintBottom_toBottomOf="@id/round_string_imageView"
         app:layout_constraintEnd_toEndOf="@id/round_string_imageView"
         app:layout_constraintStart_toStartOf="@id/round_string_imageView"
-        app:layout_constraintTop_toTopOf="@id/round_string_imageView"></TextView>
+        app:layout_constraintTop_toTopOf="@id/round_string_imageView">
+    </TextView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

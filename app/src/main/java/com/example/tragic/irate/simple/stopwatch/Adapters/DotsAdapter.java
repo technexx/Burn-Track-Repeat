@@ -13,6 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws;
 import com.example.tragic.irate.simple.stopwatch.R;
 
 import java.util.ArrayList;
@@ -32,10 +33,16 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     int mCycleRoundsLeft;
     int mPomDotCounter;
 
-    int mAlpha;
-    int savedModeOneAlpha;
-    int savedModeThreeAlpha;
+    float mAlpha;
+    float savedModeOneAlpha;
+    float savedModeThreeAlpha;
     boolean mFadeUp;
+
+    int SET_COLOR;
+    int BREAK_COLOR;
+    int WORK_COLOR;
+    int MINI_BREAK_COLOR;
+    int FULL_BREAK_COLOR;
 
     Typeface narrowFont;
     Typeface narrowFontBold;
@@ -43,6 +50,16 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     Typeface ignotum;
     Typeface sixCaps;
     Typeface testFont;
+
+    sendDotAlpha mSendDotAlpha;
+
+    public void onAlphaSend(sendDotAlpha xSendDotAlpha)  {
+        this.mSendDotAlpha = xSendDotAlpha;
+    }
+
+    public void setDotAlpha(float alpha) {
+        this.mAlpha = alpha;
+    }
 
     public DotsAdapter(Context context, List<String> roundList) {
         this.mContext = context; this.mCyclesRoundsAsStringsList = roundList;
@@ -96,8 +113,39 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         this.mMode = mode;
     }
 
-    public void setDotAlpha(int alpha) {
-        this.mAlpha = alpha;
+    @Override
+    public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
+        holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
+        holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
+
+        if (mCharactersInCyclesRoundsList.get(position) >=4) {
+            holder.roundText.setTypeface(bigShouldersFont);
+        }
+
+        if (mMode == 1) {
+            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 2) {
+                holder.fullView.setBackgroundColor(SET_COLOR);
+            }
+            if (mRoundTypeList.get(position) == 3 || mRoundTypeList.get(position) == 4) {
+                holder.fullView.setBackgroundColor(BREAK_COLOR);
+            }
+
+            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 3) {
+                holder.fullView.setBackgroundColor(0);
+            }
+            if (mRoundTypeList.get(position) == 2 || mRoundTypeList.get(position) == 4) {
+                holder.fullView.setBackgroundColor(0);
+            }
+
+            if (mCyclesRoundCount - mCycleRoundsLeft == position) {
+//                fadeDot(holder.fullView);
+                holder.fullView.setAlpha(mAlpha);
+            } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
+                holder.fullView.setAlpha(0.3f);
+            } else {
+                holder.fullView.setAlpha(1.0f);
+            }
+        }
     }
 
     public void saveModeOneAlpha() {
@@ -134,20 +182,22 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         return new DotsViewHolder(view);
     }
 
-    @Override
-    public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
-        holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
-        holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
+    private void fadeAlpha() {
+        mSendDotAlpha.sendAlphaValue(mAlpha);
 
-        if (mCharactersInCyclesRoundsList.get(position) >=4) {
-            holder.roundText.setTypeface(bigShouldersFont);
+        if (mAlpha >=1.0f) {
+            mAlpha = 1.0f;
+            mFadeUp = false;
+        }
 
-//            holder.roundText.setTypeface(sixCaps);
-//            holder.roundText.setTextSize(38);
+        if (mAlpha>0.25f && !mFadeUp) {
+            mAlpha -= 0.05;
+        } else {
+            mFadeUp = true;
+        }
 
-//            holder.roundText.setTypeface(ignotum);
-//            holder.roundText.setTextSize(28);
-//            holder.roundText.setTypeface(Typeface.DEFAULT_BOLD);
+        if (mFadeUp) {
+            mAlpha += 0.05;
         }
     }
 
@@ -156,12 +206,37 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         return mCyclesRoundsAsStringsList.size();
     }
 
+    private void fadeDot(View view) {
+        view.setAlpha(mAlpha);
+
+        mSendDotAlpha.sendAlphaValue(mAlpha);
+
+        if (mAlpha >=255) {
+            mAlpha = 255;
+            mFadeUp = false;
+        }
+        if (mAlpha>90 && !mFadeUp){
+            mAlpha -=15;
+        } else {
+            mFadeUp = true;
+        }
+        if (mFadeUp) {
+            mAlpha +=15;
+        }
+    }
+
+    public interface sendDotAlpha {
+        void sendAlphaValue(float alpha);
+    }
+
     public class DotsViewHolder extends RecyclerView.ViewHolder {
+        public View fullView;
         public TextView roundText;
 
         public DotsViewHolder(@NonNull View itemView) {
             super(itemView);
             roundText = itemView.findViewById(R.id.round_string_textView);
+            fullView = itemView;
         }
     }
 
@@ -180,4 +255,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
 //        testFont = ResourcesCompat.getFont(mContext, R.font.sixcaps);
     }
+
+    //            holder.roundText.setTypeface(sixCaps);
+//            holder.roundText.setTextSize(38);
+
+//            holder.roundText.setTypeface(ignotum);
+//            holder.roundText.setTextSize(28);
+//            holder.roundText.setTypeface(Typeface.DEFAULT_BOLD);
 }

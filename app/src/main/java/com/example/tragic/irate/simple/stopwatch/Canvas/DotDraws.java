@@ -279,8 +279,7 @@ public class DotDraws extends View {
             } else {
               fadeDot(false);
             }
-          }
-          //if our remaining rounds added to our current position in the round list is less than the size of the list, mute that position's alpha (i.e. completed rounds).
+          } //if our remaining rounds added to our current position in the round list is less than the size of the list, mute that position's alpha (i.e. completed rounds).
           else if (mCycleRoundsLeft + i < mCyclesRoundCount) {
             mPaint.setAlpha(105);
             //If position is a "count up" round, also mute the text's alpha.
@@ -520,7 +519,7 @@ public class DotDraws extends View {
     }
   }
 
-  public void fadeDot(boolean fadeText) {
+  private void fadeDot(boolean fadeText) {
     mPaint.setAlpha(mAlpha);
     if (fadeText) {
       mPaintText.setAlpha(mAlpha);

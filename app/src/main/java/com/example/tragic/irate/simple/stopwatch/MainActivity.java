@@ -106,7 +106,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DotsAdapter.sendDotAlpha {
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
@@ -450,6 +450,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean stopWatchTextSizeHasChanged;
 
   int receivedAlpha;
+  float receivedDotAlpha;
   View pauseResumeButton;
 
   Runnable infinityTimerForSetsRunnable;
@@ -803,6 +804,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     receivedAlpha = alpha;
   }
 
+
+  @Override
+  public void sendAlphaValue(float alpha) {
+    receivedDotAlpha = alpha;
+  }
+
+
   @Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
     if (resumingOrResetting==RESUMING_CYCLE_FROM_ADAPTER) {
@@ -1154,18 +1162,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     endFade = new Runnable() {
       @Override
       public void run() {
-        dotDraws.reDraw();
+//        dotDraws.reDraw();
+//
+//        if (receivedAlpha <= 105) {
+//          dotDraws.setAlpha(105);
+//          dotDraws.reDraw();
+//
+//          dotsAdapter.setDotAlpha(105);
+//          dotsAdapter.notifyDataSetChanged();
+//
+//          mHandler.removeCallbacks(this);
+//        } else {
+//          mHandler.postDelayed(this, 50);
+//        }
+
         dotsAdapter.notifyDataSetChanged();
 
-        if (receivedAlpha <= 105) {
-          dotDraws.setAlpha(105);
-          dotDraws.reDraw();
+        if (receivedDotAlpha <= 0.3f) {
 
-          dotsAdapter.setDotAlpha(105);
+          dotsAdapter.setDotAlpha(0.3f);
           dotsAdapter.notifyDataSetChanged();
 
           mHandler.removeCallbacks(this);
-        } else mHandler.postDelayed(this, 50);
+        } else {
+          mHandler.postDelayed(this, 50);
+        }
       }
     };
 
