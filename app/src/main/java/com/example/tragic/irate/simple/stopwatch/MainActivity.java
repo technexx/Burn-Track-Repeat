@@ -843,6 +843,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     populateCycleRoundAndRoundTypeArrayLists();
     dotDraws.reDraw();
+    dotsAdapter.notifyDataSetChanged();
 
     if (mode==1) {
       savedCycleAdapter.removeActiveCycleLayout();
@@ -1154,9 +1155,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         dotDraws.reDraw();
+        dotsAdapter.notifyDataSetChanged();
+
         if (receivedAlpha <= 105) {
           dotDraws.setAlpha(105);
           dotDraws.reDraw();
+
+          dotsAdapter.setDotAlpha(105);
+          dotsAdapter.notifyDataSetChanged();
+
           mHandler.removeCallbacks(this);
         } else mHandler.postDelayed(this, 50);
       }
@@ -1386,6 +1393,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dotDraws.setMode(mode);
     dotDraws.onAlphaSend(MainActivity.this);
+
+    dotsAdapter.setMode(mode);
     progressBar.setProgress(maxProgress);
   }
 
@@ -1435,12 +1444,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleRoundsAdapter.setMode(1);
             dotDraws.setMode(1);
             dotDraws.setModeOneDotAlpha();
+
+            dotsAdapter.setMode(1);
+            dotsAdapter.setModeOneAlpha();
             break;
           case 1:
             mode = 3;
             cycleRoundsAdapter.setMode(3);
             dotDraws.setMode(3);
             dotDraws.setModeThreeDotAlpha();
+
+            dotsAdapter.setMode(3);
+            dotsAdapter.setModeThreeAlpha();
             break;
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -1459,6 +1474,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedCycleAdapter.notifyDataSetChanged();
           }
           dotDraws.saveModeOneDotAlpha();
+
+          dotsAdapter.saveModeOneAlpha();
         }
         if (savedCyclesTab.getPosition()==1) {
           if (savedPomCycleAdapter.isCycleHighlighted()==true) {
@@ -1466,6 +1483,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedPomCycleAdapter.notifyDataSetChanged();
           }
           dotDraws.saveModeThreeDotAlpha();
+
+          dotsAdapter.saveModeThreeAlpha();
         }
       }
       @Override
@@ -2290,7 +2309,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         cycleRoundsAdapter.disablePomFade();
-        for (int i=0; i<pomValuesTime.size(); i++) pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(i)/1000));
+        for (int i=0; i<pomValuesTime.size(); i++) {
+          pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(i)/1000));
+        }
         break;
     }
   }
@@ -2603,6 +2624,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = false;
     reset.setVisibility(View.INVISIBLE);
     dotDraws.setMode(mode);
+
+    dotsAdapter.setMode(mode);
 
     if (mode==1) {
       savedCycleRecycler.setVisibility(View.VISIBLE);
@@ -3349,7 +3372,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           pomValuesTime.add(pomValue1 * 1000);
           pomValuesTime.add(pomValue3 * 1000);
-          for (int j=0; j<pomValuesTime.size(); j++) pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(j)/1000));
+          for (int j=0; j<pomValuesTime.size(); j++) {
+            pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(j)/1000));
+          }
 
           cycleRoundsAdapter.setPomFade(true);
           cycleRoundsAdapter.notifyDataSetChanged();
@@ -3567,11 +3592,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           }
 
+          //Todo: Test other phones.
           ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
           adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
-          dotsAdapter.setRoundList(convertedWorkoutRoundList);
+          dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
           dotsAdapter.notifyDataSetChanged();
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
@@ -4206,6 +4232,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.reDraw();
 
+        adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
+        dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
+        dotsAdapter.notifyDataSetChanged();
+
         decreaseTextSizeForTimers(setMillis);
         setNotificationValues();
 
@@ -4244,6 +4274,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.reDraw();
 
+        adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
+        dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
+        dotsAdapter.notifyDataSetChanged();
+
         decreaseTextSizeForTimers(breakMillis);
         setNotificationValues();
         mHandler.postDelayed(this, timerRunnableDelay);
@@ -4280,6 +4314,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         increaseTextSizeForTimers(startMillis, setMillis);
 
         dotDraws.reDraw();
+
+        dotsAdapter.notifyDataSetChanged();
+
         setNotificationValues();
       }
 
@@ -4308,6 +4345,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         increaseTextSizeForTimers(startMillis, breakMillis);
 
         dotDraws.reDraw();
+
+        dotsAdapter.notifyDataSetChanged();
+
         setNotificationValues();
       }
 
@@ -4337,6 +4377,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         increaseTextSizeForTimers(startMillis, pomMillis);
 
         dotDraws.reDraw();
+
+        dotsAdapter.notifyDataSetChanged();
+
         setNotificationValues();
       }
 
@@ -4585,6 +4628,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.setModeOneDotAlpha();
         dotDraws.reDraw();
 
+        dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeft);
+        dotsAdapter.resetModeOneAlpha();
+        dotsAdapter.setModeOneAlpha();
+        dotsAdapter.notifyDataSetChanged();
+
         setMillis = 0;
         breakMillis = 0;
         timerIsPaused = false;
@@ -4646,6 +4694,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.resetModeThreeAlpha();
         dotDraws.setModeThreeDotAlpha();
         dotDraws.reDraw();
+
+        dotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
+        dotsAdapter.resetModeThreeAlpha();
+        dotsAdapter.setModeThreeAlpha();
+        dotsAdapter.notifyDataSetChanged();
 
         if (pomDotCounter<=7) {
           pomMillis = pomValuesTime.get(pomDotCounter);
@@ -5148,6 +5201,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.setModeOneDotAlpha();
         dotDraws.reDraw();
 
+        dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
+        dotsAdapter.setTypeOfRoundList(typeOfRound);
+
+        dotsAdapter.resetModeOneAlpha();
+        dotsAdapter.setModeOneAlpha();
+        dotsAdapter.notifyDataSetChanged();
+
         cyclesTextSizeHasChanged = false;
       }
     }
@@ -5167,6 +5227,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dotDraws.pomDraw(pomDotCounter,pomValuesTime);
 
+        dotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
+
         setInitialTextSizeForRounds(pomMillis);
       }
       toggleCycleTimeTextViewSizes();
@@ -5176,6 +5238,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dotDraws.resetModeThreeAlpha();
       dotDraws.setModeThreeDotAlpha();
       dotDraws.reDraw();
+
+      dotsAdapter.resetModeThreeAlpha();
+      dotsAdapter.setModeThreeAlpha();
+      dotsAdapter.notifyDataSetChanged();
     }
 
     setNotificationValues();

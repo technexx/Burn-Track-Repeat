@@ -29,8 +29,8 @@ public class DotDraws extends View {
   Paint mPaintText;
   Paint mPaintRoundNumbers;
 
-  int mRoundCount;
-  int mRoundsLeft;
+  int mCyclesRoundCount;
+  int mCycleRoundsLeft;
   ArrayList<String> mRoundTimes;
   ArrayList<Integer> mRoundType;
   ArrayList<String> mPomTime;
@@ -139,7 +139,7 @@ public class DotDraws extends View {
   }
 
   public void updateWorkoutRoundCount(int roundCount, int roundsLeft) {
-    this.mRoundCount = roundCount;  this.mRoundsLeft = roundsLeft;
+    this.mCyclesRoundCount = roundCount;  this.mCycleRoundsLeft = roundsLeft;
   }
 
   //Updates list every time it is called w/ a String conversion of our long millis value.
@@ -272,7 +272,7 @@ public class DotDraws extends View {
             setDotStyle(true);
           }
           //If the rounds remaining subtracted from our total rounds equals the position in its list we are drawing, fade that position (i.e. our current round).
-          if (mRoundCount - mRoundsLeft == i) {
+          if (mCyclesRoundCount - mCycleRoundsLeft == i) {
             //If we are in a "count up" round, also fade the text.
             if (mRoundType.get(i)==2 || mRoundType.get(i)==4) {
               fadeDot(true);
@@ -281,7 +281,7 @@ public class DotDraws extends View {
             }
           }
           //if our remaining rounds added to our current position in the round list is less than the size of the list, mute that position's alpha (i.e. completed rounds).
-          else if (mRoundsLeft + i < mRoundCount) {
+          else if (mCycleRoundsLeft + i < mCyclesRoundCount) {
             mPaint.setAlpha(105);
             //If position is a "count up" round, also mute the text's alpha.
             if (mRoundType.get(i)==2 || mRoundType.get(i)==4) {

@@ -20,37 +20,106 @@ import java.util.List;
 
 public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder> {
     Context mContext;
-    List<String> mRoundList;
-    List<Integer> mCharactersInRoundList;
+    int mMode;
+
+    List<String> mCyclesRoundsAsStringsList;
+    List<Integer> mRoundTypeList;
+    List<Integer> mCharactersInCyclesRoundsList;
+    int mCyclesRoundCount;
+    int mCycleRoundsLeft;
+
+    List<String> mPomCycleRoundsAsStringsList;
+    List<Integer> mCharactersInPomCyclesRoundsList;
+    int mPomDotCounter;
+
+    int mAlpha;
+    int savedModeOneAlpha;
+    int savedModeThreeAlpha;
+    boolean mFadeUp;
+
     Typeface narrowFont;
     Typeface narrowFontBold;
-
     Typeface bigShouldersFont;
     Typeface ignotum;
     Typeface sixCaps;
     Typeface testFont;
 
     public DotsAdapter(Context context, List<String> roundList) {
-        this.mContext = context; this.mRoundList = roundList;
+        this.mContext = context; this.mCyclesRoundsAsStringsList = roundList;
         instantiateMiscObjects();
     }
 
-    public void setRoundList(List<String> roundList) {
-        this.mRoundList = roundList;
-        setCharactersInRoundList();
-        Log.i("testRound", "list is " + mCharactersInRoundList);
+    public void setCycleRoundsAsStringsList(List<String> cyclesRoundsAsStringList) {
+        this.mCyclesRoundsAsStringsList = cyclesRoundsAsStringList;
+        setCharactersInCyclesRoundsList();
     }
 
-    private void setCharactersInRoundList() {
-        mCharactersInRoundList = new ArrayList<>();
+    public void setTypeOfRoundList(List<Integer> typeOfRoundsList) {
+        this.mRoundTypeList = typeOfRoundsList;
+    }
 
-        for (int i=0; i<mRoundList.size(); i++) {
-            mCharactersInRoundList.add(mRoundList.get(i).length());
+    public void updateCycleRoundCount(int roundCount, int roundsLeft) {
+        this.mCyclesRoundCount = roundCount; this.mCycleRoundsLeft = roundsLeft;
+    }
+
+    private void setCharactersInCyclesRoundsList() {
+        mCharactersInCyclesRoundsList = new ArrayList<>();
+
+        for (int i=0; i<mCyclesRoundsAsStringsList.size(); i++) {
+            mCharactersInCyclesRoundsList.add(mCyclesRoundsAsStringsList.get(i).length());
+        }
+    }
+
+    public void setPomCycleRoundsAsStringsList(List<String> pomCyclesRoundsAsStringsList) {
+        this.mPomCycleRoundsAsStringsList = pomCyclesRoundsAsStringsList;
+    }
+
+    public void updatePomDotCounter(int pomDotCounter) {
+        this.mPomDotCounter = pomDotCounter;
+    }
+
+    private void setCharactersInPomCyclesRoundsList() {
+        mCharactersInPomCyclesRoundsList = new ArrayList<>();
+
+        for (int i=0; i<mPomCycleRoundsAsStringsList.size(); i++) {
+            mCharactersInPomCyclesRoundsList.add(mPomCycleRoundsAsStringsList.get(i).length());
         }
     }
 
     private float textSizeForEachRound(int numberOfRoundChars) {
         return 40 - (5* (numberOfRoundChars-1));
+    }
+
+    public void setMode(int mode) {
+        this.mMode = mode;
+    }
+
+    public void setDotAlpha(int alpha) {
+        this.mAlpha = alpha;
+    }
+
+    public void saveModeOneAlpha() {
+        savedModeOneAlpha = mAlpha;
+    }
+
+    public void saveModeThreeAlpha() {
+        savedModeThreeAlpha = mAlpha;
+    }
+
+    public void setModeOneAlpha() {
+        mAlpha = savedModeOneAlpha;
+    }
+
+    public void setModeThreeAlpha() {
+        mAlpha = savedModeThreeAlpha;
+    }
+
+    public void resetModeOneAlpha() {
+        savedModeOneAlpha = 255;
+    }
+
+    public void resetModeThreeAlpha() {
+        savedModeThreeAlpha = 255;
     }
 
     @NonNull
@@ -65,10 +134,10 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
-        holder.roundText.setText(mRoundList.get(position));
-        holder.roundText.setTextSize(textSizeForEachRound(mCharactersInRoundList.get(position)));
+        holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
+        holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
 
-        if (mCharactersInRoundList.get(position) >=4) {
+        if (mCharactersInCyclesRoundsList.get(position) >=4) {
             holder.roundText.setTypeface(bigShouldersFont);
 
 //            holder.roundText.setTypeface(sixCaps);
@@ -82,7 +151,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     @Override
     public int getItemCount() {
-        return mRoundList.size();
+        return mCyclesRoundsAsStringsList.size();
     }
 
     public class DotsViewHolder extends RecyclerView.ViewHolder {
