@@ -795,6 +795,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     dotDraws.changeColorSetting(typeOFRound, settingNumber);
+
+    dotsAdapter.changeColorSetting(typeOFRound, settingNumber);
+
     assignColorSettingValues(typeOFRound, settingNumber);
   }
 
@@ -1417,6 +1420,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws.setMode(mode);
     dotDraws.onAlphaSend(MainActivity.this);
 
+    dotsAdapter.onAlphaSend(MainActivity.this);
     dotsAdapter.setMode(mode);
     progressBar.setProgress(maxProgress);
   }
@@ -2477,6 +2481,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws.changeColorSetting(3, workColorNumericValue);
     dotDraws.changeColorSetting(4, miniBreakColorNumericValue);
     dotDraws.changeColorSetting(5, fullBreakColorNumericValue);
+
+    dotsAdapter.changeColorSetting(1, setColorNumericValue);
+    dotsAdapter.changeColorSetting(2, breakColorNumericValue);
+    dotsAdapter.changeColorSetting(3, workColorNumericValue);
+    dotsAdapter.changeColorSetting(4, miniBreakColorNumericValue);
+    dotsAdapter.changeColorSetting(5, fullBreakColorNumericValue);
 
     cycleRoundsAdapter.changeColorSetting(1, setColorNumericValue);
     cycleRoundsAdapter.changeColorSetting(2, breakColorNumericValue);

@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws;
 import com.example.tragic.irate.simple.stopwatch.R;
+import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ChangeSettingsValues;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,6 +23,7 @@ import java.util.List;
 public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder> {
     Context mContext;
     int mMode;
+    ChangeSettingsValues changeSettingsValues;
 
     List<String> mCyclesRoundsAsStringsList;
     List<Integer> mRoundTypeList;
@@ -113,6 +115,15 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         this.mMode = mode;
     }
 
+    public void changeColorSetting(int typeOFRound, int settingNumber) {
+        if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==4) MINI_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==5) FULL_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+    }
+
+    //Todo: For Pom as well.
     @Override
     public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
         holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
@@ -122,33 +133,35 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             holder.roundText.setTypeface(bigShouldersFont);
         }
 
-        Log.i("testDots", "updating at position " + position);
-//
-//        if (mMode == 1) {
-//            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 2) {
-//                holder.fullView.setBackgroundColor(SET_COLOR);
-//            }
-//            if (mRoundTypeList.get(position) == 3 || mRoundTypeList.get(position) == 4) {
-//                holder.fullView.setBackgroundColor(BREAK_COLOR);
-//            }
-//
-//            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 3) {
+//        Log.i("testDots", "updating at position " + position);
+
+        if (mMode == 1) {
+            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 2) {
+                holder.fullView.setBackgroundColor(SET_COLOR);
+                Log.i("testDots", "set color is " + SET_COLOR + " at position " + position);
+            }
+
+            if (mRoundTypeList.get(position) == 3 || mRoundTypeList.get(position) == 4) {
+                holder.fullView.setBackgroundColor(BREAK_COLOR);
+            }
+
+            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 3) {
 //                holder.fullView.setBackgroundColor(0);
-//            }
-//            if (mRoundTypeList.get(position) == 2 || mRoundTypeList.get(position) == 4) {
-//                holder.fullView.setBackgroundColor(0);
-//            }
-//
-//            if (mCyclesRoundCount - mCycleRoundsLeft == position) {
-////                fadeDot(holder.fullView);
-//                fadeAlpha();
-//                holder.fullView.setAlpha(mAlpha);
-//            } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
-//                holder.fullView.setAlpha(0.3f);
-//            } else {
-//                holder.fullView.setAlpha(1.0f);
-//            }
-//        }
+            }
+
+            if (mRoundTypeList.get(position) == 2 || mRoundTypeList.get(position) == 4) {
+                holder.fullView.setBackgroundColor(0);
+            }
+
+            if (mCyclesRoundCount - mCycleRoundsLeft == position) {
+                fadeAlpha();
+                holder.fullView.setAlpha(mAlpha);
+            } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
+                holder.fullView.setAlpha(0.3f);
+            } else {
+                holder.fullView.setAlpha(1.0f);
+            }
+        }
     }
 
     public void saveModeOneAlpha() {
@@ -206,7 +219,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     @Override
     public int getItemCount() {
-        Log.i("testDots", "string list size is " + mCyclesRoundsAsStringsList.size());
+//        Log.i("testDots", "string list size is " + mCyclesRoundsAsStringsList.size());
         return mCyclesRoundsAsStringsList.size();
     }
 
@@ -251,6 +264,8 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     }
 
     private void instantiateMiscObjects() {
+        changeSettingsValues = new ChangeSettingsValues();
+
         narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
         narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
         bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
