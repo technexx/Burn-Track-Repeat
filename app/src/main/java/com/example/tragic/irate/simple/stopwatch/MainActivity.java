@@ -4696,6 +4696,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.reDraw();
 
         dotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
+        dotsAdapter.updatePomDotCounter(pomDotCounter);
         dotsAdapter.resetModeThreeAlpha();
         dotsAdapter.setModeThreeAlpha();
         dotsAdapter.notifyDataSetChanged();
@@ -5225,9 +5226,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomMillis = pomValuesTime.get(0);
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
 
-        dotDraws.pomDraw(pomDotCounter,pomValuesTime);
+        dotDraws.pomDraw(pomDotCounter, pomValuesTime);
 
         dotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
+        dotsAdapter.updatePomDotCounter(pomDotCounter);
 
         setInitialTextSizeForRounds(pomMillis);
       }

@@ -24,12 +24,12 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     List<String> mCyclesRoundsAsStringsList;
     List<Integer> mRoundTypeList;
+    List<String> mPomCycleRoundsAsStringsList;
     List<Integer> mCharactersInCyclesRoundsList;
+    List<Integer> mCharactersInPomCyclesRoundsList;
+
     int mCyclesRoundCount;
     int mCycleRoundsLeft;
-
-    List<String> mPomCycleRoundsAsStringsList;
-    List<Integer> mCharactersInPomCyclesRoundsList;
     int mPomDotCounter;
 
     int mAlpha;
@@ -51,6 +51,8 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     public void setCycleRoundsAsStringsList(List<String> cyclesRoundsAsStringList) {
         this.mCyclesRoundsAsStringsList = cyclesRoundsAsStringList;
+
+        instantiateLists();
         setCharactersInCyclesRoundsList();
     }
 
@@ -161,6 +163,12 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             super(itemView);
             roundText = itemView.findViewById(R.id.round_string_textView);
         }
+    }
+
+    private void instantiateLists() {
+        mCyclesRoundsAsStringsList = new ArrayList<>();
+        mRoundTypeList = new ArrayList<>();
+        mPomCycleRoundsAsStringsList  = new ArrayList<>();
     }
 
     private void instantiateMiscObjects() {
