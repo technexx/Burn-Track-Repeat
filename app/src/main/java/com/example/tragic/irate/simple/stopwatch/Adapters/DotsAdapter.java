@@ -38,6 +38,10 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
     }
 
+    private float textSizeForEachRound(int numberOfRoundChars) {
+        return 40 - (5* (numberOfRoundChars-1));
+    }
+
     @NonNull
     @Override
     public DotsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -51,6 +55,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     @Override
     public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
         holder.roundText.setText(mRoundList.get(position));
+        holder.roundText.setTextSize(textSizeForEachRound(mCharactersInRoundList.get(position)));
     }
 
     @Override
