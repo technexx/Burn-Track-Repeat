@@ -6,8 +6,9 @@
     android:layout_marginStart="2dp"
     android:layout_marginTop="28dp"
     android:layout_marginEnd="2dp"
-    android:background="@color/dark_grey">
+    android:background="@drawable/dots_border">
 
+    <!--Setting src/background image here cuts off left/right sides-->
     <ImageView
         android:id="@+id/round_string_imageView"
         android:layout_width="62dp"
@@ -19,6 +20,7 @@
         >
     </ImageView>
 
+    <!--ImageView meant to be main visual. This just sets text directly inside it. -->
     <TextView
         android:id="@+id/round_string_textView"
         android:layout_width="wrap_content"

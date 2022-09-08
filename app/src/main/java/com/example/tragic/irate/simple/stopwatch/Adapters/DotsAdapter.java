@@ -7,9 +7,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -61,6 +63,47 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     public void setDotAlpha(float alpha) {
         this.mAlpha = alpha;
+    }
+
+    //Todo: For Pom as well.
+    @Override
+    public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
+        holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
+        holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
+
+        if (mCharactersInCyclesRoundsList.get(position) >=4) {
+            holder.roundText.setTypeface(bigShouldersFont);
+        }
+
+//        Log.i("testDots", "updating at position " + position);
+
+        if (mMode == 1) {
+            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 2) {
+//                holder.fullView.setBackgroundColor(SET_COLOR);
+
+            }
+
+            if (mRoundTypeList.get(position) == 3 || mRoundTypeList.get(position) == 4) {
+                holder.fullView.setBackgroundColor(BREAK_COLOR);
+            }
+
+            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 3) {
+//                holder.fullView.setBackgroundColor(0);
+            }
+
+            if (mRoundTypeList.get(position) == 2 || mRoundTypeList.get(position) == 4) {
+                holder.fullView.setBackgroundColor(0);
+            }
+
+            if (mCyclesRoundCount - mCycleRoundsLeft == position) {
+                fadeAlpha();
+                holder.fullView.setAlpha(mAlpha);
+            } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
+                holder.fullView.setAlpha(0.3f);
+            } else {
+                holder.fullView.setAlpha(1.0f);
+            }
+        }
     }
 
     public DotsAdapter(Context context, List<String> cycleRoundsAsStringList, List<Integer> typeOfRoundList) {
@@ -123,44 +166,22 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         if (typeOFRound==5) FULL_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
     }
 
-    //Todo: For Pom as well.
-    @Override
-    public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
-        holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
-        holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
+    private void fadeAlpha() {
+        mSendDotAlpha.sendAlphaValue(mAlpha);
 
-        if (mCharactersInCyclesRoundsList.get(position) >=4) {
-            holder.roundText.setTypeface(bigShouldersFont);
+        if (mAlpha >=1.0f) {
+            mAlpha = 1.0f;
+            mFadeUp = false;
         }
 
-//        Log.i("testDots", "updating at position " + position);
+        if (mAlpha>0.25f && !mFadeUp) {
+            mAlpha -= 0.05;
+        } else {
+            mFadeUp = true;
+        }
 
-        if (mMode == 1) {
-            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 2) {
-                holder.fullView.setBackgroundColor(SET_COLOR);
-                Log.i("testDots", "set color is " + SET_COLOR + " at position " + position);
-            }
-
-            if (mRoundTypeList.get(position) == 3 || mRoundTypeList.get(position) == 4) {
-                holder.fullView.setBackgroundColor(BREAK_COLOR);
-            }
-
-            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 3) {
-//                holder.fullView.setBackgroundColor(0);
-            }
-
-            if (mRoundTypeList.get(position) == 2 || mRoundTypeList.get(position) == 4) {
-                holder.fullView.setBackgroundColor(0);
-            }
-
-            if (mCyclesRoundCount - mCycleRoundsLeft == position) {
-                fadeAlpha();
-                holder.fullView.setAlpha(mAlpha);
-            } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
-                holder.fullView.setAlpha(0.3f);
-            } else {
-                holder.fullView.setAlpha(1.0f);
-            }
+        if (mFadeUp) {
+            mAlpha += 0.05;
         }
     }
 
@@ -198,48 +219,10 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         return new DotsViewHolder(view);
     }
 
-    private void fadeAlpha() {
-        mSendDotAlpha.sendAlphaValue(mAlpha);
-
-        if (mAlpha >=1.0f) {
-            mAlpha = 1.0f;
-            mFadeUp = false;
-        }
-
-        if (mAlpha>0.25f && !mFadeUp) {
-            mAlpha -= 0.05;
-        } else {
-            mFadeUp = true;
-        }
-
-        if (mFadeUp) {
-            mAlpha += 0.05;
-        }
-    }
-
     @Override
     public int getItemCount() {
 //        Log.i("testDots", "string list size is " + mCyclesRoundsAsStringsList.size());
         return mCyclesRoundsAsStringsList.size();
-    }
-
-    private void fadeDot(View view) {
-        view.setAlpha(mAlpha);
-
-        mSendDotAlpha.sendAlphaValue(mAlpha);
-
-        if (mAlpha >=255) {
-            mAlpha = 255;
-            mFadeUp = false;
-        }
-        if (mAlpha>90 && !mFadeUp){
-            mAlpha -=15;
-        } else {
-            mFadeUp = true;
-        }
-        if (mFadeUp) {
-            mAlpha +=15;
-        }
     }
 
     public interface sendDotAlpha {
@@ -249,10 +232,12 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     public class DotsViewHolder extends RecyclerView.ViewHolder {
         public View fullView;
         public TextView roundText;
+        public ImageView roundImageView;
 
         public DotsViewHolder(@NonNull View itemView) {
             super(itemView);
             roundText = itemView.findViewById(R.id.round_string_textView);
+//            roundImageView = itemView.findViewById(R.id.round_string_imageView);
             fullView = itemView;
         }
     }
