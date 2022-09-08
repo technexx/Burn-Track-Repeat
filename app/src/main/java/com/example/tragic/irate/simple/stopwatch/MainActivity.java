@@ -850,7 +850,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     populateCycleRoundAndRoundTypeArrayLists();
+
     dotDraws.reDraw();
+
     dotsAdapter.notifyDataSetChanged();
 
     if (mode==1) {
@@ -1778,10 +1780,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundListForDots.add(String.valueOf(i+1));
     }
 
+    ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
 
-    dotsAdapter = new DotsAdapter(getApplicationContext(), roundListForDots);
+    dotsAdapter = new DotsAdapter(getApplicationContext(), convertedWorkoutRoundList, typeOfRound);
 
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
     dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
@@ -3619,7 +3623,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
           dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
+          dotsAdapter.setTypeOfRoundList(typeOfRound);
           dotsAdapter.notifyDataSetChanged();
+
+          Log.i("testDots", "list passed in from Main is " + convertedWorkoutRoundList);
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
         }
@@ -4255,6 +4262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
+        dotsAdapter.setTypeOfRoundList(typeOfRound);
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(setMillis);
@@ -4297,6 +4305,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
+        dotsAdapter.setTypeOfRoundList(typeOfRound);
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(breakMillis);
