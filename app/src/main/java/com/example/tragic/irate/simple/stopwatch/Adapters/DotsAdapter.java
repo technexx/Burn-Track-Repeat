@@ -24,7 +24,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     List<Integer> mCharactersInRoundList;
     Typeface narrowFont;
     Typeface narrowFontBold;
+
     Typeface bigShouldersFont;
+    Typeface ignotum;
+    Typeface sixCaps;
+    Typeface testFont;
 
     public DotsAdapter(Context context, List<String> roundList) {
         this.mContext = context; this.mRoundList = roundList;
@@ -66,6 +70,13 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
         if (mCharactersInRoundList.get(position) >=4) {
             holder.roundText.setTypeface(bigShouldersFont);
+
+//            holder.roundText.setTypeface(sixCaps);
+//            holder.roundText.setTextSize(38);
+
+//            holder.roundText.setTypeface(ignotum);
+//            holder.roundText.setTextSize(28);
+//            holder.roundText.setTypeface(Typeface.DEFAULT_BOLD);
         }
     }
 
@@ -87,5 +98,9 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
         narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
         bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
+        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
+        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
+
+//        testFont = ResourcesCompat.getFont(mContext, R.font.sixcaps);
     }
 }
