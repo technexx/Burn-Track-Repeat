@@ -584,11 +584,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
-  //Todo: For DotDraws replacement: Single recyclerView w/ 0dp height, horiztonal row(s) of textViews w/ background circle.
-  //Todo: Test extra-large screens as well.
-  //Todo: Sizes for stopwatch as well.
+  //Todo: Text size changes w/ in dots needs to run in bindView, since infinity rounds will change within dot itself.
+  //Todo: Test sizes for stopwatch as well.
+  //Todo: Calories iterating w/ paused timer.
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
-  //Todo: Test all notifications + sound/vibrations + settings.
 
   //Todo: Test new day starting total times.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -599,6 +598,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
 
+  //Todo: Test extra-large screens as well.
+  //Todo: Test all notifications + sound/vibrations + settings.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test w/ fresh install for all default values.

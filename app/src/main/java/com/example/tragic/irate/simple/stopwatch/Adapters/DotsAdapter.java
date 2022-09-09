@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -52,6 +53,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     int WORK_COLOR;
     int MINI_BREAK_COLOR;
     int FULL_BREAK_COLOR;
+    GradientDrawable dotsBorder;
 
     Typeface narrowFont;
     Typeface narrowFontBold;
@@ -80,15 +82,17 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             holder.roundText.setTypeface(bigShouldersFont);
         }
 
-//        Log.i("testDots", "updating at position " + position);
-
         if (mMode == 1) {
             if (mRoundTypeList.get(position) == 1) {
-                holder.fullView.getBackground().setColorFilter(ContextCompat.getColor(mContext, SET_COLOR), PorterDuff.Mode.SRC_OVER);
+                dotsBorder.setColor(SET_COLOR);
+                holder.fullView.setBackground(dotsBorder);
+
+//                holder.fullView.getBackground().setColorFilter(ContextCompat.getColor(mContext, SET_COLOR), PorterDuff.Mode.SRC_OVER);
             }
 
             if (mRoundTypeList.get(position) == 3) {
-                holder.fullView.setBackgroundColor(BREAK_COLOR);
+                dotsBorder.setColor(BREAK_COLOR);
+                holder.fullView.setBackground(dotsBorder);
             }
 
 
@@ -156,11 +160,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     }
 
     public void changeColorSetting(int typeOFRound, int settingNumber) {
-        if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
-        if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
-        if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
-        if (typeOFRound==4) MINI_BREAK_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
-        if (typeOFRound==5) FULL_BREAK_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
+        if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==4) MINI_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==5) FULL_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
     }
 
     private void fadeAlpha() {
@@ -247,6 +251,8 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     private void instantiateMiscObjects() {
         changeSettingsValues = new ChangeSettingsValues();
+
+        dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
         narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
         narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
