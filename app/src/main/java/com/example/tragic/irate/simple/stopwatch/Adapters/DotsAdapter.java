@@ -2,7 +2,12 @@ package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
 import android.content.res.Resources;
+import android.graphics.BlendMode;
+import android.graphics.BlendModeColorFilter;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.Drawable;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -78,22 +83,14 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 //        Log.i("testDots", "updating at position " + position);
 
         if (mMode == 1) {
-            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 2) {
-//                holder.fullView.setBackgroundColor(SET_COLOR);
-
+            if (mRoundTypeList.get(position) == 1) {
+                holder.fullView.getBackground().setColorFilter(ContextCompat.getColor(mContext, SET_COLOR), PorterDuff.Mode.SRC_OVER);
             }
 
-            if (mRoundTypeList.get(position) == 3 || mRoundTypeList.get(position) == 4) {
+            if (mRoundTypeList.get(position) == 3) {
                 holder.fullView.setBackgroundColor(BREAK_COLOR);
             }
 
-            if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 3) {
-//                holder.fullView.setBackgroundColor(0);
-            }
-
-            if (mRoundTypeList.get(position) == 2 || mRoundTypeList.get(position) == 4) {
-                holder.fullView.setBackgroundColor(0);
-            }
 
             if (mCyclesRoundCount - mCycleRoundsLeft == position) {
                 fadeAlpha();
@@ -159,11 +156,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     }
 
     public void changeColorSetting(int typeOFRound, int settingNumber) {
-        if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
-        if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
-        if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
-        if (typeOFRound==4) MINI_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
-        if (typeOFRound==5) FULL_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
+        if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
+        if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
+        if (typeOFRound==4) MINI_BREAK_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
+        if (typeOFRound==5) FULL_BREAK_COLOR = changeSettingsValues.assignColorAsIntValue(settingNumber);
     }
 
     private void fadeAlpha() {

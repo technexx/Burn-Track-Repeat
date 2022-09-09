@@ -56,4 +56,11 @@
     <color name="test_bg"> #212f3c </color>
     <color name="test_bg2"> #201d1d </color>
 
+    <color name="android_green">#ff00ff00</color>
+    <color name="android_red">#ffff0000</color>
+    <color name="android_blue">#ff0000ff</color>
+    <color name="android_yellow">#ffffff00</color>
+    <color name="android_magenta">#ffff00ff</color>
+    <color name="android_cyan">#ff00ffff</color>
+
 </resources>

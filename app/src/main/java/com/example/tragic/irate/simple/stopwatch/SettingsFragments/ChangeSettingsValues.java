@@ -9,6 +9,7 @@ import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
 
+import com.example.tragic.irate.simple.stopwatch.R;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
 
 public class ChangeSettingsValues {
@@ -91,6 +92,19 @@ public class ChangeSettingsValues {
         if (setting==3) color = Color.YELLOW;
         if (setting==4) color = Color.MAGENTA;
         if (setting==5) color = Color.CYAN;
+
+        return color;
+    }
+
+    public int assignColorAsIntValue(int setting) {
+        int color = 0;
+
+        if (setting==0) color = R.color.android_green;
+        if (setting==1) color = R.color.android_red;
+        if (setting==2) color = R.color.android_blue;
+        if (setting==3) color = R.color.android_yellow;
+        if (setting==4) color = R.color.android_magenta;
+        if (setting==5) color = R.color.android_cyan;
 
         return color;
     }
