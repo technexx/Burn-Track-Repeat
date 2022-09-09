@@ -586,6 +586,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Text size changes w/ in dots needs to run in bindView, since infinity rounds will change within dot itself.
   //Todo: Test sizes for stopwatch as well.
+  //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Calories iterating w/ paused timer.
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
 
@@ -3637,7 +3638,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dotsAdapter.setTypeOfRoundList(typeOfRound);
           dotsAdapter.notifyDataSetChanged();
 
-          Log.i("testDots", "list passed in from Main is " + convertedWorkoutRoundList);
+//          Log.i("testDots", "list passed in from Main is " + convertedWorkoutRoundList);
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
         }

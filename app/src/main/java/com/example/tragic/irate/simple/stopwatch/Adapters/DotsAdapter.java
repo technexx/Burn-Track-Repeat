@@ -83,17 +83,29 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
 
         if (mMode == 1) {
+            dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
+
             if (mRoundTypeList.get(position) == 1) {
                 dotsBorder.setColor(SET_COLOR);
-                holder.fullView.setBackground(dotsBorder);
+                dotsBorder.setStroke(3, Color.WHITE);
+            }
 
-//                holder.fullView.getBackground().setColorFilter(ContextCompat.getColor(mContext, SET_COLOR), PorterDuff.Mode.SRC_OVER);
+            if (mRoundTypeList.get(position) == 2) {
+                dotsBorder.setColor(0);
+                dotsBorder.setStroke(3, SET_COLOR);
             }
 
             if (mRoundTypeList.get(position) == 3) {
                 dotsBorder.setColor(BREAK_COLOR);
-                holder.fullView.setBackground(dotsBorder);
+                dotsBorder.setStroke(3, Color.WHITE);
             }
+
+            if (mRoundTypeList.get(position) == 4) {
+                dotsBorder.setColor(0);
+                dotsBorder.setStroke(3, BREAK_COLOR);
+            }
+            holder.fullView.setBackground(dotsBorder);
+
 
 
             if (mCyclesRoundCount - mCycleRoundsLeft == position) {
@@ -269,4 +281,5 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 //            holder.roundText.setTypeface(ignotum);
 //            holder.roundText.setTextSize(28);
 //            holder.roundText.setTypeface(Typeface.DEFAULT_BOLD);
+//               holder.fullView.getBackground().setColorFilter(ContextCompat.getColor(mContext, SET_COLOR), PorterDuff.Mode.SRC_OVER);
 }
