@@ -5157,11 +5157,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetTimer() {
-    activeCycle = false;
-    timerIsPaused = true;
-    timerEnded = false;
-    timerDisabled = false;
-    next_round.setEnabled(true);
+    mHandler.removeCallbacks(infinityTimerForSetsRunnable);
+    mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
+
+    if (objectAnimator != null) {
+      objectAnimator.cancel();
+    }
 
     vibrator.cancel();
     if (timer != null) timer.cancel();
@@ -5170,6 +5171,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mediaPlayer.stop();
       mediaPlayer.reset();
     }
+
+    if (savedCycleAdapter.isCycleActive()==true) {
+      savedCycleAdapter.removeActiveCycleLayout();
+      savedCycleAdapter.notifyDataSetChanged();
+    }
+
+    toggleCycleTimeTextViewSizes();
+    toggleDailyStatsTimerTextViewSizes();
+
+    activeCycle = false;
+    timerIsPaused = true;
+    timerEnded = false;
+    timerDisabled = false;
+    next_round.setEnabled(true);
 
     progressBar.setProgress(10000);
     currentProgressBarValue = 10000;
@@ -5184,9 +5199,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleLayoutParamsForCyclesAndStopwatch();
     setCyclesCompletedTextView();
 
-    //////////////////////////////////
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-    //////////////////////////////////
 
     if (mode==1) {
       if (workoutTime.size()>0) {
@@ -5212,29 +5225,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setInitialTextSizeForRounds(0);
             break;
         };
-        numberOfRoundsLeft = workoutTime.size();
-        currentRound = 0;
-
-        mHandler.removeCallbacks(infinityTimerForSetsRunnable);
-        mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
-
-        if (objectAnimator != null) objectAnimator.cancel();
-
-        if (savedCycleAdapter.isCycleActive()==true) {
-          savedCycleAdapter.removeActiveCycleLayout();
-          savedCycleAdapter.notifyDataSetChanged();
-        }
-        toggleCycleTimeTextViewSizes();
-        toggleDailyStatsTimerTextViewSizes();
 
         for (int i=0; i<workoutTime.size(); i++) {
-          if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) workoutTime.set(i, 0);
+          if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) {
+            workoutTime.set(i, 0);
+          }
         }
 
+        currentRound = 0;
         startRounds = workoutTime.size();
         numberOfRoundsLeft = startRounds;
 
-        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
+//        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
 
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
@@ -5246,6 +5248,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.setTypeOfRoundList(typeOfRound);
+        dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeft);
 
         dotsAdapter.resetModeOneAlpha();
         dotsAdapter.setModeOneAlpha();

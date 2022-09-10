@@ -82,7 +82,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     }
 
     private float textSizeForEachRound(int numberOfRoundChars) {
-        int floatToReturn = 40 - (5 * (numberOfRoundChars-1));
+        int floatToReturn = 40 - (6 * (numberOfRoundChars-1));
 
         return floatToReturn;
     }
@@ -91,12 +91,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     @Override
     public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
         holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
-
         holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
 
-        if (mCharactersInCyclesRoundsList.get(position) >=0) {
-            holder.roundText.setTypeface(bigShouldersFont);
-        }
+//        if (mCharactersInCyclesRoundsList.get(position) >=0) {
+//            holder.roundText.setTypeface(bigShouldersFont);
+//        }
 
         if (mMode == 1) {
             dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
@@ -125,12 +124,17 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             if (mCyclesRoundCount - mCycleRoundsLeft == position) {
                 fadeAlpha();
                 holder.fullView.setAlpha(mAlpha);
-
+                Log.i("testFade", "fading position " + position);
             } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
                 holder.fullView.setAlpha(0.3f);
+                Log.i("testFade", "low alpha positions are " + position);
             } else {
                 holder.fullView.setAlpha(1.0f);
+                Log.i("testFade", "full alpha positions are " + position);
             }
+
+//            Log.i("testFade", "rounds left are " + mCycleRoundsLeft);
+//            Log.i("testFade", "round count is " + mCyclesRoundCount);
         }
     }
 
