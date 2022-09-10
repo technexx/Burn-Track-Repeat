@@ -10,6 +10,7 @@ import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -72,13 +73,28 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         this.mAlpha = alpha;
     }
 
+
+    public DotsAdapter(Context context, List<String> cycleRoundsAsStringList, List<Integer> typeOfRoundList) {
+        this.mContext = context; this.mCyclesRoundsAsStringsList = cycleRoundsAsStringList; this.mRoundTypeList = typeOfRoundList;
+        instantiateMiscObjects();
+        instantiateLists();
+
+    }
+
+    private float textSizeForEachRound(int numberOfRoundChars) {
+        int floatToReturn = 40 - (5 * (numberOfRoundChars-1));
+
+        return floatToReturn;
+    }
+
     //Todo: For Pom as well.
     @Override
     public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
         holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
+
         holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
 
-        if (mCharactersInCyclesRoundsList.get(position) >=4) {
+        if (mCharactersInCyclesRoundsList.get(position) >=0) {
             holder.roundText.setTypeface(bigShouldersFont);
         }
 
@@ -109,6 +125,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             if (mCyclesRoundCount - mCycleRoundsLeft == position) {
                 fadeAlpha();
                 holder.fullView.setAlpha(mAlpha);
+
             } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
                 holder.fullView.setAlpha(0.3f);
             } else {
@@ -117,16 +134,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
     }
 
-    public DotsAdapter(Context context, List<String> cycleRoundsAsStringList, List<Integer> typeOfRoundList) {
-        this.mContext = context; this.mCyclesRoundsAsStringsList = cycleRoundsAsStringList; this.mRoundTypeList = typeOfRoundList;
-        instantiateMiscObjects();
-        instantiateLists();
-    }
-
     public void setCycleRoundsAsStringsList(List<String> cyclesRoundsAsStringList) {
         this.mCyclesRoundsAsStringsList = cyclesRoundsAsStringList;
 
         setCharactersInCyclesRoundsList();
+
     }
 
     public void setTypeOfRoundList(List<Integer> typeOfRoundsList) {
@@ -143,6 +155,8 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         for (int i=0; i<mCyclesRoundsAsStringsList.size(); i++) {
             mCharactersInCyclesRoundsList.add(mCyclesRoundsAsStringsList.get(i).length());
         }
+
+        Log.i("testSize", "list being set is " + mCharactersInCyclesRoundsList);
     }
 
     public void setPomCycleRoundsAsStringsList(List<String> pomCyclesRoundsAsStringsList) {
@@ -159,10 +173,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         for (int i=0; i<mPomCycleRoundsAsStringsList.size(); i++) {
             mCharactersInPomCyclesRoundsList.add(mPomCycleRoundsAsStringsList.get(i).length());
         }
-    }
-
-    private float textSizeForEachRound(int numberOfRoundChars) {
-        return 40 - (5* (numberOfRoundChars-1));
     }
 
     public void setMode(int mode) {
@@ -248,7 +258,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         public DotsViewHolder(@NonNull View itemView) {
             super(itemView);
             roundText = itemView.findViewById(R.id.round_string_textView);
-            roundImageView = itemView.findViewById(R.id.round_string_imageView);
+//            roundImageView = itemView.findViewById(R.id.round_string_imageView);
             fullView = itemView;
         }
     }
