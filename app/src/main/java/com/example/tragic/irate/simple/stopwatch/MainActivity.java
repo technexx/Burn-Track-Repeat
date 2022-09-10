@@ -4345,10 +4345,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dotDraws.reDraw();
 
-        //Todo: With this here, it only b0rks in post-round runnable.
-        //Todo: What happens is, the ticks that do not send the converted string over do not display correctly.
-        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
-        dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.notifyDataSetChanged();
 
         setNotificationValues();
@@ -4666,10 +4662,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeft);
         dotsAdapter.resetModeOneAlpha();
         dotsAdapter.setModeOneAlpha();
-
-        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
-        dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
-        dotsAdapter.notifyDataSetChanged();
 
         setMillis = 0;
         breakMillis = 0;
