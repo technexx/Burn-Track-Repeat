@@ -66,7 +66,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     sendDotAlpha mSendDotAlpha;
 
     private float textSizeForEachRound(int numberOfRoundChars) {
-        int floatToReturn = 30 - (6 * (numberOfRoundChars-1));
+        int floatToReturn = 40 - (5 * (numberOfRoundChars-1));
 
         return floatToReturn;
     }
@@ -89,7 +89,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     //Todo: For Pom as well.
     @Override
     public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
-        holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
+        holder.roundText.setText(trimTwoDigitString(mCyclesRoundsAsStringsList.get(position)));
         holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
 
         Log.i("testRounds", "round list is " + mCyclesRoundsAsStringsList);
@@ -132,10 +132,14 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
     }
 
-//    private String trimTwoDigitString(String timeString) {
-//        if (timeString.length()==2) {
-//        }
-//    }
+    private String trimTwoDigitString(String timeString) {
+        String stringToReturn = timeString;
+        if (timeString.length()==2) {
+            stringToReturn = timeString.substring(1);
+        }
+
+        return stringToReturn;
+    }
 
     public void setCycleRoundsAsStringsList(List<String> cyclesRoundsAsStringList) {
         this.mCyclesRoundsAsStringsList = cyclesRoundsAsStringList;
