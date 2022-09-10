@@ -584,9 +584,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
-  //Todo: Calories iterating w/ paused timer. Set time, too.
-  //Todo: nextRound followed by pause/resume quickly can cause successive/b0rked timers.
-
   //Todo: Test sizes for stopwatch as well.
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
@@ -4635,6 +4632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void globalNextRoundLogic() {
     timerIsPaused = false;
+    timerDisabled = true;
     setHasTextSizeChangedForTimers(false);
 
     setAllActivityTimesAndCaloriesToTextViews();
