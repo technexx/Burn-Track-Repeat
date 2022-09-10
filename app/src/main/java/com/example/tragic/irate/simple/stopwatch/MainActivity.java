@@ -584,11 +584,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
-  //Todo: Text size changes w/ in dots needs to run in bindView, since infinity rounds will change within dot itself.
-  //Todo: Test sizes for stopwatch as well.
-  //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Calories iterating w/ paused timer. Set time, too.
+  //Todo: nextRound followed by pause/resume quickly can cause successive/b0rked timers.
+
+  //Todo: Test sizes for stopwatch as well.
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
+  //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
+  //Todo: Sound settings (vibrations) seems off (1 vib = silent, 2 vib = 1, etc.)
 
   //Todo: Test new day starting total times.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -1169,24 +1171,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     endFade = new Runnable() {
       @Override
       public void run() {
-//        dotDraws.reDraw();
-//
-//        if (receivedAlpha <= 105) {
-//          dotDraws.setAlpha(105);
-//          dotDraws.reDraw();
-//
-//          dotsAdapter.setDotAlpha(105);
-//          dotsAdapter.notifyDataSetChanged();
-//
-//          mHandler.removeCallbacks(this);
-//        } else {
-//          mHandler.postDelayed(this, 50);
-//        }
-
         dotsAdapter.notifyDataSetChanged();
 
         if (receivedDotAlpha <= 0.3f) {
-
           dotsAdapter.setDotAlpha(0.3f);
           dotsAdapter.notifyDataSetChanged();
 
@@ -3087,7 +3074,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String totalRounds = String.valueOf(startRounds);
 
     String timeRemaining = "";
-    timeRemaining = convertTimerValuesToString(((timeLeft-250) +1000) / 1000);
+    timeRemaining = convertTimerValuesToStringForNotifications(((timeLeft-250) +1000) / 1000);
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
   }
@@ -3163,7 +3150,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (stopWatchPopUpWindow.isShowing()) {
           headerOne = getString(R.string.notification_stopwatch_header);
-          bodyOne = convertTimerValuesToString((long) stopWatchSeconds);
+          bodyOne = convertTimerValuesToStringForNotifications((long) stopWatchSeconds);
         }
 
         builder.setStyle(new NotificationCompat.InboxStyle()
@@ -3336,13 +3323,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public String convertTimerValuesToString(long totalSeconds) {
+  public String convertTimerValuesToStringForNotifications(long totalSeconds) {
     DecimalFormat df = new DecimalFormat("00");
     long minutes;
     long remainingSeconds;
     minutes = totalSeconds / 60;
 
     remainingSeconds = totalSeconds % 60;
+
     if (totalSeconds >= 60) {
       String formattedSeconds = df.format(remainingSeconds);
       if (formattedSeconds.length() > 2) formattedSeconds = "0" + formattedSeconds;
@@ -4274,7 +4262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
-        dotsAdapter.setTypeOfRoundList(typeOfRound);
+//        dotsAdapter.setTypeOfRoundList(typeOfRound);
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(setMillis);
@@ -4317,7 +4305,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
-        dotsAdapter.setTypeOfRoundList(typeOfRound);
+//        dotsAdapter.setTypeOfRoundList(typeOfRound);
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(breakMillis);
@@ -4357,6 +4345,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dotDraws.reDraw();
 
+        //Todo: With this here, it only b0rks in post-round runnable.
+        //Todo: What happens is, the ticks that do not send the converted string over do not display correctly.
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+        dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.notifyDataSetChanged();
 
         setNotificationValues();
@@ -4552,6 +4544,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       resetTimer();
       return;
     }
+
     mHandler.post(endFade);
 
     if (endingEarly) {
@@ -4673,6 +4666,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeft);
         dotsAdapter.resetModeOneAlpha();
         dotsAdapter.setModeOneAlpha();
+
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+        dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.notifyDataSetChanged();
 
         setMillis = 0;

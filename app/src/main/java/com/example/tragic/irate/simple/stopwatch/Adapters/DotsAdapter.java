@@ -65,6 +65,12 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     sendDotAlpha mSendDotAlpha;
 
+    private float textSizeForEachRound(int numberOfRoundChars) {
+        int floatToReturn = 30 - (6 * (numberOfRoundChars-1));
+
+        return floatToReturn;
+    }
+
     public void onAlphaSend(sendDotAlpha xSendDotAlpha)  {
         this.mSendDotAlpha = xSendDotAlpha;
     }
@@ -78,13 +84,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         this.mContext = context; this.mCyclesRoundsAsStringsList = cycleRoundsAsStringList; this.mRoundTypeList = typeOfRoundList;
         instantiateMiscObjects();
         instantiateLists();
-
-    }
-
-    private float textSizeForEachRound(int numberOfRoundChars) {
-        int floatToReturn = 40 - (6 * (numberOfRoundChars-1));
-
-        return floatToReturn;
     }
 
     //Todo: For Pom as well.
@@ -93,9 +92,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         holder.roundText.setText(mCyclesRoundsAsStringsList.get(position));
         holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
 
-//        if (mCharactersInCyclesRoundsList.get(position) >=0) {
-//            holder.roundText.setTypeface(bigShouldersFont);
-//        }
+        Log.i("testRounds", "round list is " + mCyclesRoundsAsStringsList);
 
         if (mMode == 1) {
             dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
@@ -124,13 +121,10 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             if (mCyclesRoundCount - mCycleRoundsLeft == position) {
                 fadeAlpha();
                 holder.fullView.setAlpha(mAlpha);
-                Log.i("testFade", "fading position " + position);
             } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
                 holder.fullView.setAlpha(0.3f);
-                Log.i("testFade", "low alpha positions are " + position);
             } else {
                 holder.fullView.setAlpha(1.0f);
-                Log.i("testFade", "full alpha positions are " + position);
             }
 
 //            Log.i("testFade", "rounds left are " + mCycleRoundsLeft);
@@ -138,11 +132,20 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
     }
 
+//    private String trimTwoDigitString(String timeString) {
+//        if (timeString.length()==2) {
+//        }
+//    }
+
     public void setCycleRoundsAsStringsList(List<String> cyclesRoundsAsStringList) {
         this.mCyclesRoundsAsStringsList = cyclesRoundsAsStringList;
-
+        Log.i("testRounds", "round list being updated as " + mCyclesRoundsAsStringsList);
         setCharactersInCyclesRoundsList();
 
+    }
+
+    public interface sendDotAlpha {
+        void sendAlphaValue(float alpha);
     }
 
     public void setTypeOfRoundList(List<Integer> typeOfRoundsList) {
@@ -246,12 +249,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     @Override
     public int getItemCount() {
-//        Log.i("testDots", "string list size is " + mCyclesRoundsAsStringsList.size());
         return mCyclesRoundsAsStringsList.size();
-    }
-
-    public interface sendDotAlpha {
-        void sendAlphaValue(float alpha);
     }
 
     public class DotsViewHolder extends RecyclerView.ViewHolder {
