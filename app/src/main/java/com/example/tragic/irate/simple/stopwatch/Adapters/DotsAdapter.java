@@ -66,10 +66,21 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     sendDotAlpha mSendDotAlpha;
 
     private float textSizeForEachRound(int numberOfRoundChars) {
-        //May have smaller "0" sometimes since it's converted before our trim.
+        int floatToReturn = 0;
 
-        int floatToReturn = 42 - (7 * (numberOfRoundChars-1));
-//        Log.i("testSize", "float return is " + floatToReturn);
+        if (numberOfRoundChars == 1) {
+            floatToReturn = 42;
+        }
+        if (numberOfRoundChars == 2) {
+            floatToReturn = 34;
+        }
+        if (numberOfRoundChars == 4) {
+            floatToReturn = 20;
+        }
+        if (numberOfRoundChars == 5) {
+            floatToReturn = 16;
+        }
+
         return floatToReturn;
     }
 
