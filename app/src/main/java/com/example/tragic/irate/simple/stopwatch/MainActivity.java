@@ -33,6 +33,7 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
@@ -585,8 +586,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
   //Todo: Some overlap in Timer for non-long in emulator. Cutting off dots also w/ single row.
+      //Todo: Can just use our different /long layouts for moment.
+      //Todo: Test w/ other 2 motos.
+
   //Todo: Test sizes for stopwatch as well.
   //Todo: Guidelines for edit popUp.
+  //Todo: light_green color looks better for green dots.
 
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
@@ -1784,9 +1789,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
     dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
 
-
     dotsRecycler.setAdapter(dotsAdapter);
     dotsRecycler.setLayoutManager(gridLayoutManager);
+
+    //Disables "ghost scrolling"
+    dotsRecycler.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        return true;
+      }
+    });
   }
 
   private void adjustDotRecyclerViewSize(int numberOfRows) {

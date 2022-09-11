@@ -279,7 +279,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         public DotsViewHolder(@NonNull View itemView) {
             super(itemView);
             roundText = itemView.findViewById(R.id.round_string_textView);
-//            roundImageView = itemView.findViewById(R.id.round_string_imageView);
+            roundImageView = itemView.findViewById(R.id.round_string_imageView);
             fullView = itemView;
         }
     }
