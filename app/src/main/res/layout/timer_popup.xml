@@ -9,6 +9,70 @@
     android:id="@+id/main_timer_layout"
     android:theme="@style/TimerTheme">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/first_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.33">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/second_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.6">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/third_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.38">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/fourth_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent="0.58">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws
+        android:id="@+id/dotdraws"
+        android:layout_width="1dp"
+        android:layout_height="1dp"
+        app:layout_constraintBottom_toTopOf="@id/progressBar"
+        app:layout_constraintStart_toStartOf="parent">
+    </com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws>
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/dots_recyclerView"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginBottom="16dp"
+        android:background="@drawable/recycler_border"
+        android:orientation="horizontal"
+        android:paddingStart="4dp"
+        android:paddingEnd="4dp"
+        app:layout_constraintBottom_toTopOf="@id/second_guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/first_guideline">
+    </androidx.recyclerview.widget.RecyclerView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/non_tracking_timer_stat_headers_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintBottom_toBottomOf="@id/first_guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
         android:id="@+id/cycle_title_textView"
         android:layout_width="wrap_content"
@@ -17,7 +81,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@color/teal_200"
-        android:textSize="22sp"
+        android:textSize="26sp"
         android:fontFamily="@font/open_sans">
     </TextView>
 
@@ -30,7 +94,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="24dp"
         android:textColor="@color/white"
-        android:textSize="20sp">
+        android:textSize="24sp">
     </TextView>
 
     <TextView
@@ -40,8 +104,8 @@
         app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/reset_total_cycle_times"
-        android:layout_marginTop="12dp"
-        android:textSize="20sp">
+        android:layout_marginTop="20dp"
+        android:textSize="22sp">
     </TextView>
 
     <TextView
@@ -51,8 +115,8 @@
         app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/reset_total_cycle_times"
-        android:layout_marginTop="12dp"
-        android:textSize="20sp">
+        android:layout_marginTop="20dp"
+        android:textSize="22sp">
     </TextView>
 
     <TextView
@@ -92,33 +156,33 @@
 
     <!--//////////////////////////////////////////////////////////////////////////////////////////////-->
 
-    <TextView
-        android:id="@+id/tracking_daily_stats_header_textView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        android:gravity="center_horizontal"
-        android:layout_marginTop="4dp"
-        android:textColor="@color/teal_200"
-        android:textStyle="bold"
-        android:textSize="22sp">
-    </TextView>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/tracking_timer_header_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/tracking_daily_stats_header_textView"
-        android:layout_marginTop="4dp"
-        app:layout_constraintEnd_toEndOf="@id/tracking_daily_stats_header_textView"
-        app:layout_constraintStart_toStartOf="@id/tracking_daily_stats_header_textView">
+        android:layout_height="0dp"
+        android:layout_marginStart="80dp"
+        app:layout_constraintBottom_toBottomOf="@id/first_guideline"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:id="@+id/tracking_daily_stats_header_textView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:gravity="center_horizontal"
+            android:textColor="@color/teal_200"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+        </TextView>
 
         <TextView
             android:id="@+id/daily_total_time_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toStartOf="parent"
             android:textColor="@color/white"
             android:textSize="24sp">
@@ -128,7 +192,7 @@
             android:id="@+id/daily_total_time_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toEndOf="@id/daily_total_time_textView_header"
             android:layout_marginStart="8dp"
             android:textColor="@color/green"
@@ -156,29 +220,18 @@
             android:textSize="24sp"
             android:textColor="@color/purple_200">
         </TextView>
-    </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/daily_single_activity_string_header"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="12dp"
-        android:gravity="center_horizontal"
-        android:textColor="@color/light_blue"
-        android:textSize="22sp"
-        app:layout_constraintStart_toStartOf="parent"
-        android:maxLines="1"
-        app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout">
-    </TextView>
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/timer_total_single_activity_stats_layout"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        app:layout_constraintEnd_toEndOf="@id/tracking_daily_stats_header_textView"
-        app:layout_constraintStart_toStartOf="@id/tracking_daily_stats_header_textView"
-        app:layout_constraintTop_toBottomOf="@id/daily_single_activity_string_header">
+        <TextView
+            android:id="@+id/daily_single_activity_string_header"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:gravity="center_horizontal"
+            android:textColor="@color/light_blue"
+            android:textSize="22sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/daily_total_calories_textView_header">
+        </TextView>
 
         <TextView
             android:id="@+id/daily_total_time_for_single_activity_textView_header"
@@ -186,7 +239,7 @@
             android:layout_height="wrap_content"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header">
         </TextView>
 
         <TextView
@@ -198,7 +251,7 @@
             android:textColor="@color/green"
             android:textSize="22sp"
             app:layout_constraintStart_toEndOf="@id/daily_total_time_for_single_activity_textView_header"
-            app:layout_constraintTop_toTopOf="parent">
+            app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header">
         </TextView>
 
         <TextView
@@ -225,24 +278,6 @@
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws
-        android:id="@+id/dotdraws"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        app:layout_constraintTop_toBottomOf="@id/timer_total_single_activity_stats_layout"
-        app:layout_constraintBottom_toTopOf="@id/progressBar"
-        app:layout_constraintStart_toStartOf="parent">
-    </com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dots_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintBottom_toTopOf="@id/progressBar"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/timer_total_single_activity_stats_layout">
-    </androidx.recyclerview.widget.RecyclerView>
-
     <TextView
         android:id="@+id/timeLeft"
         android:textColor="@color/white"
@@ -257,36 +292,27 @@
 
     <ProgressBar
         android:id="@+id/progressBar"
-        android:layout_width="260dp"
+        android:layout_width="300dp"
         android:layout_height="0dp"
-        android:layout_marginBottom="50dp"
+        android:layout_marginBottom="4dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintDimensionRatio="1:1"
-        app:layout_constraintTop_toBottomOf="@id/bottom_third_guideline"
+        app:layout_constraintTop_toBottomOf="@id/second_guideline"
         style="?android:attr/progressBarStyleHorizontal"
         android:max="10000"
         android:progressDrawable="@drawable/circle_progress"
         android:background="@drawable/circle_shape">
     </ProgressBar>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/bottom_third_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.65">
-    </androidx.constraintlayout.widget.Guideline>
-
     <View
         android:id="@+id/pauseResumeButton"
-        android:layout_width="220dp"
-        android:layout_height="220dp"
+        android:layout_width="260dp"
+        android:layout_height="260dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="32dp"
+        android:layout_marginBottom="44dp"
         app:cornerRadius="90dp">
     </View>
 
@@ -295,10 +321,9 @@
         android:text="Reset"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="4dp"
+        app:layout_constraintTop_toBottomOf="@id/pauseResumeButton"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="@id/pauseResumeButton"
         android:textColor="@color/white"
         android:textSize="20sp">
     </TextView>

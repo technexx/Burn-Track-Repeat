@@ -183,7 +183,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             mCharactersInCyclesRoundsList.add(mCyclesRoundsAsStringsList.get(i).length());
         }
 
-//        Log.i("testSize", "list being set is " + mCharactersInCyclesRoundsList);
     }
 
     public void setPomCycleRoundsAsStringsList(List<String> pomCyclesRoundsAsStringsList) {
@@ -296,11 +295,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
-        narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
-        narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
-        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
-        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
-        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
+//        narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
+//        narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
+//        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
+//        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
+//        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
 
 //        testFont = ResourcesCompat.getFont(mContext, R.font.sixcaps);
     }

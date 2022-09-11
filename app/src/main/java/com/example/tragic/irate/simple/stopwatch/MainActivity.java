@@ -4108,8 +4108,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         decreaseTextSizeForTimersForStopWatch(stopWatchTotalTime);
 
-        Log.i("testStop", "running w/ displayTime of " + displayTime);
-
         mHandler.postDelayed(this, 10);
       }
     };
