@@ -66,8 +66,10 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     sendDotAlpha mSendDotAlpha;
 
     private float textSizeForEachRound(int numberOfRoundChars) {
-        int floatToReturn = 40 - (5 * (numberOfRoundChars-1));
+        //May have smaller "0" sometimes since it's converted before our trim.
 
+        int floatToReturn = 42 - (7 * (numberOfRoundChars-1));
+//        Log.i("testSize", "float return is " + floatToReturn);
         return floatToReturn;
     }
 
@@ -92,7 +94,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         holder.roundText.setText(trimTwoDigitString(mCyclesRoundsAsStringsList.get(position)));
         holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
 
-        Log.i("testRounds", "round list is " + mCyclesRoundsAsStringsList);
+//        Log.i("testRounds", "round list is " + mCyclesRoundsAsStringsList);
 
         if (mMode == 1) {
             dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
@@ -134,9 +136,12 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     private String trimTwoDigitString(String timeString) {
         String stringToReturn = timeString;
-        if (timeString.length()==2) {
+
+        if (timeString.length()==2 && timeString.substring(0, 1).equals("0")) {
             stringToReturn = timeString.substring(1);
         }
+        Log.i("testSize", "timer substring is " + timeString.substring(0, 1));
+
 
         return stringToReturn;
     }
@@ -167,7 +172,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             mCharactersInCyclesRoundsList.add(mCyclesRoundsAsStringsList.get(i).length());
         }
 
-        Log.i("testSize", "list being set is " + mCharactersInCyclesRoundsList);
+//        Log.i("testSize", "list being set is " + mCharactersInCyclesRoundsList);
     }
 
     public void setPomCycleRoundsAsStringsList(List<String> pomCyclesRoundsAsStringsList) {
