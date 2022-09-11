@@ -6,45 +6,75 @@
     android:background="@color/black"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
-    <TextView
-        android:id="@+id/laps_completed_textView"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/laps_header_and_adapter_layout"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="10dp"
-        android:textColor="@color/white"
-        android:textSize="24sp">
-    </TextView>
+        app:layout_constraintVertical_weight="1">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/lap_recycler"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        app:layout_constraintTop_toBottomOf="@id/laps_completed_textView"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="30dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp">
-    </androidx.recyclerview.widget.RecyclerView>
+        <TextView
+            android:id="@+id/laps_completed_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:textColor="@color/white"
+            android:textSize="24sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+        </TextView>
 
-    <com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas
-        android:id="@+id/lapCanvas"
-        android:layout_width="280dp"
-        android:layout_height="280dp"
-        app:layout_constraintTop_toBottomOf="@id/laps_completed_textView"
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/lap_recycler"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_marginTop="30dp"
+            android:paddingStart="10dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/laps_completed_textView">
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas
+            android:id="@+id/lapCanvas"
+            android:layout_width="280dp"
+            android:layout_height="280dp"
+            android:layout_marginTop="30dp"
+            android:paddingStart="10dp"
+            android:paddingTop="2dp"
+            android:paddingEnd="10dp"
+            android:paddingBottom="2dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/laps_completed_textView">
+        </com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas>
+
+        <TextView
+            android:id="@+id/empty_laps_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/empty_laps_list"
+            app:layout_constraintBottom_toBottomOf="@id/lap_recycler"
+            app:layout_constraintEnd_toEndOf="@id/lap_recycler"
+            app:layout_constraintStart_toStartOf="@id/lap_recycler"
+            app:layout_constraintTop_toTopOf="@id/lap_recycler">
+        </TextView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/stopwatch_timer_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginTop="30dp"
-        android:paddingStart="10dp"
-        android:paddingEnd="10dp"
-        android:paddingTop="2dp"
-        android:paddingBottom="2dp">
-    </com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas>
+        app:layout_constraintTop_toBottomOf="@id/laps_header_and_adapter_layout"
+        app:layout_constraintVertical_weight="1">
+    </androidx.constraintlayout.widget.ConstraintLayout>
     
     <ImageButton
         android:id="@+id/stopwatchPauseResumeButton"
@@ -105,16 +135,5 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@color/white"
         android:textSize="20sp">
-    </TextView>
-
-    <TextView
-        android:id="@+id/empty_laps_text"
-        android:text="@string/empty_laps_list"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="@id/lap_recycler"
-        app:layout_constraintBottom_toBottomOf="@id/lap_recycler"
-        app:layout_constraintStart_toStartOf="@id/lap_recycler"
-        app:layout_constraintEnd_toEndOf="@id/lap_recycler">
     </TextView>
 </androidx.constraintlayout.widget.ConstraintLayout>

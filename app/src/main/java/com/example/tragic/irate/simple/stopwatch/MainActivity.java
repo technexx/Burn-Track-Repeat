@@ -585,6 +585,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
   //Todo: Test sizes for stopwatch as well.
+  //Todo: Guidelines only in /long for timer right now. May not need a /long w/ guidelines.
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Sound settings (vibrations) seems off (1 vib = silent, 2 vib = 1, etc.)
@@ -4089,22 +4090,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         DecimalFormat df2 = new DecimalFormat("00");
 
+        timerIteration.setCurrentTime(System.currentTimeMillis());
         long timeToIterate = timerIteration.getDifference();
-
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
+
         stopWatchTotalTime = timerIteration.getNewTotal();
 
         stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
         stopWatchMinutes = (int) stopWatchSeconds/60;
         stopWatchMs = (stopWatchTotalTime%1000) / 10;
 
-        displayTime = convertSeconds( (long)stopWatchSeconds);
+        displayTime = convertSeconds( (long) stopWatchSeconds);
         displayMs = df2.format(stopWatchMs);
 
         stopWatchTimeTextView.setText(displayTime);
         msTimeTextView.setText(displayMs);
 
         decreaseTextSizeForTimersForStopWatch(stopWatchTotalTime);
+
+        Log.i("testStop", "running w/ displayTime of " + displayTime);
 
         mHandler.postDelayed(this, 10);
       }
