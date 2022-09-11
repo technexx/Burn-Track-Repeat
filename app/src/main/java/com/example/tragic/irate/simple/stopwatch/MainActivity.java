@@ -584,8 +584,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
+  //Todo: Some overlap in Timer for non-long in emulator. Cutting off dots also w/ single row.
   //Todo: Test sizes for stopwatch as well.
-  //Todo: Guidelines only in /long for timer right now. May not need a /long w/ guidelines.
+  //Todo: Guidelines for edit popUp.
+
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Sound settings (vibrations) seems off (1 vib = silent, 2 vib = 1, etc.)
