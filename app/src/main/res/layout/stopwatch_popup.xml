@@ -10,8 +10,8 @@
         android:id="@+id/laps_header_and_adapter_layout"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_weight="1">
 
@@ -36,8 +36,8 @@
             android:paddingTop="2dp"
             android:paddingEnd="10dp"
             android:paddingBottom="2dp"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/laps_completed_textView">
         </androidx.recyclerview.widget.RecyclerView>
 

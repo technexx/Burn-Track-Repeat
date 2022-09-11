@@ -73,6 +73,7 @@ import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapterTwo;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DotsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.LapAdapter;
+import com.example.tragic.irate.simple.stopwatch.Adapters.PomDotsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.SavedCycleAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.SavedPomCycleAdapter;
 import com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws;
@@ -107,7 +108,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DotsAdapter.sendDotAlpha {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
@@ -581,6 +582,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   RecyclerView dotsRecycler;
   DotsAdapter dotsAdapter;
+
+  RecyclerView pomDotsRecycler;
+  PomDotsAdapter pomDotsAdapter;
+
   List<String> roundListForDots;
 
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
@@ -589,23 +594,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Can just use our different /long layouts for moment.
       //Todo: Test w/ other 2 motos.
 
-  //Todo: Test sizes for stopwatch as well.
-  //Todo: Guidelines for edit popUp.
-  //Todo: light_green color looks better for green dots.
-
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Sound settings (vibrations) seems off (1 vib = silent, 2 vib = 1, etc.)
-  //Todo: Maybe diff. color for text inside dots.
 
-  //Todo: Test new day starting total times.
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Add Day/Night modes.
-
-  //Todo: Adding for multiple days will skip over days w/ no time left. Intentional but may be a bit confusing.
 
   //Todo: Test extra-large screens as well.
   //Todo: Test all notifications + sound/vibrations + settings.
@@ -812,6 +809,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
 
+  //Old dotDraws.
   @Override
   public void sendAlphaValue(int alpha) {
     receivedAlpha = alpha;
@@ -821,6 +819,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void sendAlphaValue(float alpha) {
     receivedDotAlpha = alpha;
+  }
+
+  @Override
+  public void sendPomAlphaValue(float alpha) {
+
   }
 
 
@@ -1416,7 +1419,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotDraws.onAlphaSend(MainActivity.this);
 
     dotsAdapter.onAlphaSend(MainActivity.this);
-    dotsAdapter.setMode(mode);
+    pomDotsAdapter.onPomAlphaSend(MainActivity.this);
     progressBar.setProgress(maxProgress);
   }
 
@@ -1783,6 +1786,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
+    GridLayoutManager gridLayoutManagerTwo = new GridLayoutManager(getApplicationContext(). 8);
+    gridLayoutManager.setOrientation(RecyclerView.VERTICAL);
 
     dotsAdapter = new DotsAdapter(getApplicationContext(), convertedWorkoutRoundList, typeOfRound);
 
@@ -1799,6 +1804,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return true;
       }
     });
+
+    pomDotsAdapter = new PomDotsAdapter(getApplicationContext(), pomStringListOfRoundValues);
+
+    pomDotsRecycler = timerPopUpView.findViewById(R.id.pom_dots_recyclerView);
+    pomDotsRecycler.setAdapter(pomDotsAdapter);
+    pomDotsRecycler.setLayoutManager(gridLayoutManagerTwo);
+
+    pomDotsRecycler.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        return true;
+      }
+    });
+
   }
 
   private void adjustDotRecyclerViewSize(int numberOfRows) {
