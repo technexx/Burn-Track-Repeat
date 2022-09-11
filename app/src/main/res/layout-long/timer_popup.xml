@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.66">
+        app:layout_constraintGuide_percent="0.38">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.38">
+        app:layout_constraintGuide_percent="0.58">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.58">
+        app:layout_constraintGuide_percent="0.66">
     </androidx.constraintlayout.widget.Guideline>
 
     <com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws
@@ -57,7 +57,7 @@
         android:layout_marginBottom="16dp"
         android:background="@drawable/recycler_border"
         android:orientation="horizontal"
-        app:layout_constraintBottom_toTopOf="@id/second_guideline"
+        app:layout_constraintBottom_toTopOf="@id/fourth_guideline"
         app:layout_constraintStart_toStartOf="parent"
         android:paddingStart="4dp"
         android:paddingEnd="4dp"
@@ -284,7 +284,7 @@
         android:layout_height="0dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/second_guideline">
+        app:layout_constraintTop_toTopOf="@id/fourth_guideline">
 
         <TextView
             android:id="@+id/timeLeft"

@@ -1789,11 +1789,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void adjustDotRecyclerViewSize(int numberOfRows) {
     if (numberOfRows<=8) {
-      dotsRecyclerLayoutParams.topToBottom = R.id.third_guideline;
-      dotsRecyclerLayoutParams.bottomToTop = R.id.fourth_guideline;
+      dotsRecyclerLayoutParams.topToBottom = R.id.second_guideline;
+      dotsRecyclerLayoutParams.bottomToTop = R.id.third_guideline;
     } else {
       dotsRecyclerLayoutParams.topToBottom = R.id.first_guideline;
-      dotsRecyclerLayoutParams.bottomToTop = R.id.second_guideline;
+      dotsRecyclerLayoutParams.bottomToTop = R.id.fourth_guideline;
     }
   }
 
