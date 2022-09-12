@@ -80,9 +80,18 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
                 dotsBorder.setColor(FULL_BREAK_COLOR);
                 break;
         }
+
+        //Todo: Should not need a loop inside this, as we've done in DotDraws.
+        if (mPomDotCounter == position) {
+            fadeAlpha();
+            holder.fullView.setAlpha(mAlpha);
+        } else if (position < mPomDotCounter) {
+            holder.fullView.setAlpha(0.3f);
+        } else {
+            holder.fullView.setAlpha(1.0f);
+        }
+
         holder.fullView.setBackground(dotsBorder);
-
-
     }
 
     @Override
@@ -122,14 +131,6 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
     private void instantiateMiscObjects() {
         changeSettingsValues = new ChangeSettingsValues();
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
-
-//        narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
-//        narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
-//        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
-//        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
-//        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
-
-//        testFont = ResourcesCompat.getFont(mContext, R.font.sixcaps);
     }
 
     public void setPomCycleRoundsAsStringsList(List<String> pomCyclesRoundsAsStringsList) {
@@ -158,6 +159,25 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
 
     public void resetModeThreeAlpha() {
         savedModeThreeAlpha = 255;
+    }
+
+    private void fadeAlpha() {
+        mSendPomDotAlpha.sendPomAlphaValue(mAlpha);
+
+        if (mAlpha >=1.0f) {
+            mAlpha = 1.0f;
+            mFadeUp = false;
+        }
+
+        if (mAlpha>0.25f && !mFadeUp) {
+            mAlpha -= 0.05;
+        } else {
+            mFadeUp = true;
+        }
+
+        if (mFadeUp) {
+            mAlpha += 0.05;
+        }
     }
 
     public void changeColorSetting(int typeOFRound, int settingNumber) {
