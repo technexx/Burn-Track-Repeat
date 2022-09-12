@@ -2,9 +2,12 @@ package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
 import android.graphics.drawable.GradientDrawable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
@@ -16,7 +19,7 @@ import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ChangeSetting
 import java.util.ArrayList;
 import java.util.List;
 
-public class PomDotsAdapter extends RecyclerView.Adapter {
+public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsViewHolder> {
     Context mContext;
     ChangeSettingsValues changeSettingsValues;
     GradientDrawable dotsBorder;
@@ -37,6 +40,8 @@ public class PomDotsAdapter extends RecyclerView.Adapter {
 
     public PomDotsAdapter(Context context, List<String> pomCycleRoundsAsStringList) {
         this.mContext = context; this.mPomCycleRoundsAsStringsList = pomCycleRoundsAsStringList;
+        instantiateLists();
+        instantiateMiscObjects();
     }
 
     public void onPomAlphaSend(sendPomDotAlpha xSendPomDotAlpha) {
@@ -49,7 +54,7 @@ public class PomDotsAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+    public PomDotsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
         View view = inflater.inflate(R.layout.dots_recycler_views, parent, false);
@@ -58,13 +63,73 @@ public class PomDotsAdapter extends RecyclerView.Adapter {
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull PomDotsViewHolder holder, int position) {
+        holder.roundText.setText(trimTwoDigitString(mPomCycleRoundsAsStringsList.get(position)));
+        holder.roundText.setTextSize(textSizeForEachRound(mCharactersInPomCyclesRoundsList.get(position)));
+
+        dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
+
+        switch (mPomDotCounter) {
+            case 0: case 2: case 4: case 6:
+                dotsBorder.setColor(WORK_COLOR);
+                break;
+            case 1: case 3: case 5:
+                dotsBorder.setColor(MINI_BREAK_COLOR);
+                break;
+            case 7:
+                dotsBorder.setColor(FULL_BREAK_COLOR);
+                break;
+        }
+        holder.fullView.setBackground(dotsBorder);
+
 
     }
 
     @Override
     public int getItemCount() {
-        return 0;
+        return mPomCycleRoundsAsStringsList.size();
+    }
+
+    private float textSizeForEachRound(int numberOfRoundChars) {
+        int floatToReturn = 0;
+
+        if (numberOfRoundChars == 4) {
+            floatToReturn = 20;
+        }
+        if (numberOfRoundChars == 5) {
+            floatToReturn = 16;
+        }
+
+        return floatToReturn;
+    }
+
+    private String trimTwoDigitString(String timeString) {
+        String stringToReturn = timeString;
+
+        if (timeString.length()==2 && timeString.substring(0, 1).equals("0")) {
+            stringToReturn = timeString.substring(1);
+        }
+        Log.i("testSize", "timer substring is " + timeString.substring(0, 1));
+
+
+        return stringToReturn;
+    }
+
+    private void instantiateLists() {
+        mPomCycleRoundsAsStringsList = new ArrayList<>();
+    }
+
+    private void instantiateMiscObjects() {
+        changeSettingsValues = new ChangeSettingsValues();
+        dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
+
+//        narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
+//        narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
+//        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
+//        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
+//        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
+
+//        testFont = ResourcesCompat.getFont(mContext, R.font.sixcaps);
     }
 
     public void setPomCycleRoundsAsStringsList(List<String> pomCyclesRoundsAsStringsList) {
@@ -106,10 +171,15 @@ public class PomDotsAdapter extends RecyclerView.Adapter {
     }
 
     public class PomDotsViewHolder extends RecyclerView.ViewHolder {
+        public View fullView;
+        public TextView roundText;
+        public ImageView roundImageView;
 
         public PomDotsViewHolder(@NonNull View itemView) {
             super(itemView);
+            roundText = itemView.findViewById(R.id.round_string_textView);
+            roundImageView = itemView.findViewById(R.id.round_string_imageView);
+            fullView = itemView;
         }
     }
-
 }

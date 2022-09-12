@@ -42,14 +42,19 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     int SET_COLOR;
     int BREAK_COLOR;
 
+    sendDotAlpha mSendDotAlpha;
+
     Typeface narrowFont;
     Typeface narrowFontBold;
     Typeface bigShouldersFont;
     Typeface ignotum;
     Typeface sixCaps;
-    Typeface testFont;
 
-    sendDotAlpha mSendDotAlpha;
+    public DotsAdapter(Context context, List<String> cycleRoundsAsStringList, List<Integer> typeOfRoundList) {
+        this.mContext = context; this.mCyclesRoundsAsStringsList = cycleRoundsAsStringList; this.mRoundTypeList = typeOfRoundList;
+        instantiateMiscObjects();
+        instantiateLists();
+    }
 
     public void onAlphaSend(sendDotAlpha xSendDotAlpha)  {
         this.mSendDotAlpha = xSendDotAlpha;
@@ -57,6 +62,21 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     public void setDotAlpha(float alpha) {
         this.mAlpha = alpha;
+    }
+
+    @NonNull
+    @Override
+    public DotsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        Context context = parent.getContext();
+        LayoutInflater inflater = LayoutInflater.from(context);
+        View view = inflater.inflate(R.layout.dots_recycler_views, parent, false);
+
+        return new DotsViewHolder(view);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mCyclesRoundsAsStringsList.size();
     }
 
     //Todo: For Pom as well.
@@ -98,6 +118,23 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
     }
 
+    public interface sendDotAlpha {
+        void sendAlphaValue(float alpha);
+    }
+
+    public class DotsViewHolder extends RecyclerView.ViewHolder {
+        public View fullView;
+        public TextView roundText;
+        public ImageView roundImageView;
+
+        public DotsViewHolder(@NonNull View itemView) {
+            super(itemView);
+            roundText = itemView.findViewById(R.id.round_string_textView);
+            roundImageView = itemView.findViewById(R.id.round_string_imageView);
+            fullView = itemView;
+        }
+    }
+
     private float textSizeForEachRound(int numberOfRoundChars) {
         int floatToReturn = 0;
 
@@ -115,16 +152,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
 
         return floatToReturn;
-    }
-
-    public DotsAdapter(Context context, List<String> cycleRoundsAsStringList, List<Integer> typeOfRoundList) {
-        this.mContext = context; this.mCyclesRoundsAsStringsList = cycleRoundsAsStringList; this.mRoundTypeList = typeOfRoundList;
-        instantiateMiscObjects();
-        instantiateLists();
-    }
-
-    public interface sendDotAlpha {
-        void sendAlphaValue(float alpha);
     }
 
     private String trimTwoDigitString(String timeString) {
@@ -191,46 +218,12 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         savedModeOneAlpha = mAlpha;
     }
 
-
-
     public void setModeOneAlpha() {
         mAlpha = savedModeOneAlpha;
     }
 
-
-
     public void resetModeOneAlpha() {
         savedModeOneAlpha = 255;
-    }
-
-
-
-    @NonNull
-    @Override
-    public DotsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        Context context = parent.getContext();
-        LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.dots_recycler_views, parent, false);
-
-        return new DotsViewHolder(view);
-    }
-
-    @Override
-    public int getItemCount() {
-        return mCyclesRoundsAsStringsList.size();
-    }
-
-    public class DotsViewHolder extends RecyclerView.ViewHolder {
-        public View fullView;
-        public TextView roundText;
-        public ImageView roundImageView;
-
-        public DotsViewHolder(@NonNull View itemView) {
-            super(itemView);
-            roundText = itemView.findViewById(R.id.round_string_textView);
-            roundImageView = itemView.findViewById(R.id.round_string_imageView);
-            fullView = itemView;
-        }
     }
 
     private void instantiateLists() {
