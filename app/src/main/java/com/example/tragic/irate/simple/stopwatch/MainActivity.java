@@ -597,9 +597,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Can just use our different /long layouts for moment.
       //Todo: Test w/ other 2 motos.
 
+  //Todo: Round recycler for Pom is size of >8 rounds.
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
-      //Todo: Seems the case only if first round is infinity.
   //Todo: Sound settings (vibrations) seems off (1 vib = silent, 2 vib = 1, etc.)
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -794,10 +794,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void changeColorSetting(int receivedMode, int typeOFRound, int settingNumber) {
     cycleRoundsAdapter.changeColorSetting(typeOFRound, settingNumber);
+    cycleRoundsAdapterTwo.changeColorSetting(typeOFRound, settingNumber);
+
+    Log.i("testColor", "type of round is " + typeOFRound + " and setting number is " + settingNumber);
 
     if (receivedMode==1) {
       savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
-      cycleRoundsAdapterTwo.changeColorSetting(typeOFRound, settingNumber);
       savedCycleAdapter.notifyDataSetChanged();
 
       dotsAdapter.changeColorSetting(typeOFRound, settingNumber);
@@ -1025,6 +1027,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
       editCyclesPopUpDismissalLogic();
+      setDefaultEditRoundViews();
 
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
@@ -2765,6 +2768,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_green);
         newDraw.setColorFilter(setColor, PorterDuff.Mode.SRC_IN);
         toggleInfinityRounds.setImageDrawable(newDraw);
+
         toggleInfinityModeAndSetRoundType();
 
         editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeOne;
@@ -3421,6 +3425,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (adding) {
       if (mode==1) {
         toggleInfinityModeAndSetRoundType();
+
         switch (roundType) {
           case 1:
             addOrReplaceRounds(setValue, roundIsSelected);
@@ -5171,6 +5176,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomTimerValueInEditPopUpTextViewThree.setVisibility(View.VISIBLE);
 
         setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
+
         sortHigh.setVisibility(View.GONE);
         sortLow.setVisibility(View.GONE);
         sortActivityTitleAtoZ.setVisibility(View.GONE);

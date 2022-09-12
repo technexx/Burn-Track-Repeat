@@ -6,6 +6,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -159,6 +160,9 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 modeOneRounds.infinity_rounds.setColorFilter(BREAK_COLOR);
                 break;
         }
+
+        Log.i("testAdd", "set color is " + SET_COLOR);
+        Log.i("testAdd", "break color is " + BREAK_COLOR);
 
         //Only runs fade animation if adding/subtracting rounds.
         if (mRunRoundAnimation) {
