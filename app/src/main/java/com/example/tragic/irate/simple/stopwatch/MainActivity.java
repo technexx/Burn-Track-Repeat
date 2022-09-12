@@ -410,8 +410,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int currentProgressBarValue = 10000;
   long setMillisUntilFinished;
   long breakMillisUntilFinished;
+
   long pomMillisUntilFinished;
-  Runnable endFade;
+  Runnable endFadeForModeOne;
+  Runnable endFadeForModeThree;
   int pomDotCounter;
 
   double stopWatchMs;
@@ -451,8 +453,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean pomCyclesTextSizeHasChanged;
   boolean stopWatchTextSizeHasChanged;
 
-  int receivedAlpha;
+//  int receivedAlpha;
   float receivedDotAlpha;
+  float receivedPomDotAlpha;
   View pauseResumeButton;
 
   Runnable infinityTimerForSetsRunnable;
@@ -814,7 +817,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Old dotDraws.
   @Override
   public void sendAlphaValue(int alpha) {
-    receivedAlpha = alpha;
+//    receivedAlpha = alpha;
   }
 
 
@@ -825,7 +828,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void sendPomAlphaValue(float alpha) {
-
+    receivedPomDotAlpha = alpha;
   }
 
 
@@ -1179,7 +1182,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-    endFade = new Runnable() {
+    endFadeForModeOne = new Runnable() {
       @Override
       public void run() {
         dotsAdapter.notifyDataSetChanged();
@@ -1187,6 +1190,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (receivedDotAlpha <= 0.3f) {
           dotsAdapter.setDotAlpha(0.3f);
           dotsAdapter.notifyDataSetChanged();
+
+          mHandler.removeCallbacks(this);
+        } else {
+          mHandler.postDelayed(this, 50);
+        }
+      }
+    };
+
+    endFadeForModeThree = new Runnable() {
+      @Override
+      public void run() {
+        pomDotsAdapter.notifyDataSetChanged();
+
+        if (receivedPomDotAlpha <= 0.3f) {
+          pomDotsAdapter.setPomDotAlpha(0.3f);
+          pomDotsAdapter.notifyDataSetChanged();
 
           mHandler.removeCallbacks(this);
         } else {
@@ -4449,7 +4468,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         dotDraws.reDraw();
 
-        dotsAdapter.notifyDataSetChanged();
+        pomDotsAdapter.notifyDataSetChanged();
 
         setNotificationValues();
       }
@@ -4577,12 +4596,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalNextRoundLogic();
 
     if (numberOfRoundsLeft==0) {
-      mHandler.removeCallbacks(endFade);
+      mHandler.removeCallbacks(endFadeForModeOne);
       resetTimer();
       return;
     }
 
-    mHandler.post(endFade);
+    mHandler.post(endFadeForModeOne);
 
     if (endingEarly) {
       if (timer != null) timer.cancel();
@@ -4635,13 +4654,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalNextRoundLogic();
 
     if (pomDotCounter==8) {
-      mHandler.removeCallbacks(endFade);
+      mHandler.removeCallbacks(endFadeForModeThree);
       resetTimer();
       return;
     }
 
     timeLeft.setText("0");
-    mHandler.post(endFade);
+    mHandler.post(endFadeForModeThree);
 
     if (pomDotCounter < 7) {
       pomDotCounter++;

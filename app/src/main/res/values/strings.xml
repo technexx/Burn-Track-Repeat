@@ -24,7 +24,7 @@
 
     <string name="overtime">- %1$s</string>
 
-    <string name="confirm_cycle_reset">Confirm Reset</string>
+    <string name="confirm_cycle_reset">Confirm</string>
     <string name="delete_cycles_times_and_completed_cycles">Delete time and cycle totals?</string>
     <string name="delete_all_cycles">Are you sure? This will delete all cycles!</string>
 

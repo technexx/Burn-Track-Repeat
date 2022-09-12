@@ -83,7 +83,6 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
 
         holder.fullView.setBackground(dotsBorder);
 
-        //Todo: Should not need a loop inside this, as we've done in DotDraws.
         if (mPomDotCounter == position) {
             fadeAlpha();
             holder.fullView.setAlpha(mAlpha);
@@ -177,8 +176,6 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==4) MINI_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==5) FULL_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
-
-        Log.i("testColor","color setting is " + settingNumber);
     }
 
     private void instantiateLists() {
