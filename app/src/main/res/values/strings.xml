@@ -3,6 +3,9 @@
     <string name="variable">Variable Mode</string>
     <string name="pomodoro">Pomodoro</string>
 
+    <string name="infinity_symbol">&#8734;</string>
+    <string name="test_infinity"><font fgcolor='#ffffffff'>&#8734;</font></string>
+
     <string name="no_sets">Breaks Only</string>
     <string name="reset">Reset</string>
     <string name="clear_cycles">Reset Count</string>

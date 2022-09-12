@@ -6,14 +6,14 @@
 
     <TextView
         android:id="@+id/custom_name_header"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/cycle_and_tdee_text_constraint"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginTop="2dp"
         android:layout_marginStart="5dp"
-        android:textSize="18sp"
+        android:textSize="19sp"
         android:textColor="@color/light_grey"
         android:textStyle="bold"
         android:maxLines="2">
@@ -26,7 +26,7 @@
         app:layout_constraintTop_toBottomOf="@id/custom_name_header"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/cycle_and_tdee_text_constraint"
-        android:textSize="19sp"
+        android:textSize="20sp"
         android:layout_marginStart="5dp"
         android:layout_marginEnd="10dp"
         android:layout_marginTop="3dp"
@@ -57,7 +57,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:textColor="@color/white"
-        android:textSize="16sp"
+        android:textSize="17sp"
         android:gravity="center"
         android:textStyle="bold">
     </TextView>
