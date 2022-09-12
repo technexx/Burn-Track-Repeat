@@ -790,24 +790,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void changeColorSetting(int receivedMode, int typeOFRound, int settingNumber) {
     cycleRoundsAdapter.changeColorSetting(typeOFRound, settingNumber);
+
     if (receivedMode==1) {
       savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
       cycleRoundsAdapterTwo.changeColorSetting(typeOFRound, settingNumber);
       savedCycleAdapter.notifyDataSetChanged();
+
+      dotsAdapter.changeColorSetting(typeOFRound, settingNumber);
     }
 
     if (receivedMode==3) {
       savedPomCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
       savedPomCycleAdapter.notifyDataSetChanged();
+
+      pomDotsAdapter.changeColorSetting(typeOFRound, settingNumber);
     }
 
     dotDraws.changeColorSetting(typeOFRound, settingNumber);
 
-    dotsAdapter.changeColorSetting(typeOFRound, settingNumber);
-
     assignColorSettingValues(typeOFRound, settingNumber);
   }
-
 
   //Old dotDraws.
   @Override
@@ -1471,6 +1473,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dotDraws.setModeOneDotAlpha();
 
             dotsAdapter.setModeOneAlpha();
+
+            dotsRecycler.setVisibility(View.VISIBLE);
+            pomDotsRecycler.setVisibility(View.GONE);
             break;
           case 1:
             mode = 3;
@@ -1479,6 +1484,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             dotDraws.setModeThreeDotAlpha();
 
             pomDotsAdapter.setModeThreeAlpha();
+
+            pomDotsRecycler.setVisibility(View.VISIBLE);
+            dotsRecycler.setVisibility(View.GONE);
             break;
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -1816,6 +1824,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
+    //Default mode 1 visibilities at app launch.
+    dotsRecycler.setVisibility(View.VISIBLE);
+    pomDotsRecycler.setVisibility(View.GONE);
   }
 
   private void adjustDotRecyclerViewSize(int numberOfRows) {
@@ -2503,9 +2514,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dotsAdapter.changeColorSetting(1, setColorNumericValue);
     dotsAdapter.changeColorSetting(2, breakColorNumericValue);
-    dotsAdapter.changeColorSetting(3, workColorNumericValue);
-    dotsAdapter.changeColorSetting(4, miniBreakColorNumericValue);
-    dotsAdapter.changeColorSetting(5, fullBreakColorNumericValue);
+    pomDotsAdapter.changeColorSetting(3, workColorNumericValue);
+    pomDotsAdapter.changeColorSetting(4, miniBreakColorNumericValue);
+    pomDotsAdapter.changeColorSetting(5, fullBreakColorNumericValue);
 
     cycleRoundsAdapter.changeColorSetting(1, setColorNumericValue);
     cycleRoundsAdapter.changeColorSetting(2, breakColorNumericValue);
@@ -3654,14 +3665,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dotsAdapter.setTypeOfRoundList(typeOfRound);
           dotsAdapter.notifyDataSetChanged();
 
-//          Log.i("testDots", "list passed in from Main is " + convertedWorkoutRoundList);
-
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
         }
 
         break;
       case 3:
         pomValuesTime.clear();
+        pomStringListOfRoundValues.clear();
 
         if (pomArray.size()-1>=positionOfSelectedCycle) {
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
@@ -3669,11 +3679,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           /////---------Testing pom round iterations---------------/////////
 //          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
           for (int i=0; i<fetchedPomCycle.length; i++) {
-            pomValuesTime.add(Integer.parseInt(fetchedPomCycle[i]));
+            int integerValue = Integer.parseInt(fetchedPomCycle[i]);
+            pomValuesTime.add(integerValue);
+            pomStringListOfRoundValues.add(convertSeconds(integerValue/1000));
           }
 
-          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
+          pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
+          pomDotsAdapter.updatePomDotCounter(pomDotCounter);
+          pomDotsAdapter.notifyDataSetChanged();
 
+          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
         }
         break;
     }
@@ -4241,9 +4256,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setCurrentTime(System.currentTimeMillis());
         long timeToIterate = timerIteration.getDifference();
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
-
-        Log.i("testPom", "time to iterate is " + timeToIterate);
-        Log.i("testPom", "previous total is " + timerIteration.getPreviousTotal());
 
         if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
           totalCycleWorkTimeInMillis = timerIteration.getNewTotal();

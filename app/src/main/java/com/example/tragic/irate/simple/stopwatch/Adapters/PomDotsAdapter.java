@@ -69,7 +69,7 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
 
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
-        switch (mPomDotCounter) {
+        switch (position) {
             case 0: case 2: case 4: case 6:
                 dotsBorder.setColor(WORK_COLOR);
                 break;
@@ -81,6 +81,8 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
                 break;
         }
 
+        holder.fullView.setBackground(dotsBorder);
+
         //Todo: Should not need a loop inside this, as we've done in DotDraws.
         if (mPomDotCounter == position) {
             fadeAlpha();
@@ -90,8 +92,6 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         } else {
             holder.fullView.setAlpha(1.0f);
         }
-
-        holder.fullView.setBackground(dotsBorder);
     }
 
     @Override
@@ -124,21 +124,10 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         return stringToReturn;
     }
 
-    private void instantiateLists() {
-        mPomCycleRoundsAsStringsList = new ArrayList<>();
-    }
-
-    private void instantiateMiscObjects() {
-        changeSettingsValues = new ChangeSettingsValues();
-        dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
-    }
-
     public void setPomCycleRoundsAsStringsList(List<String> pomCyclesRoundsAsStringsList) {
+        Log.i("testPom", "pom list being passed is " + mPomCycleRoundsAsStringsList);
         this.mPomCycleRoundsAsStringsList = pomCyclesRoundsAsStringsList;
-    }
-
-    public void updatePomDotCounter(int pomDotCounter) {
-        this.mPomDotCounter = pomDotCounter;
+        setCharactersInPomCyclesRoundsList();
     }
 
     private void setCharactersInPomCyclesRoundsList() {
@@ -147,6 +136,10 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         for (int i=0; i<mPomCycleRoundsAsStringsList.size(); i++) {
             mCharactersInPomCyclesRoundsList.add(mPomCycleRoundsAsStringsList.get(i).length());
         }
+    }
+
+    public void updatePomDotCounter(int pomDotCounter) {
+        this.mPomDotCounter = pomDotCounter;
     }
 
     public void saveModeThreeAlpha() {
@@ -184,6 +177,17 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==4) MINI_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==5) FULL_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+
+        Log.i("testColor","color setting is " + settingNumber);
+    }
+
+    private void instantiateLists() {
+        mPomCycleRoundsAsStringsList = new ArrayList<>();
+    }
+
+    private void instantiateMiscObjects() {
+        changeSettingsValues = new ChangeSettingsValues();
+        dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
     }
 
     public interface sendPomDotAlpha {

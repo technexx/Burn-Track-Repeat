@@ -168,9 +168,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     public void setCycleRoundsAsStringsList(List<String> cyclesRoundsAsStringList) {
         this.mCyclesRoundsAsStringsList = cyclesRoundsAsStringList;
-        Log.i("testRounds", "round list being updated as " + mCyclesRoundsAsStringsList);
         setCharactersInCyclesRoundsList();
-
     }
 
     public void setTypeOfRoundList(List<Integer> typeOfRoundsList) {
@@ -187,7 +185,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         for (int i=0; i<mCyclesRoundsAsStringsList.size(); i++) {
             mCharactersInCyclesRoundsList.add(mCyclesRoundsAsStringsList.get(i).length());
         }
-
     }
 
     public void changeColorSetting(int typeOFRound, int settingNumber) {
