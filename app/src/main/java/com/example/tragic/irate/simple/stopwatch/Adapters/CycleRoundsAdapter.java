@@ -231,6 +231,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       case 1:
         return mWorkOutList.size();
       case 3:
+        Log.i("testMode", "pom list is " + mPomList);
         return mPomList.size();
       default:
         return 0;

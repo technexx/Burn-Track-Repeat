@@ -597,7 +597,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Can just use our different /long layouts for moment.
       //Todo: Test w/ other 2 motos.
 
-  //Todo: Round recycler for Pom is size of >8 rounds.
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Sound settings (vibrations) seems off (1 vib = silent, 2 vib = 1, etc.)
@@ -2391,9 +2390,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         cycleRoundsAdapter.disablePomFade();
+
+        pomStringListOfRoundValues.clear();
         for (int i=0; i<pomValuesTime.size(); i++) {
           pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(i)/1000));
         }
+        Log.i("testPom", "pom values in populateRoundArrayForHighlightedCycle() are " + pomStringListOfRoundValues);
+
         break;
     }
   }
@@ -3467,6 +3470,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           cycleRoundsAdapter.setPomFade(true);
           cycleRoundsAdapter.notifyDataSetChanged();
+
+          Log.i("testPom", "pom values are " + pomStringListOfRoundValues);
         } else {
 //          showToastIfNoneActive("Pomodoro cycle already loaded!");
         }
@@ -3708,6 +3713,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             pomValuesTime.add(integerValue);
             pomStringListOfRoundValues.add(convertSeconds(integerValue/1000));
           }
+
+          Log.i("testPom", "pom values in populateCycleRoundAndRoundTypeArrayLists() are " + pomStringListOfRoundValues);
+
 
           pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
           pomDotsAdapter.updatePomDotCounter(pomDotCounter);
@@ -5384,15 +5392,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleEditPopUpViewsForAddingActivity(boolean activityExists) {
-    if (activityExists) {
-      String activity = (String) tdee_sub_category_spinner.getSelectedItem();
-      addTDEEfirstMainTextView.setText(activity);
-      removeTdeeActivityImageView.setVisibility(View.VISIBLE);
-      cycleHasActivityAssigned = true;
-    } else {
-      addTDEEfirstMainTextView.setText(R.string.add_activity);
-      removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
-      cycleHasActivityAssigned = false;
+    if (mode==1) {
+      if (activityExists) {
+        String activity = (String) tdee_sub_category_spinner.getSelectedItem();
+        addTDEEfirstMainTextView.setText(activity);
+        removeTdeeActivityImageView.setVisibility(View.VISIBLE);
+        cycleHasActivityAssigned = true;
+      } else {
+        addTDEEfirstMainTextView.setText(R.string.add_activity);
+        removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
+        cycleHasActivityAssigned = false;
+      }
     }
   }
 
