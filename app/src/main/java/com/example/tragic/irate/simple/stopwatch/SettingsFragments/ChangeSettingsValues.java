@@ -69,13 +69,13 @@ public class ChangeSettingsValues {
     public long[] getVibrationSetting(int settingNumber) {
         long[] chosenVibration = new long[0];
 
-        if (settingNumber==2) {
+        if (settingNumber==1) {
             chosenVibration = new long[]{0, 300, 300};
         }
-        if (settingNumber==3) {
+        if (settingNumber==2) {
             chosenVibration = new long[]{0, 300, 150, 300, 150};
         }
-        if (settingNumber==4) {
+        if (settingNumber==3) {
             chosenVibration = new long[]{0, 300, 300, 300, 300, 300, 300};
         }
 

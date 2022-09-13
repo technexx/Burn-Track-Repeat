@@ -599,7 +599,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
-  //Todo: Sound settings (vibrations) seems off (1 vib = silent, 2 vib = 1, etc.)
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
