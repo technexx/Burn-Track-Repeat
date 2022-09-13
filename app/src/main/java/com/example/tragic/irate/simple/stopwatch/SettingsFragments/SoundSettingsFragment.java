@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,6 +90,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryTextChange(soundEntryListForSets, setValue);
             setPreference.setSummary(entryString);
+
             return true;
         });
 

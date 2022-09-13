@@ -794,8 +794,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.changeColorSetting(typeOFRound, settingNumber);
     cycleRoundsAdapterTwo.changeColorSetting(typeOFRound, settingNumber);
 
-    Log.i("testColor", "type of round is " + typeOFRound + " and setting number is " + settingNumber);
-
     if (receivedMode==1) {
       savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
       savedCycleAdapter.notifyDataSetChanged();
@@ -2678,8 +2676,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mediaPlayer.start();
         break;
     }
-
-    Log.i("testSound", "sound setting is " + vibrationSetting);
   }
 
   private void assignColorSettingValues(int typeOfRound, int settingsNumber) {
@@ -2700,13 +2696,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignSoundSettingValues(int typeOfRound, int settingNumber) {
     switch (typeOfRound) {
-      case 0:
-        vibrationSettingForSets = settingNumber; break;
       case 1:
+        vibrationSettingForSets = settingNumber; break;
+      case 2:
         vibrationSettingForBreaks = settingNumber; break;
-      case 3:
-        vibrationSettingForWork = settingNumber; break;
       case 4:
+        vibrationSettingForWork = settingNumber; break;
+      case 5:
         vibrationSettingForMiniBreaks = settingNumber; break;
     }
   }
@@ -3687,7 +3683,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           }
 
-          //Todo: Test other phones.
           ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
           dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
