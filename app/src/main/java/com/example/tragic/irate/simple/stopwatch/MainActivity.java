@@ -3253,8 +3253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String totalRounds = String.valueOf(startRounds);
 
     String timeRemaining = "";
-//    timeRemaining = convertTimerValuesToStringForNotifications(((timeLeft-250) +1000) / 1000);
-    timeRemaining = convertTimerValuesToStringForNotifications((timeLeft+999) / 1000);
+    timeRemaining = convertTimerValuesToStringForNotifications((timeLeft) / 1000);
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
   }
