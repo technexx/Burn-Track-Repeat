@@ -79,7 +79,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         return mCyclesRoundsAsStringsList.size();
     }
 
-    //Todo: For Pom as well.
     @Override
     public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
         holder.roundText.setText(trimTwoDigitString(mCyclesRoundsAsStringsList.get(position)));

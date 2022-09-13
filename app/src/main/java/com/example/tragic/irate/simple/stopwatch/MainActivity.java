@@ -483,6 +483,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder builder;
   static boolean dismissNotification = true;
+  Runnable notificationsRunnable;
 
   String oldCycleTitleString;
   ArrayList<String> oldCycleRoundListOne;
@@ -590,14 +591,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PomDotsAdapter pomDotsAdapter;
 
   List<String> roundListForDots;
-
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
   // Todo: Some overlap in Timer for non-long in emulator. Cutting off dots also w/ single row.
       //Todo: Can just use our different /long layouts for moment.
       //Todo: Test w/ other 2 motos.
 
-  //Todo: End of all rounds shows +1 in notifications (e.g. round 12 of 12 is ended, shows "on 13/12").
+  //Todo: "Reset" in stopwatch doesn't disappear after click.
+  //Todo: Test 2 and 3 digit minutes for stopwatch. Make circle thinner.
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -636,10 +637,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onStop() {
     super.onStop();
     setVisible(false);
-    if (timerPopUpWindow.isShowing()) {
+    if (timerPopUpWindow.isShowing() || stopWatchPopUpWindow.isShowing()) {
       dismissNotification = false;
-      setNotificationValues();
+      notificationsRunnable = notificationsRunnable();
+      mHandler.post(notificationsRunnable);
     }
+  }
+
+  private Runnable notificationsRunnable() {
+    return new Runnable() {
+      @Override
+      public void run() {
+        setNotificationValues();
+        mHandler.postDelayed(this, 900);
+        Log.i("testNote", "running!");
+      }
+    };
   }
 
   @Override
@@ -2116,6 +2129,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   };
 
+  private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
+    globalSaveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
+      @Override
+      public void run() {
+        AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+      }
+    };
+  }
+
   private void createNewListOfActivitiesIfDayHasChanged() {
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
@@ -2149,15 +2171,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
-  }
-
-  private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
-    globalSaveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
-      @Override
-      public void run() {
-        AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-      }
-    };
   }
 
   private void fabLogic() {
@@ -3128,41 +3141,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return dismissPendingIntent;
   }
 
-  public String setNotificationHeader(String selectedMode, String roundType) {
-    return (getString(R.string.notification_text_header, selectedMode, roundType));
-  }
-
-  private String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
-    String currentTimerRound = "";
-
-    if (roundsLeft!=0) {
-      currentTimerRound = String.valueOf(startRounds-roundsLeft + 1);
-    } else {
-      currentTimerRound = String.valueOf(startRounds);
-    }
-
-    String totalRounds = String.valueOf(startRounds);
-
-    String timeRemaining = "";
-    timeRemaining = convertTimerValuesToStringForNotifications(((timeLeft-250) +1000) / 1000);
-
-    return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
-  }
-
-  private String getUpOrDownArrowForNotifications() {
-    String stringToReturn = "";
-
-    if (mode==1) {
-      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
-        stringToReturn = getString(R.string.arrow_down);
-      } else {
-        stringToReturn = getString(R.string.arrow_up);
-      }
-    };
-
-    return stringToReturn;
-  }
-
   private void instantiateNotifications() {
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
@@ -3246,6 +3224,43 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
   }
+
+
+  public String setNotificationHeader(String selectedMode, String roundType) {
+    return (getString(R.string.notification_text_header, selectedMode, roundType));
+  }
+
+  private String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
+    String currentTimerRound = "";
+
+    if (roundsLeft!=0) {
+      currentTimerRound = String.valueOf(startRounds-roundsLeft + 1);
+    } else {
+      currentTimerRound = String.valueOf(startRounds);
+    }
+
+    String totalRounds = String.valueOf(startRounds);
+
+    String timeRemaining = "";
+    timeRemaining = convertTimerValuesToStringForNotifications((timeLeft+999) / 1000);
+
+    return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
+  }
+
+  private String getUpOrDownArrowForNotifications() {
+    String stringToReturn = "";
+
+    if (mode==1) {
+      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
+        stringToReturn = getString(R.string.arrow_down);
+      } else {
+        stringToReturn = getString(R.string.arrow_up);
+      }
+    };
+
+    return stringToReturn;
+  }
+
 
   private void activateResumeOrResetOptionForCycle() {
     if (mode==1) {
@@ -4180,8 +4195,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        setNotificationValues();
-
         DecimalFormat df2 = new DecimalFormat("00");
 
         timerIteration.setCurrentTime(System.currentTimeMillis());
@@ -4357,8 +4370,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(setMillis);
-        setNotificationValues();
-
         mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
@@ -4400,7 +4411,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(breakMillis);
-        setNotificationValues();
         mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
@@ -4421,8 +4431,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long initialMillisValue = setMillis;
     setInitialTextSizeForRounds(setMillis);
 
-    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
-
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
@@ -4437,8 +4445,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.reDraw();
 
         dotsAdapter.notifyDataSetChanged();
-
-        setNotificationValues();
       }
 
       @Override
@@ -4453,8 +4459,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setInitialTextSizeForRounds(breakMillis);
     long initialMillisValue = breakMillis;
 
-    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
-
     timer = new CountDownTimer(breakMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
@@ -4468,8 +4472,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.reDraw();
 
         dotsAdapter.notifyDataSetChanged();
-
-        setNotificationValues();
       }
 
       @Override
@@ -4483,8 +4485,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long startMillis = pomMillis;
     setInitialTextSizeForRounds(pomMillis);
     long initialMillisValue = pomMillis;
-
-    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
 
     timer = new CountDownTimer(pomMillis, timerRunnableDelay) {
       @Override
@@ -4500,8 +4500,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.reDraw();
 
         pomDotsAdapter.notifyDataSetChanged();
-
-        setNotificationValues();
       }
 
       @Override
@@ -5057,8 +5055,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapAdapter.notifyDataSetChanged();
     empty_laps.setVisibility(View.VISIBLE);
     setInitialTextSizeForRounds(0);
-
-    setNotificationValues();
   }
 
   private void startObjectAnimatorAndTotalCycleTimeCounters() {
@@ -5371,8 +5367,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       pomDotsAdapter.setModeThreeAlpha();
       pomDotsAdapter.notifyDataSetChanged();
     }
-
-    setNotificationValues();
   }
 
   private void sendPhoneResolutionToDotDrawsClass() {
