@@ -5,6 +5,8 @@
 
     <string name="infinity_symbol">&#8734;</string>
     <string name="test_infinity"><font fgcolor='#ffffffff'>&#8734;</font></string>
+    <string name="arrow_down">\u2193</string>
+    <string name="arrow_up">\u2191</string>
 
     <string name="no_sets">Breaks Only</string>
     <string name="reset">Reset</string>
@@ -82,7 +84,7 @@
     <string name="long_break_sounds">Long Break:</string>
 
     <string name="notification_text_header">%1$s - On %2$s </string>
-    <string name="notification_text">Round %1$s of %2$s - %3$s</string>
+    <string name="notification_text">Round %1$s of %2$s - %3$s %4$s</string>
     <string name="notification_stopwatch_header">Stopwatch</string>
 
     <string name="workout_mode">Workout Mode</string>

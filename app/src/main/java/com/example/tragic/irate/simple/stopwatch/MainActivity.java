@@ -593,7 +593,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
-  //Todo: Some overlap in Timer for non-long in emulator. Cutting off dots also w/ single row.
+  // Todo: Some overlap in Timer for non-long in emulator. Cutting off dots also w/ single row.
       //Todo: Can just use our different /long layouts for moment.
       //Todo: Test w/ other 2 motos.
 
@@ -3133,13 +3133,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
-    String currentTimerRound = String.valueOf(startRounds-roundsLeft + 1);
+    String currentTimerRound = "";
+
+    if (roundsLeft!=0) {
+      currentTimerRound = String.valueOf(startRounds-roundsLeft + 1);
+    } else {
+      currentTimerRound = String.valueOf(startRounds);
+    }
+
     String totalRounds = String.valueOf(startRounds);
 
     String timeRemaining = "";
     timeRemaining = convertTimerValuesToStringForNotifications(((timeLeft-250) +1000) / 1000);
 
-    return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
+    return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
+  }
+
+  private String getUpOrDownArrowForNotifications() {
+    String stringToReturn = "";
+
+    if (mode==1) {
+      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
+        stringToReturn = getString(R.string.arrow_down);
+      } else {
+        stringToReturn = getString(R.string.arrow_up);
+      }
+    };
+
+    return stringToReturn;
   }
 
   private void instantiateNotifications() {
