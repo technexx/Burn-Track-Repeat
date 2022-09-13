@@ -2663,14 +2663,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
     switch (vibrationSetting) {
-      case 2: case 3: case 4:
+      case 1: case 2: case 3:
         if (repeat) {
           vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
         } else {
           vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
         }
         break;
-      case 5:
+      case 4:
         if (!repeat) {
           mediaPlayer.setLooping(false);
         } else {
@@ -2679,6 +2679,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mediaPlayer.start();
         break;
     }
+
+    Log.i("testSound", "sound setting is " + vibrationSetting);
   }
 
   private void assignColorSettingValues(int typeOfRound, int settingsNumber) {

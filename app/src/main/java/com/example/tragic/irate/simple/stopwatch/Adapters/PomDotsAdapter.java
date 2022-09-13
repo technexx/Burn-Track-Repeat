@@ -162,13 +162,13 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         }
 
         if (mAlpha>0.25f && !mFadeUp) {
-            mAlpha -= 0.05;
+            mAlpha -= 0.08;
         } else {
             mFadeUp = true;
         }
 
         if (mFadeUp) {
-            mAlpha += 0.05;
+            mAlpha += 0.08;
         }
     }
 

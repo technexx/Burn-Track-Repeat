@@ -71,7 +71,6 @@ public class ChangeSettingsValues {
 
         if (settingNumber==2) {
             chosenVibration = new long[]{0, 300, 300};
-
         }
         if (settingNumber==3) {
             chosenVibration = new long[]{0, 300, 150, 300, 150};
