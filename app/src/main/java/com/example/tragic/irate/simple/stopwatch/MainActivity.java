@@ -626,6 +626,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVisible(true);
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
+    mHandler.removeCallbacks(notificationsRunnable);
   }
 
   @Override
@@ -649,8 +650,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         setNotificationValues();
-        mHandler.postDelayed(this, 900);
-        Log.i("testNote", "running!");
+        mHandler.postDelayed(this, 1000);
+//        Log.i("testNote", "running!");
       }
     };
   }
@@ -666,6 +667,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onBackPressed() {
     if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
+      onPause();
       return;
     }
 
@@ -2672,22 +2674,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
-    switch (vibrationSetting) {
-      case 1: case 2: case 3:
-        if (repeat) {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
-        } else {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
-        }
-        break;
-      case 4:
-        if (!repeat) {
-          mediaPlayer.setLooping(false);
-        } else {
-          mediaPlayer.setLooping(true);
-        }
-        mediaPlayer.start();
-        break;
+    if (!dismissNotification) {
+      if (!repeat) {
+        mediaPlayer.setLooping(false);
+      } else {
+        mediaPlayer.setLooping(true);
+      }
+      mediaPlayer.start();
+    } else {
+      switch (vibrationSetting) {
+        case 1: case 2: case 3:
+          if (repeat) {
+            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+          } else {
+            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+          }
+          break;
+        case 4:
+          if (!repeat) {
+            mediaPlayer.setLooping(false);
+          } else {
+            mediaPlayer.setLooping(true);
+          }
+          mediaPlayer.start();
+          break;
+      }
     }
   }
 
@@ -3242,6 +3253,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String totalRounds = String.valueOf(startRounds);
 
     String timeRemaining = "";
+//    timeRemaining = convertTimerValuesToStringForNotifications(((timeLeft-250) +1000) / 1000);
     timeRemaining = convertTimerValuesToStringForNotifications((timeLeft+999) / 1000);
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
