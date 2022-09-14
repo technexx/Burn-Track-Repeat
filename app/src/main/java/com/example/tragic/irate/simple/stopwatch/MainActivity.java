@@ -593,12 +593,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   List<String> roundListForDots;
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
-  // Todo: Some overlap in Timer for non-long in emulator. Cutting off dots also w/ single row.
-      //Todo: Can just use our different /long layouts for moment.
-      //Todo: Test w/ other 2 motos.
-
-  //Todo: Test 2 and 3 digit minutes for stopwatch. Make circle thinner.
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
+  //Todo: Test all popUps (incl. stopwatch)  + stats frag w/ diff devices.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -613,6 +609,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test w/ fresh install for all default values.
   //Todo: Test everything 10x. Incl. round selection/replacement.
 
+  //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
   //Todo: Custom activity edits can reset calorie count.
@@ -1341,7 +1338,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void stopWatchLaunchLogic() {
-    setInitialTextSizeForRounds(0);
+    setInitialTextSizeForStopWatch();
 
     stopWatchTimeTextView.setText(displayTime);
     msTimeTextView.setText(displayMs);
@@ -4218,6 +4215,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchMs = (stopWatchTotalTime%1000) / 10;
 
         displayTime = convertSeconds( (long) stopWatchSeconds);
+//        displayTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView((long) stopWatchTotalTime);
         displayMs = df2.format(stopWatchMs);
 
         stopWatchTimeTextView.setText(displayTime);
@@ -4349,7 +4347,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       valueAnimatorDown.cancel();
     }
 
-    setInitialTextSizeForRounds(0);
+    setInitialTextSizeForTimers(0);
 
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -4390,7 +4388,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       valueAnimatorDown.cancel();
     }
 
-    setInitialTextSizeForRounds(0);
+    setInitialTextSizeForTimers(0);
 
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -4439,7 +4437,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void startSetTimer() {
     long startMillis = setMillis;
     long initialMillisValue = setMillis;
-    setInitialTextSizeForRounds(setMillis);
+    setInitialTextSizeForTimers(setMillis);
 
     timer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
@@ -4466,7 +4464,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void startBreakTimer() {
     long startMillis = breakMillis;
-    setInitialTextSizeForRounds(breakMillis);
+    setInitialTextSizeForTimers(breakMillis);
     long initialMillisValue = breakMillis;
 
     timer = new CountDownTimer(breakMillis, timerRunnableDelay) {
@@ -4493,7 +4491,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void startPomTimer() {
     long startMillis = pomMillis;
-    setInitialTextSizeForRounds(pomMillis);
+    setInitialTextSizeForTimers(pomMillis);
     long initialMillisValue = pomMillis;
 
     timer = new CountDownTimer(pomMillis, timerRunnableDelay) {
@@ -4577,7 +4575,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopWatchTextSizeHasChanged = hasChanged;
   }
 
-  private void setInitialTextSizeForRounds(long millis) {
+  private void setInitialTextSizeForTimers(long millis) {
+    if (valueAnimatorDown.isRunning()) {
+      valueAnimatorDown.cancel();
+    }
+    if (valueAnimatorUp.isRunning()) {
+      valueAnimatorUp.cancel();
+    }
+
     if (millis>=60000) {
       if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
         timeLeft.setTextSize(70f);
@@ -4590,6 +4595,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         timeLeft.setTextSize(120f);
       }
+    }
+  }
+
+  private void setInitialTextSizeForStopWatch() {
+    if (valueAnimatorDown.isRunning()) {
+      valueAnimatorDown.cancel();
+    }
+
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+      stopWatchTimeTextView.setTextSize(90f);
+    } else {
+      stopWatchTimeTextView.setTextSize(120f);
     }
   }
 
@@ -5065,7 +5082,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapAdapter.notifyDataSetChanged();
     stopwatchReset.setVisibility(View.INVISIBLE);
     empty_laps.setVisibility(View.VISIBLE);
-    setInitialTextSizeForRounds(0);
+    setInitialTextSizeForStopWatch();
   }
 
   private void startObjectAnimatorAndTotalCycleTimeCounters() {
@@ -5295,22 +5312,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 1:
             setMillis = workoutTime.get(0);
             timeLeft.setText(convertSeconds((dividedMillisForTimerDisplay(setMillis))));
-            setInitialTextSizeForRounds(setMillis);
+            setInitialTextSizeForTimers(setMillis);
             break;
           case 2:
             setMillis = 0;
             timeLeft.setText("0");
-            setInitialTextSizeForRounds(0);
+            setInitialTextSizeForTimers(0);
             break;
           case 3:
             breakMillis = workoutTime.get(0);
             timeLeft.setText(convertSeconds(((dividedMillisForTimerDisplay(breakMillis)))));
-            setInitialTextSizeForRounds(breakMillis);
+            setInitialTextSizeForTimers(breakMillis);
             break;
           case 4:
             breakMillis = 0;
             timeLeft.setText("0");
-            setInitialTextSizeForRounds(0);
+            setInitialTextSizeForTimers(0);
             break;
         };
 
@@ -5364,7 +5381,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
         pomDotsAdapter.updatePomDotCounter(pomDotCounter);
 
-        setInitialTextSizeForRounds(pomMillis);
+        setInitialTextSizeForTimers(pomMillis);
       }
       toggleCycleTimeTextViewSizes();
 
