@@ -663,10 +663,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onDestroy();
   }
 
+  //Remember, this does not execute if we are dismissing a popUp.
   @Override
   public void onBackPressed() {
     if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
-      onPause();
       return;
     }
 
@@ -1027,6 +1027,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     timerPopUpWindow.setOnDismissListener(() -> {
       timerPopUpDismissalLogic();
+      Log.i("testBack", "dismissed!");
+
 
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -5509,12 +5511,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleCycleTimeTextViewSizes() {
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
-      cycles_completed_textView.setTextSize(24);
+      cycles_completed_textView.setTextSize(20);
 
-      total_set_header.setTextSize(24);
-      total_set_time.setTextSize(22);
-      total_break_header.setTextSize(24);
-      total_break_time.setTextSize(22);
+      total_set_header.setTextSize(18);
+      total_set_time.setTextSize(18);
+      total_break_header.setTextSize(20);
+      total_break_time.setTextSize(20);
     } else {
       cycles_completed_textView.setTextSize(28);
 
