@@ -9,38 +9,6 @@
     android:id="@+id/main_timer_layout"
     android:theme="@style/TimerTheme">
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/first_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.33">
-    </androidx.constraintlayout.widget.Guideline>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/second_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.38">
-    </androidx.constraintlayout.widget.Guideline>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/third_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.58">
-    </androidx.constraintlayout.widget.Guideline>
-
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/fourth_guideline"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent="0.66">
-    </androidx.constraintlayout.widget.Guideline>
-
     <com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws
         android:id="@+id/dotdraws"
         android:layout_width="1dp"
@@ -49,43 +17,15 @@
         app:layout_constraintStart_toStartOf="parent">
     </com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dots_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/first_guideline"
-        app:layout_constraintBottom_toTopOf="@id/fourth_guideline"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/recycler_border"
-        android:orientation="horizontal"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp">
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pom_dots_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/second_guideline"
-        app:layout_constraintBottom_toTopOf="@id/third_guideline"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/recycler_border"
-        android:orientation="horizontal"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp">
-    </androidx.recyclerview.widget.RecyclerView>
-    
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/non_tracking_timer_stat_headers_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/first_guideline"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/dots_recycler_layout"
+        app:layout_constraintVertical_weight="5">
 
         <TextView
             android:id="@+id/cycle_title_textView"
@@ -93,9 +33,11 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/open_sans"
             android:textColor="@color/teal_200"
-            android:textSize="26sp"
-            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="20sp"
+            android:maxLines="1"
+            android:maxLength="50"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
         </TextView>
 
@@ -105,7 +47,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="24dp"
             android:textColor="@color/white"
-            android:textSize="24sp"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cycle_title_textView">
@@ -115,8 +57,8 @@
             android:id="@+id/total_set_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:textSize="22sp"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
             app:layout_constraintEnd_toStartOf="@id/reset_total_cycle_times"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView">
@@ -126,8 +68,8 @@
             android:id="@+id/total_break_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
-            android:textSize="22sp"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/reset_total_cycle_times"
             app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView">
@@ -176,9 +118,11 @@
         android:id="@+id/tracking_timer_header_layout"
         android:layout_width="wrap_content"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="@id/first_guideline"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/dots_recycler_layout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_weight="5">
 
         <TextView
             android:id="@+id/tracking_daily_stats_header_textView"
@@ -243,7 +187,7 @@
             android:id="@+id/daily_single_activity_string_header"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
+            android:layout_marginTop="20dp"
             android:textColor="@color/light_blue"
             android:textSize="22sp"
             android:gravity="center_horizontal"
@@ -302,12 +246,54 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/timer_progress_bar_layout"
+        android:id="@+id/dots_recycler_layout"
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/fourth_guideline">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
+        app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
+        app:layout_constraintVertical_weight="3">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dots_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingEnd="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/recycler_border"
+            android:orientation="horizontal"
+            android:paddingStart="4dp">
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pom_dots_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/recycler_border"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
+        </androidx.recyclerview.widget.RecyclerView>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/timer_progress_bar_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@id/vertical_guideline_left"
+        app:layout_constraintEnd_toEndOf="@id/vertical_guideline_right"
+        app:layout_constraintTop_toBottomOf="@id/dots_recycler_layout"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintVertical_weight="5">
 
         <TextView
             android:id="@+id/timeLeft"
@@ -324,8 +310,8 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="300dp"
-            android:layout_height="0dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
             android:layout_marginBottom="4dp"
             android:background="@drawable/circle_shape"
             android:max="10000"
@@ -372,9 +358,23 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent">
         </ImageButton>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical_guideline_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".15">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical_guideline_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".85">
+    </androidx.constraintlayout.widget.Guideline>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>

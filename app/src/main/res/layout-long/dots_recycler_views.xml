@@ -5,7 +5,8 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="2dp"
     android:layout_marginEnd="2dp"
-    android:layout_marginTop="22dp">
+    android:layout_marginTop="8dp"
+    android:layout_marginBottom="8dp">
 
     <!--Setting src/background image here cuts off left/right sides-->
     <ImageView

@@ -586,16 +586,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   RecyclerView dotsRecycler;
   DotsAdapter dotsAdapter;
+  ConstraintLayout dotsRecyclerLayout;
 
   RecyclerView pomDotsRecycler;
   PomDotsAdapter pomDotsAdapter;
-
   List<String> roundListForDots;
-  ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
+  ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
   ConstraintLayout progressBarLayout;
 
-  //Todo: Progressbar gets cut off relative to dotsRecycler because it is constrained to 4th guideline even when dotsRecycler is constrained between 2nd and 3rd (for single row of dots).
+  //Todo: Watch some tutorials on layouts across devices.
+  //Todo: We could have a scrollView for stat headers.
+
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Test all popUps (incl. stopwatch)  + stats frag w/ diff devices.
 
@@ -1834,7 +1836,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsAdapter = new DotsAdapter(getApplicationContext(), convertedWorkoutRoundList, typeOfRound);
 
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
-    dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
+    dotsRecyclerLayout = timerPopUpView.findViewById(R.id.dots_recycler_layout);
+    dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecyclerLayout.getLayoutParams();
 
     dotsRecycler.setAdapter(dotsAdapter);
     dotsRecycler.setLayoutManager(gridLayoutManager);
@@ -1867,15 +1870,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void adjustDotRecyclerViewSize(int numberOfRows) {
     if (numberOfRows<=8) {
-      dotsRecyclerLayoutParams.topToBottom = R.id.second_guideline;
-      dotsRecyclerLayoutParams.bottomToTop = R.id.third_guideline;
-
-      progressBarLayoutParams.topToTop = R.id.third_guideline;
+      dotsRecyclerLayoutParams.verticalWeight = 3;
     } else {
-      dotsRecyclerLayoutParams.topToBottom = R.id.first_guideline;
-      dotsRecyclerLayoutParams.bottomToTop = R.id.fourth_guideline;
-
-      progressBarLayoutParams.topToTop = R.id.fourth_guideline;
+      dotsRecyclerLayoutParams.verticalWeight = 4;
     }
   }
 
@@ -5513,8 +5510,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
       cycles_completed_textView.setTextSize(20);
 
-      total_set_header.setTextSize(18);
-      total_set_time.setTextSize(18);
+      total_set_header.setTextSize(20);
+      total_set_time.setTextSize(20);
       total_break_header.setTextSize(20);
       total_break_time.setTextSize(20);
     } else {
@@ -5527,6 +5524,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //These have the same effect as changing the /long and /not-long layouts
   private void toggleDailyStatsTimerTextViewSizes() {
     if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
       tracking_daily_stats_header_textView.setTextSize(20);
