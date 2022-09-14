@@ -11,8 +11,8 @@
     <!--Setting src/background image here cuts off left/right sides-->
     <ImageView
         android:id="@+id/round_string_imageView"
-        android:layout_width="62dp"
-        android:layout_height="62dp"
+        android:layout_width="45dp"
+        android:layout_height="45dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"

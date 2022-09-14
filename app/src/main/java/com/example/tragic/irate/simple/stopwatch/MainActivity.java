@@ -592,6 +592,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PomDotsAdapter pomDotsAdapter;
   List<String> roundListForDots;
 
+  ConstraintLayout.LayoutParams trackingHeaderLayoutParams;
+  ConstraintLayout.LayoutParams nonTrackingHeaderLayoutParams;
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
   ConstraintLayout progressBarLayout;
 
@@ -1665,9 +1667,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset = timerPopUpView.findViewById(R.id.reset);
 
     nonTrackingTimerHeaderLayout = timerPopUpView.findViewById(R.id.non_tracking_timer_stat_headers_layout);
-    trackingTimerHeaderLayout = timerPopUpView.findViewById(R.id.tracking_timer_header_layout);
+    nonTrackingHeaderLayoutParams = (ConstraintLayout.LayoutParams) nonTrackingTimerHeaderLayout.getLayoutParams();
 
+    trackingTimerHeaderLayout = timerPopUpView.findViewById(R.id.tracking_timer_header_layout);
     tracking_daily_stats_header_textView = timerPopUpView.findViewById(R.id.tracking_daily_stats_header_textView);
+    trackingTimerHeaderLayout = timerPopUpView.findViewById(R.id.tracking_timer_header_layout);
+    trackingHeaderLayoutParams = (ConstraintLayout.LayoutParams) trackingTimerHeaderLayout.getLayoutParams();
+
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
     cycles_completed_textView = timerPopUpView.findViewById(R.id.cycles_completed_textView);
 
@@ -1870,9 +1876,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void adjustDotRecyclerViewSize(int numberOfRows) {
     if (numberOfRows<=8) {
-      dotsRecyclerLayoutParams.verticalWeight = 3;
+      dotsRecyclerLayoutParams.verticalWeight = 2;
+      nonTrackingHeaderLayoutParams.verticalWeight = 5;
+      trackingHeaderLayoutParams.verticalWeight = 5;
     } else {
-      dotsRecyclerLayoutParams.verticalWeight = 4;
+      dotsRecyclerLayoutParams.verticalWeight = 3;
+      nonTrackingHeaderLayoutParams.verticalWeight = 4;
+      trackingHeaderLayoutParams.verticalWeight = 4;
     }
   }
 
