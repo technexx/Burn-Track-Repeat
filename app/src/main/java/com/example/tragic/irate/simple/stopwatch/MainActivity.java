@@ -1874,15 +1874,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomDotsRecycler.setVisibility(View.GONE);
   }
 
+  //Todo: Weight on layout that contains recyclerView is not the same as weight on view itself.
   private void adjustDotRecyclerViewSize(int numberOfRows) {
     if (numberOfRows<=8) {
       dotsRecyclerLayoutParams.verticalWeight = 2;
       nonTrackingHeaderLayoutParams.verticalWeight = 5;
       trackingHeaderLayoutParams.verticalWeight = 5;
+      progressBarLayoutParams.verticalWeight = 5;
     } else {
       dotsRecyclerLayoutParams.verticalWeight = 3;
       nonTrackingHeaderLayoutParams.verticalWeight = 4;
       trackingHeaderLayoutParams.verticalWeight = 4;
+      progressBarLayoutParams.verticalWeight = 2;
     }
   }
 
