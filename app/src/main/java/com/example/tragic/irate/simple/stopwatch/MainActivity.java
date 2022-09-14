@@ -597,7 +597,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Can just use our different /long layouts for moment.
       //Todo: Test w/ other 2 motos.
 
-  //Todo: "Reset" in stopwatch doesn't disappear after click.
   //Todo: Test 2 and 3 digit minutes for stopwatch. Make circle thinner.
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
 
@@ -5064,6 +5063,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapsNumber = 0;
 
     lapAdapter.notifyDataSetChanged();
+    stopwatchReset.setVisibility(View.INVISIBLE);
     empty_laps.setVisibility(View.VISIBLE);
     setInitialTextSizeForRounds(0);
   }
