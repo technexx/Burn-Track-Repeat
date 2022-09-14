@@ -593,6 +593,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   List<String> roundListForDots;
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
+  ConstraintLayout progressBarLayout;
+
+  //Todo: Progressbar gets cut off relative to dotsRecycler because it is constrained to 4th guideline even when dotsRecycler is constrained between 2nd and 3rd (for single row of dots).
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Test all popUps (incl. stopwatch)  + stats frag w/ diff devices.
 
@@ -1701,6 +1704,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopwatchReset = stopWatchPopUpView.findViewById(R.id.stopwatch_reset);
 
     progressBar = timerPopUpView.findViewById(R.id.progressBar);
+    progressBarLayout = timerPopUpView.findViewById(R.id.timer_progress_bar_layout);
     timeLeft = timerPopUpView.findViewById(R.id.timeLeft);
     reset_total_cycle_times = timerPopUpView.findViewById(R.id.reset_total_cycle_times);
     pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
@@ -1863,9 +1867,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (numberOfRows<=8) {
       dotsRecyclerLayoutParams.topToBottom = R.id.second_guideline;
       dotsRecyclerLayoutParams.bottomToTop = R.id.third_guideline;
+
+      progressBarLayoutParams.topToTop = R.id.third_guideline;
     } else {
       dotsRecyclerLayoutParams.topToBottom = R.id.first_guideline;
       dotsRecyclerLayoutParams.bottomToTop = R.id.fourth_guideline;
+
+      progressBarLayoutParams.topToTop = R.id.fourth_guideline;
     }
   }
 
@@ -2021,7 +2029,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cyclesCompletedLayoutParams = (ConstraintLayout.LayoutParams) cycles_completed_textView.getLayoutParams();
     totalSetTimeHeaderLayoutParams = (ConstraintLayout.LayoutParams) total_set_header.getLayoutParams();
     totalBreakTimeHeaderLayoutParams = (ConstraintLayout.LayoutParams) total_break_header.getLayoutParams();
-    progressBarLayoutParams = (ConstraintLayout.LayoutParams) progressBar.getLayoutParams();
+    progressBarLayoutParams = (ConstraintLayout.LayoutParams) progressBarLayout.getLayoutParams();
     timerTextViewLayoutParams = (ConstraintLayout.LayoutParams) timeLeft.getLayoutParams();
 
     roundRecyclerParentLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
