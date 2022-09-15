@@ -112,39 +112,39 @@
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <!--Longer wrap_content in any view within this layout will increase the wrap_content width/height of layout itself -->
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/tracking_timer_header_layout"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/dots_recycler_layout"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintVertical_weight="4">
 
         <TextView
             android:id="@+id/tracking_daily_stats_header_textView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="4dp"
-            android:layout_marginStart="72dp"
+            android:layout_marginStart="0dp"
             android:gravity="center_horizontal"
             android:textColor="@color/teal_200"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent">
+            android:textSize="24sp"
+            android:textStyle="bold">
         </TextView>
 
         <TextView
             android:id="@+id/daily_total_time_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="72dp"
+            android:layout_marginStart="100dp"
             app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toStartOf="parent"
             android:textColor="@color/white"
-            android:textSize="24sp">
+            android:textSize="22sp">
         </TextView>
 
         <TextView
@@ -155,18 +155,18 @@
             app:layout_constraintStart_toEndOf="@id/daily_total_time_textView_header"
             android:layout_marginStart="8dp"
             android:textColor="@color/green"
-            android:textSize="24sp">
+            android:textSize="22sp">
         </TextView>
 
         <TextView
             android:id="@+id/daily_total_calories_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginStart="72dp"
+            android:layout_marginStart="100dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
             android:layout_marginTop="4dp"
-            android:textSize="24sp">
+            android:textSize="22sp">
         </TextView>
 
         <TextView
@@ -177,23 +177,23 @@
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
             app:layout_constraintStart_toEndOf="@id/daily_total_calories_textView_header"
             android:layout_marginTop="4dp"
-            android:textSize="24sp"
+            android:textSize="22sp"
             android:textColor="@color/purple_200">
         </TextView>
 
         <TextView
             android:id="@+id/daily_single_activity_string_header"
-            android:layout_width="0dp"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/daily_total_calories_textView_header"
+            android:gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:textColor="@color/light_blue"
             android:textSize="22sp"
-            android:gravity="center_horizontal"
             android:layout_marginStart="30dp"
-            android:maxLines="2"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/daily_total_calories_textView_header">
+            android:maxLines="2">
         </TextView>
 
         <TextView
@@ -201,7 +201,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textSize="22sp"
-            android:layout_marginStart="72dp"
+            android:layout_marginStart="100dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header">
         </TextView>
@@ -223,7 +223,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
-            android:layout_marginStart="72dp"
+            android:layout_marginStart="100dp"
             android:textSize="22sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header">
@@ -282,11 +282,6 @@
         app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
         app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
         app:layout_constraintVertical_weight="3">
-
-
-
-
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
