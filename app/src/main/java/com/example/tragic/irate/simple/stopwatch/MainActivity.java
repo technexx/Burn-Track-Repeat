@@ -996,24 +996,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return true;
   }
 
-  private void setPhoneDimensionLayouts() {
+  private void setPhoneDimensions() {
     DisplayMetrics metrics = new DisplayMetrics();
     getWindowManager().getDefaultDisplay().getMetrics(metrics);
 
-    int height = metrics.heightPixels;
-    int width = metrics.widthPixels;
+    phoneHeight = metrics.heightPixels;
+    phoneWidth = metrics.widthPixels;
 
+    Log.i("testDimensions", "height is " + phoneHeight + " and width is " + phoneWidth);
+  }
+
+  private void setTimerLayoutForDifferentHeights() {
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    if (height<=1920) {
-      timerPopUpView = inflater.inflate(R.layout.timer_popup_h1300, null);
+    if (phoneHeight<=1920) {
+      timerPopUpView = inflater.inflate(R.layout.timer_popup_h1920, null);
     } else {
       timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
     }
 
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-
-    Log.i("testDimensions", "height is " + height + " and width is " + width);
   }
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
@@ -1022,9 +1024,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    setPhoneDimensionLayouts();
-
+    setPhoneDimensions();
     groupAllAppStartInstantiations();
+    dotsAdapter.setScreenHeight(phoneHeight);
 
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSets();
@@ -1467,7 +1469,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setDefaultTimerValuesAndTheirEditTextViews();
     setDefaultLayoutVisibilities();
     instantiateAnimationAndColorMethods();
-    sendPhoneResolutionToDotDrawsClass();
 
     instantiateNotifications();
 
@@ -2012,6 +2013,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 //    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+
+    setTimerLayoutForDifferentHeights();
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -5443,15 +5446,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void sendPhoneResolutionToDotDrawsClass() {
-    DisplayMetrics metrics = new DisplayMetrics();
-    getWindowManager().getDefaultDisplay().getMetrics(metrics);
-
-    phoneHeight = metrics.heightPixels;
-    phoneWidth = metrics.widthPixels;
-
-    dotDraws.receivePhoneDimensions(phoneHeight, phoneWidth);
-  }
+//  private void sendPhoneResolutionToDotDrawsClass() {
+//    DisplayMetrics metrics = new DisplayMetrics();
+//    getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//
+//    phoneHeight = metrics.heightPixels;
+//    phoneWidth = metrics.widthPixels;
+//
+//    dotDraws.receivePhoneDimensions(phoneHeight, phoneWidth);
+//  }
 
   private String getCurrentDateAsSlashFormattedString() {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());

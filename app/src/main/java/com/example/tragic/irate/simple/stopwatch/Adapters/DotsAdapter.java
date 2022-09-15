@@ -3,7 +3,6 @@ package com.example.tragic.irate.simple.stopwatch.Adapters;
 import android.content.Context;
 import android.graphics.Color;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -14,7 +13,6 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.R;
@@ -44,6 +42,8 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     sendDotAlpha mSendDotAlpha;
 
+    int mScreenHeight;
+
     Typeface narrowFont;
     Typeface narrowFontBold;
     Typeface bigShouldersFont;
@@ -64,12 +64,23 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         this.mAlpha = alpha;
     }
 
+    public void setScreenHeight(int height) {
+        this.mScreenHeight = height;
+    }
+
     @NonNull
     @Override
     public DotsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.dots_recycler_views, parent, false);
+
+        View view;
+
+        if (mScreenHeight<=1920) {
+            view = inflater.inflate(R.layout.dots_recycler_views_h1920, parent, false);
+        } else {
+            view = inflater.inflate(R.layout.dots_recycler_views, parent, false);
+        }
 
         return new DotsViewHolder(view);
     }

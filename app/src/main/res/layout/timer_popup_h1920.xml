@@ -130,7 +130,7 @@
             android:layout_marginStart="72dp"
             android:gravity="center_horizontal"
             android:textColor="@color/teal_200"
-            android:textSize="21sp"
+            android:textSize="19sp"
             android:textStyle="bold"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent">
@@ -144,7 +144,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toStartOf="parent"
             android:textColor="@color/white"
-            android:textSize="21sp">
+            android:textSize="18sp">
         </TextView>
 
         <TextView
@@ -155,7 +155,7 @@
             app:layout_constraintStart_toEndOf="@id/daily_total_time_textView_header"
             android:layout_marginStart="8dp"
             android:textColor="@color/green"
-            android:textSize="21sp">
+            android:textSize="18sp">
         </TextView>
 
         <TextView
@@ -166,7 +166,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
             android:layout_marginTop="4dp"
-            android:textSize="21sp">
+            android:textSize="18sp">
         </TextView>
 
         <TextView
@@ -187,7 +187,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             android:textColor="@color/light_blue"
-            android:textSize="21sp"
+            android:textSize="18sp"
             android:gravity="center_horizontal"
             android:layout_marginStart="30dp"
             android:maxLines="2"
@@ -200,7 +200,7 @@
             android:id="@+id/daily_total_time_for_single_activity_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="21sp"
+            android:textSize="18sp"
             android:layout_marginStart="72dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header">
@@ -213,7 +213,7 @@
             android:layout_marginStart="8dp"
             android:gravity="center"
             android:textColor="@color/green"
-            android:textSize="21sp"
+            android:textSize="18sp"
             app:layout_constraintStart_toEndOf="@id/daily_total_time_for_single_activity_textView_header"
             app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header">
         </TextView>
@@ -224,7 +224,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginStart="72dp"
-            android:textSize="21sp"
+            android:textSize="18sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header">
         </TextView>
@@ -237,7 +237,7 @@
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:textColor="@color/purple_200"
-            android:textSize="21sp"
+            android:textSize="18sp"
             app:layout_constraintStart_toEndOf="@id/daily_total_calories_for_single_activity_textView_header"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header">
         </TextView>
@@ -309,8 +309,8 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
+            android:layout_width="260dp"
+            android:layout_height="260dp"
             android:layout_marginBottom="4dp"
             android:background="@drawable/circle_shape"
             android:max="10000"
@@ -324,7 +324,7 @@
         <View
             android:id="@+id/pauseResumeButton"
             android:layout_width="260dp"
-            android:layout_height="0dp"
+            android:layout_height="260dp"
             android:layout_marginBottom="4dp"
             app:cornerRadius="90dp"
             app:layout_constraintBottom_toBottomOf="parent"
