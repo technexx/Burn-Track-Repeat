@@ -46,7 +46,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.GridLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -594,11 +593,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout.LayoutParams trackingHeaderLayoutParams;
   ConstraintLayout.LayoutParams nonTrackingHeaderLayoutParams;
+
+  ConstraintLayout.LayoutParams dotsRecyclerParamsForConstraintLayout;
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
+
   ConstraintLayout progressBarLayout;
 
   //Todo: Watch some tutorials on layouts across devices.
-  //Todo: We could have a scrollView for stat headers.
+  //Todo: Just get height of phone, and set diff. layouts for each!
 
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Test all popUps (incl. stopwatch)  + stats frag w/ diff devices.
@@ -994,13 +996,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return true;
   }
 
+  private void setPhoneDimensionLayouts() {
+    DisplayMetrics metrics = new DisplayMetrics();
+    getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+    int height = metrics.heightPixels;
+    int width = metrics.widthPixels;
+
+    LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+    if (height<1300) {
+      timerPopUpView = inflater.inflate(R.layout.timer_popup_h1300, null);
+      Log.i("testDimensions", "executed at <1300 height");
+    } else {
+      timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
+    }
+
+    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+    Log.i("testDimensions", "height is " + height + " and width is " + width);
+  }
+
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
+    setPhoneDimensionLayouts();
     groupAllAppStartInstantiations();
+
 
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSets();
@@ -1843,7 +1867,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
     dotsRecyclerLayout = timerPopUpView.findViewById(R.id.dots_recycler_layout);
-    dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecyclerLayout.getLayoutParams();
+
+    dotsRecyclerParamsForConstraintLayout = (ConstraintLayout.LayoutParams) dotsRecyclerLayout.getLayoutParams();
+    dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
 
     dotsRecycler.setAdapter(dotsAdapter);
     dotsRecycler.setLayoutManager(gridLayoutManager);
@@ -1882,10 +1908,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       trackingHeaderLayoutParams.verticalWeight = 5;
       progressBarLayoutParams.verticalWeight = 5;
     } else {
-      dotsRecyclerLayoutParams.verticalWeight = 3;
+      dotsRecyclerLayoutParams.verticalWeight = 2;
       nonTrackingHeaderLayoutParams.verticalWeight = 4;
       trackingHeaderLayoutParams.verticalWeight = 4;
-      progressBarLayoutParams.verticalWeight = 2;
+      progressBarLayoutParams.verticalWeight = 4;
     }
   }
 
@@ -1974,7 +2000,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
     addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_main_activity, null);
 
-    timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
+//    timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
     stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup, null);
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, convertDensityPixelsToScalable(250), convertDensityPixelsToScalable(450), true);
@@ -1984,7 +2010,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     addTdeePopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
 
-    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+//    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
