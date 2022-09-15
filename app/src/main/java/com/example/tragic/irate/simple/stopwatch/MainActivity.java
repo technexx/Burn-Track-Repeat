@@ -46,6 +46,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
@@ -586,6 +587,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RecyclerView dotsRecycler;
   DotsAdapter dotsAdapter;
   ConstraintLayout dotsRecyclerLayout;
+  GridView dotsGridView;
 
   RecyclerView pomDotsRecycler;
   PomDotsAdapter pomDotsAdapter;
@@ -599,7 +601,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: Watch some tutorials on layouts across devices.
+  //Todo: Dots adapter needs to change w/ two rows vs. 1
 
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Test all popUps (incl. stopwatch)  + stats frag w/ diff devices.
@@ -1861,6 +1863,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
+
     GridLayoutManager gridLayoutManagerTwo = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(RecyclerView.VERTICAL);
 
@@ -1874,6 +1877,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dotsRecycler.setAdapter(dotsAdapter);
     dotsRecycler.setLayoutManager(gridLayoutManager);
+    dotsRecycler.addItemDecoration(setVerticalSpaceItemDecoration(20));
 
     //Disables "ghost scrolling"
     dotsRecycler.setOnTouchListener(new View.OnTouchListener() {
@@ -1901,7 +1905,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomDotsRecycler.setVisibility(View.GONE);
   }
 
-  //Todo: Weight on layout that contains recyclerView is not the same as weight on view itself.
+  private VerticalSpaceItemDecoration setVerticalSpaceItemDecoration(int space) {
+    return new VerticalSpaceItemDecoration(space);
+  }
+
+  //Weight on layout that contains recyclerView is not the same as weight on view itself.
   private void adjustDotRecyclerViewSize(int numberOfRows) {
     if (numberOfRows<=8) {
       dotsRecyclerLayoutParams.verticalWeight = 2;

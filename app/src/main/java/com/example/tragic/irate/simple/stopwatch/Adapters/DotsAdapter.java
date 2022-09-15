@@ -12,7 +12,9 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.R;
@@ -54,6 +56,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         this.mContext = context; this.mCyclesRoundsAsStringsList = cycleRoundsAsStringList; this.mRoundTypeList = typeOfRoundList;
         instantiateMiscObjects();
         instantiateLists();
+
     }
 
     public void onAlphaSend(sendDotAlpha xSendDotAlpha)  {
@@ -95,6 +98,12 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         holder.roundText.setText(trimTwoDigitString(mCyclesRoundsAsStringsList.get(position)));
         holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
 
+        if (mCharactersInCyclesRoundsList.get(position) == 5) {
+            holder.roundText.setTypeface(bigShouldersFont);
+            ConstraintLayout.LayoutParams textLayoutParams = (ConstraintLayout.LayoutParams) holder.roundText.getLayoutParams();
+            textLayoutParams.topMargin = 6;
+        }
+
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
         if (mRoundTypeList.get(position) == 1) {
@@ -116,6 +125,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             dotsBorder.setColor(0);
             dotsBorder.setStroke(3, BREAK_COLOR);
         }
+
         holder.fullView.setBackground(dotsBorder);
 
         if (mCyclesRoundCount - mCycleRoundsLeft == position) {
@@ -140,16 +150,19 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         public DotsViewHolder(@NonNull View itemView) {
             super(itemView);
             roundText = itemView.findViewById(R.id.round_string_textView);
-            roundImageView = itemView.findViewById(R.id.round_string_imageView);
+//            roundImageView = itemView.findViewById(R.id.round_string_imageView);
             fullView = itemView;
         }
     }
 
     private float textSizeForEachRound(int numberOfRoundChars) {
         int floatToReturn = 0;
-
         if (numberOfRoundChars == 1) {
-            floatToReturn = 42;
+            if (mScreenHeight <= 1920) {
+                floatToReturn = 38;
+            } else {
+                floatToReturn = 42;
+            }
         }
         if (numberOfRoundChars == 2) {
             floatToReturn = 34;
@@ -158,7 +171,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             floatToReturn = 20;
         }
         if (numberOfRoundChars == 5) {
-            floatToReturn = 16;
+            floatToReturn = 18;
         }
 
         return floatToReturn;
@@ -170,8 +183,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         if (timeString.length()==2 && timeString.substring(0, 1).equals("0")) {
             stringToReturn = timeString.substring(1);
         }
-        Log.i("testSize", "timer substring is " + timeString.substring(0, 1));
-
 
         return stringToReturn;
     }
@@ -240,14 +251,13 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     private void instantiateMiscObjects() {
         changeSettingsValues = new ChangeSettingsValues();
-
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
-//        narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
-//        narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
-//        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
-//        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
-//        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
+        narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
+        narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
+        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
+        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
+        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
 
 //        testFont = ResourcesCompat.getFont(mContext, R.font.sixcaps);
     }

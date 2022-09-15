@@ -199,7 +199,7 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         public PomDotsViewHolder(@NonNull View itemView) {
             super(itemView);
             roundText = itemView.findViewById(R.id.round_string_textView);
-            roundImageView = itemView.findViewById(R.id.round_string_imageView);
+//            roundImageView = itemView.findViewById(R.id.round_string_imageView);
             fullView = itemView;
         }
     }
