@@ -600,7 +600,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout progressBarLayout;
 
   //Todo: Watch some tutorials on layouts across devices.
-  //Todo: Just get height of phone, and set diff. layouts for each!
 
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Test all popUps (incl. stopwatch)  + stats frag w/ diff devices.
@@ -618,6 +617,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test w/ fresh install for all default values.
   //Todo: Test everything 10x. Incl. round selection/replacement.
 
+  //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
@@ -1005,7 +1005,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    if (height<1300) {
+    if (height<=1920) {
       timerPopUpView = inflater.inflate(R.layout.timer_popup_h1300, null);
     } else {
       timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
