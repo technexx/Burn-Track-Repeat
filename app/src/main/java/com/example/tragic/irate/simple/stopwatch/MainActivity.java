@@ -1007,12 +1007,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (height<1300) {
       timerPopUpView = inflater.inflate(R.layout.timer_popup_h1300, null);
-      Log.i("testDimensions", "executed at <1300 height");
     } else {
       timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
     }
 
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+
     Log.i("testDimensions", "height is " + height + " and width is " + width);
   }
 
@@ -1023,8 +1023,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setContentView(R.layout.activity_main);
 
     setPhoneDimensionLayouts();
-    groupAllAppStartInstantiations();
 
+    groupAllAppStartInstantiations();
 
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSets();
@@ -5546,40 +5546,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleCycleTimeTextViewSizes() {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
-      cycles_completed_textView.setTextSize(20);
-
-      total_set_header.setTextSize(20);
-      total_set_time.setTextSize(20);
-      total_break_header.setTextSize(20);
-      total_break_time.setTextSize(20);
-    } else {
-      cycles_completed_textView.setTextSize(28);
-
-      total_set_header.setTextSize(28);
-      total_set_time.setTextSize(26);
-      total_break_header.setTextSize(28);
-      total_break_time.setTextSize(26);
-    }
+//    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
+//      cycles_completed_textView.setTextSize(20);
+//
+//      total_set_header.setTextSize(20);
+//      total_set_time.setTextSize(20);
+//      total_break_header.setTextSize(20);
+//      total_break_time.setTextSize(20);
+//    } else {
+//      cycles_completed_textView.setTextSize(28);
+//
+//      total_set_header.setTextSize(28);
+//      total_set_time.setTextSize(26);
+//      total_break_header.setTextSize(28);
+//      total_break_time.setTextSize(26);
+//    }
   }
 
   //These have the same effect as changing the /long and /not-long layouts
   private void toggleDailyStatsTimerTextViewSizes() {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
-      tracking_daily_stats_header_textView.setTextSize(20);
-
-      dailyTotalTimeTextViewHeader.setTextSize(20);
-      dailyTotalTimeTextView.setTextSize(20);
-      dailyTotalCaloriesTextViewHeader.setTextSize(20);
-      dailyTotalCaloriesTextView.setTextSize(20);
-
-      dailySingleActivityStringHeader.setTextSize(20);
-      dailyTotalTimeForSingleActivityTextViewHeader.setTextSize(20);
-      dailyTotalCaloriesForSingleActivityTextView.setTextSize(20);
-      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextSize(20);
-      dailyTotalCaloriesForSingleActivityTextView.setTextSize(20);
-
-    }
+//    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
+//      tracking_daily_stats_header_textView.setTextSize(20);
+//
+//      dailyTotalTimeTextViewHeader.setTextSize(20);
+//      dailyTotalTimeTextView.setTextSize(20);
+//      dailyTotalCaloriesTextViewHeader.setTextSize(20);
+//      dailyTotalCaloriesTextView.setTextSize(20);
+//
+//      dailySingleActivityStringHeader.setTextSize(20);
+//      dailyTotalTimeForSingleActivityTextViewHeader.setTextSize(20);
+//      dailyTotalCaloriesForSingleActivityTextView.setTextSize(20);
+//      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextSize(20);
+//      dailyTotalCaloriesForSingleActivityTextView.setTextSize(20);
+//
+//    }
   }
 
   public String getTdeeActivityStringFromArrayPosition() {
