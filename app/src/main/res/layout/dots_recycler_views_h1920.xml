@@ -8,9 +8,6 @@
     android:layout_marginTop="8dp"
     android:layout_marginBottom="8dp">
 
-    <!--Setting src/background image here cuts off left/right sides-->
-
-
     <!--ImageView meant to be main visual. This just sets text directly inside it. -->
     <TextView
         android:id="@+id/round_string_textView"
@@ -22,7 +19,6 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:fontFamily="@font/big_shoulders_text_bold"
         android:gravity="center_vertical">
     </TextView>
 
