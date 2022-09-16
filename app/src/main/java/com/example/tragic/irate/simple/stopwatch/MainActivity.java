@@ -1612,7 +1612,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
     getSupportActionBar().setDisplayShowCustomEnabled(true);
-    getSupportActionBar().setCustomView(R.layout.custom_bar);
+
+    if (phoneHeight <= 1920) {
+      getSupportActionBar().setCustomView(R.layout.custom_bar_h1920);
+    } else {
+      getSupportActionBar().setCustomView(R.layout.custom_bar);
+    }
 
     fab = findViewById(R.id.fab);
     stopWatchLaunchButton = findViewById(R.id.stopwatch_launch_button);
