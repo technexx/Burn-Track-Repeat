@@ -601,7 +601,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: Dots adapter needs to change w/ two rows vs. 1
+  //Todo: Pom stuff for <=1920 res.
 
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Test all popUps (incl. stopwatch)  + stats frag w/ diff devices.
@@ -1028,7 +1028,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
-    dotsAdapter.setScreenHeight(phoneHeight);
 
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSets();
@@ -1798,6 +1797,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCycleAdapter.setHighlight(MainActivity.this);
     savedCycleAdapter.setResumeOrResetCycle(MainActivity.this);
 
+    savedCycleAdapter.setScreenHeight(phoneHeight);
+
     savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
     savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
     savedPomCycleRecycler.setLayoutManager(pomCyclesRecyclerLayoutManager);
@@ -1868,6 +1869,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     gridLayoutManager.setOrientation(RecyclerView.VERTICAL);
 
     dotsAdapter = new DotsAdapter(getApplicationContext(), convertedWorkoutRoundList, typeOfRound);
+    dotsAdapter.setScreenHeight(phoneHeight);
 
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
     dotsRecyclerLayout = timerPopUpView.findViewById(R.id.dots_recycler_layout);

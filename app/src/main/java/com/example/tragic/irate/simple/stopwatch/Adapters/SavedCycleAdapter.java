@@ -67,6 +67,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   int mPositionToToggle;
 
+  int mScreenHeight;
+
   public void changeColorSetting(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
     if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -110,6 +112,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public void setTdeeToggle(onTdeeModeToggle xOnTdeeModeToggle) {
     this.mOnTdeeModeToggle = xOnTdeeModeToggle;
+  }
+
+  public void setScreenHeight(int height) {
+    this.mScreenHeight = height;
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
@@ -159,7 +165,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     Context context = parent.getContext();
-    View view = LayoutInflater.from(context).inflate(R.layout.workout_cycles_recycler, parent, false);
+    View view;
+
+    if (mScreenHeight <=1980) {
+      view = LayoutInflater.from(context).inflate(R.layout.workout_cycles_recycler_h1920, parent, false);
+    } else {
+      view = LayoutInflater.from(context).inflate(R.layout.workout_cycles_recycler, parent, false);
+    }
+
     return new WorkoutHolder(view);
   }
 
