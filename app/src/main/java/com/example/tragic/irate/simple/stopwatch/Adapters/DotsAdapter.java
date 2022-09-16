@@ -5,9 +5,11 @@ import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.GridLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -15,6 +17,7 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.core.content.res.ResourcesCompat;
+import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.R;
@@ -98,10 +101,21 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         holder.roundText.setText(trimTwoDigitString(mCyclesRoundsAsStringsList.get(position)));
         holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
 
+        GridLayoutManager.LayoutParams fullViewLayoutParams = (GridLayoutManager.LayoutParams) holder.fullView.getLayoutParams();
+        ConstraintLayout.LayoutParams textLayoutParams = (ConstraintLayout.LayoutParams) holder.roundText.getLayoutParams();
+
+
         if (mCharactersInCyclesRoundsList.get(position) == 5) {
             holder.roundText.setTypeface(bigShouldersFont);
-            ConstraintLayout.LayoutParams textLayoutParams = (ConstraintLayout.LayoutParams) holder.roundText.getLayoutParams();
+
             textLayoutParams.topMargin = 6;
+        }
+
+        if (mCyclesRoundsAsStringsList.size()<=8) {
+            fullViewLayoutParams.height = (GridLayoutManager.LayoutParams.MATCH_PARENT);
+//            Log.i("testSize", "list executing at <=8 size");
+        } else {
+            fullViewLayoutParams.height = (GridLayoutManager.LayoutParams.WRAP_CONTENT);
         }
 
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
@@ -165,7 +179,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             }
         }
         if (numberOfRoundChars == 2) {
-            floatToReturn = 34;
+            if (mScreenHeight <= 1920) {
+                floatToReturn = 30;
+            } else {
+                floatToReturn = 34;
+            }
         }
         if (numberOfRoundChars == 4) {
             floatToReturn = 20;
@@ -242,6 +260,10 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     public void resetModeOneAlpha() {
         savedModeOneAlpha = 255;
+    }
+
+    private int dpConv(float pixels) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, mContext.getResources().getDisplayMetrics());
     }
 
     private void instantiateLists() {

@@ -1877,7 +1877,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dotsRecycler.setAdapter(dotsAdapter);
     dotsRecycler.setLayoutManager(gridLayoutManager);
-    dotsRecycler.addItemDecoration(setVerticalSpaceItemDecoration(16));
+    dotsRecycler.addItemDecoration(setVerticalSpaceItemDecoration(18));
 
     //Disables "ghost scrolling"
     dotsRecycler.setOnTouchListener(new View.OnTouchListener() {
@@ -1913,16 +1913,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void adjustDotRecyclerViewSize(int numberOfRows) {
     if (numberOfRows<=8) {
       dotsRecyclerLayoutParams.height = dpConv(90);
-//      dotsRecyclerLayoutParams.verticalWeight = 2;
-//      nonTrackingHeaderLayoutParams.verticalWeight = 5;
-//      trackingHeaderLayoutParams.verticalWeight = 5;
-//      progressBarLayoutParams.verticalWeight = 5;
+
     } else {
       dotsRecyclerLayoutParams.height = dpConv(125);
-//      dotsRecyclerLayoutParams.verticalWeight = 2;
-//      nonTrackingHeaderLayoutParams.verticalWeight = 4;
-//      trackingHeaderLayoutParams.verticalWeight = 4;
-//      progressBarLayoutParams.verticalWeight = 4;
+
     }
   }
 
