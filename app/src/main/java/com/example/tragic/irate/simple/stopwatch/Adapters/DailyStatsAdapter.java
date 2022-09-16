@@ -55,6 +55,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     boolean animateButtonSliding;
 
+    int mPhoneHeight;
+
     public interface tdeeEditedItemIsSelected {
         void activityEditItemSelected (int position);
     }
@@ -76,6 +78,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         setAnimations();
     }
 
+    public void setPhoneHeight(int height) {
+        this.mPhoneHeight = height;
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -83,14 +89,23 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         View view;
 
         if (viewType==HEADER_VIEW) {
-            view = inflater.inflate(R.layout.daily_stats_recycler_header_layout, parent, false);
+            if (mPhoneHeight <= 1920) {
+                view = inflater.inflate(R.layout.daily_stats_recycler_header_layout_h1920, parent, false);
+            } else {
+                view = inflater.inflate(R.layout.daily_stats_recycler_header_layout, parent, false);
+            }
             return new HeaderViewHolder(view);
         } else if (viewType==FOOTER_VIEW) {
             view = inflater.inflate(R.layout.daily_stats_recycler_footer_layout, parent, false);
             return new FootViewHolder(view);
         }
 
-        view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
+        if (mPhoneHeight <= 1920) {
+            view = inflater.inflate(R.layout.daily_stats_recycler_layout_h1920, parent, false);
+        } else {
+            view = inflater.inflate(R.layout.daily_stats_recycler_layout, parent, false);
+        }
+
         return new MainViewHolder(view);
     }
 

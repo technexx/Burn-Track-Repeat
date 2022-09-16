@@ -1020,6 +1020,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
   }
 
+  private void setStatsFragmentLayoutForDifferentHeights() {
+    LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+    if (phoneHeight<=1920) {
+
+    }
+  }
+
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {

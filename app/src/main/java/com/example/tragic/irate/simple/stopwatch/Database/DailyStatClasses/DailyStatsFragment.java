@@ -3,12 +3,12 @@ package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
 import android.text.TextWatcher;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
 import android.view.Gravity;
@@ -29,7 +29,6 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
@@ -238,6 +237,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     changeOnOptionsItemSelectedMenu mChangeOnOptionsItemSelectedMenu;
 
+    int phoneHeight;
+    int phoneWidth;
+
     public void setOnOptionsMenu(changeOnOptionsItemSelectedMenu xChangeOnOptionsItemSelectedMenu) {
         this.mChangeOnOptionsItemSelectedMenu = xChangeOnOptionsItemSelectedMenu;
     }
@@ -318,8 +320,25 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    private void setPhoneDimensions() {
+        DisplayMetrics metrics = new DisplayMetrics();
+        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+
+        phoneHeight = metrics.heightPixels;
+        phoneWidth = metrics.widthPixels;
+
+        Log.i("testDimensions", "height is " + phoneHeight + " and width is " + phoneWidth);
+    }
+
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
+        setPhoneDimensions();
+
         View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
+
+        if (phoneHeight <= 1920) {
+            root = inflater.inflate(R.layout.daily_stats_fragment_layout_h1920, container, false);
+        }
+
         mRoot = root;
 
         notifyDataSetChangedRunnable = new Runnable() {
@@ -609,8 +628,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void toggleSimplifiedStatsButtonView(boolean areSimplified) {
         if (!areSimplified) {
             dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
+
+//            if (phoneHeight <= 1920) {
+//                dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1_h1920);
+//            } else {
+//                dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
+//            }
         } else {
             dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
+
+//            if (phoneHeight <= 1920) {
+//                dailyStatsExpandedButton.setImageResource(R.drawable.expand_1_h1920);
+//            } else {
+//                dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
+//            }
         }
     }
 
@@ -1855,9 +1886,16 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setCalendarMinimizationButton(boolean minimizing) {
         if (minimizing) {
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_up_2);
+            if (phoneHeight <= 1920) {
+                minimizeCalendarButton.setImageResource(R.drawable.arrow_up_small);
+            } else {
+                minimizeCalendarButton.setImageResource(R.drawable.arrow_up);
+            }
         } else {
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_down_2);
+            if (phoneHeight <= 1920) {
+                minimizeCalendarButton.setImageResource(R.drawable.arrow_down_small);
+            }
+            minimizeCalendarButton.setImageResource(R.drawable.arrow_down);
         }
     }
 
@@ -2021,9 +2059,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
         caloriesComparisonTabLayout = mRoot.findViewById(R.id.calorie_comparison_tab_layout);
-        caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Expended"));
-        caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
-        caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));
+
+        if (phoneHeight <= 1920) {
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Expended"));
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Consumed"));
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Compared"));
+        } else {
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Expended"));
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));
+        }
+
 
         activityStatsDurationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);
         activityStatsDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
@@ -2067,6 +2113,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateActivityRecyclerViewAndItsAdapter() {
         dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.getTotalActivitiesListForSelectedDuration(), dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration(), dailyStatsAccess.getTotalCaloriesBurnedListForEachActivityForSelectedDuration());
+
+        dailyStatsAdapter.setPhoneHeight(phoneHeight);
 
         dailyStatsAdapter.getSelectedTdeeItemPosition(DailyStatsFragment.this);
         dailyStatsAdapter.addActivityToDailyStats(DailyStatsFragment.this);

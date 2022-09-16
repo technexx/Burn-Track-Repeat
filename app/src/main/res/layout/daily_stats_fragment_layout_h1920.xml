@@ -10,15 +10,16 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/calorie_comparison_tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="30dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/test_bg2"
         app:tabTextColor="@color/white"
         app:tabIndicatorColor="@color/off_white"
         app:tabSelectedTextColor="@color/blue_2"
-        app:tabTextAppearance="@style/TabLayoutTextStyle"
-        app:tabIndicatorFullWidth="true" />
+        app:tabTextAppearance="@style/TabLayoutTextStyle_h1920"
+        app:tabIndicatorFullWidth="true"
+        app:tabMode="fixed"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_duration_header_layout"
@@ -39,7 +40,8 @@
             app:layout_constraintTop_toTopOf="@+id/stat_duration_switcher_button_left"
             app:layout_constraintBottom_toBottomOf="@+id/stat_duration_switcher_button_left"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent">
+            app:layout_constraintEnd_toEndOf="parent"
+            android:textSize="17sp">
         </TextView>
 
         <ImageButton
@@ -50,7 +52,7 @@
             app:layout_constraintEnd_toStartOf="@id/activity_stats_duration_header_textView"
             android:layout_marginEnd="12dp"
             android:backgroundTint="@color/test_bg2"
-            android:src="@drawable/double_arrow_left">
+            android:src="@drawable/double_arrow_left_small">
         </ImageButton>
 
         <ImageButton
@@ -61,7 +63,7 @@
             app:layout_constraintStart_toEndOf="@id/activity_stats_duration_header_textView"
             android:layout_marginStart="12dp"
             android:backgroundTint="@color/test_bg2"
-            android:src="@drawable/double_arrow_right">
+            android:src="@drawable/double_arrow_right_small">
         </ImageButton>
 
         <TextView
@@ -71,9 +73,9 @@
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="4dp"
-            android:layout_marginBottom="4dp"
-            android:textSize="18sp"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="10dp"
+            android:textSize="16sp"
             android:textColor="@color/yellow_1">
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
@@ -145,8 +147,8 @@
         app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
         app:layout_constraintBottom_toTopOf="@id/daily_stats_recyclerView"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="10dp"
-        android:src="@drawable/collapse_1"
+        android:layout_marginStart="16dp"
+        android:src="@drawable/collapse_1_h1920"
         android:backgroundTint="@color/test_bg2">
     </ImageButton>
 
@@ -206,7 +208,7 @@
             android:text="@string/metabolic_rate"
             android:textColor="@color/red"
             android:textStyle="bold"
-            android:textSize="17sp"
+            android:textSize="15sp"
             app:layout_constraintStart_toStartOf="parent"
             android:alpha="0.8"
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider">
@@ -221,7 +223,7 @@
             android:minWidth="100dp"
             android:textColor="@color/green"
             android:textStyle="bold"
-            android:textSize="17sp"
+            android:textSize="15sp"
             app:layout_constraintEnd_toStartOf="@id/total_bmr_stats_calories_textView"
             android:alpha="0.8"
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider">
@@ -237,7 +239,7 @@
             android:minWidth="100dp"
             android:textColor="@color/purple_200"
             android:textStyle="bold"
-            android:textSize="17sp"
+            android:textSize="15sp"
             app:layout_constraintEnd_toEndOf="parent"
             android:alpha="0.8"
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider">
@@ -250,7 +252,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
-            android:textSize="17sp"
+            android:textSize="15sp"
             android:paddingStart="6dp"
             android:paddingEnd="6dp"
             android:textStyle="bold"
@@ -264,7 +266,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toStartOf="@id/daily_stats_total_activity_calories_burned_textView"
             app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
-            android:textSize="17sp"
+            android:textSize="15sp"
             android:gravity="center"
             android:textStyle="bold"
             android:textColor="@color/green"
@@ -279,7 +281,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
-            android:textSize="17sp"
+            android:textSize="16sp"
             android:gravity="center"
             android:layout_marginEnd="8dp"
             android:textStyle="bold"
@@ -298,7 +300,7 @@
             android:paddingEnd="6dp"
             android:textColor="@color/red"
             android:textStyle="bold"
-            android:textSize="19sp"
+            android:textSize="17sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header">
         </TextView>
@@ -312,7 +314,7 @@
             android:minWidth="100dp"
             android:textColor="@color/green"
             android:textStyle="bold"
-            android:textSize="19sp"
+            android:textSize="17sp"
             app:layout_constraintEnd_toStartOf="@+id/total_expended_stats_calories_burned_textView"
             app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header">
         </TextView>
@@ -327,7 +329,7 @@
             android:minWidth="100dp"
             android:textColor="@color/purple_200"
             android:textStyle="bold"
-            android:textSize="19sp"
+            android:textSize="17sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header">
         </TextView>
@@ -361,13 +363,13 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:mcv_tileHeight="30dp"
-        app:mcv_tileWidth="52dp"
+        app:mcv_tileHeight="24dp"
+        app:mcv_tileWidth="48sp"
         app:mcv_showOtherDates="other_months"
         app:mcv_selectionColor="@color/teal"
-        app:mcv_dateTextAppearance="@style/CalendarDateTextAppearance"
-        app:mcv_headerTextAppearance="@style/CalendarHeader"
-        app:mcv_weekDayTextAppearance="@style/CalendarWeekDayHeader"
+        app:mcv_dateTextAppearance="@style/CalendarDateTextAppearance_h1920"
+        app:mcv_headerTextAppearance="@style/CalendarHeader_h1920"
+        app:mcv_weekDayTextAppearance="@style/CalendarWeekDayHeader_h1920"
         app:mcv_leftArrowMask="@drawable/calendar_left_arrow"
         app:mcv_rightArrowMask="@drawable/calendar_right_arrow">
     </com.prolificinteractive.materialcalendarview.MaterialCalendarView>
@@ -448,7 +450,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginStart="2dp"
             android:textColor="@color/lighter_grey"
-            android:textSize="20sp">
+            android:textSize="18sp">
         </TextView>
 
         <TextView
@@ -458,7 +460,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
             android:textColor="@color/light_red"
-            android:textSize="20sp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent">
         </TextView>
@@ -473,7 +475,7 @@
             android:layout_marginTop="32dp"
             android:layout_marginStart="2dp"
             android:textColor="@color/lighter_grey"
-            android:textSize="20sp">
+            android:textSize="18sp">
         </TextView>
 
         <TextView
@@ -483,7 +485,7 @@
             android:layout_marginTop="32dp"
             android:layout_marginEnd="2dp"
             android:textColor="@color/light_green"
-            android:textSize="20sp"
+            android:textSize="18sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared">
         </TextView>
@@ -498,7 +500,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginStart="2dp"
             android:textColor="@color/lighter_grey"
-            android:textSize="18sp">
+            android:textSize="16sp">
         </TextView>
 
         <TextView
@@ -508,7 +510,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
             android:textColor="@color/yellow_3"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared">
         </TextView>
@@ -523,7 +525,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginStart="2dp"
             android:textColor="@color/lighter_grey"
-            android:textSize="18sp">
+            android:textSize="16sp">
         </TextView>
 
         <TextView
@@ -533,7 +535,7 @@
             android:layout_marginTop="6dp"
             android:layout_marginEnd="2dp"
             android:textColor="@color/yellow_3"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_expended_calories_compared_bmr">
         </TextView>
@@ -546,7 +548,7 @@
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="4dp"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textColor="@color/lighter_grey"
             app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared">
         </TextView>
@@ -557,7 +559,7 @@
             android:layout_height="wrap_content"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="4dp"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:textStyle="bold"
             app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared"
             app:layout_constraintEnd_toEndOf="parent">
@@ -569,7 +571,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:layout_marginStart="2dp"
             android:textColor="@color/lighter_grey"
             app:layout_constraintBottom_toBottomOf="parent">
@@ -580,7 +582,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            android:textSize="20sp"
+            android:textSize="18sp"
             android:layout_marginEnd="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
             android:textStyle="bold">
@@ -594,7 +596,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/arrow_down"
+        android:src="@drawable/arrow_down_small"
         android:background="#08000000">
     </ImageButton>
 
