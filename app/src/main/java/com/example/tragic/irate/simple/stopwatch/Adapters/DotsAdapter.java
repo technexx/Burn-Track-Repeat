@@ -107,15 +107,15 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
         if (mCharactersInCyclesRoundsList.get(position) == 5) {
             holder.roundText.setTypeface(bigShouldersFont);
-
             textLayoutParams.topMargin = 6;
         }
 
         if (mCyclesRoundsAsStringsList.size()<=8) {
-            fullViewLayoutParams.height = (GridLayoutManager.LayoutParams.MATCH_PARENT);
-//            Log.i("testSize", "list executing at <=8 size");
+            fullViewLayoutParams.topMargin = dpConv(20);
+//            fullViewLayoutParams.height = (GridLayoutManager.LayoutParams.MATCH_PARENT);
         } else {
-            fullViewLayoutParams.height = (GridLayoutManager.LayoutParams.WRAP_CONTENT);
+            fullViewLayoutParams.topMargin = dpConv(8);
+//            fullViewLayoutParams.height = (GridLayoutManager.LayoutParams.WRAP_CONTENT);
         }
 
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
