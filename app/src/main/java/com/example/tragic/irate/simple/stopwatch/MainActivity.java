@@ -1020,12 +1020,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
   }
 
-  private void setStatsFragmentLayoutForDifferentHeights() {
+  private void setStopWatchLayoutForDifferentHeights() {
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    if (phoneHeight<=1920) {
-
+    if (phoneHeight <= 1920) {
+      stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup_h1920, null);
+    } else {
+      stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup, null);
     }
+
+    stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
   }
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
@@ -2025,7 +2029,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_main_activity, null);
 
 //    timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
-    stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup, null);
+//    stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup, null);
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, convertDensityPixelsToScalable(250), convertDensityPixelsToScalable(450), true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, convertDensityPixelsToScalable(300), convertDensityPixelsToScalable(150), true);
@@ -2035,9 +2039,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTdeePopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
 
 //    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-    stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+//    stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 
     setTimerLayoutForDifferentHeights();
+    setStopWatchLayoutForDifferentHeights();
 
     savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
