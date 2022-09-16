@@ -159,7 +159,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         int floatToReturn = 0;
         if (numberOfRoundChars == 1) {
             if (mScreenHeight <= 1920) {
-                floatToReturn = 38;
+                floatToReturn = 36;
             } else {
                 floatToReturn = 42;
             }

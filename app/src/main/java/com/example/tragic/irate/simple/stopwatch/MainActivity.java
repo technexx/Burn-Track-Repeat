@@ -1877,7 +1877,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dotsRecycler.setAdapter(dotsAdapter);
     dotsRecycler.setLayoutManager(gridLayoutManager);
-    dotsRecycler.addItemDecoration(setVerticalSpaceItemDecoration(20));
+    dotsRecycler.addItemDecoration(setVerticalSpaceItemDecoration(16));
 
     //Disables "ghost scrolling"
     dotsRecycler.setOnTouchListener(new View.OnTouchListener() {
@@ -1912,16 +1912,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Weight on layout that contains recyclerView is not the same as weight on view itself.
   private void adjustDotRecyclerViewSize(int numberOfRows) {
     if (numberOfRows<=8) {
-      dotsRecyclerLayoutParams.verticalWeight = 2;
-      nonTrackingHeaderLayoutParams.verticalWeight = 5;
-      trackingHeaderLayoutParams.verticalWeight = 5;
-      progressBarLayoutParams.verticalWeight = 5;
+      dotsRecyclerLayoutParams.height = dpConv(90);
+//      dotsRecyclerLayoutParams.verticalWeight = 2;
+//      nonTrackingHeaderLayoutParams.verticalWeight = 5;
+//      trackingHeaderLayoutParams.verticalWeight = 5;
+//      progressBarLayoutParams.verticalWeight = 5;
     } else {
-      dotsRecyclerLayoutParams.verticalWeight = 2;
-      nonTrackingHeaderLayoutParams.verticalWeight = 4;
-      trackingHeaderLayoutParams.verticalWeight = 4;
-      progressBarLayoutParams.verticalWeight = 4;
+      dotsRecyclerLayoutParams.height = dpConv(125);
+//      dotsRecyclerLayoutParams.verticalWeight = 2;
+//      nonTrackingHeaderLayoutParams.verticalWeight = 4;
+//      trackingHeaderLayoutParams.verticalWeight = 4;
+//      progressBarLayoutParams.verticalWeight = 4;
     }
+  }
+
+  private int dpConv(float pixels) {
+    return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
   }
 
   private void instantiateAnimationAndColorMethods() {

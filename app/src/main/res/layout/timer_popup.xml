@@ -243,45 +243,44 @@
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dots_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:paddingEnd="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
-        app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:background="@drawable/recycler_border"
-        android:orientation="horizontal"
-        android:paddingStart="4dp"
-        app:layout_constraintVertical_weight="3">
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pom_dots_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/recycler_border"
-        android:orientation="horizontal"
-        android:paddingStart="4dp"
-        android:paddingEnd="4dp">
-    </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dots_recycler_layout"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
-        app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
-        app:layout_constraintVertical_weight="3">
+        app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dots_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:paddingEnd="4dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:background="@drawable/recycler_border"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            app:layout_constraintVertical_weight="3">
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pom_dots_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="16dp"
+            android:layout_marginBottom="16dp"
+            android:background="@drawable/recycler_border"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp">
+        </androidx.recyclerview.widget.RecyclerView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
