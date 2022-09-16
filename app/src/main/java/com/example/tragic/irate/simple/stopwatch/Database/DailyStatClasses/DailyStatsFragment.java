@@ -333,10 +333,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         setPhoneDimensions();
 
-        View root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
+        View root;
 
         if (phoneHeight <= 1920) {
             root = inflater.inflate(R.layout.daily_stats_fragment_layout_h1920, container, false);
+        } else {
+            root = inflater.inflate(R.layout.daily_stats_fragment_layout, container, false);
         }
 
         mRoot = root;

@@ -472,7 +472,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/total_consumed_calories_compared"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="20dp"
             android:layout_marginStart="2dp"
             android:textColor="@color/lighter_grey"
             android:textSize="18sp">
@@ -482,7 +482,7 @@
             android:id="@+id/total_expended_calories_compared"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="32dp"
+            android:layout_marginTop="20dp"
             android:layout_marginEnd="2dp"
             android:textColor="@color/light_green"
             android:textSize="18sp"
@@ -546,23 +546,23 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="4dp"
             android:textSize="18sp"
-            android:textColor="@color/lighter_grey"
-            app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared">
+            android:textColor="@color/lighter_grey">
         </TextView>
 
         <TextView
             android:id="@+id/total_calories_difference_compared"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="4dp"
             android:textSize="18sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:textStyle="bold">
         </TextView>
 
         <TextView
@@ -571,10 +571,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="20dp"
             android:textSize="18sp"
             android:layout_marginStart="2dp"
-            android:textColor="@color/lighter_grey"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:textColor="@color/lighter_grey">
         </TextView>
 
         <TextView
@@ -582,9 +583,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
-            android:textSize="18sp"
-            android:layout_marginEnd="2dp"
             app:layout_constraintBottom_toBottomOf="parent"
+            android:textSize="18sp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginEnd="2dp"
             android:textStyle="bold">
         </TextView>
 
