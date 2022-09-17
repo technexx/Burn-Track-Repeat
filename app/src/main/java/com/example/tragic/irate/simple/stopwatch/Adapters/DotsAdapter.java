@@ -110,6 +110,12 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             holder.roundText.setTypeface(Typeface.DEFAULT);
         }
 
+        if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 3) {
+            holder.roundText.setTextColor(Color.BLACK);
+        } else {
+            holder.roundText.setTextColor(Color.WHITE);
+        }
+
         if (mScreenHeight <= 1920) {
             if (mCyclesRoundsAsStringsList.size()<=8) {
                 fullViewLayoutParams.topMargin = dpConv(14);
@@ -123,7 +129,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
                 fullViewLayoutParams.topMargin = dpConv(8);
             }
         }
-
 
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
