@@ -1934,11 +1934,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Weight on layout that contains recyclerView is not the same as weight on view itself.
   private void adjustDotRecyclerViewSize(int numberOfRows) {
-    if (numberOfRows<=8) {
-      dotsRecyclerLayoutParams.height = dpConv(95);
+    if (phoneHeight <= 1920) {
+      if (numberOfRows<=8) {
+        dotsRecyclerLayoutParams.height = dpConv(80);
+      } else {
+        dotsRecyclerLayoutParams.height = dpConv(140);
+      }
     } else {
-      dotsRecyclerLayoutParams.height = dpConv(160);
-
+      if (numberOfRows<=8) {
+        dotsRecyclerLayoutParams.height = dpConv(95);
+      } else {
+        dotsRecyclerLayoutParams.height = dpConv(160);
+      }
     }
   }
 

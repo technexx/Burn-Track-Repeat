@@ -110,13 +110,20 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             holder.roundText.setTypeface(Typeface.DEFAULT);
         }
 
-        if (mCyclesRoundsAsStringsList.size()<=8) {
-            fullViewLayoutParams.topMargin = dpConv(20);
-//            fullViewLayoutParams.height = (GridLayoutManager.LayoutParams.MATCH_PARENT);
+        if (mScreenHeight <= 1920) {
+            if (mCyclesRoundsAsStringsList.size()<=8) {
+                fullViewLayoutParams.topMargin = dpConv(14);
+            } else {
+                fullViewLayoutParams.topMargin = dpConv(10);
+            }
         } else {
-            fullViewLayoutParams.topMargin = dpConv(8);
-//            fullViewLayoutParams.height = (GridLayoutManager.LayoutParams.WRAP_CONTENT);
+            if (mCyclesRoundsAsStringsList.size()<=8) {
+                fullViewLayoutParams.topMargin = dpConv(20);
+            } else {
+                fullViewLayoutParams.topMargin = dpConv(8);
+            }
         }
+
 
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
