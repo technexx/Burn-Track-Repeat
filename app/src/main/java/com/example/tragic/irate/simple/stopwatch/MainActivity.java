@@ -596,12 +596,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams trackingHeaderLayoutParams;
   ConstraintLayout.LayoutParams nonTrackingHeaderLayoutParams;
 
-  ConstraintLayout.LayoutParams dotsRecyclerParamsForConstraintLayout;
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: Pom stuff for <=1920 res.
+  //Todo: Wrap_content for height in dots recycler will wrap SMALLEST. So, if all rounds have tiny font (i.e. 5 characters), dots will be tiny.
+      //Todo: Culprit of unaligned infinity symbol may be related.
+      //Todo: match_parent height, w/ imageView @ desired height and background surrounding imageView;
+
+  //Todo: Yellow background + white text for dots doesn't work well.
 
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Test all popUps (incl. stopwatch)  + stats frag w/ diff devices.
@@ -1822,6 +1825,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleAdapter.setItemClick(MainActivity.this);
     savedPomCycleAdapter.setHighlight(MainActivity.this);
     savedPomCycleAdapter.setResumeOrResetCycle(MainActivity.this);
+
   }
 
   private void instantiateLayoutManagers() {
@@ -1891,7 +1895,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
     dotsRecyclerLayout = timerPopUpView.findViewById(R.id.dots_recycler_layout);
 
-    dotsRecyclerParamsForConstraintLayout = (ConstraintLayout.LayoutParams) dotsRecyclerLayout.getLayoutParams();
     dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
 
     dotsRecycler.setAdapter(dotsAdapter);
@@ -1907,6 +1910,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     pomDotsAdapter = new PomDotsAdapter(getApplicationContext(), pomStringListOfRoundValues);
+    pomDotsAdapter.setScreenHeight(phoneHeight);
 
     pomDotsRecycler = timerPopUpView.findViewById(R.id.pom_dots_recyclerView);
     pomDotsRecycler.setAdapter(pomDotsAdapter);
@@ -1931,10 +1935,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Weight on layout that contains recyclerView is not the same as weight on view itself.
   private void adjustDotRecyclerViewSize(int numberOfRows) {
     if (numberOfRows<=8) {
-      dotsRecyclerLayoutParams.height = dpConv(90);
-
+      dotsRecyclerLayoutParams.height = dpConv(95);
     } else {
-      dotsRecyclerLayoutParams.height = dpConv(125);
+      dotsRecyclerLayoutParams.height = dpConv(160);
 
     }
   }
@@ -4449,7 +4452,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.reDraw();
 
-        adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
+//        adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
 //        dotsAdapter.setTypeOfRoundList(typeOfRound);
         dotsAdapter.notifyDataSetChanged();
@@ -4490,7 +4493,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
         dotDraws.reDraw();
 
-        adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
+//        adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
 //        dotsAdapter.setTypeOfRoundList(typeOfRound);
         dotsAdapter.notifyDataSetChanged();

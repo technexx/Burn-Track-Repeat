@@ -555,12 +555,12 @@
             android:id="@+id/total_calories_difference_compared"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="2dp"
             android:layout_marginBottom="4dp"
             android:textSize="20sp"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/total_weight_difference_compared"
-            app:layout_constraintEnd_toEndOf="parent">
+            android:textStyle="bold">
         </TextView>
 
         <TextView
@@ -569,10 +569,11 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:textSize="20sp"
             android:layout_marginStart="2dp"
-            android:textColor="@color/lighter_grey"
-            app:layout_constraintBottom_toBottomOf="parent">
+            android:layout_marginBottom="72dp"
+            android:textColor="@color/lighter_grey">
         </TextView>
 
         <TextView
@@ -580,9 +581,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
             android:textSize="20sp"
             android:layout_marginEnd="2dp"
-            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="72dp"
             android:textStyle="bold">
         </TextView>
 

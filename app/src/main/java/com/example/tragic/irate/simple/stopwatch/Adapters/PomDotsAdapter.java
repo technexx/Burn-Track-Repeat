@@ -38,6 +38,8 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
 
     sendPomDotAlpha mSendPomDotAlpha;
 
+    int mScreenHeight;
+
     public PomDotsAdapter(Context context, List<String> pomCycleRoundsAsStringList) {
         this.mContext = context; this.mPomCycleRoundsAsStringsList = pomCycleRoundsAsStringList;
         instantiateLists();
@@ -52,14 +54,29 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         this.mAlpha = alpha;
     }
 
+    public void setScreenHeight(int height) {
+        this.mScreenHeight = height;
+    }
+
     @NonNull
     @Override
     public PomDotsViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
         LayoutInflater inflater = LayoutInflater.from(context);
-        View view = inflater.inflate(R.layout.dots_recycler_views, parent, false);
 
+        View view;
+
+        if (mScreenHeight<=1920) {
+            view = inflater.inflate(R.layout.pom_dots_recycler_views_h1920, parent, false);
+        } else {
+            view = inflater.inflate(R.layout.pom_dots_recycler_views, parent, false);
+        }
         return new PomDotsViewHolder(view);
+    }
+
+    @Override
+    public int getItemCount() {
+        return mPomCycleRoundsAsStringsList.size();
     }
 
     @Override
@@ -91,11 +108,6 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         } else {
             holder.fullView.setAlpha(1.0f);
         }
-    }
-
-    @Override
-    public int getItemCount() {
-        return mPomCycleRoundsAsStringsList.size();
     }
 
     private float textSizeForEachRound(int numberOfRoundChars) {
@@ -198,7 +210,7 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
 
         public PomDotsViewHolder(@NonNull View itemView) {
             super(itemView);
-            roundText = itemView.findViewById(R.id.round_string_textView);
+            roundText = itemView.findViewById(R.id.round_string_textView_for_pom_cycles);
 //            roundImageView = itemView.findViewById(R.id.round_string_imageView);
             fullView = itemView;
         }

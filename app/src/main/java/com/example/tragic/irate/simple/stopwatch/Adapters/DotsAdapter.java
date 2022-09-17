@@ -59,7 +59,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         this.mContext = context; this.mCyclesRoundsAsStringsList = cycleRoundsAsStringList; this.mRoundTypeList = typeOfRoundList;
         instantiateMiscObjects();
         instantiateLists();
-
     }
 
     public void onAlphaSend(sendDotAlpha xSendDotAlpha)  {
@@ -104,10 +103,11 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         GridLayoutManager.LayoutParams fullViewLayoutParams = (GridLayoutManager.LayoutParams) holder.fullView.getLayoutParams();
         ConstraintLayout.LayoutParams textLayoutParams = (ConstraintLayout.LayoutParams) holder.roundText.getLayoutParams();
 
-
         if (mCharactersInCyclesRoundsList.get(position) == 5) {
             holder.roundText.setTypeface(bigShouldersFont);
             textLayoutParams.topMargin = 6;
+        } else {
+            holder.roundText.setTypeface(Typeface.DEFAULT);
         }
 
         if (mCyclesRoundsAsStringsList.size()<=8) {
@@ -163,7 +163,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
         public DotsViewHolder(@NonNull View itemView) {
             super(itemView);
-            roundText = itemView.findViewById(R.id.round_string_textView);
+            roundText = itemView.findViewById(R.id.round_string_textView_for_cycles);
 //            roundImageView = itemView.findViewById(R.id.round_string_imageView);
             fullView = itemView;
         }
