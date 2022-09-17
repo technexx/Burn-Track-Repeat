@@ -289,19 +289,19 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       //If we are on the last round object, clear our bullet String so the view does not end with one.
       if (j == tempTypeArray.length - 1) bullet = "";
       //If round is counting up, create a Spannable w/ the count-down time of the round. Otherwise, create a new Spannable w/ a placeholder for an ImageSpan.
+
       if (tempTypeArray[j].contains("1") || (tempTypeArray[j].contains("3"))) {
         span = new SpannableString(tempWorkoutArray[j] + bullet);
         //tempSpace is used as the "end" mark of our Spannable object manipulation. We set it to 2 spaces less than the span's length so we leave the bullet occupying the last places [space + bullet] alone). If on LAST spannable, use the full length so we do not fall short in coloring, since there is no space+bullet after.
-        if (j != tempTypeArray.length - 1) tempSpace = span.length() - 2;
-        else tempSpace = span.length();
       } else {
         //Uses slightly different spacing for first round entry.
         if (j != 0) {
-          span = new SpannableString("   " + bullet);
+          span = new SpannableString(" " + mContext.getString(R.string.infinity_test) + " " + bullet);
+//          span = new SpannableString("   " + bullet);
           //Our ImageSpan is set (below) on indices 1 and 2, so we set tempSpace to 2 to cover its entirety (i.e. changing its color/size).
           tempSpace = 2;
         } else {
-          span = new SpannableString("  " + bullet);
+          span = new SpannableString(mContext.getString(R.string.infinity_test) + " " + bullet);
           tempSpace = 1;
         }
 
@@ -313,6 +313,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
       }
 
+      if (j != tempTypeArray.length - 1) {
+        tempSpace = span.length() - 2;
+      }
+      else {
+        tempSpace = span.length();
+      }
+
       //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
       if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {
         span.setSpan(new ForegroundColorSpan(SET_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
@@ -320,16 +327,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         span.setSpan(new ForegroundColorSpan(BREAK_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
 
       if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
-        //If using infinity drawable, increase its size.
-        span.setSpan(new AbsoluteSizeSpan(18, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        //Setting our Spannable, which can be concatenated w/ permSpan object in TextUtils below, to our imageSpan. We run from index 1-2 inclusive because 0 is used as an empty separator space (see: original Spannable span creation above).
-        //Using different placement of image in spannable for first round, since we do not want it spaced out (i.e. indented).
-        if (j != 0) {
-          span.setSpan(imageSpan, 1, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        }
-        else {
-          span.setSpan(imageSpan, 0, 1, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-        }
+        span.setSpan(new AbsoluteSizeSpan(26, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
       }
 
       //If a cycle is active, change color of completed rounds to "greyed out" version of original color.

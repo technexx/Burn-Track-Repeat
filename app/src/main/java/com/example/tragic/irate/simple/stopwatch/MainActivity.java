@@ -600,14 +600,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: Wrap_content for height in dots recycler will wrap SMALLEST. So, if all rounds have tiny font (i.e. 5 characters), dots will be tiny.
-      //Todo: Culprit of unaligned infinity symbol may be related.
-      //Todo: match_parent height, w/ imageView @ desired height and background surrounding imageView;
-
-  //Todo: Yellow background + white text for dots doesn't work well.
-
   //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
-  //Todo: Test all popUps (incl. stopwatch)  + stats frag w/ diff devices.
+  //Todo: Getting a blank timer textView on some timer launches (until we start timer).
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.

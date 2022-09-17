@@ -98,6 +98,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     @Override
     public void onBindViewHolder(@NonNull DotsViewHolder holder, int position) {
         holder.roundText.setText(trimTwoDigitString(mCyclesRoundsAsStringsList.get(position)));
+
         holder.roundText.setTextSize(textSizeForEachRound(mCharactersInCyclesRoundsList.get(position)));
 
         GridLayoutManager.LayoutParams fullViewLayoutParams = (GridLayoutManager.LayoutParams) holder.fullView.getLayoutParams();
