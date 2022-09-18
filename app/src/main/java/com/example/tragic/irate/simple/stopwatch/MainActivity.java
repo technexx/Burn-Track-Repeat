@@ -600,7 +600,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout progressBarLayout;
 
   //Todo: Editing cycle (adding an activity) -> launch shows cycle recyclerView during transition. Should be invisible.
-      //Todo: Also blank timer textView.
+  //Todo: Tracking mode carries over to Pom. Was causing some timer sync issues.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -5178,7 +5178,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
     setDefaultTimerValuesAndTheirEditTextViews();
 
-    timeLeft.setText(timeLeftValueHolder);
+    //Causes blank timeLeft on launching from edit popUp dismiss.
+//    timeLeft.setText(timeLeftValueHolder);
     setEditPopUpTimerHeaders(1);
 
     switch (mode) {
