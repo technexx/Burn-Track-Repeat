@@ -127,8 +127,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         PomHolder pomHolder = (PomHolder) holder;
-
         pomHolder.resetCycle.setVisibility(View.GONE);
+
         if (mActiveCycle) {
             if (position==mPositionOfActiveCycle) {
                 pomHolder.resetCycle.setVisibility(View.VISIBLE);
@@ -138,6 +138,19 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 });
             }
         }
+
+        if (mHighlightDeleted) {
+            //Clears highlight list.
+            mPositionList.clear();
+            //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
+            mHighlightMode = false;
+            //Sets all of our backgrounds to black (unhighlighted).
+            for (int i=0; i<mPomList.size(); i++) {
+                pomHolder.fullView.setBackgroundColor(Color.BLACK);
+            }
+        }
+
+
         pomHolder.pomName.setText(mPomTitle.get(position));
         String tempPom = (convertTime(mPomList).get(position));
 
@@ -175,18 +188,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             if (i!=7) if (mSizeToggle.get(i)==4) moving+=7; else moving+=8;
         }
         pomHolder.pomView.setText(pomSpan);
-
-
-        if (mHighlightDeleted) {
-            //Clears highlight list.
-            mPositionList.clear();
-            //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
-            mHighlightMode = false;
-            //Sets all of our backgrounds to black (unhighlighted).
-            for (int i=0; i<mPomList.size(); i++) {
-                pomHolder.fullView.setBackgroundColor(Color.BLACK);
-            }
-        }
 
         pomHolder.fullView.setOnClickListener(v-> {
             boolean changed = false;

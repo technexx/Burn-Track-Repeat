@@ -153,7 +153,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mNumberOfRoundsCompleted = number;
   }
 
-
   public void modifyActiveTdeeModeToggleList(int positionToToggle) {
     if (mActiveTdeeModeBooleanList.get(positionToToggle)) {
       mActiveTdeeModeBooleanList.set(positionToToggle, false);
@@ -197,18 +196,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
-    workoutHolder.tdeeActivityStringToggle.setOnClickListener(v-> {
-      if (!mActiveCycle && !mHighlightMode) {
-        mOnTdeeModeToggle.toggleTdeeMode(position);
-      }
-    });
-
-    if (mActiveTdeeModeBooleanList.get(position)) {
-      workoutHolder.tdeeActivityStringToggle.setAlpha(1.0f);
-    } else {
-    workoutHolder.tdeeActivityStringToggle.setAlpha(0.3f);
-    }
-
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
@@ -216,7 +203,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         workoutHolder.resetCycle.setOnClickListener(v-> {
           mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
         });
+
+        Log.i("testReset", "position of active cycle is being set!");
       }
+
+      Log.i("testReset", "position of active cycle within active boolean is " + mPositionOfActiveCycle);
     }
 
     if (mTdeeActivityExistsInCycleList.get(position)) {
@@ -231,6 +222,19 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
       workoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
+
+
+    if (mActiveTdeeModeBooleanList.get(position)) {
+      workoutHolder.tdeeActivityStringToggle.setAlpha(1.0f);
+    } else {
+      workoutHolder.tdeeActivityStringToggle.setAlpha(0.3f);
+    }
+
+    workoutHolder.tdeeActivityStringToggle.setOnClickListener(v-> {
+      if (!mActiveCycle && !mHighlightMode) {
+        mOnTdeeModeToggle.toggleTdeeMode(position);
+      }
+    });
 
     workoutHolder.fullView.setOnClickListener(v -> {
       boolean changed = false;

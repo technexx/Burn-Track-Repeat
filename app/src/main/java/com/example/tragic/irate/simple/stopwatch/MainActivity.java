@@ -3322,6 +3322,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.setActiveCycleLayout();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
         savedCycleAdapter.setNumberOfRoundsCompleted(startRounds-numberOfRoundsLeft);
+
+        savedCycleAdapter.notifyDataSetChanged();
       }
       //If between rounds, post runnable for next round without starting timer or object animator.
 //      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode());
@@ -3340,6 +3342,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.setActiveCycleLayout();
         savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(pomDotCounter);
+
+        savedPomCycleAdapter.notifyDataSetChanged();
       }
 //      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode());
 
