@@ -137,13 +137,22 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mHighlightMode = false;
   }
 
-  public void showActiveCycleLayout(int positionOfCycle, int numberOfRoundsCompleted) {
-    mActiveCycle = true; mPositionOfActiveCycle = positionOfCycle; mNumberOfRoundsCompleted = numberOfRoundsCompleted;
+  public void setActiveCycleLayout() {
+    mActiveCycle = true;
   }
 
   public void removeActiveCycleLayout() {
     mActiveCycle = false;
   }
+
+  public void setActiveCyclePosition(int position) {
+    this.mPositionOfActiveCycle = position;
+  }
+
+  public void setNumberOfRoundsCompleted(int number) {
+    this.mNumberOfRoundsCompleted = number;
+  }
+
 
   public void modifyActiveTdeeModeToggleList(int positionToToggle) {
     if (mActiveTdeeModeBooleanList.get(positionToToggle)) {
@@ -235,7 +244,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
       else {
         ArrayList<Integer> tempList = new ArrayList<>(mPositionList);
-        //Iterate through every cycle in list.
         for (int i = 0; i < mWorkoutList.size(); i++) {
           //Using tempList for stable loop since mPositionList changes.
           for (int j = 0; j < tempList.size(); j++) {

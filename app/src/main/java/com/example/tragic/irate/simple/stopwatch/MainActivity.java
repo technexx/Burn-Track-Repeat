@@ -599,8 +599,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: Editing cycle (adding an activity) -> launch shows cycle recyclerView during transition. Should be invisible.
-  //Todo: Tracking mode carries over to Pom. Was causing some timer sync issues.
+  //Todo: "Reset" in cycle recycler disappearing when switching modes, but active cycle remains.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -3320,7 +3319,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       if (activeCycle) {
         if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
-        savedCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, startRounds-numberOfRoundsLeft);
+        savedCycleAdapter.setActiveCycleLayout();
+        savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
+        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds-numberOfRoundsLeft);
       }
       //If between rounds, post runnable for next round without starting timer or object animator.
 //      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode());
@@ -3336,7 +3337,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) {
       if (activeCycle) {
         if (isNewCycle) positionOfSelectedCycle = pomArray.size()-1;
-        savedPomCycleAdapter.showActiveCycleLayout(positionOfSelectedCycle, pomDotCounter);
+        savedPomCycleAdapter.setActiveCycleLayout();
+        savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
+        savedPomCycleAdapter.setNumberOfRoundsCompleted(pomDotCounter);
       }
 //      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode());
 
