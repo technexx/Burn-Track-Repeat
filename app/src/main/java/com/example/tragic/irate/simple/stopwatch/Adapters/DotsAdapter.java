@@ -125,7 +125,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             }
         } else {
             if (mCyclesRoundsAsStringsList.size()<=8) {
-                fullViewLayoutParams.topMargin = dpConv(20);
+                fullViewLayoutParams.topMargin = dpConv(18);
             } else {
                 fullViewLayoutParams.topMargin = dpConv(8);
             }
@@ -252,7 +252,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             mFadeUp = false;
         }
 
-        if (mAlpha>0.25f && !mFadeUp) {
+        if (mAlpha>0.3f && !mFadeUp) {
             mAlpha -= 0.08;
         } else {
             mFadeUp = true;

@@ -600,14 +600,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: W/ 4 rows of rounds in cycle w/ activity, first one as infinity gets alignment pushed down.
   //Todo: Getting a blank timer textView on some timer launches (until we start timer).
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
-  //Todo: Add Day/Night modes.
 
   //Todo: Test extra-large screens as well.
   //Todo: Test all notifications + sound/vibrations + settings.
@@ -621,6 +619,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
   //Todo: Custom activity edits can reset calorie count.
+  //Todo: Add Day/Night modes.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
@@ -3834,9 +3833,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             pomStringListOfRoundValues.add(convertSeconds(integerValue/1000));
           }
 
-          Log.i("testPom", "pom values in populateCycleRoundAndRoundTypeArrayLists() are " + pomStringListOfRoundValues);
-
-
           pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
           pomDotsAdapter.updatePomDotCounter(pomDotCounter);
           pomDotsAdapter.notifyDataSetChanged();
@@ -5411,6 +5407,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setInitialTextSizeForTimers(0);
             break;
         };
+
+        Log.i("testTime", "timeLeft set at " + timeLeft.getText());
 
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) {

@@ -22,6 +22,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ChangeSettingsValues;
@@ -68,6 +69,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int mPositionToToggle;
 
   int mScreenHeight;
+
+  Typeface moonFace;
 
   public void changeColorSetting(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -125,6 +128,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
     mHighlightDeleted = false;
+
+    moonFace = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
   }
 
   public void removeHighlight() {
@@ -305,12 +310,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           tempSpace = 1;
         }
 
-        //If roundType is 2 (sets), use green infinity drawable for ImageSpan. If roundType is 4 (breaks), use red.
-        if (tempTypeArray[j].contains("2")) {
-          imageSpan = setColorOnInfinityImageSpan(SET_COLOR, R.drawable.infinity_small_green);
-        } else {
-          imageSpan = setColorOnInfinityImageSpan(BREAK_COLOR, R.drawable.infinity_small_red);
-        }
       }
 
       if (j != tempTypeArray.length - 1) {
@@ -320,7 +319,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         tempSpace = span.length();
       }
 
-      //If our roundType object contains a 1 or 2, it refers to a SET, and we set its corresponding workout object to green. Otherwise, it refers to a BREAK, and we set its color to red.
       if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {
         span.setSpan(new ForegroundColorSpan(SET_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
       } else
