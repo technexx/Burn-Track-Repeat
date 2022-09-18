@@ -108,7 +108,7 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, DotDraws.sendAlpha, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
@@ -441,7 +441,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   LinearLayoutManager lapRecyclerLayoutManager;
   ConstraintLayout roundRecyclerLayout;
 
-  DotDraws dotDraws;
   ValueAnimator sizeAnimator;
   ValueAnimator valueAnimatorDown;
   ValueAnimator valueAnimatorUp;
@@ -600,7 +599,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: Getting a blank timer textView on some timer launches (until we start timer).
+  //Todo: Editing cycle (adding an activity) -> launch shows cycle recyclerView during transition. Should be invisible.
+      //Todo: Also blank timer textView.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -826,17 +826,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       pomDotsAdapter.changeColorSetting(typeOFRound, settingNumber);
     }
 
-    dotDraws.changeColorSetting(typeOFRound, settingNumber);
-
     assignColorSettingValues(typeOFRound, settingNumber);
   }
-
-  //Old dotDraws.
-  @Override
-  public void sendAlphaValue(int alpha) {
-//    receivedAlpha = alpha;
-  }
-
 
   @Override
   public void sendAlphaValue(float alpha) {
@@ -888,8 +879,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     populateCycleRoundAndRoundTypeArrayLists();
-
-    dotDraws.reDraw();
 
     dotsAdapter.notifyDataSetChanged();
 
@@ -1099,8 +1088,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
       assignOldCycleValuesToCheckForChanges();
-
-      dotDraws.reDraw();
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -1490,9 +1477,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setAllSortTextViewsOntoClickListeners();
 
-    dotDraws.setMode(mode);
-    dotDraws.onAlphaSend(MainActivity.this);
-
     dotsAdapter.onAlphaSend(MainActivity.this);
     pomDotsAdapter.onPomAlphaSend(MainActivity.this);
     progressBar.setProgress(maxProgress);
@@ -1542,9 +1526,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 0:
             mode = 1;
             cycleRoundsAdapter.setMode(1);
-            dotDraws.setMode(1);
-            dotDraws.setModeOneDotAlpha();
-
             dotsAdapter.setModeOneAlpha();
 
             dotsRecycler.setVisibility(View.VISIBLE);
@@ -1553,9 +1534,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 1:
             mode = 3;
             cycleRoundsAdapter.setMode(3);
-            dotDraws.setMode(3);
-            dotDraws.setModeThreeDotAlpha();
-
             pomDotsAdapter.setModeThreeAlpha();
 
             pomDotsRecycler.setVisibility(View.VISIBLE);
@@ -1577,8 +1555,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             removeCycleHighlights();
             savedCycleAdapter.notifyDataSetChanged();
           }
-          dotDraws.saveModeOneDotAlpha();
-
           dotsAdapter.saveModeOneAlpha();
         }
         if (savedCyclesTab.getPosition()==1) {
@@ -1586,8 +1562,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             removeCycleHighlights();
             savedPomCycleAdapter.notifyDataSetChanged();
           }
-          dotDraws.saveModeThreeDotAlpha();
-
           pomDotsAdapter.saveModeThreeAlpha();
         }
       }
@@ -1702,7 +1676,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void assignTimerPopUpLayoutClassesToTheirIds() {
-    dotDraws = timerPopUpView.findViewById(R.id.dotdraws);
     reset = timerPopUpView.findViewById(R.id.reset);
 
     nonTrackingTimerHeaderLayout = timerPopUpView.findViewById(R.id.non_tracking_timer_stat_headers_layout);
@@ -2620,12 +2593,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     miniBreakColor = changeSettingsValues.assignColor(miniBreakColorNumericValue);
     fullBreakColor = changeSettingsValues.assignColor(fullBreakColorNumericValue);
 
-    dotDraws.changeColorSetting(1, setColorNumericValue);
-    dotDraws.changeColorSetting(2, breakColorNumericValue);
-    dotDraws.changeColorSetting(3, workColorNumericValue);
-    dotDraws.changeColorSetting(4, miniBreakColorNumericValue);
-    dotDraws.changeColorSetting(5, fullBreakColorNumericValue);
-
     dotsAdapter.changeColorSetting(1, setColorNumericValue);
     dotsAdapter.changeColorSetting(2, breakColorNumericValue);
     pomDotsAdapter.changeColorSetting(3, workColorNumericValue);
@@ -2811,7 +2778,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerDisabled = false;
     timerPopUpIsVisible = false;
     reset.setVisibility(View.INVISIBLE);
-    dotDraws.setMode(mode);
 
     if (mode==1) {
       savedCycleRecycler.setVisibility(View.VISIBLE);
@@ -3167,10 +3133,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
        runOnUiThread(()->{
          if (trackActivityWithinCycle) {
-           toggleCycleTimeTextViewSizes();
            setAllActivityTimesAndCaloriesToTextViews();
          } else {
-           toggleDailyStatsTimerTextViewSizes();
            setCyclesCompletedTextView();
          }
 
@@ -3807,7 +3771,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
 
           ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
-          dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
 
           adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
           dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
@@ -3974,12 +3937,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView.setText(cycleTitle);
     toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
-    if (mode==1) {
-      changeTextSizeWithoutAnimator(workoutTime.get(0));
-    }
-    if (mode==3) {
-      changeTextSizeWithoutAnimator(pomValuesTime.get(0));
-    }
+//    if (mode==1) {
+//      changeTextSizeWithoutAnimator(workoutTime.get(0));
+//    }
+//    if (mode==3) {
+//      changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+//    }
 
     if (editCyclesPopupWindow.isShowing()) {
       editCyclesPopupWindow.dismiss();
@@ -4446,12 +4409,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
-        dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
-        dotDraws.reDraw();
 
-//        adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
-//        dotsAdapter.setTypeOfRoundList(typeOfRound);
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(setMillis);
@@ -4487,12 +4446,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
-        dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
-        dotDraws.reDraw();
 
-//        adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
-//        dotsAdapter.setTypeOfRoundList(typeOfRound);
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(breakMillis);
@@ -4527,8 +4482,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         increaseTextSizeForTimers(startMillis, setMillis);
 
-        dotDraws.reDraw();
-
         dotsAdapter.notifyDataSetChanged();
       }
 
@@ -4553,8 +4506,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (breakMillis < 500) timerDisabled = true;
 
         increaseTextSizeForTimers(startMillis, breakMillis);
-
-        dotDraws.reDraw();
 
         dotsAdapter.notifyDataSetChanged();
       }
@@ -4581,8 +4532,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomMillis < 500) timerDisabled = true;
 
         increaseTextSizeForTimers(startMillis, pomMillis);
-
-        dotDraws.reDraw();
 
         pomDotsAdapter.notifyDataSetChanged();
       }
@@ -4848,11 +4797,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-        dotDraws.resetModeOneAlpha();
-        dotDraws.setModeOneDotAlpha();
-        dotDraws.reDraw();
-
         dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeft);
         dotsAdapter.resetModeOneAlpha();
         dotsAdapter.setModeOneAlpha();
@@ -4914,11 +4858,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        dotDraws.pomDraw(pomDotCounter, pomValuesTime);
-        dotDraws.resetModeThreeAlpha();
-        dotDraws.setModeThreeDotAlpha();
-        dotDraws.reDraw();
-
         pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
         pomDotsAdapter.updatePomDotCounter(pomDotCounter);
         pomDotsAdapter.resetModeThreeAlpha();
@@ -5359,9 +5298,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.notifyDataSetChanged();
     }
 
-    toggleCycleTimeTextViewSizes();
-    toggleDailyStatsTimerTextViewSizes();
-
     activeCycle = false;
     timerIsPaused = true;
     timerEnded = false;
@@ -5420,15 +5356,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         startRounds = workoutTime.size();
         numberOfRoundsLeft = startRounds;
 
-//        workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
-
-        dotDraws.updateWorkoutTimes(convertedWorkoutRoundList, typeOfRound);
-        dotDraws.updateWorkoutRoundCount(startRounds, numberOfRoundsLeft);
-
-        dotDraws.resetModeOneAlpha();
-        dotDraws.setModeOneDotAlpha();
-        dotDraws.reDraw();
 
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.setTypeOfRoundList(typeOfRound);
@@ -5455,36 +5383,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomMillis = pomValuesTime.get(0);
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
 
-        dotDraws.pomDraw(pomDotCounter, pomValuesTime);
-
         pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
         pomDotsAdapter.updatePomDotCounter(pomDotCounter);
 
         setInitialTextSizeForTimers(pomMillis);
       }
-      toggleCycleTimeTextViewSizes();
 
       pomCyclesTextSizeHasChanged = false;
-
-      dotDraws.resetModeThreeAlpha();
-      dotDraws.setModeThreeDotAlpha();
-      dotDraws.reDraw();
 
       pomDotsAdapter.resetModeThreeAlpha();
       pomDotsAdapter.setModeThreeAlpha();
       pomDotsAdapter.notifyDataSetChanged();
     }
   }
-
-//  private void sendPhoneResolutionToDotDrawsClass() {
-//    DisplayMetrics metrics = new DisplayMetrics();
-//    getWindowManager().getDefaultDisplay().getMetrics(metrics);
-//
-//    phoneHeight = metrics.heightPixels;
-//    phoneWidth = metrics.widthPixels;
-//
-//    dotDraws.receivePhoneDimensions(phoneHeight, phoneWidth);
-//  }
 
   private String getCurrentDateAsSlashFormattedString() {
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
@@ -5576,43 +5487,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalCaloriesForSingleActivityTextViewHeader.setVisibility(View.VISIBLE);
       dailyTotalCaloriesForSingleActivityTextView.setVisibility(View.VISIBLE);
     }
-  }
-
-  private void toggleCycleTimeTextViewSizes() {
-//    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
-//      cycles_completed_textView.setTextSize(20);
-//
-//      total_set_header.setTextSize(20);
-//      total_set_time.setTextSize(20);
-//      total_break_header.setTextSize(20);
-//      total_break_time.setTextSize(20);
-//    } else {
-//      cycles_completed_textView.setTextSize(28);
-//
-//      total_set_header.setTextSize(28);
-//      total_set_time.setTextSize(26);
-//      total_break_header.setTextSize(28);
-//      total_break_time.setTextSize(26);
-//    }
-  }
-
-  //These have the same effect as changing the /long and /not-long layouts
-  private void toggleDailyStatsTimerTextViewSizes() {
-//    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8) {
-//      tracking_daily_stats_header_textView.setTextSize(20);
-//
-//      dailyTotalTimeTextViewHeader.setTextSize(20);
-//      dailyTotalTimeTextView.setTextSize(20);
-//      dailyTotalCaloriesTextViewHeader.setTextSize(20);
-//      dailyTotalCaloriesTextView.setTextSize(20);
-//
-//      dailySingleActivityStringHeader.setTextSize(20);
-//      dailyTotalTimeForSingleActivityTextViewHeader.setTextSize(20);
-//      dailyTotalCaloriesForSingleActivityTextView.setTextSize(20);
-//      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextSize(20);
-//      dailyTotalCaloriesForSingleActivityTextView.setTextSize(20);
-//
-//    }
   }
 
   public String getTdeeActivityStringFromArrayPosition() {

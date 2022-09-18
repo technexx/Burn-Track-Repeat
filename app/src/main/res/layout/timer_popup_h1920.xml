@@ -9,14 +9,6 @@
     android:id="@+id/main_timer_layout"
     android:theme="@style/TimerTheme">
 
-    <com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws
-        android:id="@+id/dotdraws"
-        android:layout_width="1dp"
-        android:layout_height="1dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent">
-    </com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/non_tracking_timer_stat_headers_layout"
         android:layout_width="match_parent"
