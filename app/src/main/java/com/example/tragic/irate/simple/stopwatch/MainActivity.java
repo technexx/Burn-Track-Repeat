@@ -1528,7 +1528,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleRoundsAdapter.setMode(1);
             dotsAdapter.setModeOneAlpha();
 
+            savedCycleRecycler.setVisibility(View.VISIBLE);
             dotsRecycler.setVisibility(View.VISIBLE);
+            savedPomCycleRecycler.setVisibility(View.GONE);
             pomDotsRecycler.setVisibility(View.GONE);
             break;
           case 1:
@@ -1536,12 +1538,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleRoundsAdapter.setMode(3);
             pomDotsAdapter.setModeThreeAlpha();
 
-            pomDotsRecycler.setVisibility(View.VISIBLE);
+            savedCycleRecycler.setVisibility(View.GONE);
             dotsRecycler.setVisibility(View.GONE);
+            savedPomCycleRecycler.setVisibility(View.VISIBLE);
+            pomDotsRecycler.setVisibility(View.VISIBLE);
+
             break;
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-        //Todo: This overwrites our attempt to make recyclerView visible when launching cycles.
         setDefaultEditRoundViews();
         getTimerVariablesForEachMode();
       }
@@ -1889,10 +1893,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         return true;
       }
     });
-
-    //Default mode 1 visibilities at app launch.
-    dotsRecycler.setVisibility(View.VISIBLE);
-    pomDotsRecycler.setVisibility(View.GONE);
   }
 
   private VerticalSpaceItemDecoration setVerticalSpaceItemDecoration(int space) {
@@ -2103,6 +2103,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
     new_lap.setAlpha(0.3f);
     roundListDivider.setVisibility(View.GONE);
+
+    savedCycleRecycler.setVisibility(View.VISIBLE);
+    savedPomCycleRecycler.setVisibility(View.GONE);
   }
 
   private void setDefaultLayoutTexts() {
@@ -5212,9 +5215,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         addTDEEfirstMainTextView.setVisibility(View.VISIBLE);
 
         total_set_header.setText(R.string.total_sets);
-
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-        savedPomCycleRecycler.setVisibility(View.GONE);
         break;
       case 3:
         firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
@@ -5255,8 +5255,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         addTDEEfirstMainTextView.setVisibility(View.INVISIBLE);;
         total_set_header.setText(R.string.total_work);
 
-        savedCycleRecycler.setVisibility(View.GONE);
-        savedPomCycleRecycler.setVisibility(View.VISIBLE);
+//        savedCycleRecycler.setVisibility(View.GONE);
+//        savedPomCycleRecycler.setVisibility(View.VISIBLE);
         break;
     }
   }
