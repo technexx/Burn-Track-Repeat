@@ -104,6 +104,9 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         GridLayoutManager.LayoutParams fullViewLayoutParams = (GridLayoutManager.LayoutParams) holder.fullView.getLayoutParams();
         ConstraintLayout.LayoutParams textLayoutParams = (ConstraintLayout.LayoutParams) holder.roundText.getLayoutParams();
 
+        dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
+        holder.fullView.setBackground(dotsBorder);
+
         if (mCharactersInCyclesRoundsList.get(position) == 5) {
             holder.roundText.setTypeface(bigShouldersFont);
             textLayoutParams.topMargin = 6;
@@ -131,8 +134,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             }
         }
 
-        dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
-
         if (mRoundTypeList.get(position) == 1) {
             dotsBorder.setColor(SET_COLOR);
             dotsBorder.setStroke(3, Color.WHITE);
@@ -152,8 +153,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             dotsBorder.setColor(0);
             dotsBorder.setStroke(3, BREAK_COLOR);
         }
-
-        holder.fullView.setBackground(dotsBorder);
 
         if (mCyclesRoundCount - mCycleRoundsLeft == position) {
             fadeAlpha();

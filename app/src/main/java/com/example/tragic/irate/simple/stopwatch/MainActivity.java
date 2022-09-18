@@ -599,7 +599,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: "Reset" in cycle recycler disappearing when switching modes, but active cycle remains.
+  //Todo: First Cycles resume doesn't iterate progress bar.
+
+  //Todo: Border bug likely something done in Main.
+      //Todo: Slight visible shift dots position when starting timer. Maybe related.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -3127,24 +3130,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       AsyncTask.execute(()-> {
         if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
-          Log.i("testChange", "stats have changed boolean is " + dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay());
           insertActivityIntoDatabaseAndAssignItsValueToObjects();
 
           dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
         }
 
        runOnUiThread(()->{
-         if (trackActivityWithinCycle) {
-           setAllActivityTimesAndCaloriesToTextViews();
-         } else {
-           setCyclesCompletedTextView();
-         }
-
          if (mode==1) {
            changeTextSizeWithoutAnimator(workoutTime.get(0));
+
+           if (trackActivityWithinCycle) {
+             setAllActivityTimesAndCaloriesToTextViews();
+           } else {
+             setCyclesCompletedTextView();
+           }
          }
          if (mode==3) {
            changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+           setCyclesCompletedTextView();
+           toggleViewsForTotalDailyAndCycleTimes(false);
          }
 
          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
@@ -5304,11 +5308,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mediaPlayer.reset();
     }
 
-    if (savedCycleAdapter.isCycleActive()==true) {
-      savedCycleAdapter.removeActiveCycleLayout();
-      savedCycleAdapter.notifyDataSetChanged();
-    }
-
     activeCycle = false;
     timerIsPaused = true;
     timerEnded = false;
@@ -5329,6 +5328,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setCyclesCompletedTextView();
 
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+
+
+
 
     if (mode==1) {
       if (workoutTime.size()>0) {
@@ -5378,18 +5380,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.notifyDataSetChanged();
 
         cyclesTextSizeHasChanged = false;
+
+        if (savedCycleAdapter.isCycleActive()==true) {
+          savedCycleAdapter.removeActiveCycleLayout();
+          savedCycleAdapter.notifyDataSetChanged();
+        }
       }
     }
 
     if (mode==3) {
       pomDotCounter = 0;
-      if (objectAnimatorPom != null) objectAnimatorPom.cancel();
-
-      if (savedPomCycleAdapter.isCycleActive()==true) {
-        savedPomCycleAdapter.removeActiveCycleLayout();
-        savedPomCycleAdapter.notifyDataSetChanged();
-      }
-
       if (pomValuesTime.size() > 0) {
         pomMillis = pomValuesTime.get(0);
         timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
@@ -5401,6 +5401,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       pomCyclesTextSizeHasChanged = false;
+
+      if (objectAnimatorPom != null) objectAnimatorPom.cancel();
+
+      if (savedPomCycleAdapter.isCycleActive()==true) {
+        savedPomCycleAdapter.removeActiveCycleLayout();
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
 
       pomDotsAdapter.resetModeThreeAlpha();
       pomDotsAdapter.setModeThreeAlpha();
@@ -5448,9 +5455,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleViewsForTotalDailyAndCycleTimes(boolean trackingCycle) {
     if (!trackingCycle) {
-//      nonTrackingTimerHeaderLayout.setVisibility(View.VISIBLE);
-//      trackingTimerHeaderLayout.setVisibility(View.GONE);
-
       setTotalCycleTimeValuesToTextView();
 
       cycle_title_textView.setVisibility(View.VISIBLE);
@@ -5474,9 +5478,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalCaloriesForSingleActivityTextViewHeader.setVisibility(View.INVISIBLE);
       dailyTotalCaloriesForSingleActivityTextView.setVisibility(View.INVISIBLE);
     } else {
-//      nonTrackingTimerHeaderLayout.setVisibility(View.GONE);
-//      trackingTimerHeaderLayout.setVisibility(View.VISIBLE);
-
       cycle_title_textView.setVisibility(View.GONE);
       tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
