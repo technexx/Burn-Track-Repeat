@@ -1541,6 +1541,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+        //Todo: This overwrites our attempt to make recyclerView visible when launching cycles.
         setDefaultEditRoundViews();
         getTimerVariablesForEachMode();
       }
@@ -2100,7 +2101,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cancelHighlight.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     reset.setVisibility(View.INVISIBLE);
-    savedPomCycleRecycler.setVisibility(View.GONE);
     new_lap.setAlpha(0.3f);
     roundListDivider.setVisibility(View.GONE);
   }
@@ -2780,13 +2780,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
 
     if (mode==1) {
-      savedCycleRecycler.setVisibility(View.VISIBLE);
-      savedCycleAdapter.notifyDataSetChanged();
+//      savedCycleRecycler.setVisibility(View.VISIBLE);
+//      savedCycleAdapter.notifyDataSetChanged();
       pauseAndResumeTimer(PAUSING_TIMER);
     } else if (mode==3){
       pauseAndResumePomodoroTimer(PAUSING_TIMER);
-      savedPomCycleRecycler.setVisibility(View.VISIBLE);
-      savedPomCycleAdapter.notifyDataSetChanged();
+//      savedPomCycleRecycler.setVisibility(View.VISIBLE);
+//      savedPomCycleAdapter.notifyDataSetChanged();
     }
     mHandler.removeCallbacksAndMessages(null);
   }
@@ -3935,18 +3935,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTimerLaunchViews(int typeOfLaunch) {
     timerPopUpIsVisible = true;
     cycle_title_textView.setText(cycleTitle);
-    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
-//    if (mode==1) {
-//      changeTextSizeWithoutAnimator(workoutTime.get(0));
-//    }
-//    if (mode==3) {
-//      changeTextSizeWithoutAnimator(pomValuesTime.get(0));
-//    }
+    if (mode==1) {
+      changeTextSizeWithoutAnimator(workoutTime.get(0));
+    }
+    if (mode==3) {
+      changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+    }
 
     if (editCyclesPopupWindow.isShowing()) {
       editCyclesPopupWindow.dismiss();
     }
+
+    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
@@ -5203,8 +5204,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortLow.setVisibility(View.VISIBLE);
         sortActivityTitleAtoZ.setVisibility(View.VISIBLE);
         sortActivityTitleZToA.setVisibility(View.VISIBLE);
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-        savedPomCycleRecycler.setVisibility(View.GONE);
 
         timerValueInEditPopUpTextView.setVisibility(View.VISIBLE);
         pomTimerValueInEditPopUpTextViewOne.setVisibility(View.GONE);
@@ -5213,6 +5212,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         addTDEEfirstMainTextView.setVisibility(View.VISIBLE);
 
         total_set_header.setText(R.string.total_sets);
+
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+        savedPomCycleRecycler.setVisibility(View.GONE);
         break;
       case 3:
         firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
@@ -5249,11 +5251,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortActivityTitleZToA.setVisibility(View.GONE);
         roundRecyclerTwo.setVisibility(View.GONE);
         roundListDivider.setVisibility(View.GONE);
+
+        addTDEEfirstMainTextView.setVisibility(View.INVISIBLE);;
+        total_set_header.setText(R.string.total_work);
+
         savedCycleRecycler.setVisibility(View.GONE);
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
-        addTDEEfirstMainTextView.setVisibility(View.INVISIBLE);
-
-        total_set_header.setText(R.string.total_work);
         break;
     }
   }
