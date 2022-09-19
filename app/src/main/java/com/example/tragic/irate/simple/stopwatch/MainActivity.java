@@ -598,8 +598,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Also, total times not iterating last second as round ends.
 
-  //Todo: Border bug likely something done in Main.
-      //Todo: Slight visible shift dots position when starting timer. Maybe related.
+  //Todo: Border bug is pom's recyclerView border overlapping in cycles.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -4358,6 +4357,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           totalCycleBreakTimeInMillis = timerIteration.getNewTotal();
         }
 
+        Log.i("testTime", "cycle setmillis in runnable is " + totalCycleSetTimeInMillis);
+
         setTotalCycleTimeValuesToTextView();
 
         mHandler.postDelayed(this, timerRunnableDelay);
@@ -4702,10 +4703,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     globalNextRoundLogic();
 
+    //Todo: Should we be rounding up here instead?
     roundDownCycleSetAndBreakTimes();
     if (trackActivityWithinCycle) {
       roundDownDailyStatTimes();
     }
+
+    Log.i("testTime", "cycle setmillis at nextRound method is " + totalCycleSetTimeInMillis);
+
 
     mHandler.post(endFadeForModeOne);
 
