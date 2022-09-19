@@ -4298,11 +4298,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setCycleTimeToIterate() {
     if (mode == 1) {
-      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
         CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
       }
-      if (typeOfRound.get(currentRound) == 2 || typeOfRound.get(currentRound) == 4) {
-        CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
+      if (typeOfRound.get(currentRound) == 3 || typeOfRound.get(currentRound) == 4) {
+        CYCLE_TIME_TO_ITERATE = CYCLE_BREAKS;
       }
     }
 
@@ -4797,15 +4797,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (typeOfRound.get(currentRound)) {
       case 1:
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
-
-        removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
         setEndOfRoundSounds(vibrationSettingForSets, isAlertRepeating);
         break;
       case 2:
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
         mHandler.removeCallbacks(infinityTimerForSetsRunnable);
-        removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
         setEndOfRoundSounds(vibrationSettingForSets, isAlertRepeating);
         break;
       case 3:
@@ -4820,6 +4817,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setEndOfRoundSounds(vibrationSettingForBreaks, isAlertRepeating);
         break;
     }
+    removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
     numberOfRoundsLeft--;
     if (currentRound < typeOfRound.size()-1) {
@@ -4917,16 +4915,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startSetTimer();
               }
-
-              postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
               break;
             case 2:
               timeLeft.setText("0");
               //Do not want to consolidate infinityTimer runnable methods, since we only want its global re-instantiated here, not in our pause/resume option.
               infinityTimerForSetsRunnable = infinityRunnableForSets();
               mHandler.post(infinityTimerForSetsRunnable);
-
-              postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
               break;
             case 3:
               breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
@@ -4943,6 +4937,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               mHandler.post(infinityTimerForBreaksRunnable);
               break;
           }
+
+          postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
+
         } else {
           animateEnding();
           currentRound = 0;
@@ -5020,13 +5017,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startSetTimer();
               }
-              postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
               break;
             case 2:
               if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
                 mHandler.post(infinityTimerForSetsRunnable);
               }
-              postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
               break;
             case 3:
               if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
@@ -5040,6 +5035,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
           }
+          postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
           timerResumeLogic();
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
