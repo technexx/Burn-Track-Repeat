@@ -1456,11 +1456,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVerticalSpaceDecorationForCycleRecyclerViewBasedOnAspectRatio();
     instantiateLapAdapterAndSetRecyclerOnIt();
 
-    setDefaultLayoutTexts();
     retrieveAndImplementCycleSorting();
-
-    setDefaultTimerValuesAndTheirEditTextViews();
-    setDefaultLayoutVisibilities();
     instantiateAnimationAndColorMethods();
 
     instantiateNotifications();
@@ -1473,6 +1469,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateDotsRecyclerAndAdapter();
 
     setAllSortTextViewsOntoClickListeners();
+
+    setDefaultLayoutTexts();
+    setDefaultTimerValuesAndTheirEditTextViews();
+    setDefaultLayoutVisibilities();
 
     dotsAdapter.onAlphaSend(MainActivity.this);
     pomDotsAdapter.onPomAlphaSend(MainActivity.this);
@@ -2101,8 +2101,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     new_lap.setAlpha(0.3f);
     roundListDivider.setVisibility(View.GONE);
 
-    savedCycleRecycler.setVisibility(View.VISIBLE);
     savedPomCycleRecycler.setVisibility(View.GONE);
+    pomDotsRecycler.setVisibility(View.GONE);
   }
 
   private void setDefaultLayoutTexts() {
@@ -4703,7 +4703,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     globalNextRoundLogic();
 
-    //Todo: Should we be rounding up here instead?
+    //Todo: Should be rounding up here instead.
     roundDownCycleSetAndBreakTimes();
     if (trackActivityWithinCycle) {
       roundDownDailyStatTimes();
