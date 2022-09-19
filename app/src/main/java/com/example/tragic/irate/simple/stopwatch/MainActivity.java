@@ -393,9 +393,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long totalCycleRestTimeInMillis;
 
   long totalSetTimeForCurrentDayInMillis;
-  long totalBreakTimeForCurrentDayInMillis;
-  long totalWorkTimeForCurrentDayInMillis;
-  long totalRestTimeForCurrentDayInMillis;
   double totalCaloriesBurnedForCurrentDay;
 
   long totalSetTimeForSpecificActivityForCurrentDayInMillis;
@@ -599,7 +596,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: First Cycles resume doesn't iterate progress bar.
+  //Todo: Also, total times not iterating last second as round ends.
 
   //Todo: Border bug likely something done in Main.
       //Todo: Slight visible shift dots position when starting timer. Maybe related.
@@ -1268,7 +1265,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     reset.setOnClickListener(v -> {
-      roundDownAllTotalTimeValuesToEnsureSyncing();
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
       if (mode==1) {
@@ -3131,7 +3127,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(()-> {
         if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
           insertActivityIntoDatabaseAndAssignItsValueToObjects();
-
           dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
         }
 
@@ -3150,7 +3145,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
            setCyclesCompletedTextView();
            toggleViewsForTotalDailyAndCycleTimes(false);
          }
-
          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
        });
       });
@@ -3852,6 +3846,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
       retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      roundDownPomCycleWorkAndRestTimes();
 
       runOnUiThread(new Runnable() {
         @Override
@@ -3917,6 +3912,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!trackActivityWithinCycle) {
         setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+        roundDownCycleSetAndBreakTimes();
+      } else {
+        roundDownDailyStatTimes();
       }
 
       runOnUiThread(new Runnable() {
@@ -3934,7 +3932,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     retrieveTotalDailySetAndBreakTimes();
     retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-    roundDownAllTotalTimeValuesToEnsureSyncing();
 
     clearRoundAndCycleAdapterArrayLists();
     populateCycleRoundAndRoundTypeArrayLists();
@@ -4160,11 +4157,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return textView.getVisibility()==View.VISIBLE;
   }
 
-  private void roundDownAllTotalTimeValuesToEnsureSyncing() {
+  private void roundDownCycleSetAndBreakTimes() {
     totalCycleSetTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleSetTimeInMillis);
     totalCycleBreakTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleBreakTimeInMillis);
+  }
+
+  private void roundDownPomCycleWorkAndRestTimes() {
+    totalCycleWorkTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleWorkTimeInMillis);
+    totalCycleRestTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleRestTimeInMillis);
+  }
+
+  private void roundDownDailyStatTimes() {
     totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
-    totalBreakTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForCurrentDayInMillis);
 
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
@@ -4223,7 +4227,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==3) {
       total_set_time.setText(convertSeconds(totalCycleWorkTimeInMillis/1000));
       total_break_time.setText(convertSeconds(totalCycleRestTimeInMillis/1000));
-
     }
   }
 
@@ -4690,12 +4693,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextRound(boolean endingEarly) {
-    globalNextRoundLogic();
 
     if (numberOfRoundsLeft==0) {
       mHandler.removeCallbacks(endFadeForModeOne);
       resetTimer();
       return;
+    }
+
+    globalNextRoundLogic();
+
+    roundDownCycleSetAndBreakTimes();
+    if (trackActivityWithinCycle) {
+      roundDownDailyStatTimes();
     }
 
     mHandler.post(endFadeForModeOne);
@@ -4748,13 +4757,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextPomRound(boolean endingEarly) {
-    globalNextRoundLogic();
-
     if (pomDotCounter==8) {
       mHandler.removeCallbacks(endFadeForModeThree);
       resetTimer();
       return;
     }
+
+    globalNextRoundLogic();
+    roundDownPomCycleWorkAndRestTimes();
 
     timeLeft.setText("0");
     mHandler.post(endFadeForModeThree);
@@ -4804,7 +4814,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     currentProgressBarValue = 10000;
     next_round.setEnabled(false);
 
-    roundDownAllTotalTimeValuesToEnsureSyncing();
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
   }
 
@@ -5125,7 +5134,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             instantiateAndStartObjectAnimator(setMillis);
           } else {
             setMillis = setMillisUntilFinished;
-            if (objectAnimator != null) objectAnimator.resume();
+            if (objectAnimator != null) {
+              objectAnimator.resume();
+            }
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
           if (currentProgressBarValue==maxProgress) {
@@ -5133,7 +5144,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             instantiateAndStartObjectAnimator(breakMillis);
           } else {
             breakMillis = breakMillisUntilFinished;
-            if (objectAnimator != null) objectAnimator.resume();
+            if (objectAnimator != null) {
+              objectAnimator.resume();
+            }
           }
         }
         break;
@@ -5296,13 +5309,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mHandler.removeCallbacks(infinityTimerForSetsRunnable);
     mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
 
-    if (objectAnimator != null) {
-      objectAnimator.cancel();
-    }
-
     vibrator.cancel();
     if (timer != null) timer.cancel();
     if (endAnimation!=null) endAnimation.cancel();
+
     if (mediaPlayer.isPlaying()) {
       mediaPlayer.stop();
       mediaPlayer.reset();
@@ -5329,9 +5339,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
-
-
-
     if (mode==1) {
       if (workoutTime.size()>0) {
         switch (typeOfRound.get(0)) {
@@ -5357,8 +5364,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
         };
 
-        Log.i("testTime", "timeLeft set at " + timeLeft.getText());
-
         for (int i=0; i<workoutTime.size(); i++) {
           if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) {
             workoutTime.set(i, 0);
@@ -5381,6 +5386,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         cyclesTextSizeHasChanged = false;
 
+        roundDownCycleSetAndBreakTimes();
+        roundDownDailyStatTimes();
+
+        if (objectAnimator != null) {
+          objectAnimator.cancel();
+        }
+
         if (savedCycleAdapter.isCycleActive()==true) {
           savedCycleAdapter.removeActiveCycleLayout();
           savedCycleAdapter.notifyDataSetChanged();
@@ -5402,7 +5414,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       pomCyclesTextSizeHasChanged = false;
 
-      if (objectAnimatorPom != null) objectAnimatorPom.cancel();
+      roundDownPomCycleWorkAndRestTimes();
+
+      if (objectAnimatorPom != null) {
+        objectAnimatorPom.cancel();
+      }
 
       if (savedPomCycleAdapter.isCycleActive()==true) {
         savedPomCycleAdapter.removeActiveCycleLayout();
