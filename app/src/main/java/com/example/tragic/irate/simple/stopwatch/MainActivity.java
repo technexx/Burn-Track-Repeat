@@ -396,7 +396,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double totalCaloriesBurnedForCurrentDay;
 
   long totalSetTimeForSpecificActivityForCurrentDayInMillis;
-  long totalBreakTimeForSpecificActivityForCurrentDayInMillis;
   double totalCaloriesBurnedForSpecificActivityForCurrentDay;
 
   String timeLeftValueHolder;
@@ -3845,7 +3844,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
       retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-      roundDownPomCycleWorkAndRestTimes();
+//      roundDownPomCycleWorkAndRestTimes();
 
       runOnUiThread(new Runnable() {
         @Override
@@ -3911,9 +3910,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!trackActivityWithinCycle) {
         setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-        roundDownCycleSetAndBreakTimes();
+//        roundDownCycleSetAndBreakTimes();
       } else {
-        roundDownDailyStatTimes();
+//        roundDownDailyStatTimes();
       }
 
       runOnUiThread(new Runnable() {
@@ -3993,11 +3992,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
-    totalBreakTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalBreakTimeForSelectedActivity();
     totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
-
-//    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-//    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
@@ -4156,25 +4151,97 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return textView.getVisibility()==View.VISIBLE;
   }
 
-  private void roundDownCycleSetAndBreakTimes() {
-    totalCycleSetTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleSetTimeInMillis);
-    totalCycleBreakTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleBreakTimeInMillis);
+  private void roundCycleSetTimeDown() {
+    totalCycleSetTimeInMillis = roundDownMillisValues(totalCycleSetTimeInMillis);
   }
 
-  private void roundDownPomCycleWorkAndRestTimes() {
-    totalCycleWorkTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleWorkTimeInMillis);
-    totalCycleRestTimeInMillis = roundDownMillisValuesToSyncTimers(totalCycleRestTimeInMillis);
+  private void roundCycleSetTimeUp() {
+    totalCycleSetTimeInMillis = roundUpMillisValues(totalCycleSetTimeInMillis);
   }
 
-  private void roundDownDailyStatTimes() {
-    totalSetTimeForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForCurrentDayInMillis);
-
-    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    totalBreakTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValuesToSyncTimers(totalBreakTimeForSpecificActivityForCurrentDayInMillis);
+  private void roundCycleBreakTimeDown() {
+    totalCycleBreakTimeInMillis = roundDownMillisValues(totalCycleBreakTimeInMillis);
   }
 
-  private long roundDownMillisValuesToSyncTimers(long millisToRound) {
+  private void roundCycleBreakTimeUp() {
+    totalCycleBreakTimeInMillis = roundUpMillisValues(totalCycleBreakTimeInMillis);
+  }
+
+  private void roundDailyStatTimesDown() {
+    totalSetTimeForCurrentDayInMillis = roundDownMillisValues(totalSetTimeForCurrentDayInMillis);
+
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValues(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+  }
+
+  private void roundDailyStatTimesUp() {
+    totalSetTimeForCurrentDayInMillis = roundUpMillisValues(totalSetTimeForCurrentDayInMillis);
+
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundUpMillisValues(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+  }
+
+  private void roundDownPomCycleWorkTime() {
+    totalCycleWorkTimeInMillis = roundDownMillisValues(totalCycleWorkTimeInMillis);
+  }
+
+  private void roundUpPomCycleWorkTime() {
+    totalCycleWorkTimeInMillis = roundUpMillisValues(totalCycleWorkTimeInMillis);
+  }
+
+  private void roundDownPomCycleRestTime() {
+    totalCycleRestTimeInMillis = roundDownMillisValues(totalCycleRestTimeInMillis);
+  }
+
+  private void roundUpPomCycleRestTime() {
+    totalCycleRestTimeInMillis = roundUpMillisValues(totalCycleRestTimeInMillis);
+  }
+
+  private long roundDownMillisValues(long millisToRound) {
     return millisToRound - (millisToRound%1000);
+  }
+
+  private long roundUpMillisValues(long millisToRound) {
+    long remainder = millisToRound%1000;
+    return millisToRound + (1000-remainder);
+  }
+
+  private void roundCycleSetTimeUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundCycleSetTimeDown();
+    } else {
+      roundCycleSetTimeUp();
+    }
+  }
+
+  private void roundCycleBreakTimeUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundCycleBreakTimeDown();
+    } else {
+      roundCycleBreakTimeUp();
+    }
+  }
+
+  private void roundDailyStatTimesUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundDailyStatTimesDown();
+    } else {
+      roundDailyStatTimesUp();
+    }
+  }
+
+  private void roundPomWorkTimeUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundDownPomCycleWorkTime();
+    } else {
+      roundUpPomCycleWorkTime();
+    }
+  }
+
+  private void roundPomRestTimeUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundDownPomCycleRestTime();
+    } else {
+      roundUpPomCycleRestTime();
+    }
   }
 
   private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
@@ -4694,7 +4761,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextRound(boolean endingEarly) {
-
     if (numberOfRoundsLeft==0) {
       mHandler.removeCallbacks(endFadeForModeOne);
       resetTimer();
@@ -4702,15 +4768,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     globalNextRoundLogic();
-
-    //Todo: Should be rounding up here instead.
-    roundDownCycleSetAndBreakTimes();
-    if (trackActivityWithinCycle) {
-      roundDownDailyStatTimes();
-    }
-
-    Log.i("testTime", "cycle setmillis at nextRound method is " + totalCycleSetTimeInMillis);
-
 
     mHandler.post(endFadeForModeOne);
 
@@ -4721,7 +4778,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       progressBar.setProgress(0);
     }
 
+    if (trackActivityWithinCycle) {
+      roundDailyStatTimesUpOrDown(endingEarly);
+    } else {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+        roundCycleSetTimeUpOrDown(endingEarly);
+      } else {
+        roundCycleBreakTimeUpOrDown(endingEarly);
+      }
+    }
+
     boolean isAlertRepeating = false;
+
     if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) {
       isAlertRepeating = true;
     }
@@ -4731,25 +4799,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
         removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
-        setEndOfRoundSounds(vibrationSettingForSets, false);
+        setEndOfRoundSounds(vibrationSettingForSets, isAlertRepeating);
         break;
       case 2:
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
 
         mHandler.removeCallbacks(infinityTimerForSetsRunnable);
         removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
-        setEndOfRoundSounds(vibrationSettingForSets, false);
+        setEndOfRoundSounds(vibrationSettingForSets, isAlertRepeating);
         break;
       case 3:
         total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
 
-        setEndOfRoundSounds(vibrationSettingForBreaks, false);
+        setEndOfRoundSounds(vibrationSettingForBreaks, isAlertRepeating);
         break;
       case 4:
         mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
         total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
 
-        setEndOfRoundSounds(vibrationSettingForBreaks, false);
+        setEndOfRoundSounds(vibrationSettingForBreaks, isAlertRepeating);
         break;
     }
 
@@ -4769,7 +4837,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     globalNextRoundLogic();
-    roundDownPomCycleWorkAndRestTimes();
 
     timeLeft.setText("0");
     mHandler.post(endFadeForModeThree);
@@ -4788,10 +4855,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 0: case 2: case 4: case 6:
         total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleWorkTimeInMillis)));
         setEndOfRoundSounds(vibrationSettingForWork, false);
+
+        roundPomWorkTimeUpOrDown(endingEarly);
         break;
       case 1: case 3: case 5:
         total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
+
+        roundPomRestTimeUpOrDown(endingEarly);
         break;
       case 7:
         total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
@@ -4799,6 +4870,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         boolean isAlertRepeating = false;
         if (isFullBreakSoundContinuous) isAlertRepeating = true;
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, isAlertRepeating);
+
+        roundPomRestTimeUpOrDown(endingEarly);
     }
 
     mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
@@ -5391,8 +5464,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         cyclesTextSizeHasChanged = false;
 
-        roundDownCycleSetAndBreakTimes();
-        roundDownDailyStatTimes();
+        roundCycleSetTimeDown();
+        roundCycleBreakTimeDown();
+        roundDailyStatTimesDown();
 
         if (objectAnimator != null) {
           objectAnimator.cancel();
@@ -5419,7 +5493,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       pomCyclesTextSizeHasChanged = false;
 
-      roundDownPomCycleWorkAndRestTimes();
+      roundDownPomCycleWorkTime();
+      roundDownPomCycleRestTime();
 
       if (objectAnimatorPom != null) {
         objectAnimatorPom.cancel();
