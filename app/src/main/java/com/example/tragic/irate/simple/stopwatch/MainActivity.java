@@ -602,7 +602,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Notifications begin new rounds at -1 second from start time.
   //Todo: Pencil icon in app bar remaining after on/off highlight mode
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -3346,7 +3345,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String totalRounds = String.valueOf(startRounds);
 
     String timeRemaining = "";
-    timeRemaining = convertTimerValuesToStringForNotifications((timeLeft) / 1000);
+    if (timeLeft < 100) {
+      timeRemaining = "00:00";
+    } else {
+      timeRemaining = convertTimerValuesToStringForNotifications((timeLeft+999) / 1000);
+    }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
   }
