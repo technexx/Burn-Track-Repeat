@@ -606,7 +606,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Add "Paused" in notifications if paused.
   //Todo: Pencil icon in app bar remaining after on/off highlight mode
   //Todo: Resolve vibration issue.
 
@@ -3298,10 +3297,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (timerPopUpWindow.isShowing()) {
           if (mode==1) {
             if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-              headerOne = setNotificationHeader("Workout", "Set");
+              headerOne = setNotificationHeader("Workout", "Set", timerIsPaused);
               bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
             } else {
-              headerOne = setNotificationHeader("Workout", "Break");
+              headerOne = setNotificationHeader("Workout", "Break", timerIsPaused);
               bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
             }
           }
@@ -3310,11 +3309,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             int numberOfRoundsLeft = 8-pomDotCounter;
             switch (pomDotCounter) {
               case 0: case 2: case 4: case 6:
-                headerOne = setNotificationHeader("Pomodoro", "Work");
+                headerOne = setNotificationHeader("Pomodoro", "Work", timerIsPaused);
                 bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
                 break;
               case 1: case 3: case 5: case 7:
-                headerOne = setNotificationHeader("Pomodoro", "Break");
+                headerOne = setNotificationHeader("Pomodoro", "Break", timerIsPaused);
                 bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
                 break;
             }
@@ -3336,9 +3335,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-
-  public String setNotificationHeader(String selectedMode, String roundType) {
-    return (getString(R.string.notification_text_header, selectedMode, roundType));
+  public String setNotificationHeader(String selectedMode, String roundType, boolean paused) {
+    if (paused) {
+      return (getString(R.string.notification_text_header, selectedMode, roundType) + " - " + getString(R.string.paused));
+    } else {
+      return (getString(R.string.notification_text_header, selectedMode, roundType));
+    }
   }
 
   private String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {

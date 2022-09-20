@@ -87,6 +87,7 @@
     <string name="notification_text_header">%1$s - On %2$s </string>
     <string name="notification_text">Round %1$s of %2$s - %3$s %4$s</string>
     <string name="notification_stopwatch_header">Stopwatch</string>
+    <string name="paused">Paused</string>
 
     <string name="workout_mode">Workout Mode</string>
     <string name="pomodoro_mode">Pomodoro Mode</string>
