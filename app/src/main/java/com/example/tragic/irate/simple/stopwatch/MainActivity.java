@@ -46,6 +46,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
+import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -55,6 +56,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -68,6 +70,8 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.Worker;
+import androidx.work.WorkerParameters;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapterTwo;
@@ -107,6 +111,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
 
@@ -595,9 +600,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ConstraintLayout progressBarLayout;
 
-  //Todo: Also, total times not iterating last second as round ends.
+  boolean isAppStopped;
 
-  //Todo: Border bug is pom's recyclerView border overlapping in cycles.
+  //Todo: Notifications begin new rounds at -1 second from start time.
+  //Todo: Pencil icon in app bar remaining after on/off highlight mode
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -627,6 +633,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
     mHandler.removeCallbacks(notificationsRunnable);
+
+    isAppStopped = false;
   }
 
   @Override
@@ -642,6 +650,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dismissNotification = false;
       notificationsRunnable = notificationsRunnable();
       mHandler.post(notificationsRunnable);
+
+      isAppStopped = true;
     }
   }
 
@@ -651,7 +661,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         setNotificationValues();
         mHandler.postDelayed(this, 1000);
-//        Log.i("testNote", "running!");
       }
     };
   }
@@ -1013,6 +1022,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
   }
+
+  public class TestWorker extends Worker {
+    public TestWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+      super(context, workerParams);
+    }
+
+    @Override
+    public Result doWork() {
+      vibrator.vibrate(changeSettingsValues.getVibrationSetting(2), 0);
+
+      Log.i("testvibrate", "class executed!");
+
+      // Indicate whether the work finished successfully with the Result
+      return Result.success();
+    }
+  }
+
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
@@ -2716,31 +2742,60 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
-    if (!dismissNotification) {
-      if (!repeat) {
-        mediaPlayer.setLooping(false);
-      } else {
-        mediaPlayer.setLooping(true);
-      }
-      mediaPlayer.start();
-    } else {
-      switch (vibrationSetting) {
-        case 1: case 2: case 3:
-          if (repeat) {
-            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
-          } else {
-            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
-          }
-          break;
-        case 4:
-          if (!repeat) {
-            mediaPlayer.setLooping(false);
-          } else {
-            mediaPlayer.setLooping(true);
-          }
-          mediaPlayer.start();
-          break;
-      }
+//    if (isAppStopped) {
+//      WorkRequest uploadWorkRequest =
+//              new OneTimeWorkRequest.Builder(TestWorker.class)
+//                      .build();
+//      WorkManager
+//              .getInstance()
+//              .enqueue(uploadWorkRequest);
+//
+//    }
+
+//    if (!dismissNotification && vibrationSetting != 0) {
+//      if (!repeat) {
+//        mediaPlayer.setLooping(false);
+//      } else {
+//        mediaPlayer.setLooping(true);
+//      }
+//      mediaPlayer.start();
+//    } else {
+//
+//      switch (vibrationSetting) {
+//        case 1: case 2: case 3:
+//          if (repeat) {
+//            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+//          } else {
+//            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+//          }
+//          break;
+//        case 4:
+//          if (!repeat) {
+//            mediaPlayer.setLooping(false);
+//          } else {
+//            mediaPlayer.setLooping(true);
+//          }
+//          mediaPlayer.start();
+//          break;
+//      }
+//    }
+
+    switch (vibrationSetting) {
+      case 1: case 2: case 3:
+        if (repeat) {
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+        } else {
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+        }
+        break;
+      case 4:
+        if (!repeat) {
+          mediaPlayer.setLooping(false);
+        } else {
+          mediaPlayer.setLooping(true);
+        }
+        mediaPlayer.start();
+        break;
     }
   }
 
@@ -3201,7 +3256,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       channel.setDescription(description);
 
       // Register the channel with the system; you can't change the importance
-      // or other notification behaviors after this
+      // or other notification behaviors after this.
       NotificationManager notificationManager = getSystemService(NotificationManager.class);
       notificationManager.createNotificationChannel(channel);
       builder = new NotificationCompat.Builder(this, "1");
@@ -4761,6 +4816,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextRound(boolean endingEarly) {
+    if (!endingEarly) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
+        timeLeft.setText("0");
+      }
+    }
+
     if (numberOfRoundsLeft==0) {
       mHandler.removeCallbacks(endFadeForModeOne);
       resetTimer();
@@ -4828,6 +4889,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextPomRound(boolean endingEarly) {
+    if (!endingEarly) {
+      timeLeft.setText("0");
+    }
+
     if (pomDotCounter==8) {
       mHandler.removeCallbacks(endFadeForModeThree);
       resetTimer();
