@@ -606,7 +606,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Pencil icon in app bar remaining after on/off highlight mode
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -1075,6 +1074,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     fab.setOnClickListener(v -> {
       fabLogic();
+      removeCycleHighlights();
+
     });
 
     sortButton.setOnClickListener(v-> {
@@ -1102,8 +1103,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     edit_highlighted_cycle.setOnClickListener(v-> {
       fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
-      removeHighlightFromCycle();
-
+      removeCycleHighlights();
       editHighlightedCycleLogic();
 
       if (mode==1) cycles = cyclesList.get(positionOfSelectedCycle);
@@ -2490,16 +2490,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void removeHighlightFromCycle() {
-    if (mode==1) {
-      savedCycleAdapter.removeHighlight();
-    } else if (mode==3) {
-      savedPomCycleAdapter.removeHighlight();
-    }
-    cycleRoundsAdapter.notifyDataSetChanged();
-    cycleRoundsAdapterTwo.notifyDataSetChanged();
-  }
-
   private void deleteHighlightedCycles() {
     if ((mode==1 && cyclesList.size()==0 || (mode==3 && pomCyclesList.size()==0))) {
       runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
@@ -2856,13 +2846,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsInAndOut(FADE_OUT_EDIT_CYCLE);
       currentlyEditingACycle = false;
 
-      if (mode==1) {
-        savedCycleAdapter.removeHighlight();
-        savedCycleAdapter.notifyDataSetChanged();
-      } else if (mode==3) {
-        savedPomCycleAdapter.removeHighlight();
-        savedPomCycleAdapter.notifyDataSetChanged();
-      }
+      removeCycleHighlights();
     }
 
     fab.setEnabled(true);
