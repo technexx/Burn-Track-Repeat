@@ -159,7 +159,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             fadeAlpha();
             holder.fullView.setAlpha(mAlpha);
         } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
-            holder.fullView.setAlpha(0.3f);
+            holder.fullView.setAlpha(0.36f);
         } else {
             holder.fullView.setAlpha(1.0f);
         }

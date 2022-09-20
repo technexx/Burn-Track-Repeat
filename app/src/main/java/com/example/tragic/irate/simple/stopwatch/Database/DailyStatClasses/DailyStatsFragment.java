@@ -261,7 +261,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
                         togggleTotalStatTextViewsWhenSwitchingTabs(0);
 
-                        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
+//                        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
@@ -282,12 +282,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         setTabSelected(2);
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(2);
 
-                        toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
+//                        toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
                         break;
                 }
 
                 toggleCalendarMinimizationLayouts();
-                toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
+//                toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
             }
 
             @Override
@@ -384,7 +384,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         areActivityStatsSimplified = sharedPref.getBoolean("areActivityStatsSimplified", false);
         toggleSimplifiedStatsButtonView(areActivityStatsSimplified);
-        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
+        toggleSimplifiedStatViewsWithinActivityTab(false);
         setSimplifiedViewTextViews();
 
         AsyncTask.execute(()-> {
@@ -628,22 +628,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void toggleSimplifiedStatsButtonView(boolean areSimplified) {
+        dailyStatsExpandedButton.setVisibility(View.GONE);
         if (!areSimplified) {
             dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
-
-//            if (phoneHeight <= 1920) {
-//                dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1_h1920);
-//            } else {
-//                dailyStatsExpandedButton.setImageResource(R.drawable.collapse_1);
-//            }
         } else {
             dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
-
-//            if (phoneHeight <= 1920) {
-//                dailyStatsExpandedButton.setImageResource(R.drawable.expand_1_h1920);
-//            } else {
-//                dailyStatsExpandedButton.setImageResource(R.drawable.expand_1);
-//            }
         }
     }
 
