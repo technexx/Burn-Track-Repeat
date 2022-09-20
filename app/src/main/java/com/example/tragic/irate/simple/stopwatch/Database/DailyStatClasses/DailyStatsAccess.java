@@ -723,8 +723,13 @@ public class DailyStatsAccess {
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
                     totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
 
-                    double caloriesToAdd = roundDownCalories(mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+                    //Todo: This and combinedActivityCaloriesFromExistingAndRepeatingPositions() is where we removed rounding during save.
+                    double caloriesToAdd = mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
+
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.add(caloriesToAdd);
+
+                    Log.i("testCals", "calories in list are "+ totalCaloriesBurnedListForEachActivityForSelectedDuration);
+
                 } else {
                     totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedActivityCaloriesFromExistingAndRepeatingPositions(i));
@@ -750,7 +755,7 @@ public class DailyStatsAccess {
     }
 
     private double combinedActivityCaloriesFromExistingAndRepeatingPositions(int position) {
-        double iteratingValue = roundDownCalories(mStatsForEachActivityList.get(position).getTotalCaloriesBurnedForEachActivity());
+        double iteratingValue = mStatsForEachActivityList.get(position).getTotalCaloriesBurnedForEachActivity();
         double presentValue =  totalCaloriesBurnedListForEachActivityForSelectedDuration.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }

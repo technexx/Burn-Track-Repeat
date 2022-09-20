@@ -284,6 +284,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
+    //This doesn't round because input isn't a decimal (e.g. "0" is "0" until it is "1").
     private String formatCalorieString(double calories) {
         DecimalFormat df = new DecimalFormat("#");
         df.setRoundingMode(RoundingMode.DOWN);

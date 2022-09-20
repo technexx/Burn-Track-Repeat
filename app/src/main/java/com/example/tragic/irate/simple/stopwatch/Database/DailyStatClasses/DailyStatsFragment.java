@@ -1142,8 +1142,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (newActivityTime == 0) {
                 getActivity().runOnUiThread(()-> {
                     showToastIfNoneActive("Time cannot be empty!");
-                    return;
                 });
+                return;
             }
 
             String activityString = dailyStatsAccess.getTotalActivitiesListForSelectedDuration().get(mPositionToEdit);
@@ -1173,8 +1173,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 } else {
                     double caloriesPerHour = getIsCaloriesPerHourFromSpecifiCustomActivityForSelecteDays(uniqueIdToCheck, activityString);
                     finalNewCaloriesBurned = calculateCaloriesForCustomActivityEdit(finalNewActivityTime, caloriesPerHour);
-
-                    Log.i("testFetch", "day " + uniqueIdToCheck + " calories per hour for custom activity is " + caloriesPerHour);
                 }
 
                 dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityFromDayId(uniqueIdToCheck, finalNewActivityTime, finalNewCaloriesBurned);
@@ -1797,7 +1795,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private String formatDoubleToStringWithoutDecimals(double calories) {
         DecimalFormat df = new DecimalFormat("#");
-        df.setRoundingMode(RoundingMode.DOWN);
+        df.setRoundingMode(RoundingMode.UP);
         return df.format(calories);
     }
 

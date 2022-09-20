@@ -606,8 +606,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: <1 second in activity can skew display for total calories (e.g. second activity can be 24 sec/2.4 calories, but total will display 24 sec/2.6 calories).
-      //Todo: Stats Frag can also show slightly less than Timer (1 vs 2). Rounding stuff.
+   //Todo: Total daily + total activity calories do not iterate together.
+      //Todo: Need to have daily total reflect total of all activities as current one is iterating.
+
   //Todo: Pencil icon in app bar remaining after on/off highlight mode
   //Todo: Resolve vibration issue.
 
