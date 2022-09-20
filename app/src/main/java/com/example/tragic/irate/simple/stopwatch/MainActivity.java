@@ -606,9 +606,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-   //Todo: Total daily + total activity calories do not iterate together.
-      //Todo: Need to have daily total reflect total of all activities as current one is iterating.
-
+  //Todo: Add "Paused" in notifications if paused.
   //Todo: Pencil icon in app bar remaining after on/off highlight mode
   //Todo: Resolve vibration issue.
 
@@ -4448,6 +4446,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         long timeToIterate = timerIteration.getDifference();
         double caloriesToIterate = calculateCaloriesBurnedPerMillis() * timeToIterate;
 
+        //If calories have not iterated in hundredths during tick, display will not update, which is why they won't be 100% sync'd at faster interval delays.
         timerIteration.setNewDailyTotal(timerIteration.getPreviousDailyTotal() + timeToIterate);
         timerIteration.setNewActivityTotal(timerIteration.getPreviousActivityTotal() + timeToIterate);
         totalSetTimeForCurrentDayInMillis = timerIteration.getNewDailyTotal();
@@ -4460,7 +4459,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
-        mHandler.postDelayed(this, 50);
+        mHandler.postDelayed(this, 150);
       }
     };
   }

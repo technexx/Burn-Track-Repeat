@@ -723,7 +723,6 @@ public class DailyStatsAccess {
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
                     totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
 
-                    //Todo: This and combinedActivityCaloriesFromExistingAndRepeatingPositions() is where we removed rounding during save.
                     double caloriesToAdd = mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
 
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.add(caloriesToAdd);
