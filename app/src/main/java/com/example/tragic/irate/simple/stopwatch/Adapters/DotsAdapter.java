@@ -112,6 +112,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
             textLayoutParams.topMargin = 6;
         } else {
             holder.roundText.setTypeface(Typeface.DEFAULT);
+            textLayoutParams.topMargin = 0;
         }
 
         if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 3) {
@@ -176,7 +177,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         public DotsViewHolder(@NonNull View itemView) {
             super(itemView);
             roundText = itemView.findViewById(R.id.round_string_textView_for_cycles);
-//            roundImageView = itemView.findViewById(R.id.round_string_imageView);
             fullView = itemView;
         }
     }

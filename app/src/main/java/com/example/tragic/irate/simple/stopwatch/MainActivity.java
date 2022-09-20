@@ -24,6 +24,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -70,6 +71,9 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.OneTimeWorkRequest;
+import androidx.work.WorkManager;
+import androidx.work.WorkRequest;
 import androidx.work.Worker;
 import androidx.work.WorkerParameters;
 
@@ -603,6 +607,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean isAppStopped;
 
   //Todo: Pencil icon in app bar remaining after on/off highlight mode
+  //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
@@ -1023,7 +1028,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   public class TestWorker extends Worker {
-    public TestWorker(@NonNull Context context, @NonNull WorkerParameters workerParams) {
+    public TestWorker(Context context, WorkerParameters workerParams) {
       super(context, workerParams);
     }
 
@@ -1527,7 +1532,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
-    vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+    vibrator = (Vibrator) getSystemService(getApplicationContext().VIBRATOR_SERVICE);
 
     mToast = new Toast(getApplicationContext());
   }
@@ -2195,10 +2200,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (!timerIsPaused) {
           mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
-          Log.i("testSave", "save runnable is running!");
         } else {
           mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
-          Log.i("testSave", "save runnable has been stopped!!");
         }
       }
     };
@@ -2741,15 +2744,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
-//    if (isAppStopped) {
-//      WorkRequest uploadWorkRequest =
-//              new OneTimeWorkRequest.Builder(TestWorker.class)
-//                      .build();
-//      WorkManager
-//              .getInstance()
-//              .enqueue(uploadWorkRequest);
-//
-//    }
+    if (isAppStopped) {
+      WorkRequest uploadWorkRequest =
+              new OneTimeWorkRequest.Builder(TestWorker.class)
+                      .build();
+      WorkManager
+              .getInstance()
+              .enqueue(uploadWorkRequest);
+
+      Log.i("testvibrate", "method executed!");
+
+    }
 
 //    if (!dismissNotification && vibrationSetting != 0) {
 //      if (!repeat) {
@@ -2779,23 +2784,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //      }
 //    }
 
-    switch (vibrationSetting) {
-      case 1: case 2: case 3:
-        if (repeat) {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
-        } else {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
-        }
-        break;
-      case 4:
-        if (!repeat) {
-          mediaPlayer.setLooping(false);
-        } else {
-          mediaPlayer.setLooping(true);
-        }
-        mediaPlayer.start();
-        break;
-    }
+//    switch (vibrationSetting) {
+//      case 1: case 2: case 3:
+//        if (repeat) {
+//          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+//        } else {
+//          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+//
+//        }
+//        break;
+//      case 4:
+//        if (!repeat) {
+//          mediaPlayer.setLooping(false);
+//        } else {
+//          mediaPlayer.setLooping(true);
+//        }
+//        mediaPlayer.start();
+//        break;
+//    }
   }
 
   private void assignColorSettingValues(int typeOfRound, int settingsNumber) {
@@ -3258,7 +3264,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       // or other notification behaviors after this.
       NotificationManager notificationManager = getSystemService(NotificationManager.class);
       notificationManager.createNotificationChannel(channel);
-      builder = new NotificationCompat.Builder(this, "1");
+        builder = new NotificationCompat.Builder(this, "1");
     } else {
       builder = new NotificationCompat.Builder(this);
     }
