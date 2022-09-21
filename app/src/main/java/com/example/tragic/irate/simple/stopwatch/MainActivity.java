@@ -2514,6 +2514,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityStatsByLeastTimeTextView.setOnClickListener(activitySortOptionListener());
     sortActivityStatsByMostCaloriesTextView.setOnClickListener(activitySortOptionListener());
     sortActivityStatsByLeastCaloriesTextView.setOnClickListener(activitySortOptionListener());
+
+    sortFoodConsumedStatsAToZTextView.setOnClickListener(foodConsumedSortOptionListener());
+    sortFoodConsumedStatsZToATextView.setOnClickListener(foodConsumedSortOptionListener());
+    sortFoodConsumedCaloriesByMostTextView.setOnClickListener(foodConsumedSortOptionListener());
+    sortFoodConsumedCaloriesByLeastTextView.setOnClickListener(foodConsumedSortOptionListener());
   }
 
   private void editHighlightedCycleLogic() {
