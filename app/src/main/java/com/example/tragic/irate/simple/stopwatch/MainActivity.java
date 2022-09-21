@@ -617,13 +617,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
-  //Todo: Sort in Stats Frag not changing w/ tab change.
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on app start as a guide.
   //Todo: Put disclaimer in "About" section.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
+  //Todo: Check stats add/edit popUp windows w/ diff. layout heights.
 
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Test extra-large screens as well.
@@ -2468,7 +2468,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       AsyncTask.execute(()-> {
-        dailyStatsFragment.setActivitySortMode(sortModeForFoodConsumed);
+        dailyStatsFragment.setFoodConsumedSortMode(sortModeForFoodConsumed);
         dailyStatsFragment.sortFoodConsumedStatsAsACallFromMainActivity();
         runOnUiThread(()-> {
           sortPopupWindow.dismiss();
