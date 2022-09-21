@@ -606,7 +606,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Round recycler will likely need diff. layout param changes for <= 1920 heights.
+  //Todo: Round recycler will likely need diff. layout param changes  + layout changes for <= 1920 heights.
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().

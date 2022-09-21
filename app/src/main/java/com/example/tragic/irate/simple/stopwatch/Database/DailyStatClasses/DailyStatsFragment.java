@@ -1895,7 +1895,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
             recyclerParams.bottomToTop = R.id.total_activity_stats_values_textView_layout;
         } else {
-            textViewParams.bottomToTop = R.id.minimize_calendarView_button;
+//            textViewParams.bottomToTop = R.id.minimize_calendarView_button;
+            textViewParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
+            textViewParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
 
             recyclerParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
             recyclerParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
