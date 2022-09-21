@@ -4,6 +4,7 @@
     package="com.example.tragic.irate.simple.stopwatch">
 
     <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permissions.DEVICE_POWER" />
     <application
         android:allowBackup="false"
         android:icon="@mipmap/ic_launcher"

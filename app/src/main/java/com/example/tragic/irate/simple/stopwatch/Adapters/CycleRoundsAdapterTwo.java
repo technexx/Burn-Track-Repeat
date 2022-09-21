@@ -44,6 +44,8 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     int SET_COLOR;
     int BREAK_COLOR;
 
+    int mScreenHeight;
+
     public interface onFadeFinished {
         void subtractionFadeHasFinished();
     }
@@ -90,6 +92,10 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         });
     }
 
+    public void setScreenHeight(int height) {
+        this.mScreenHeight = height;
+    }
+
     //Receives position from Main to fade (or not), and also sets our fade animation boolean to true.
     public void setFadeInPosition(int add) {
         mPosAddHolder = add; mPosSubHolder = -1; mRunRoundAnimation = true;
@@ -107,7 +113,12 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         Context context = parent.getContext();
-        View view = LayoutInflater.from(context).inflate(R.layout.mode_one_rounds_second_adapter, parent, false);
+        View view;
+        if (mScreenHeight <= 1920) {
+            view = LayoutInflater.from(context).inflate(R.layout.mode_one_rounds_second_adapter_h1920, parent, false);
+        } else {
+            view = LayoutInflater.from(context).inflate(R.layout.mode_one_rounds_second_adapter, parent, false);
+        }
         return new ModeOneRounds(view);
     }
 

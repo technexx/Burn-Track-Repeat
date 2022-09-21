@@ -17,7 +17,7 @@
         android:layout_marginTop="8dp"
         android:textColorHint="@color/circular_progress_default_subtitle"
         android:textColor="@color/white"
-        android:textSize="22sp"
+        android:textSize="20sp"
         android:hint="@string/cycle_name"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
@@ -43,7 +43,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginTop="10dp"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -53,7 +53,7 @@
         app:layout_constraintStart_toEndOf="@id/firstRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginTop="10dp"
-        android:textSize="24sp"
+        android:textSize="22sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -64,7 +64,7 @@
         app:layout_constraintTop_toBottomOf="@id/cycle_name_edit"
         android:layout_marginTop="10dp"
         android:layout_marginEnd="26dp"
-        android:textSize="26sp"
+        android:textSize="24sp"
         android:textColor="@color/white"/>
 
     <TextView
@@ -75,7 +75,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
         android:layout_marginTop="0dp"
-        android:layout_marginEnd="24dp"
+        android:layout_marginEnd="21dp"
         android:textSize="35sp">
     </TextView>
 
@@ -88,7 +88,7 @@
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
         android:layout_marginTop="20dp"
         android:layout_marginStart="6dp"
-        android:textSize="26sp">
+        android:textSize="24sp">
     </TextView>
 
     <TextView
@@ -100,7 +100,7 @@
         app:layout_constraintEnd_toStartOf="@id/pomTimerValueInEditPopUpTextViewThree"
         android:layout_marginTop="20dp"
         android:layout_marginStart="2sp"
-        android:textSize="26sp">
+        android:textSize="24sp">
     </TextView>
 
     <TextView
@@ -112,7 +112,7 @@
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
         android:layout_marginTop="20dp"
         android:layout_marginEnd="28dp"
-        android:textSize="26sp">
+        android:textSize="24sp">
     </TextView>
 
     <ImageButton
@@ -355,15 +355,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="@id/round_recycler_layout"
-        app:layout_constraintEnd_toStartOf="@id/cancel_activity_for_cycle"
-        app:layout_constraintTop_toBottomOf="@+id/number_pad_layout"
-        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="@id/round_recycler_layout"
+        app:layout_constraintTop_toBottomOf="@id/number_pad_layout"
         android:layout_marginTop="2dp"
-        android:layout_marginBottom="0dp"
         android:textColor="@color/white"
-        app:layout_constraintWidth_max="270dp"
+        app:layout_constraintWidth_max="320dp"
         android:gravity="center_horizontal"
-        android:textStyle="bold">
+        android:textStyle="bold"
+        android:textSize="18sp">
     </TextView>
 
     <ImageView
@@ -383,7 +382,7 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/round_recycler_layout"
         android:layout_width="260dp"
-        android:layout_height="100dp"
+        android:layout_height="200dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"

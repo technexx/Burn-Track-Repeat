@@ -3,6 +3,8 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Application;
+import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -24,6 +26,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.PowerManager;
 import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
@@ -67,6 +70,7 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.legacy.content.WakefulBroadcastReceiver;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -605,6 +609,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout progressBarLayout;
 
   boolean isAppStopped;
+  PowerManager powerManager;
+  PowerManager.WakeLock wakeLock;
 
   //Todo: Round recycler will likely need diff. layout param changes  + layout changes for <= 1920 heights.
   //Todo: Resolve vibration issue.
@@ -658,6 +664,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mHandler.post(notificationsRunnable);
 
       isAppStopped = true;
+
     }
   }
 
@@ -1050,6 +1057,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
+
+    powerManager = (PowerManager) getSystemService(Application.POWER_SERVICE);
+
+    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP , "MyWakeLock");
 
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSets();
@@ -2733,52 +2744,52 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
-    if (!dismissNotification && vibrationSetting != 0) {
-      if (!repeat) {
-        mediaPlayer.setLooping(false);
-      } else {
-        mediaPlayer.setLooping(true);
-      }
-      mediaPlayer.start();
-    } else {
-
-      switch (vibrationSetting) {
-        case 1: case 2: case 3:
-          if (repeat) {
-            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
-          } else {
-            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
-          }
-          break;
-        case 4:
-          if (!repeat) {
-            mediaPlayer.setLooping(false);
-          } else {
-            mediaPlayer.setLooping(true);
-          }
-          mediaPlayer.start();
-          break;
-      }
-    }
-
-//    switch (vibrationSetting) {
-//      case 1: case 2: case 3:
-//        if (repeat) {
-//          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
-//        } else {
-//          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+//    if (!dismissNotification && vibrationSetting != 0) {
+//      if (!repeat) {
+//        mediaPlayer.setLooping(false);
+//      } else {
+//        mediaPlayer.setLooping(true);
+//      }
+//      mediaPlayer.start();
+//    } else {
 //
-//        }
-//        break;
-//      case 4:
-//        if (!repeat) {
-//          mediaPlayer.setLooping(false);
-//        } else {
-//          mediaPlayer.setLooping(true);
-//        }
-//        mediaPlayer.start();
-//        break;
+//      switch (vibrationSetting) {
+//        case 1: case 2: case 3:
+//          if (repeat) {
+//            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+//          } else {
+//            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+//          }
+//          break;
+//        case 4:
+//          if (!repeat) {
+//            mediaPlayer.setLooping(false);
+//          } else {
+//            mediaPlayer.setLooping(true);
+//          }
+//          mediaPlayer.start();
+//          break;
+//      }
 //    }
+
+    switch (vibrationSetting) {
+      case 1: case 2: case 3:
+        if (repeat) {
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+        } else {
+          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+
+        }
+        break;
+      case 4:
+        if (!repeat) {
+          mediaPlayer.setLooping(false);
+        } else {
+          mediaPlayer.setLooping(true);
+        }
+        mediaPlayer.start();
+        break;
+    }
   }
 
   private void assignColorSettingValues(int typeOfRound, int settingsNumber) {
@@ -3202,6 +3213,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       millis = pomMillis;
     }
     return (convertSeconds((millis + 999) / 1000));
+  }
+
+  public class MyWakefulReceiver extends WakefulBroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+
+      // Start the service, keeping the device awake while the service is
+      // launching. This is the Intent to deliver to the service.
+
+
+      Intent service = new Intent(context, MyIntentService.class);
+      startWakefulService(context, service);
+    }
+  }
+
+  public class MyIntentService extends IntentService {
+    public MyIntentService() {
+      super("MyIntentService");
+    }
+    @Override
+    protected void onHandleIntent(Intent intent) {
+      Bundle extras = intent.getExtras();
+      // Do the work that requires your app to keep the CPU running.
+      // ...
+      // Release the wake lock provided by the WakefulBroadcastReceiver.
+      MyWakefulReceiver.completeWakefulIntent(intent);
+    }
   }
 
   //These broadcast the Pending Intents we have created. MUST BE DECLARED IN MANIFEST.
@@ -3969,6 +4007,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (trackingActivity) {
       setAllActivityTimesAndCaloriesToTextViews();
     }
+
+    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP , "MyWakeLock");
 
     resetTimer();
   }
@@ -4794,6 +4834,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextRound(boolean endingEarly) {
+    if (isAppStopped) {
+      wakeLock.acquire();
+      Log.i("testWake", "acquired!");
+    }
+
     if (!endingEarly) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
         timeLeft.setText("0");
@@ -4861,6 +4906,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     numberOfRoundsLeft--;
     if (currentRound < typeOfRound.size()-1) {
       currentRound++;
+    }
+
+    if (isAppStopped) {
+      wakeLock.release();
+      Log.i("testWake", "released!");
     }
 
     mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);

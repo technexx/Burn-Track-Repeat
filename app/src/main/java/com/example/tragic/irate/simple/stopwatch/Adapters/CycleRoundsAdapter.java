@@ -47,6 +47,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   int MINI_BREAK_COLOR;
   int FULL_BREAK_COLOR;
 
+  int mScreenHeight;
+
   public interface onFadeFinished {
     void subtractionFadeHasFinished();
   }
@@ -95,6 +97,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     });
   }
 
+  public void setScreenHeight(int height) {
+    this.mScreenHeight = height;
+  }
+
   public void setMode(int mode) {
     mMode = mode;
     animateIn.setStartOffset(0);
@@ -127,11 +133,22 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
     Context context = parent.getContext();
+    View view;
+
     if (viewType == MODE_ONE) {
-      View view = LayoutInflater.from(context).inflate(R.layout.mode_one_rounds, parent, false);
+
+      if (mScreenHeight <= 1920) {
+        view = LayoutInflater.from(context).inflate(R.layout.mode_one_rounds_h1920, parent, false);
+      } else {
+        view = LayoutInflater.from(context).inflate(R.layout.mode_one_rounds, parent, false);
+      }
       return new ModeOneRounds(view);
     } else if (viewType == MODE_THREE) {
-      View view = LayoutInflater.from(context).inflate(R.layout.mode_three_rounds, parent, false);
+      if (mScreenHeight <= 1920) {
+        view = LayoutInflater.from(context).inflate(R.layout.mode_three_rounds_h1920, parent, false);
+      } else {
+        view = LayoutInflater.from(context).inflate(R.layout.mode_three_rounds, parent, false);
+      }
       return new ModeThreeRounds(view);
     } else return null;
   }
