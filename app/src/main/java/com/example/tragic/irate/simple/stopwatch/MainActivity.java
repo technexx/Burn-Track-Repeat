@@ -3767,7 +3767,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (phoneHeight <= 1920) {
           roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
-          roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(60);
+          roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(15);
         } else {
           roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
           roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(20);
