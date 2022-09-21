@@ -1855,6 +1855,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), workoutStringListOfRoundValuesForSecondAdapter, workoutIntegerListOfRoundTypeForSecondAdapter);
     cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
     cycleRoundsAdapterTwo.selectedRoundSecondAdapter(MainActivity.this);
+
+    cycleRoundsAdapter.setScreenHeight(phoneHeight);
+    cycleRoundsAdapterTwo.setScreenHeight(phoneHeight);
   }
 
   private void setRoundRecyclersOnAdaptersAndLayoutManagers() {
