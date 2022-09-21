@@ -606,6 +606,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
+  //Todo: Bit of ghosting in custom bar icons when dismissing edit popUp after from highlight.
+  //Todo: Round recycler will likely need diff. layout param changes for <= 1920 heights.
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -1003,10 +1005,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testDimensions", "height is " + phoneHeight + " and width is " + phoneWidth);
   }
 
+  private void setEditCyclesLayoutForDifferentHeights() {
+    LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+    if (phoneHeight <= 1920) {
+      editCyclesPopupView = inflater.inflate(R.layout.editing_cycles_h1920, null);
+    } else {
+      editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
+    }
+
+    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+
+  }
+
   private void setTimerLayoutForDifferentHeights() {
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
-    if (phoneHeight<=1920) {
+    if (phoneHeight <= 1920) {
       timerPopUpView = inflater.inflate(R.layout.timer_popup_h1920, null);
     } else {
       timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
@@ -1026,23 +1041,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
   }
-
-  public class TestWorker extends Worker {
-    public TestWorker(Context context, WorkerParameters workerParams) {
-      super(context, workerParams);
-    }
-
-    @Override
-    public Result doWork() {
-      vibrator.vibrate(changeSettingsValues.getVibrationSetting(2), 0);
-
-      Log.i("testvibrate", "class executed!");
-
-      // Indicate whether the work finished successfully with the Result
-      return Result.success();
-    }
-  }
-
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
@@ -2029,22 +2027,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
     sortCyclePopupView = inflater.inflate(R.layout.cycles_sort_popup, null);
     sortStatsPopupView = inflater.inflate(R.layout.stats_sort_popup, null);
-    editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
     addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_main_activity, null);
 
+//    editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
 //    timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
 //    stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup, null);
 
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, convertDensityPixelsToScalable(250), convertDensityPixelsToScalable(450), true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, convertDensityPixelsToScalable(300), convertDensityPixelsToScalable(150), true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     addTdeePopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-
+//    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 //    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 //    stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 
+    setEditCyclesLayoutForDifferentHeights();
     setTimerLayoutForDifferentHeights();
     setStopWatchLayoutForDifferentHeights();
 
@@ -2735,45 +2733,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
-    if (isAppStopped) {
-      WorkRequest uploadWorkRequest =
-              new OneTimeWorkRequest.Builder(TestWorker.class)
-                      .build();
-      WorkManager
-              .getInstance()
-              .enqueue(uploadWorkRequest);
+    if (!dismissNotification && vibrationSetting != 0) {
+      if (!repeat) {
+        mediaPlayer.setLooping(false);
+      } else {
+        mediaPlayer.setLooping(true);
+      }
+      mediaPlayer.start();
+    } else {
 
-      Log.i("testvibrate", "method executed!");
-
+      switch (vibrationSetting) {
+        case 1: case 2: case 3:
+          if (repeat) {
+            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+          } else {
+            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+          }
+          break;
+        case 4:
+          if (!repeat) {
+            mediaPlayer.setLooping(false);
+          } else {
+            mediaPlayer.setLooping(true);
+          }
+          mediaPlayer.start();
+          break;
+      }
     }
-
-//    if (!dismissNotification && vibrationSetting != 0) {
-//      if (!repeat) {
-//        mediaPlayer.setLooping(false);
-//      } else {
-//        mediaPlayer.setLooping(true);
-//      }
-//      mediaPlayer.start();
-//    } else {
-//
-//      switch (vibrationSetting) {
-//        case 1: case 2: case 3:
-//          if (repeat) {
-//            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
-//          } else {
-//            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
-//          }
-//          break;
-//        case 4:
-//          if (!repeat) {
-//            mediaPlayer.setLooping(false);
-//          } else {
-//            mediaPlayer.setLooping(true);
-//          }
-//          mediaPlayer.start();
-//          break;
-//      }
-//    }
 
 //    switch (vibrationSetting) {
 //      case 1: case 2: case 3:
@@ -3747,7 +3733,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundRecyclerTwo.setVisibility(View.GONE);
         roundListDivider.setVisibility(View.GONE);
 
-        if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+        if (phoneHeight <= 1920) {
           roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
           roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(60);
         } else {
@@ -3759,7 +3745,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundRecyclerTwo.setVisibility(View.VISIBLE);
         roundListDivider.setVisibility(View.VISIBLE);
 
-        if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+        if (phoneHeight <= 1920) {
           roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
           roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(20);
           roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(140);
