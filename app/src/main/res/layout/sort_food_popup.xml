@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rounded_corners"
+    android:backgroundTint="@color/grey_2"
+    android:paddingBottom="10dp"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp"
+    android:id="@+id/sort_layout"
+    android:theme="@style/MenuTheme">
+
+    <TextView
+        android:text="Food Name: A - Z"
+        android:id="@+id/sort_food_name_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp">
+    </TextView>
+
+    <TextView
+        android:text="Food Name: Z - A"
+        android:id="@+id/sort_food_name_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_food_name_start"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp">
+    </TextView>
+
+    <TextView
+        android:text="Calories: Most"
+        android:id="@+id/sort_calories_consumed_most"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_food_name_end"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp">
+    </TextView>
+
+    <TextView
+        android:text="Calories: Least"
+        android:id="@+id/sort_calories_consumed_least"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_calories_consumed_most"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp">
+    </TextView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

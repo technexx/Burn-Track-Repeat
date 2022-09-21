@@ -57,7 +57,7 @@
 
     <TextView
         android:text="Calories: Most"
-        android:id="@+id/sort_calories_most"
+        android:id="@+id/sort_calories_expended_most"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sort_least_time"
@@ -68,10 +68,10 @@
 
     <TextView
         android:text="Calories: Least"
-        android:id="@+id/sort_calories_least"
+        android:id="@+id/sort_calories_expended_least"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_calories_most"
+        app:layout_constraintTop_toBottomOf="@id/sort_calories_expended_most"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"

@@ -27,7 +27,6 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.PowerManager;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -50,7 +49,6 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.FrameLayout;
-import android.widget.GridLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
 import android.widget.ImageView;
@@ -60,7 +58,6 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -75,11 +72,6 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.work.OneTimeWorkRequest;
-import androidx.work.WorkManager;
-import androidx.work.WorkRequest;
-import androidx.work.Worker;
-import androidx.work.WorkerParameters;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapterTwo;
@@ -88,7 +80,6 @@ import com.example.tragic.irate.simple.stopwatch.Adapters.LapAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.PomDotsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.SavedCycleAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.SavedPomCycleAdapter;
-import com.example.tragic.irate.simple.stopwatch.Canvas.DotDraws;
 import com.example.tragic.irate.simple.stopwatch.Canvas.LapListCanvas;
 import com.example.tragic.irate.simple.stopwatch.Database.Cycles;
 import com.example.tragic.irate.simple.stopwatch.Database.CyclesDatabase;
@@ -169,11 +160,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   LinearLayoutManager pomCyclesRecyclerLayoutManager;
 
   View deleteCyclePopupView;
+
   View sortCyclePopupView;
-  View sortStatsPopupView;
+  View sortActivitiesPopupView;
+  View sortFoodConsumedPopupView;
+
   View savedCyclePopupView;
   View editCyclesPopupView;
   View settingsPopupView;
+
   View soundsViewInSettings;
   View colorsViewInSettings;
   View aboutViewInSettings;
@@ -223,12 +218,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView sortActivityTitleAtoZ;
   TextView sortActivityTitleZToA;
 
-  TextView sortStatsAToZTextView;
-  TextView sortStatsZToATextView;
-  TextView sortStatsByMostTimeTextView;
-  TextView sortStatsByLeastTimeTextView;
-  TextView sortStatsByMostCaloriesTextView;
-  TextView sortStatsByLeastCaloriesTextView;
+  TextView sortActivityStatsAToZTextView;
+  TextView sortActivityStatsZToATextView;
+  TextView sortActivityStatsByMostTimeTextView;
+  TextView sortActivityStatsByLeastTimeTextView;
+  TextView sortActivityStatsByMostCaloriesTextView;
+  TextView sortActivityStatsByLeastCaloriesTextView;
+
+  TextView sortFoodConsumedStatsAToZTextView;
+  TextView sortFoodConsumedStatsZToATextView;
+  TextView sortFoodConsumedCaloriesByMostTextView;
+  TextView sortFoodConsumedCaloriesByLeastTextView;
 
   TextView delete_all_text;
   Button delete_all_confirm;
@@ -1462,7 +1462,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortPopupWindow.setContentView(sortCyclePopupView);
     }
     if (typeOfSort==SORTING_STATS) {
-      sortPopupWindow.setContentView(sortStatsPopupView);
+      sortPopupWindow.setContentView(sortActivitiesPopupView);
     }
   }
 
@@ -1782,12 +1782,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityTitleAtoZ = sortCyclePopupView.findViewById(R.id.sort_activity_ascending_from_cycles);
     sortActivityTitleZToA = sortCyclePopupView.findViewById(R.id.sort_activity_descending_from_cycles);
 
-    sortStatsAToZTextView = sortStatsPopupView.findViewById(R.id.sort_activity_name_start);
-    sortStatsZToATextView = sortStatsPopupView.findViewById(R.id.sort_activity_name_end);
-    sortStatsByMostTimeTextView = sortStatsPopupView.findViewById(R.id.sort_most_time);
-    sortStatsByLeastTimeTextView = sortStatsPopupView.findViewById(R.id.sort_least_time);
-    sortStatsByMostCaloriesTextView = sortStatsPopupView.findViewById(R.id.sort_calories_most);
-    sortStatsByLeastCaloriesTextView = sortStatsPopupView.findViewById(R.id.sort_calories_least);
+    sortActivityStatsAToZTextView = sortActivitiesPopupView.findViewById(R.id.sort_activity_name_start);
+    sortActivityStatsZToATextView = sortActivitiesPopupView.findViewById(R.id.sort_activity_name_end);
+    sortActivityStatsByMostTimeTextView = sortActivitiesPopupView.findViewById(R.id.sort_most_time);
+    sortActivityStatsByLeastTimeTextView = sortActivitiesPopupView.findViewById(R.id.sort_least_time);
+    sortActivityStatsByMostCaloriesTextView = sortActivitiesPopupView.findViewById(R.id.sort_calories_expended_most);
+    sortActivityStatsByLeastCaloriesTextView = sortActivitiesPopupView.findViewById(R.id.sort_calories_expended_least);
+
+    sortFoodConsumedStatsAToZTextView =sortFoodConsumedPopupView.findViewById(R.id.sort_food_name_start);
+    sortFoodConsumedStatsZToATextView =sortFoodConsumedPopupView.findViewById(R.id.sort_food_name_end);
+    sortFoodConsumedCaloriesByMostTextView =sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_most);
+    sortFoodConsumedCaloriesByLeastTextView =sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_least);
   }
 
   private void assignDeletePopUpLayoutClassesToTheirIds() {
@@ -2038,8 +2043,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     savedCyclePopupView = inflater.inflate(R.layout.saved_cycles_layout, null);
     deleteCyclePopupView = inflater.inflate(R.layout.delete_cycles_popup, null);
-    sortCyclePopupView = inflater.inflate(R.layout.cycles_sort_popup, null);
-    sortStatsPopupView = inflater.inflate(R.layout.stats_sort_popup, null);
+    sortCyclePopupView = inflater.inflate(R.layout.sort_cycles_popup, null);
+    sortActivitiesPopupView = inflater.inflate(R.layout.sort_activities_popup, null);
+    sortFoodConsumedPopupView = inflater.inflate(R.layout.sort_food_popup, null);
     addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_main_activity, null);
 
 //    editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
@@ -2382,27 +2388,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (textView.getText().toString().equals("Activity Name: A - Z")) {
         sortModeForStats = 1;
-        highlightSelectedSortTextViewForStats(sortStatsAToZTextView);
+        highlightSelectedSortTextViewForStats(sortActivityStatsAToZTextView);
       }
       if (textView.getText().toString().equals("Activity Name: Z - A")) {
         sortModeForStats = 2;
-        highlightSelectedSortTextViewForStats(sortStatsZToATextView);
+        highlightSelectedSortTextViewForStats(sortActivityStatsZToATextView);
       }
       if (textView.getText().toString().equals("Time: Most")) {
         sortModeForStats = 3;
-        highlightSelectedSortTextViewForStats(sortStatsByMostTimeTextView);
+        highlightSelectedSortTextViewForStats(sortActivityStatsByMostTimeTextView);
       }
       if (textView.getText().toString().equals("Time: Least")) {
         sortModeForStats = 4;
-        highlightSelectedSortTextViewForStats(sortStatsByLeastTimeTextView);
+        highlightSelectedSortTextViewForStats(sortActivityStatsByLeastTimeTextView);
       }
       if (textView.getText().toString().equals("Calories: Most")) {
         sortModeForStats = 5;
-        highlightSelectedSortTextViewForStats(sortStatsByMostCaloriesTextView);
+        highlightSelectedSortTextViewForStats(sortActivityStatsByMostCaloriesTextView);
       }
       if (textView.getText().toString().equals("Calories: Least")) {
         sortModeForStats = 6;
-        highlightSelectedSortTextViewForStats(sortStatsByLeastCaloriesTextView);
+        highlightSelectedSortTextViewForStats(sortActivityStatsByLeastCaloriesTextView);
       }
 
       AsyncTask.execute(()-> {
@@ -2422,12 +2428,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void unHighlightAllSortTextViewsForStats() {
     int noHighlight = Color.TRANSPARENT;
-    sortStatsAToZTextView.setBackgroundColor(noHighlight);
-    sortStatsZToATextView.setBackgroundColor(noHighlight);
-    sortStatsByMostTimeTextView.setBackgroundColor(noHighlight);
-    sortStatsByLeastTimeTextView.setBackgroundColor(noHighlight);
-    sortStatsByMostCaloriesTextView.setBackgroundColor(noHighlight);
-    sortStatsByLeastCaloriesTextView.setBackgroundColor(noHighlight);
+    sortActivityStatsAToZTextView.setBackgroundColor(noHighlight);
+    sortActivityStatsZToATextView.setBackgroundColor(noHighlight);
+    sortActivityStatsByMostTimeTextView.setBackgroundColor(noHighlight);
+    sortActivityStatsByLeastTimeTextView.setBackgroundColor(noHighlight);
+    sortActivityStatsByMostCaloriesTextView.setBackgroundColor(noHighlight);
+    sortActivityStatsByLeastCaloriesTextView.setBackgroundColor(noHighlight);
   }
 
   private void setAllSortTextViewsOntoClickListeners() {
@@ -2438,12 +2444,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityTitleAtoZ.setOnClickListener(cyclesSortOptionListener());
     sortActivityTitleZToA.setOnClickListener(cyclesSortOptionListener());
 
-    sortStatsAToZTextView.setOnClickListener(statsSortOptionListener());
-    sortStatsZToATextView.setOnClickListener(statsSortOptionListener());
-    sortStatsByMostTimeTextView.setOnClickListener(statsSortOptionListener());
-    sortStatsByLeastTimeTextView.setOnClickListener(statsSortOptionListener());
-    sortStatsByMostCaloriesTextView.setOnClickListener(statsSortOptionListener());
-    sortStatsByLeastCaloriesTextView.setOnClickListener(statsSortOptionListener());
+    sortActivityStatsAToZTextView.setOnClickListener(statsSortOptionListener());
+    sortActivityStatsZToATextView.setOnClickListener(statsSortOptionListener());
+    sortActivityStatsByMostTimeTextView.setOnClickListener(statsSortOptionListener());
+    sortActivityStatsByLeastTimeTextView.setOnClickListener(statsSortOptionListener());
+    sortActivityStatsByMostCaloriesTextView.setOnClickListener(statsSortOptionListener());
+    sortActivityStatsByLeastCaloriesTextView.setOnClickListener(statsSortOptionListener());
   }
 
   private void editHighlightedCycleLogic() {
