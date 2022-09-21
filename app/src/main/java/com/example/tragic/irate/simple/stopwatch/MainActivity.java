@@ -606,7 +606,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Bit of ghosting in custom bar icons when dismissing edit popUp after from highlight.
   //Todo: Round recycler will likely need diff. layout param changes for <= 1920 heights.
   //Todo: Resolve vibration issue.
 
@@ -3417,12 +3416,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.setEnabled(true);
     }
     if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
-      edit_highlighted_cycle.clearAnimation();
-      delete_highlighted_cycle.clearAnimation();
-      cancelHighlight.clearAnimation();
-      appHeader.clearAnimation();
-      sortButton.clearAnimation();
-
       delete_highlighted_cycle.setEnabled(false);
       sortButton.setEnabled(true);
       edit_highlighted_cycle.setEnabled(false);
@@ -3440,7 +3433,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
     }
-    if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE) {
+    if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE || typeOfFade == FADE_IN_EDIT_CYCLE) {
       appHeader.startAnimation(fadeIn);
       edit_highlighted_cycle.startAnimation(fadeOut);
       delete_highlighted_cycle.startAnimation(fadeOut);
