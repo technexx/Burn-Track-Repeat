@@ -6,6 +6,6 @@
     <item android:id="@+id/delete_all_days_from_daily_stats"
         android:title="Delete All Days">
     </item>
-    <item android:id="@+id/refresh_stats"
-        android:title="Refresh"> </item>
+    <item android:id="@+id/disclaimer"
+        android:title="Disclaimer"> </item>
 </menu>

@@ -620,8 +620,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
-  //Todo: Splash screen on app start as a guide.
-  //Todo: Put disclaimer in "About" section.
+  //Todo: Splash screen on Stats Fragment opening as a guide.
+  //Todo: Replace "Refresh" with "Disclaimer"
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Check stats add/edit popUp windows w/ diff. layout heights.
 
