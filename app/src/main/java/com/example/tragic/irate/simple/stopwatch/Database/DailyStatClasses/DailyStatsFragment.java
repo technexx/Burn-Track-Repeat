@@ -184,6 +184,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ConstraintLayout.LayoutParams deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams;
 
     int mActivitySortMode;
+    int mFoodConsumedSortMode;
     int mPositionToEdit;
 
     int ADDING_ACTIVITY = 0;
@@ -825,9 +826,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         this.mActivitySortMode = sortMode;
     }
 
-    public void sortStatsAsACallFromMainActivity() {
+    public void setFoodConsumedSortMode(int sortMode) {
+        this.mFoodConsumedSortMode = sortMode;
+    }
+
+    public void sortActivityStatsAsACallFromMainActivity() {
         dailyStatsAccess.setActivitySortMode(mActivitySortMode);
         populateListsAndTextViewsFromEntityListsInDatabase();
+    }
+
+    public void sortFoodConsumedStatsAsACallFromMainActivity() {
+        dailyStatsAccess.setFoodConsumedSortMode(mFoodConsumedSortMode);
+        populateListsAndTextViewsFromEntityListsInDatabase();;
     }
 
     private void setListOfStatsForEachActivity() {

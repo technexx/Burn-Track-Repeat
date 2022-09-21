@@ -66,7 +66,7 @@ public class DailyStatsAccess {
 
     String mFoodString = "";
     Double mCaloriesInFoodItem;
-    int mCalorieSortMode = 1;
+    int mCaloriesConsumedSortMode = 1;
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
@@ -130,18 +130,12 @@ public class DailyStatsAccess {
         return duplicateStringSet;
     }
 
-
-
-    public void setDoesDayExistInDatabase(boolean doesExist) {
-        this.doesDayExistInDatabase = doesExist;
-    }
-
-    public boolean getDoesDayExistInDatabase() {
-        return doesDayExistInDatabase;
-    }
-
     public void setActivitySortMode(int sortMode) {
         this.mActivitySortMode = sortMode;
+    }
+
+    public void setFoodConsumedSortMode(int sortMode) {
+        this.mCaloriesConsumedSortMode = sortMode;
     }
 
     public List<StatsForEachActivity> assignStatsForEachActivityListBySortMode(List<Integer> listOfDays) {
@@ -174,7 +168,7 @@ public class DailyStatsAccess {
     public List<CaloriesForEachFood> assignCaloriesForEachFoodListBySortMode(List<Integer> listOfDays) {
         List<CaloriesForEachFood> listToReturn = new ArrayList<>();
 
-        switch (mCalorieSortMode) {
+        switch (mCaloriesConsumedSortMode) {
             case 1:
                 listToReturn = cyclesDatabase.cyclesDao().loadCaloriesForEachFoodByAToZName(listOfDays);
                 break;
