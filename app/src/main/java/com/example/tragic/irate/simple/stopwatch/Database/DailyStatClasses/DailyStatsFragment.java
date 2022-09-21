@@ -1795,7 +1795,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private String formatDoubleToStringWithoutDecimals(double calories) {
         DecimalFormat df = new DecimalFormat("#");
-        df.setRoundingMode(RoundingMode.UP);
+        df.setRoundingMode(RoundingMode.DOWN);
         return df.format(calories);
     }
 
