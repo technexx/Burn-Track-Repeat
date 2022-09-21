@@ -183,10 +183,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     ConstraintLayout.LayoutParams confirmActivityEditWithinPopUpButtonLayoutParams;
     ConstraintLayout.LayoutParams deleteActivityIfEditingRowWithinEditPopUpButtonLayoutParams;
 
-    int mActivitySortMode;
-    int mFoodConsumedSortMode;
     int mPositionToEdit;
-
     int ADDING_ACTIVITY = 0;
     int EDITING_ACTIVITY = 1;
 
@@ -238,13 +235,32 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int STATS_MENU = 1;
     int FILLER_MENU = 2;
 
+    int mActivitySortMode;
+    int mFoodConsumedSortMode;
+    int SORTING_ACTIVITIES = 1;
+    int SORTING_FOOD_CONSUMED = 2;
+    int DISABLE_SORTING = -1;
+
     changeOnOptionsItemSelectedMenu mChangeOnOptionsItemSelectedMenu;
+    changeSortMenu mChangeSortMenu;
 
     int phoneHeight;
     int phoneWidth;
 
+    public interface changeOnOptionsItemSelectedMenu {
+        void onChangeOnOptionsMenu(int typeOfSort);
+    }
+
     public void setOnOptionsMenu(changeOnOptionsItemSelectedMenu xChangeOnOptionsItemSelectedMenu) {
         this.mChangeOnOptionsItemSelectedMenu = xChangeOnOptionsItemSelectedMenu;
+    }
+
+    public interface changeSortMenu {
+        void onChangeSortMenu(int menuNumber);
+    }
+
+    public void setSortMenu(changeSortMenu xChangeSortMenu) {
+        this.mChangeSortMenu = xChangeSortMenu;
     }
 
     private void instantiateCalorieTabLayoutListenerAndViews() {
@@ -262,6 +278,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         setTabSelected(0);
 
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(STATS_MENU);
+                        mChangeSortMenu.onChangeSortMenu(SORTING_ACTIVITIES);
+
                         togggleTotalStatTextViewsWhenSwitchingTabs(0);
 
 //                        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
@@ -273,9 +291,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                         toggleEditButtonView(false);
                         setTabSelected(1);
+
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(STATS_MENU);
 
                         togggleTotalStatTextViewsWhenSwitchingTabs(1);
+                        mChangeSortMenu.onChangeSortMenu(SORTING_FOOD_CONSUMED);
                         break;
                     case 2:
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
@@ -283,7 +303,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                         toggleEditButtonView(true);
                         setTabSelected(2);
-                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(FILLER_MENU);
+
+                        mChangeSortMenu.onChangeSortMenu(DISABLE_SORTING);
 
 //                        toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
                         break;
@@ -751,8 +772,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setSimplifiedViewTextViews();
         });
     }
-
-
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
@@ -2033,10 +2052,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             caloriesConsumedAdapter.getItemCount();
             caloriesConsumedAdapter.notifyDataSetChanged();
         });
-    }
-
-    public interface changeOnOptionsItemSelectedMenu {
-        void onChangeOnOptionsMenu(int menuNumber);
     }
 
     private void setTabSelected(int selectedTab) {

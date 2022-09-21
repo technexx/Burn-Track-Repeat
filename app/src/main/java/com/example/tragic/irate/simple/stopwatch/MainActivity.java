@@ -112,13 +112,13 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DailyStatsFragment.changeSortMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
 
   Menu onOptionsMenu;
-  int mMenuType;
+  int mOnOptionsSelectedMenuType;
   int DEFAULT_MENU = 0;
   int STATS_MENU = 1;
   int FILLER_MENU = 2;
@@ -587,7 +587,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int delayBeforeTimerBeginsSyncingWithTotalTimeStats = 1000;
 
   int SORTING_CYCLES = 0;
-  int SORTING_STATS = 1;
+  int SORTING_ACTIVITIES = 1;
+  int SORTING_FOOD_CONSUMED = 2;
+  int DISABLE_SORTING = -1;
 
   int ON_STATS_ACTIVITY_TAB = 0;
   int ON_STATS_FOOD_TAB = 1;
@@ -707,8 +709,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
         }
 
-        setTypeOFMenu(DEFAULT_MENU);
-        toggleSortMenuViewBetweenCyclesAndStats(SORTING_CYCLES);
+        setTypeOfOnOptionsSelectedMenu(DEFAULT_MENU);
+        toggleSortMenuViewBetweenCyclesAndActivities(SORTING_CYCLES);
       }
 
       sortButton.setVisibility(View.VISIBLE);
@@ -773,16 +775,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public boolean onPrepareOptionsMenu(Menu menu) {
     menu.clear();
 
-    if (mMenuType==DEFAULT_MENU) {
+    if (mOnOptionsSelectedMenuType==DEFAULT_MENU) {
       getMenuInflater().inflate(R.menu.main_options_menu, menu);
     }
-    if (mMenuType==STATS_MENU) {
+    if (mOnOptionsSelectedMenuType==STATS_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_options_menu, menu);
     }
-    if (mMenuType==FILLER_MENU) {
+    if (mOnOptionsSelectedMenuType==FILLER_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_option_menu_comparison_tab, menu);
     }
-    if (mMenuType==SETTINGS_MENU) {
+    if (mOnOptionsSelectedMenuType==SETTINGS_MENU) {
       getMenuInflater().inflate(R.menu.settings_menu, menu);
     }
     return super.onPrepareOptionsMenu(menu);
@@ -790,7 +792,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onChangeOnOptionsMenu(int menuNumber) {
-    mMenuType = menuNumber;
+    mOnOptionsSelectedMenuType = menuNumber;
 //    invalidateOptionsMenu();
   }
 
@@ -806,7 +808,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       sortButton.setVisibility(View.INVISIBLE);
 
-      setTypeOFMenu(SETTINGS_MENU);
+      setTypeOfOnOptionsSelectedMenu(SETTINGS_MENU);
     }
   }
 
@@ -1460,11 +1462,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
   }
 
-  private void toggleSortMenuViewBetweenCyclesAndStats(int typeOfSort) {
+  @Override
+  public void onChangeSortMenu(int typeOfSort) {
+    if (typeOfSort == SORTING_ACTIVITIES) {
+      sortPopupWindow.setContentView(sortActivitiesPopupView);
+    }
+    if (typeOfSort == SORTING_FOOD_CONSUMED) {
+      sortPopupWindow.setContentView(sortFoodConsumedPopupView);
+    }
+    if (typeOfSort == DISABLE_SORTING) {
+      sortButton.setAlpha(0.3f);
+      sortButton.setEnabled(false);
+    } else {
+      sortButton.setAlpha(1.0f);
+      sortButton.setEnabled(true);
+    }
+  }
+
+  private void toggleSortMenuViewBetweenCyclesAndActivities(int typeOfSort) {
     if (typeOfSort==SORTING_CYCLES) {
       sortPopupWindow.setContentView(sortCyclePopupView);
     }
-    if (typeOfSort==SORTING_STATS) {
+    if (typeOfSort==SORTING_ACTIVITIES) {
       sortPopupWindow.setContentView(sortActivitiesPopupView);
     }
   }
@@ -1663,6 +1682,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     colorSettingsFragment.colorSetting(MainActivity.this);
 
     dailyStatsFragment.setOnOptionsMenu(MainActivity.this);
+    dailyStatsFragment.setSortMenu(MainActivity.this);
 
     mainActivityFragmentFrameLayout = findViewById(R.id.settings_fragment_frameLayout);
     mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
@@ -2721,8 +2741,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             .commit();
 
 //    invalidateOptionsMenu();
-    setTypeOFMenu(STATS_MENU);
-    toggleSortMenuViewBetweenCyclesAndStats(SORTING_STATS);
+    setTypeOfOnOptionsSelectedMenu(STATS_MENU);
+    toggleSortMenuViewBetweenCyclesAndActivities(SORTING_ACTIVITIES);
 
     if (dailyStatsFragment.getIsFragmentAttached()) {
       AsyncTask.execute(()-> {
@@ -2731,8 +2751,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setTypeOFMenu(int menuType) {
-    mMenuType = menuType;
+  public void setTypeOfOnOptionsSelectedMenu(int menuType) {
+    mOnOptionsSelectedMenuType = menuType;
   }
   private void deleteActivityStatsForSelectedDays() {
     List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
@@ -3252,6 +3272,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       resetTimer();
     }
   }
+
+
 
   private String retrieveTimerValueString() {
     long millis;
