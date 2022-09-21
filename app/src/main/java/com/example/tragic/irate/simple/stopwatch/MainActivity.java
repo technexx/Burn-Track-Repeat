@@ -616,7 +616,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Test extra-large screens as well.
-  //Todo: Test all notifications + sound/vibrations + settings.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test w/ fresh install for all default values.
@@ -626,6 +625,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
+      //Todo: Can have "Custom" as Category spinner, and custom additions in Sub-Category spinner.
+      //Todo: If too convoluted for app use, can just have a custom add in daily stats fragment.
   //Todo: Custom activity edits can reset calorie count.
   //Todo: Add Day/Night modes.
 
