@@ -612,7 +612,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
-  //Todo: Round recycler will likely need diff. layout param changes  + layout changes for <= 1920 heights.
+  //Todo: Sort in Stats Frag not changing w/ tab change.
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -630,11 +630,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
+  //Todo: Add Day/Night modes.
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
       //Todo: Can have "Custom" as Category spinner, and custom additions in Sub-Category spinner.
       //Todo: If too convoluted for app use, can just have a custom add in daily stats fragment.
-  //Todo: Custom activity edits can reset calorie count.
-  //Todo: Add Day/Night modes.
+      //Todo: Custom activity edits can reset calorie count.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
@@ -789,7 +789,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onChangeOnOptionsMenu(int menuNumber) {
     mMenuType = menuNumber;
 //    invalidateOptionsMenu();
-    Log.i("testcall", "menu called back at " + menuNumber);
   }
 
   private void launchGlobalSettingsFragment() {

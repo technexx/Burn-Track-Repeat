@@ -53,6 +53,8 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
     caloriesConsumedEdit mCaloriesConsumedEdit;
     caloriesConsumedAddition mCaloriesConsumedAddition;
 
+    int mScreenHeight;
+
     public interface caloriesConsumedEdit {
         void editCaloriesConsumedRowSelected(int position);
     }
@@ -69,6 +71,10 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
         this.mCaloriesConsumedAddition = xCaloriesConsumedAddition;
     }
 
+    public void setScreenHeight(int height) {
+        this.mScreenHeight = height;
+    }
+
     public CaloriesConsumedAdapter(Context context, List<String> foodEaten, List<Double> caloriesConsumed) {
         this.mContext = context; this.mFoodEaten = foodEaten; this.mCaloriesConsumed = caloriesConsumed;
         setAnimations();
@@ -81,14 +87,23 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
         View view;
 
         if (viewType==HEADER_VIEW) {
-            view = inflater.inflate(R.layout.calories_consumed_recycler_header_layout, parent, false);
+            if (mScreenHeight <= 1920) {
+                view = inflater.inflate(R.layout.calories_consumed_recycler_header_layout_h1920, parent, false);
+            } else {
+                view = inflater.inflate(R.layout.calories_consumed_recycler_header_layout, parent, false);
+            }
             return new HeaderViewHolder(view);
         } else if (viewType==FOOTER_VIEW) {
             view = inflater.inflate(R.layout.calories_consumed_footer_layout, parent, false);
             return new FootViewHolder(view);
         }
 
-        view = inflater.inflate(R.layout.calories_consumed_recycler_layout, parent, false);
+        if (mScreenHeight <= 1920) {
+            view = inflater.inflate(R.layout.calories_consumed_recycler_layout_h1920, parent, false);
+        } else {
+            view = inflater.inflate(R.layout.calories_consumed_recycler_layout, parent, false);
+        }
+
         return new MainViewHolder(view);
     }
 

@@ -78,7 +78,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         setAnimations();
     }
 
-    public void setPhoneHeight(int height) {
+    public void setScreenHeight(int height) {
         this.mPhoneHeight = height;
     }
 

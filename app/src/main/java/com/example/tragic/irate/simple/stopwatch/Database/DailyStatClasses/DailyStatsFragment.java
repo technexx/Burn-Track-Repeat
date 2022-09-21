@@ -234,6 +234,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     boolean statsHaveBeenEditedForCurrentDay;
 
     int mSelectedTab;
+    int STATS_MENU = 1;
+    int FILLER_MENU = 2;
 
     changeOnOptionsItemSelectedMenu mChangeOnOptionsItemSelectedMenu;
 
@@ -258,7 +260,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         toggleEditButtonView(false);
                         setTabSelected(0);
 
-                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
+                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(STATS_MENU);
                         togggleTotalStatTextViewsWhenSwitchingTabs(0);
 
 //                        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
@@ -270,7 +272,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                         toggleEditButtonView(false);
                         setTabSelected(1);
-                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(1);
+                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(STATS_MENU);
 
                         togggleTotalStatTextViewsWhenSwitchingTabs(1);
                         break;
@@ -280,7 +282,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                         toggleEditButtonView(true);
                         setTabSelected(2);
-                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(2);
+                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(FILLER_MENU);
 
 //                        toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
                         break;
@@ -2105,7 +2107,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void instantiateActivityRecyclerViewAndItsAdapter() {
         dailyStatsAdapter = new DailyStatsAdapter(getContext(), dailyStatsAccess.getTotalActivitiesListForSelectedDuration(), dailyStatsAccess.getTotalSetTimeListForEachActivityForSelectedDuration(), dailyStatsAccess.getTotalCaloriesBurnedListForEachActivityForSelectedDuration());
 
-        dailyStatsAdapter.setPhoneHeight(phoneHeight);
+        dailyStatsAdapter.setScreenHeight(phoneHeight);
 
         dailyStatsAdapter.getSelectedTdeeItemPosition(DailyStatsFragment.this);
         dailyStatsAdapter.addActivityToDailyStats(DailyStatsFragment.this);
@@ -2120,6 +2122,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
         caloriesConsumedAdapter = new CaloriesConsumedAdapter(getContext(), dailyStatsAccess.getTotalFoodStringListForSelectedDuration(), dailyStatsAccess.getTotalCaloriesConsumedListForSelectedDuration());
+
+        caloriesConsumedAdapter.setScreenHeight(phoneHeight);
 
         caloriesConsumedAdapter.editConsumedCalories(DailyStatsFragment.this);
         caloriesConsumedAdapter.addCaloriesToStats(DailyStatsFragment.this);

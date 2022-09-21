@@ -16,6 +16,8 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/divider_view_for_food_consumed"
         android:layout_marginStart="8dp"
+        android:paddingStart="6dp"
+        android:paddingEnd="6dp"
         android:textSize="20sp">
     </TextView>
 
@@ -28,7 +30,7 @@
         app:layout_constraintBottom_toTopOf="@+id/divider_view_for_food_consumed"
         android:gravity="center"
         android:layout_marginEnd="32dp"
-        android:textSize="20sp"
+        android:textSize="16sp"
         android:minWidth="100dp"
         android:maxWidth="150dp">
     </TextView>
