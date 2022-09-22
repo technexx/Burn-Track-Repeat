@@ -241,6 +241,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int SORTING_FOOD_CONSUMED = 2;
     int DISABLE_SORTING = -1;
 
+    View aboutStatsPopUpView;
+    PopupWindow aboutStatsPopUpWindow;
+
     changeOnOptionsItemSelectedMenu mChangeOnOptionsItemSelectedMenu;
     changeSortMenu mChangeSortMenu;
 
@@ -399,6 +402,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         instantiateCaloriesConsumedEditPopUpViews();
         instantiateCaloriesComparedViews();
         instantiateCalorieTabLayoutListenerAndViews();
+        instantiateAboutStatsPopUpViews();
 
         instantiateExpansionPopUpViews();
         setValueCappingTextWatcherOnEditTexts();
@@ -2052,6 +2056,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             caloriesConsumedAdapter.getItemCount();
             caloriesConsumedAdapter.notifyDataSetChanged();
         });
+    }
+
+    private void instantiateAboutStatsPopUpViews() {
+        aboutStatsPopUpView = inflater.inflate(R.layout.about_stats_popup_layout, null);
+        aboutStatsPopUpWindow = new PopupWindow(aboutStatsPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+//        aboutStatsPopUpWindow = new PopupWindow(aboutStatsPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(440), true);
+        aboutStatsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+    }
+
+    public void launchAboutStatsPopUpWindow() {
+        aboutStatsPopUpWindow.showAtLocation(topOfRecyclerViewAnchor, Gravity.TOP, 0, 0);
     }
 
     private void setTabSelected(int selectedTab) {

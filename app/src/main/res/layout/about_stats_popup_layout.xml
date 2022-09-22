@@ -2,17 +2,24 @@
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rounded_corners"
+    android:backgroundTint="@color/darker_grey"
+    android:paddingStart="10dp"
+    android:paddingEnd="10dp"
+    android:paddingTop="5dp"
+    android:paddingBottom="10dp">
 
     <TextView
-        android:id="@+id/disclaimer_textView"
-        android:text="@string/disclaimer"
+        android:id="@+id/about_stats_textView"
+        android:text="@string/about_stats"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent">
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:textSize="18sp"
+        android:fontFamily="@font/roboto">
     </TextView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

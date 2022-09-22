@@ -617,11 +617,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
+  //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
+  //Todo: "Calories Expended" on comparison tab shows base bmr and does not include Activities (which is correct).
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Splash screen on Stats Fragment opening as a guide.
-  //Todo: Replace "Refresh" with "Disclaimer"
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
   //Todo: Check stats add/edit popUp windows w/ diff. layout heights.
 
@@ -767,6 +768,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
         break;
+      case R.id.about_stats:
+        dailyStatsFragment.launchAboutStatsPopUpWindow();
     }
     return super.onOptionsItemSelected(item);
   }

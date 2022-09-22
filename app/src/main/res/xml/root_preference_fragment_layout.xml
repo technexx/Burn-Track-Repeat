@@ -17,7 +17,7 @@
 
     <PreferenceScreen
         android:key="tdeePref"
-        android:title="TDEE"
+        android:title="User Details"
         />
 
     <PreferenceScreen
