@@ -621,6 +621,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
   //Todo: Had a null object crash with dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase() in launchStatsFragment.
+      //Todo: Occurs when Stats Fragment -> Exit -> Settings Fragment -> Exit -> Stats Fragment
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -726,7 +727,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                       0,  // enter
                       R.anim.slide_out_from_left_mid  // exit
               )
-//              .addToBackStack(null)
               .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
               .commit();
       setEditPopUpTimerHeaders(1);
@@ -2764,6 +2764,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (dailyStatsFragment.getIsFragmentAttached()) {
       AsyncTask.execute(()-> {
+        Log.e("testFrag", "Stats Fragment Crash via internal method while attached");
         dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
       });
     }
