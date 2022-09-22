@@ -619,8 +619,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
+  //Todo: "About" in onOptions in Settings does nothing.
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
-  //Todo: Crashing w/ null object from dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase() in launchStatsFragment.
+  //Todo: Had a null object crash with dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase() in launchStatsFragment.
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -633,7 +634,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Test w/ fresh install for all default values.
-  //Todo: Test everything 10x.
+  //Todo: Test everything 10x. Incl. round selection/replacement.
 
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
@@ -2745,6 +2746,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
       mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
     }
+
     mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
     getSupportFragmentManager().beginTransaction()
@@ -2757,11 +2759,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
             .commit();
 
+//    invalidateOptionsMenu();
     setTypeOfOnOptionsSelectedMenu(STATS_MENU);
     toggleSortMenuViewBetweenCyclesAndActivities(SORTING_ACTIVITIES);
 
     if (dailyStatsFragment.getIsFragmentAttached()) {
-      Log.e("testFrag", "Null Daily Stats Fragment is attached");
       AsyncTask.execute(()-> {
         dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
       });
@@ -3541,24 +3543,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void fadeEditCycleButtonsInAndOut(int typeOfFade) {
-    if (typeOfFade==FADE_IN_EDIT_CYCLE) {
+    if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
       delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
-
-      fadeIn.cancel();
-      fadeOut.cancel();
-
-      appHeader.startAnimation(fadeIn);
-      sortButton.startAnimation(fadeIn);
-
-      cancelHighlight.startAnimation(fadeOut);
-      edit_highlighted_cycle.startAnimation(fadeOut);
-      delete_highlighted_cycle.startAnimation(fadeOut);
+    }
+    if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
+      delete_highlighted_cycle.setEnabled(false);
+      sortButton.setEnabled(true);
+      edit_highlighted_cycle.setEnabled(false);
+      cancelHighlight.setEnabled(false);
     }
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
-      fadeIn.cancel();
-      fadeOut.cancel();
-
       appHeader.startAnimation(fadeOut);
       edit_highlighted_cycle.startAnimation(fadeIn);
       delete_highlighted_cycle.startAnimation(fadeIn);
@@ -3570,16 +3565,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
     }
-    if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE) {
-      fadeIn.cancel();
-      fadeOut.cancel();
-
+    if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE || typeOfFade == FADE_IN_EDIT_CYCLE) {
       appHeader.startAnimation(fadeIn);
-      sortButton.startAnimation(fadeIn);
-
-      cancelHighlight.startAnimation(fadeOut);
       edit_highlighted_cycle.startAnimation(fadeOut);
       delete_highlighted_cycle.startAnimation(fadeOut);
+      appHeader.startAnimation(fadeIn);
+      sortButton.startAnimation(fadeIn);
+      cancelHighlight.startAnimation(fadeOut);
 
       sortButton.setEnabled(true);
       edit_highlighted_cycle.setEnabled(false);
