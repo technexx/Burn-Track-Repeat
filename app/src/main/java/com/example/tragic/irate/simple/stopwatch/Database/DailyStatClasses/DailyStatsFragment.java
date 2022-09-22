@@ -411,7 +411,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setCalendarAnimationListeners();
 
         areActivityStatsSimplified = sharedPref.getBoolean("areActivityStatsSimplified", false);
-        toggleSimplifiedStatsButtonView(areActivityStatsSimplified);
+        toggleSimplifiedStatsButtonView(false);
         toggleSimplifiedStatViewsWithinActivityTab(false);
         setSimplifiedViewTextViews();
 
@@ -572,7 +572,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
             }
 
-            setTotalCaloriesComparedTextViews(areActivityStatsSimplified);
+            setTotalCaloriesComparedTextViews(false);
         });
 
         return root;
@@ -772,7 +772,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setTotalActivityStatsFooterTextViews();
             setTotalCaloriesConsumedFooterTextViews();
 
-            setTotalCaloriesComparedTextViews(areActivityStatsSimplified);
+            setTotalCaloriesComparedTextViews(false);
             setSimplifiedViewTextViews();
         });
     }

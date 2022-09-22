@@ -617,8 +617,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
+  //Todo: "About" in onOptions in Settings does nothing.
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
-  //Todo: "Calories Expended" on comparison tab shows base bmr and does not include Activities (which is correct).
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
