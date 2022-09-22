@@ -619,7 +619,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
-  //Todo: "About" in onOptions in Settings does nothing.
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
   //Todo: Had a null object crash with dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase() in launchStatsFragment.
   //Todo: Resolve vibration issue.
@@ -3542,6 +3541,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //We've added fadeIn/fadeOut cancels to timer launch for moment.
   private void fadeEditCycleButtonsInAndOut(int typeOfFade) {
     if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
       delete_highlighted_cycle.setEnabled(true);
@@ -4100,6 +4100,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (trackingActivity) {
       setAllActivityTimesAndCaloriesToTextViews();
     }
+
+    fadeIn.cancel();
+    fadeOut.cancel();
 
     wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP , "MyWakeLock");
 
