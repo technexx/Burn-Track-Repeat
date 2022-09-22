@@ -168,6 +168,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View savedCyclePopupView;
   View editCyclesPopupView;
   View settingsPopupView;
+  View aboutSettingsPopUpView;
 
   View soundsViewInSettings;
   View colorsViewInSettings;
@@ -178,6 +179,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow deleteCyclePopupWindow;
   PopupWindow editCyclesPopupWindow;
   PopupWindow settingsPopupWindow;
+  PopupWindow aboutSettingsPopUpWindow;
 
   EditText cycleNameEdit;
   TextView firstRoundTypeHeaderInEditPopUp;
@@ -619,6 +621,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: "About" in onOptions in Settings does nothing.
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
+  //Todo: Had a null object crash with dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase() in launchStatsFragment.
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -708,7 +711,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (dailyStatsFragment.isVisible()) {
           dailyStatsFragment.executeTurnOffEditModeMethod();
           mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
-        }
+          sortButton.setAlpha(1.0f);
+          sortButton.setEnabled(true);        }
 
         setTypeOfOnOptionsSelectedMenu(DEFAULT_MENU);
         toggleSortMenuViewBetweenCyclesAndActivities(SORTING_CYCLES);
@@ -770,6 +774,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case R.id.about_stats:
         dailyStatsFragment.launchAboutStatsPopUpWindow();
+      case R.id.about_settings:
+        aboutSettingsPopUpWindow.showAtLocation(mainView, Gravity.CENTER_VERTICAL, 0 ,0);
     }
     return super.onOptionsItemSelected(item);
   }
@@ -1474,9 +1480,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortPopupWindow.setContentView(sortFoodConsumedPopupView);
     }
     if (typeOfSort == DISABLE_SORTING) {
+      sortButton.setVisibility(View.GONE);
       sortButton.setAlpha(0.3f);
       sortButton.setEnabled(false);
     } else {
+      sortButton.setVisibility(View.VISIBLE);
       sortButton.setAlpha(1.0f);
       sortButton.setEnabled(true);
     }
@@ -2073,6 +2081,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivitiesPopupView = inflater.inflate(R.layout.sort_activities_popup, null);
     sortFoodConsumedPopupView = inflater.inflate(R.layout.sort_food_popup, null);
     addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_main_activity, null);
+    aboutSettingsPopUpView = inflater.inflate(R.layout.about_settings_popup_layout, null);
 
 //    editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
 //    timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
@@ -2083,6 +2092,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     addTdeePopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
+    aboutSettingsPopUpWindow = new PopupWindow(aboutSettingsPopUpView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
 //    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 //    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 //    stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
@@ -2099,6 +2109,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
     stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     addTdeePopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    aboutSettingsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
   }
 
   private void instantiateArrayLists() {
