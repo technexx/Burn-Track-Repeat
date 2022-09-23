@@ -2738,12 +2738,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTypeOfOnOptionsSelectedMenu(STATS_MENU);
     toggleSortMenuViewBetweenCyclesAndActivities(SORTING_ACTIVITIES);
 
-    //Todo: Works w/ 0 delay for some reason.
     mHandler.postDelayed(() -> {
       AsyncTask.execute(()-> {
         dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
       });
-    }, 0);
+    }, 100);
   }
 
   public void setTypeOfOnOptionsSelectedMenu(int menuType) {
