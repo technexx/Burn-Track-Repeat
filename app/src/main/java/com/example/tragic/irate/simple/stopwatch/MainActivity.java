@@ -619,9 +619,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
+  //Todo: "Activity time/single activity time" in Timer ended 5 second round @ 4 seconds, then correct to 6 once first second of next round completed.
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
-  //Todo: Had a null object crash with dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase() in launchStatsFragment.
-      //Todo: Occurs when Stats Fragment -> Exit -> Settings Fragment -> Exit -> Stats Fragment
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -638,7 +637,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
-  //Todo: Settings popUps should be darker color (not white).
+  //Todo: Settings popUps should be darker color (not white).ta
+
   //Todo: Add Day/Night modes.
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
       //Todo: Can have "Custom" as Category spinner, and custom additions in Sub-Category spinner.
@@ -2028,29 +2028,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onAnimationEnd(Animation animation) {
-        getSupportFragmentManager().beginTransaction()
-                .remove(rootSettingsFragment)
-                .commit();
-        mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
-        isAnimationActive = false;
-      }
-
-      @Override
-      public void onAnimationRepeat(Animation animation) {
-      }
-    });
-
-    slideOutFromLeftLong.setAnimationListener(new Animation.AnimationListener() {
-      @Override
-      public void onAnimationStart(Animation animation) {
-        isAnimationActive = true;
-      }
-
-      @Override
-      public void onAnimationEnd(Animation animation) {
-        getSupportFragmentManager().beginTransaction()
-                .remove(dailyStatsFragment)
-                .commit();
         mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
         isAnimationActive = false;
       }
@@ -2758,16 +2735,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
             .commit();
 
-//    invalidateOptionsMenu();
     setTypeOfOnOptionsSelectedMenu(STATS_MENU);
     toggleSortMenuViewBetweenCyclesAndActivities(SORTING_ACTIVITIES);
 
-    if (dailyStatsFragment.getIsFragmentAttached()) {
+    //Todo: Works w/ 0 delay for some reason.
+    mHandler.postDelayed(() -> {
       AsyncTask.execute(()-> {
-        Log.e("testFrag", "Stats Fragment Crash via internal method while attached");
         dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
       });
-    }
+    }, 0);
   }
 
   public void setTypeOfOnOptionsSelectedMenu(int menuType) {

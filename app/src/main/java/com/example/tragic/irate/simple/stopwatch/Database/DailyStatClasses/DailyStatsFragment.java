@@ -369,6 +369,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         mRoot = root;
+        //Todo: This is not reliable.
+        fragmentIsAttached = true;
 
         notifyDataSetChangedRunnable = new Runnable() {
             @Override
@@ -380,7 +382,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             }
         };
 
-        fragmentIsAttached = true;
+
 
         mToast = new Toast(getContext());
         dailyStatsAccess = new DailyStatsAccess(getContext());
@@ -591,6 +593,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return statsHaveBeenEditedForCurrentDay;
     }
 
+    public void setIsFragmentAttached(boolean attached) {
+        this.fragmentIsAttached = attached;
+    }
     public boolean getIsFragmentAttached() {
         return fragmentIsAttached;
     }
