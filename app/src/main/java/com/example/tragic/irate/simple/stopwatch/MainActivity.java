@@ -619,7 +619,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
-  //Todo: "Activity time/single activity time" in Timer ended 5 second round @ 4 seconds, then correct to 6 once first second of next round completed.
+  //Todo: Lack of sync between timer textView and both stats + cycle times.
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
   //Todo: Resolve vibration issue.
 
@@ -4295,6 +4295,46 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return textView.getVisibility()==View.VISIBLE;
   }
 
+  private void roundCycleSetTimeUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundCycleSetTimeDown();
+    } else {
+      roundCycleSetTimeUp();
+    }
+  }
+
+  private void roundCycleBreakTimeUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundCycleBreakTimeDown();
+    } else {
+      roundCycleBreakTimeUp();
+    }
+  }
+
+  private void roundDailyStatTimesUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundDailyStatTimesDown();
+    } else {
+      roundDailyStatTimesUp();
+    }
+  }
+
+  private void roundPomWorkTimeUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundDownPomCycleWorkTime();
+    } else {
+      roundUpPomCycleWorkTime();
+    }
+  }
+
+  private void roundPomRestTimeUpOrDown(boolean endingCycleEarly) {
+    if (endingCycleEarly) {
+      roundDownPomCycleRestTime();
+    } else {
+      roundUpPomCycleRestTime();
+    }
+  }
+
   private void roundCycleSetTimeDown() {
     totalCycleSetTimeInMillis = roundDownMillisValues(totalCycleSetTimeInMillis);
   }
@@ -4340,52 +4380,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private long roundDownMillisValues(long millisToRound) {
-    return millisToRound - (millisToRound%1000);
+    return millisToRound -= (millisToRound%1000);
   }
 
   private long roundUpMillisValues(long millisToRound) {
     long remainder = millisToRound%1000;
-    return millisToRound + (1000-remainder);
-  }
-
-  private void roundCycleSetTimeUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundCycleSetTimeDown();
-    } else {
-      roundCycleSetTimeUp();
-    }
-  }
-
-  private void roundCycleBreakTimeUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundCycleBreakTimeDown();
-    } else {
-      roundCycleBreakTimeUp();
-    }
-  }
-
-  private void roundDailyStatTimesUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundDailyStatTimesDown();
-    } else {
-      roundDailyStatTimesUp();
-    }
-  }
-
-  private void roundPomWorkTimeUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundDownPomCycleWorkTime();
-    } else {
-      roundUpPomCycleWorkTime();
-    }
-  }
-
-  private void roundPomRestTimeUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundDownPomCycleRestTime();
-    } else {
-      roundUpPomCycleRestTime();
-    }
+    return millisToRound += (1000-remainder);
   }
 
   private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
@@ -4404,10 +4404,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
+  //Todo: Get this working and we can do the same for Cycle times.
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
+      Log.i("testSync", "true and changing!");
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
@@ -4511,10 +4513,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
     textViewDisplaySync.setSecondTextView((String) timeLeft.getText());
 
-    TextViewDisplaySync textViewDisplaySyncTwo = new TextViewDisplaySync();
-    textViewDisplaySyncTwo.setFirstTextView((String) dailyTotalCaloriesTextView.getText());
-    textViewDisplaySyncTwo.setSecondTextView((String) dailyTotalCaloriesForSingleActivityTextView.getText());
-
+//    TextViewDisplaySync textViewDisplaySyncTwo = new TextViewDisplaySync();
+//    textViewDisplaySyncTwo.setFirstTextView((String) dailyTotalCaloriesTextView.getText());
+//    textViewDisplaySyncTwo.setSecondTextView((String) dailyTotalCaloriesForSingleActivityTextView.getText());
 
     return new Runnable() {
       @Override
@@ -4537,7 +4538,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
-        mHandler.postDelayed(this, 150);
+        mHandler.postDelayed(this, 10);
       }
     };
   }
