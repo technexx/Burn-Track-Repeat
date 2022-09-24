@@ -300,8 +300,8 @@ public class DailyStatsAccess {
 
         clearAllActivityAndFoodIntegerDayLists();
 
-        setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, daysInYear);
-        setFullListOfFoodDaysFromDateSelection(firstAggregatedDayOfYearToUse, daysInYear);
+        setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, lastDayOfDuration);
+        setFullListOfFoodDaysFromDateSelection(firstAggregatedDayOfYearToUse, lastDayOfDuration);
 
         for (int i=0; i<daysInYear; i++) {
             if (firstAggregatedDayOfYearToUse + i > 0 ) {

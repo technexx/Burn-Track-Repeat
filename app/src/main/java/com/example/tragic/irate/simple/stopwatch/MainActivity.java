@@ -620,6 +620,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager.WakeLock wakeLock;
 
   //Todo: Resolve vibration issue.
+  //Todo: Yearly would make sense to add avg. food consumed.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
