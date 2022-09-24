@@ -369,7 +369,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         mRoot = root;
-        //Todo: This is not reliable.
         fragmentIsAttached = true;
 
         notifyDataSetChangedRunnable = new Runnable() {

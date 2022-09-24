@@ -619,7 +619,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
-  //Todo: Lack of sync between timer textView and both stats + cycle times.
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
   //Todo: Resolve vibration issue.
 
@@ -4409,7 +4408,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
-      Log.i("testSync", "true and changing!");
+//      Log.i("testSync", "true and changing!");
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
@@ -4425,6 +4424,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTotalActivityTimeToTextView();
     setTotalActivityCaloriesToTextView();
     dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
+  }
+
+  private void updateCycleTimesTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
+    textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
+
+    if (textViewDisplaySync.areTextViewsDifferent()) {
+      Log.i("testSync", "true and changing!");
+      textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
+
+      setTotalCycleTimeValuesToTextView();
+    }
+
   }
 
   private void setCyclesCompletedTextView() {
@@ -4485,7 +4496,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchMs = (stopWatchTotalTime%1000) / 10;
 
         displayTime = convertSeconds( (long) stopWatchSeconds);
-//        displayTime = longToStringConverters.convertMillisToHourBasedStringForRecyclerView((long) stopWatchTotalTime);
         displayMs = df2.format(stopWatchMs);
 
         stopWatchTimeTextView.setText(displayTime);
@@ -4512,10 +4522,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
     textViewDisplaySync.setSecondTextView((String) timeLeft.getText());
-
-//    TextViewDisplaySync textViewDisplaySyncTwo = new TextViewDisplaySync();
-//    textViewDisplaySyncTwo.setFirstTextView((String) dailyTotalCaloriesTextView.getText());
-//    textViewDisplaySyncTwo.setSecondTextView((String) dailyTotalCaloriesForSingleActivityTextView.getText());
 
     return new Runnable() {
       @Override
@@ -4549,6 +4555,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
 
+    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
+    textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
+    textViewDisplaySync.setSecondTextView((String) timeLeft.getText());
+
     if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
       timerIteration.setPreviousTotal(totalCycleSetTimeInMillis);
     }
@@ -4570,11 +4580,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           totalCycleBreakTimeInMillis = timerIteration.getNewTotal();
         }
 
-        Log.i("testTime", "cycle setmillis in runnable is " + totalCycleSetTimeInMillis);
+        updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
-        setTotalCycleTimeValuesToTextView();
-
-        mHandler.postDelayed(this, timerRunnableDelay);
+        mHandler.postDelayed(this, 10);
       }
     };
   }
@@ -4585,6 +4593,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
+
+    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
+    textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
+    textViewDisplaySync.setSecondTextView((String) timeLeft.getText());
 
     if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
       timerIteration.setPreviousTotal(totalCycleWorkTimeInMillis);
@@ -4607,9 +4619,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           totalCycleRestTimeInMillis = timerIteration.getNewTotal();
         }
 
-        setTotalCycleTimeValuesToTextView();
+        updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
-        mHandler.postDelayed(this, timerRunnableDelay);
+        mHandler.postDelayed(this, 10);
       }
     };
   }
