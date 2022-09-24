@@ -619,7 +619,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
-  //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -633,6 +632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
 
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
+  //Todo: added activities can be 1 sec short of 24 hours in capped day, tho total does show 24.
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
 
@@ -4384,7 +4384,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
-      Log.i("testSync", "true and changing!");
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
@@ -4402,9 +4401,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
   }
 
-  //Todo: This displays before we round. Runnable gets removed during nextRound() method, before it gets to display rounded value.
   private void setTotalDailyTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
   }
 
   private void setTotalDailyCaloriesToTextView() {
@@ -4412,7 +4410,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalActivityTimeToTextView() {
-    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
   }
 
   private void setTotalActivityCaloriesToTextView() {
@@ -4423,7 +4421,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
-      Log.i("testSync", "true and changing!");
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
 
       setTotalCycleTimeValuesToTextView();
@@ -4530,7 +4527,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewActivityTotal();
 
          Log.i("testSync", "daily time in millis is " + totalSetTimeForCurrentDayInMillis);
-         Log.i("testSync", "daily time converted is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
+         Log.i("testSync", "daily time converted is " + longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
 
         calorieIteration.setNewTotalCalories(calorieIteration.getPreviousTotalCalories() + caloriesToIterate);
         calorieIteration.setNewActivityCalories(calorieIteration.getPreviousActivityCalories() + caloriesToIterate);
@@ -4984,10 +4981,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextPomRound(boolean endingEarly) {
-    if (!endingEarly) {
-      timeLeft.setText("0");
-    }
-
     if (pomDotCounter==8) {
       mHandler.removeCallbacks(endFadeForModeThree);
       resetTimer();
@@ -4996,7 +4989,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     globalNextRoundLogic();
 
-    timeLeft.setText("0");
     setTotalCycleTimeValuesToTextView();
     mHandler.post(endFadeForModeThree);
 

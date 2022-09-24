@@ -714,9 +714,6 @@ public class DailyStatsAccess {
                     double caloriesToAdd = mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
 
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.add(caloriesToAdd);
-
-                    Log.i("testCals", "calories in list are "+ totalCaloriesBurnedListForEachActivityForSelectedDuration);
-
                 } else {
                     totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedActivityCaloriesFromExistingAndRepeatingPositions(i));

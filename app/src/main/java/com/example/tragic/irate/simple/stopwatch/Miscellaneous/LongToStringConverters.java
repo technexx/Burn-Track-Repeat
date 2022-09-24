@@ -38,7 +38,7 @@ public class LongToStringConverters {
         }
     }
 
-    public String convertMillisToHourBasedStringForRecyclerView(long millis) {
+    public String convertMillisToHourBasedString(long millis) {
         DecimalFormat dfOneZero = new DecimalFormat("0");
         DecimalFormat dfTwoZeros = new DecimalFormat("00");
         dfOneZero.setRoundingMode(RoundingMode.DOWN);
