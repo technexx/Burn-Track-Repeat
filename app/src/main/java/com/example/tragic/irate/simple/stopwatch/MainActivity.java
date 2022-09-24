@@ -619,7 +619,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
-  //Todo: Last second skip in timers.
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
   //Todo: Resolve vibration issue.
 
@@ -4336,10 +4335,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void roundDailyStatTimesUp() {
-//    Log.i("testSync", "old value is " + totalSetTimeForCurrentDayInMillis);
     totalSetTimeForCurrentDayInMillis = roundUpMillisValues(totalSetTimeForCurrentDayInMillis);
-//    Log.i("testSync", "new value is " + totalSetTimeForCurrentDayInMillis);
-
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundUpMillisValues(totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
@@ -4406,11 +4402,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
   }
 
-  //Todo: This displays before we round.
+  //Todo: This displays before we round. Runnable gets removed during nextRound() method, before it gets to display rounded value.
   private void setTotalDailyTimeToTextView() {
-    Log.i("testSync", "daily time in millis at text change is " + totalSetTimeForCurrentDayInMillis);
-    Log.i("testSync", "daily time converted at text change is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
-
     dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
   }
 
@@ -4921,11 +4914,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextRound(boolean endingEarly) {
-    if (isAppStopped) {
-      wakeLock.acquire();
-      Log.i("testWake", "acquired!");
-    }
-
     if (!endingEarly) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
         timeLeft.setText("0");
@@ -4950,13 +4938,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (trackActivityWithinCycle) {
-      roundDailyStatTimesUpOrDown(endingEarly);
+      setAllActivityTimesAndCaloriesToTextViews();
     } else {
-      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-        roundCycleSetTimeUpOrDown(endingEarly);
-      } else {
-        roundCycleBreakTimeUpOrDown(endingEarly);
-      }
+      setTotalCycleTimeValuesToTextView();
     }
 
     boolean isAlertRepeating = false;
@@ -4988,16 +4972,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setEndOfRoundSounds(vibrationSettingForBreaks, isAlertRepeating);
         break;
     }
+
     removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
     numberOfRoundsLeft--;
     if (currentRound < typeOfRound.size()-1) {
       currentRound++;
-    }
-
-    if (isAppStopped) {
-      wakeLock.release();
-      Log.i("testWake", "released!");
     }
 
     mHandler.postDelayed(postRoundRunnableForFirstMode(), 750);
@@ -5017,6 +4997,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalNextRoundLogic();
 
     timeLeft.setText("0");
+    setTotalCycleTimeValuesToTextView();
     mHandler.post(endFadeForModeThree);
 
     if (pomDotCounter < 7) {
