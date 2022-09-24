@@ -935,8 +935,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         long totalActivityTime = dailyStatsAccess.getTotalActivityTimeForSelectedDuration();
         double totalActivityCalories = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
-        //Todo: Rounding here.
-        String activityTimeString = longToStringConverters.convertMillisToHourBasedString(roundUpMillisValues(totalActivityTime));
+
+        String activityTimeString = longToStringConverters.convertMillisToHourBasedString(totalActivityTime);
         String activityCalorieString = formatDoubleToStringWithoutDecimals(totalActivityCalories);
 
         long totalExpendedTime = dailyStatsAccess.getAggregateTimeForSelectedDuration();

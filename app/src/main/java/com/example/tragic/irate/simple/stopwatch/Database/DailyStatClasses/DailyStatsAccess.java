@@ -709,7 +709,9 @@ public class DailyStatsAccess {
                 if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
 
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
-                    totalSetTimeListForEachActivityForSelectedDuration.add(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+
+                    long timeToAdd = roundUpMillisValues(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+                    totalSetTimeListForEachActivityForSelectedDuration.add(timeToAdd);
 
                     double caloriesToAdd = mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
 
@@ -720,6 +722,11 @@ public class DailyStatsAccess {
                 }
             }
         }
+    }
+
+    private long roundUpMillisValues(long millisToRound) {
+        long remainder = millisToRound%1000;
+        return millisToRound += (1000-remainder);
     }
 
     private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
