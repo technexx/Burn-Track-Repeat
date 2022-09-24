@@ -4336,7 +4336,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void roundDailyStatTimesUp() {
+//    Log.i("testSync", "old value is " + totalSetTimeForCurrentDayInMillis);
     totalSetTimeForCurrentDayInMillis = roundUpMillisValues(totalSetTimeForCurrentDayInMillis);
+//    Log.i("testSync", "new value is " + totalSetTimeForCurrentDayInMillis);
 
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundUpMillisValues(totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
@@ -4404,7 +4406,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
   }
 
+  //Todo: This displays before we round.
   private void setTotalDailyTimeToTextView() {
+    Log.i("testSync", "daily time in millis at text change is " + totalSetTimeForCurrentDayInMillis);
+    Log.i("testSync", "daily time converted at text change is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
+
     dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
   }
 
@@ -4529,6 +4535,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewActivityTotal(timerIteration.getPreviousActivityTotal() + timeToIterate);
         totalSetTimeForCurrentDayInMillis = timerIteration.getNewDailyTotal();
         totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewActivityTotal();
+
+         Log.i("testSync", "daily time in millis is " + totalSetTimeForCurrentDayInMillis);
+         Log.i("testSync", "daily time converted is " + longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
 
         calorieIteration.setNewTotalCalories(calorieIteration.getPreviousTotalCalories() + caloriesToIterate);
         calorieIteration.setNewActivityCalories(calorieIteration.getPreviousActivityCalories() + caloriesToIterate);
