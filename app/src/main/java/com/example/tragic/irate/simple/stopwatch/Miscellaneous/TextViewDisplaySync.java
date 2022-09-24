@@ -28,7 +28,7 @@ public class TextViewDisplaySync {
     }
 
     public boolean areTextViewsDifferent() {
-        Log.i("testSync", "In comparison, first is " + mFirstTextView + " and second is " + mSecondTextView);
+//        Log.i("testSync", "In comparison, first is " + mFirstTextView + " and second is " + mSecondTextView);
         return !mFirstTextView.equals(mSecondTextView);
     }
 }

@@ -619,24 +619,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager powerManager;
   PowerManager.WakeLock wakeLock;
 
+  //Todo: Last second skip in timers.
   //Todo: added activities 1 sec short of 24 hours in capped day, tho total does show 24.
   //Todo: Resolve vibration issue.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
-  //Todo: Splash screen on Stats Fragment opening as a guide.
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
-  //Todo: Check stats add/edit popUp windows w/ diff. layout heights.
 
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
-  //Todo: Test extra-large screens as well.
-  //Todo: Run code inspector for redundancies, etc.
-  //Todo: Rename app, of course.
+  //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
   //Todo: Test everything 10x. Incl. round selection/replacement.
+  //Todo: Run code inspector for redundancies, etc.
+  //Todo: Rename app, of course.
 
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
-  //Todo: Settings popUps should be darker color (not white).ta
+  //Todo: Settings popUps should be darker color (not white).
 
   //Todo: Add Day/Night modes.
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
@@ -4274,26 +4273,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return df.format(calories);
   }
 
-  private void setTotalDailyTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
-  }
-
-  private void setTotalDailyCaloriesToTextView() {
-    dailyTotalCaloriesTextView.setText(formatCalorieString(totalCaloriesBurnedForCurrentDay));
-  }
-
-  private void setTotalActivityTimeToTextView() {
-    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForSpecificActivityForCurrentDayInMillis));
-  }
-
-  private void setTotalActivityCaloriesToTextView() {
-    dailyTotalCaloriesForSingleActivityTextView.setText(formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
-  }
-
-  private boolean isTextViewVisible(TextView textView) {
-    return textView.getVisibility()==View.VISIBLE;
-  }
-
   private void roundCycleSetTimeUpOrDown(boolean endingCycleEarly) {
     if (endingCycleEarly) {
       roundCycleSetTimeDown();
@@ -4403,12 +4382,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return millis/1000;
   }
 
-  //Todo: Get this working and we can do the same for Cycle times.
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
-//      Log.i("testSync", "true and changing!");
+      Log.i("testSync", "true and changing!");
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
       setTotalDailyTimeToTextView();
       setTotalActivityTimeToTextView();
@@ -4426,6 +4404,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
   }
 
+  private void setTotalDailyTimeToTextView() {
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForCurrentDayInMillis));
+  }
+
+  private void setTotalDailyCaloriesToTextView() {
+    dailyTotalCaloriesTextView.setText(formatCalorieString(totalCaloriesBurnedForCurrentDay));
+  }
+
+  private void setTotalActivityTimeToTextView() {
+    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedStringForRecyclerView(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+  }
+
+  private void setTotalActivityCaloriesToTextView() {
+    dailyTotalCaloriesForSingleActivityTextView.setText(formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
+  }
+
   private void updateCycleTimesTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
 
@@ -4435,7 +4429,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setTotalCycleTimeValuesToTextView();
     }
-
   }
 
   private void setCyclesCompletedTextView() {
