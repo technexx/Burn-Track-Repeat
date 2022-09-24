@@ -710,7 +710,7 @@ public class DailyStatsAccess {
 
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
 
-                    long timeToAdd = roundUpMillisValues(mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+                    long timeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
                     totalSetTimeListForEachActivityForSelectedDuration.add(timeToAdd);
 
                     double caloriesToAdd = mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
