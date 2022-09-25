@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +21,7 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   List<String> mCurrentLap;
   List<String> mSavedLap;
   Animation anim;
-  boolean lapHasBeenAnimated;
+  boolean animateLaps;
 
   public LapAdapter(Context context, List<String> currentLap, List<String> savedLap) {
     mContext = context; mCurrentLap = currentLap; mSavedLap = savedLap;
@@ -49,9 +50,15 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
       holder.lapNumber.setText("# " + (position+1));
     }
 
-    if (!lapHasBeenAnimated) {
+    if (animateLaps) {
       holder.fullView.startAnimation(anim);
-      lapHasBeenAnimated = true;
+    }
+
+    //We reverse recyclerView positions in this adapter.
+    //Todo: Once auto-scroll (from lap addition) past position 0, this will not reset until we scroll back up and hit position 0, thus we'll get a single unwanted animation during that scroll.
+    if (position==0) {
+      animateLaps = false;
+      Log.i("testAnim", "boolean setting to false!");
     }
   }
 
@@ -76,6 +83,6 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   }
 
   public void resetLapAnimation() {
-    lapHasBeenAnimated = false;
+    animateLaps = true;
   }
 }
