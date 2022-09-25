@@ -620,7 +620,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager.WakeLock wakeLock;
 
   //Todo: Resolve vibration issue.
-  //Todo: Round metabolic rate time up if >0
   //Todo: Yearly would make sense to add avg. food consumed, especially if trying to add for upcoming week/month.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
@@ -633,6 +632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
+  //Todo: Can still have +/- 1 in total activity/calories in stats fragment.
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).

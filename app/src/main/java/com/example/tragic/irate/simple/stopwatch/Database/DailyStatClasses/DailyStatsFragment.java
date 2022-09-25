@@ -128,9 +128,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int DAILY_STATS = 0;
     int WEEKLY_STATS = 1;
     int MONTHLY_STATS = 2;
-    int YEAR_TO_DATE_STATS = 3;
+//    int YEAR_TO_DATE_STATS = 3;
 //    int YEARLY_STATS = 4;
-    int CUSTOM_STATS = 4;
+    int CUSTOM_STATS = 3;
     boolean numberOfDaysWithActivitiesHasChanged;
 
     int SPINNER_ACTIVITY = 0;
@@ -790,9 +790,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (mode==MONTHLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForMonth((mCalendar.get(Calendar.DAY_OF_MONTH)), mCalendar.getActualMaximum(Calendar.DAY_OF_MONTH), mCalendar.get(Calendar.DAY_OF_YEAR));
         }
-        if (mode==YEAR_TO_DATE_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR), true);
-        }
+//        if (mode==YEAR_TO_DATE_STATS) {
+//            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR), true);
+//        }
 //        if (mode==YEARLY_STATS) {
 //            dailyStatsAccess.setAllDayAndStatListsForYearFromDatabase(mCalendar.getActualMaximum(Calendar.DAY_OF_YEAR), false);
 //        }
@@ -809,39 +809,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         setListOfStatsForEachActivity();
         setListOfFoods();
-    }
-
-    private void setStatDurationViews(int mode) {
-        setEditActivityPopUpButtonsLayoutParams(false);
-        calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
-
-        if (mode==DAILY_STATS) {
-            totalStatsHeaderTextView.setText(R.string.day_total_header);
-            setSingleDateStringOnTextView();
-        }
-        if (mode==WEEKLY_STATS) {
-            totalStatsHeaderTextView.setText(R.string.weekly_total_header);
-            convertAndSetDateRangeStringOnTextView();
-        }
-        if (mode==MONTHLY_STATS) {
-            totalStatsHeaderTextView.setText(R.string.monthly_total_header);
-            convertAndSetDateRangeStringOnTextView();
-        }
-        if (mode==YEAR_TO_DATE_STATS) {
-            totalStatsHeaderTextView.setText(R.string.year_to_date_header);
-            convertAndSetDateRangeStringOnTextView();
-        }
-//        if (mode==YEARLY_STATS) {
-//            totalStatsHeaderTextView.setText(R.string.yearly_total_header);
-//            convertAndSetDateRangeStringOnTextView();
-//        }
-        if (mode==CUSTOM_STATS) {
-            totalStatsHeaderTextView.setText(R.string.custom_total_header);
-            calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
-            convertAndSetDateRangeStringOnTextView();
-        }
-
-        calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
     }
 
     public void setNumberOfDaysWithActivitiesHasChangedBoolean(boolean numberOfDaysHaveChanged) {
@@ -882,6 +849,39 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return caloriesForEachFoodList;
     }
 
+    private void setStatDurationViews(int mode) {
+        setEditActivityPopUpButtonsLayoutParams(false);
+        calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
+
+        if (mode==DAILY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.day_total_header);
+            setSingleDateStringOnTextView();
+        }
+        if (mode==WEEKLY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.weekly_total_header);
+            convertAndSetDateRangeStringOnTextView();
+        }
+        if (mode==MONTHLY_STATS) {
+            totalStatsHeaderTextView.setText(R.string.monthly_total_header);
+            convertAndSetDateRangeStringOnTextView();
+        }
+//        if (mode==YEAR_TO_DATE_STATS) {
+//            totalStatsHeaderTextView.setText(R.string.year_to_date_header);
+//            convertAndSetDateRangeStringOnTextView();
+//        }
+//        if (mode==YEARLY_STATS) {
+//            totalStatsHeaderTextView.setText(R.string.yearly_total_header);
+//            convertAndSetDateRangeStringOnTextView();
+//        }
+        if (mode==CUSTOM_STATS) {
+            totalStatsHeaderTextView.setText(R.string.custom_total_header);
+            calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_RANGE);
+            convertAndSetDateRangeStringOnTextView();
+        }
+
+        calendarView.setSelectedDate(daySelectedAsACalendarDayObject);
+    }
+
     private void statDurationSwitchModeLogic(int directionOfIteratingDuration) {
         AsyncTask.execute(()-> {
             iterateThroughStatDurationModeVariables(directionOfIteratingDuration);
@@ -901,7 +901,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public void iterateThroughStatDurationModeVariables(int directionOfIteration) {
         if (directionOfIteration==ITERATING_ACTIVITY_STATS_UP) {
-            if (currentStatDurationMode<4) {
+            if (currentStatDurationMode<3) {
                 currentStatDurationMode++;
             } else {
                 currentStatDurationMode=0;
@@ -910,7 +910,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             if (currentStatDurationMode>0) {
                 currentStatDurationMode--;
             } else {
-                currentStatDurationMode=4;
+                currentStatDurationMode=3;
             }
         }
     }
