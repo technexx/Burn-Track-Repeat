@@ -930,8 +930,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setTotalActivityStatsFooterTextViews() {
         long totalBmrTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
         double totalBmrCalories = dailyStatsAccess.getUnassignedCaloriesForSelectedDuration();
-        String bmrTimeString = longToStringConverters.convertMillisToHourBasedString(totalBmrTime);
-        String bmrCaloriesString = formatDoubleToStringWithoutDecimals(totalBmrCalories);
+
+        String bmrTimeString = longToStringConverters.convertMillisToHourBasedString(roundUpMillisValuesIfMoreThanZero(totalBmrTime));
+        String bmrCaloriesString = formatDoubleToStringWithoutDecimals(roundUpCaloriesIfMoreThanZero(totalBmrCalories));
 
         long totalActivityTime = dailyStatsAccess.getTotalActivityTimeForSelectedDuration();
         double totalActivityCalories = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
@@ -941,6 +942,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         long totalExpendedTime = dailyStatsAccess.getAggregateTimeForSelectedDuration();
         double totalExpendedCalories = dailyStatsAccess.getAggregateCaloriesForSelectedDuration();
+
         String expendedTimeString = longToStringConverters.convertMillisToHourBasedString(totalExpendedTime);
         String expendedCaloriesString = formatDoubleToStringWithoutDecimals(totalExpendedCalories);
 
@@ -2234,13 +2236,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
     }
 
-    private long roundDownMillisValues(long millisToRound) {
-        return millisToRound -= (millisToRound%1000);
+    private long roundUpMillisValuesIfMoreThanZero(long millisToRound) {
+        if (millisToRound > 0) {
+            long remainder = millisToRound%1000;
+            return millisToRound += (1000-remainder);
+        } else {
+            return millisToRound;
+        }
     }
 
-    private long roundUpMillisValues(long millisToRound) {
-        long remainder = millisToRound%1000;
-        return millisToRound += (1000-remainder);
+    private double roundUpCaloriesIfMoreThanZero(double calories) {
+        if (calories > 0) {
+            return Math.ceil(calories);
+        } else {
+            return calories;
+        }
     }
 
     private int dpToPxConv(float pixels) {

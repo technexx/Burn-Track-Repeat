@@ -620,7 +620,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PowerManager.WakeLock wakeLock;
 
   //Todo: Resolve vibration issue.
-  //Todo: Yearly would make sense to add avg. food consumed.
+  //Todo: Round metabolic rate time up if >0
+  //Todo: Yearly would make sense to add avg. food consumed, especially if trying to add for upcoming week/month.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
@@ -4525,9 +4526,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewActivityTotal(timerIteration.getPreviousActivityTotal() + timeToIterate);
         totalSetTimeForCurrentDayInMillis = timerIteration.getNewDailyTotal();
         totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewActivityTotal();
-
-         Log.i("testSync", "daily time in millis is " + totalSetTimeForCurrentDayInMillis);
-         Log.i("testSync", "daily time converted is " + longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
 
         calorieIteration.setNewTotalCalories(calorieIteration.getPreviousTotalCalories() + caloriesToIterate);
         calorieIteration.setNewActivityCalories(calorieIteration.getPreviousActivityCalories() + caloriesToIterate);
