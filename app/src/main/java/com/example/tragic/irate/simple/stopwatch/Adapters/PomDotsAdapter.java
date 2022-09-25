@@ -136,7 +136,6 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
     }
 
     public void setPomCycleRoundsAsStringsList(List<String> pomCyclesRoundsAsStringsList) {
-        Log.i("testPom", "pom list being passed is " + mPomCycleRoundsAsStringsList);
         this.mPomCycleRoundsAsStringsList = pomCyclesRoundsAsStringsList;
         setCharactersInPomCyclesRoundsList();
     }

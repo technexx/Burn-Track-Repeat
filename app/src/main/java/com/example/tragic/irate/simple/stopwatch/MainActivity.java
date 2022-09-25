@@ -10,6 +10,7 @@ import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
+import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -17,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
@@ -494,7 +496,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean timerPopUpIsVisible;
 
   NotificationManagerCompat notificationManagerCompat;
-  NotificationCompat.Builder builder;
+  NotificationCompat.Builder notificationManagerBuilder;
   static boolean dismissNotification = true;
   Runnable notificationsRunnable;
 
@@ -616,11 +618,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout progressBarLayout;
 
   boolean isAppStopped;
-  PowerManager powerManager;
-  PowerManager.WakeLock wakeLock;
 
   //Todo: Resolve vibration issue.
-  //Todo: Yearly would make sense to add avg. food consumed, especially if trying to add for upcoming week/month.
 
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
@@ -679,6 +678,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
+//        instantiateNotifications();
         setNotificationValues();
         mHandler.postDelayed(this, 1000);
       }
@@ -1067,10 +1067,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
-
-    powerManager = (PowerManager) getSystemService(Application.POWER_SERVICE);
-
-    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP , "MyWakeLock");
 
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSets();
@@ -2558,8 +2554,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         for (int i=0; i<pomValuesTime.size(); i++) {
           pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(i)/1000));
         }
-        Log.i("testPom", "pom values in populateRoundArrayForHighlightedCycle() are " + pomStringListOfRoundValues);
-
         break;
     }
   }
@@ -3331,30 +3325,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (Build.VERSION.SDK_INT >= 26) {
       CharSequence name = "Timers";
       String description = "Timer Countdown";
-      int importance = NotificationManager.IMPORTANCE_DEFAULT;
+      int importance = NotificationManager.IMPORTANCE_HIGH;
       NotificationChannel channel = new NotificationChannel("1", name, importance);
       channel.setDescription(description);
 
-      // Register the channel with the system; you can't change the importance
-      // or other notification behaviors after this.
+      channel.enableLights(true);
+      channel.enableVibration(true);
+      channel.setVibrationPattern(new long[]{0, 300, 250, 300, 250, 300});
+
+      // Register the channel with the system; you can't change the importance or other notification behaviors after this.
       NotificationManager notificationManager = getSystemService(NotificationManager.class);
       notificationManager.createNotificationChannel(channel);
-        builder = new NotificationCompat.Builder(this, "1");
+
+      notificationManagerBuilder = new NotificationCompat.Builder(this, "1");
     } else {
-      builder = new NotificationCompat.Builder(this);
+      notificationManagerBuilder = new NotificationCompat.Builder(this);
     }
 
-    builder.setSmallIcon(R.drawable.start_cycle);
-    builder.setAutoCancel(false);
-    builder.setPriority(Notification.PRIORITY_DEFAULT);
-    builder.setDeleteIntent(dismissNotificationIntent(this, 1));
+    notificationManagerBuilder.setSmallIcon(R.drawable.start_cycle);
+    notificationManagerBuilder.setAutoCancel(false);
+    notificationManagerBuilder.setPriority(Notification.PRIORITY_MAX);
+    notificationManagerBuilder.setDeleteIntent(dismissNotificationIntent(this, 1));
 
     PackageManager pm = getApplicationContext().getPackageManager();
     Intent pmIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
     pmIntent.setPackage(null);
 
     PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, pmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-    builder.setContentIntent(pendingIntent);
+    notificationManagerBuilder.setContentIntent(pendingIntent);
 
     notificationManagerCompat = NotificationManagerCompat.from(this);
   }
@@ -3399,12 +3397,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           bodyOne = convertTimerValuesToStringForNotifications((long) stopWatchSeconds);
         }
 
-        builder.setStyle(new NotificationCompat.InboxStyle()
+        notificationManagerBuilder.setStyle(new NotificationCompat.InboxStyle()
                 .addLine(headerOne)
                 .addLine(bodyOne)
         );
 
-        notificationManagerCompat.notify(1, builder.build());
+        Notification notification = notificationManagerBuilder.build();
+
+        notificationManagerCompat.notify(1, notification);
       }
     }
   }
@@ -3697,8 +3697,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           cycleRoundsAdapter.setPomFade(true);
           cycleRoundsAdapter.notifyDataSetChanged();
-
-          Log.i("testPom", "pom values are " + pomStringListOfRoundValues);
         } else {
 //          showToastIfNoneActive("Pomodoro cycle already loaded!");
         }
@@ -4077,8 +4075,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     fadeIn.cancel();
     fadeOut.cancel();
-
-    wakeLock = powerManager.newWakeLock(PowerManager.PARTIAL_WAKE_LOCK | PowerManager.ACQUIRE_CAUSES_WAKEUP , "MyWakeLock");
 
     resetTimer();
   }
@@ -4595,6 +4591,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerIteration.setPreviousTotal(totalCycleRestTimeInMillis);
     }
 
+    //Todo: Posting twice.
     return new Runnable() {
       @Override
       public void run() {
@@ -4608,6 +4605,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
           totalCycleRestTimeInMillis = timerIteration.getNewTotal();
         }
+
+        Log.i("testPom", "work time is " + totalCycleWorkTimeInMillis);
+        Log.i("testPom", "rest time is " + totalCycleRestTimeInMillis);
 
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
@@ -4990,6 +4990,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTotalCycleTimeValuesToTextView();
     mHandler.post(endFadeForModeThree);
 
+    removePomCycleTimeRunnable();
+
     if (pomDotCounter < 7) {
       pomDotCounter++;
     }
@@ -5121,6 +5123,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             startObjectAnimatorAndTotalCycleTimeCounters();
             startPomTimer();
           }
+          postPomCycleTimeRunnable();
         } else {
           animateEnding();
           progressBar.setProgress(0);
