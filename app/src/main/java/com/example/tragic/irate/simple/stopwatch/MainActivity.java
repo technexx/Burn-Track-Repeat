@@ -4606,9 +4606,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           totalCycleRestTimeInMillis = timerIteration.getNewTotal();
         }
 
-        Log.i("testPom", "work time is " + totalCycleWorkTimeInMillis);
-        Log.i("testPom", "rest time is " + totalCycleRestTimeInMillis);
-
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         mHandler.postDelayed(this, 10);
