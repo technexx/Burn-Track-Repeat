@@ -13,11 +13,14 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.R;
+import com.google.gson.TypeAdapterFactory;
 
+import java.lang.reflect.Type;
 import java.math.RoundingMode;
 import java.text.DecimalFormat;
 import java.util.List;
@@ -57,6 +60,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     int mPhoneHeight;
 
+    Typeface openSans;
+    Typeface roboto;
+
     public interface tdeeEditedItemIsSelected {
         void activityEditItemSelected (int position);
     }
@@ -76,6 +82,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public DailyStatsAdapter(Context context, List<String> activities, List<Long> setTimes, List<Double> caloriesBurned) {
         this.mContext = context; this.mActivities = activities; this.mSetTimes = setTimes; this.mCaloriesBurned = caloriesBurned;
         setAnimations();
+        instantiateFonts();
     }
 
     public void setScreenHeight(int height) {
@@ -229,9 +236,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mHeaderViewHolder.caloriesBurnedHeaderTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
         } else if (textStyle==REGULAR_TEXT){
-            mMainViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
-            mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
-            mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
+//            mMainViewHolder.activityTextView.setTypeface(roboto);
         }
     }
 
@@ -271,6 +276,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             setTimeTextView = itemView.findViewById(R.id.set_time_in_daily_stats_textView);
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
 
+            activityTextView.setTypeface(roboto);
+            setTimeTextView.setTypeface(roboto);
+            caloriesBurnedTextView.setTypeface(roboto);
+
             fullView = itemView;
         }
     }
@@ -282,6 +291,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             super(itemView);
             addActivity = itemView.findViewById(R.id.add_activity_in_edit_stats);
         }
+    }
+
+    private void instantiateFonts() {
+        openSans = ResourcesCompat.getFont(mContext, R.font.open_sans);
+        roboto = ResourcesCompat.getFont(mContext, R.font.roboto);
     }
 
     //This doesn't round because input isn't a decimal (e.g. "0" is "0" until it is "1").
