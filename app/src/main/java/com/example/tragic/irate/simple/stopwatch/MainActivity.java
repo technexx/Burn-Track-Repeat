@@ -622,7 +622,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean isAppStopped;
 
   //Todo: createNewListOfActivitiesIfDayHasChanged() does not iterate for new day. Also need to reset the millis values.
-      //Todo: It's also creating duplicates!
 
   //Todo: Huge text size on resuming cycle.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
@@ -2275,19 +2274,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
-
       dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-      Log.i("testChange", "boolean is " + dailyStatsAccess.doesActivityExistsForSpecificDay());
+      zeroOutDailyActivityTimeAndCalories();
 
       if (!dailyStatsAccess.doesActivityExistsForSpecificDay()) {
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
       } else {
-        //Set single item list and get entity from it to update.
+        //Todo: Works here.
+        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
         dailyStatsAccess.setStatsForEachActivityEntityFromPosition(0);
       }
 
       Log.i("testChange", "day of year changed to " + dayOfYear);
     }
+  }
+
+  private void zeroOutDailyActivityTimeAndCalories() {
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
+    totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
+    totalSetTimeForCurrentDayInMillis = 0;
+    totalCaloriesBurnedForCurrentDay = 0;
   }
 
   private void changeDayOfYear(int day) {
@@ -4616,7 +4622,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerIteration.setPreviousTotal(totalCycleRestTimeInMillis);
     }
 
-    //Todo: Posting twice.
     return new Runnable() {
       @Override
       public void run() {
