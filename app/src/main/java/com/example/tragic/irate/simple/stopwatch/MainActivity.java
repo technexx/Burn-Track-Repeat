@@ -2280,13 +2280,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (!dailyStatsAccess.doesActivityExistsForSpecificDay()) {
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
-        zeroOutDailyActivityTimeAndCalories();
-      } else {
-
       }
+
+      zeroOutDailyActivityTimeAndCalories();
       dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
       dailyStatsAccess.setStatsForEachActivityEntityFromPosition(0);
 
+      //      setTrackingDailyStatsHeaderTextView();
+      tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, "TEST!"));
 
       Log.i("testChange", "day of year changed to " + dayOfYear);
     }
@@ -2297,6 +2298,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void zeroOutDailyActivityTimeAndCalories() {
+    totalSetTimeForCurrentDayInMillis = 0;
+    totalCaloriesBurnedForCurrentDay = 0;
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
+    totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
+
     mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
     infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
     mHandler.post(infinityRunnableForDailyActivityTimer);
