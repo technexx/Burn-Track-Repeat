@@ -623,6 +623,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: createNewListOfActivitiesIfDayHasChanged() does not iterate for new day. Also need to reset the millis values.
 
+  //Todo: Ghost pencil and bugged (non-responsive) highlight menu on returning to Main after quick presses to launching timer.
   //Todo: Huge text size on resuming cycle.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Test extra-large screens as well
@@ -1305,7 +1306,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(new Runnable() {
         @Override
         public void run() {
-//          cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(280);
+          cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(280);
         }
       });
 
@@ -2267,6 +2268,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  //Todo: Also need to update timer w/ new day values + header.
   private void createNewListOfActivitiesIfDayHasChanged() {
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
 //    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
@@ -2275,29 +2277,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
       dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-      zeroOutDailyActivityTimeAndCalories();
 
       if (!dailyStatsAccess.doesActivityExistsForSpecificDay()) {
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+        zeroOutDailyActivityTimeAndCalories();
       } else {
-        //Todo: Works here.
-        dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
-        dailyStatsAccess.setStatsForEachActivityEntityFromPosition(0);
+
       }
+      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+      dailyStatsAccess.setStatsForEachActivityEntityFromPosition(0);
+
 
       Log.i("testChange", "day of year changed to " + dayOfYear);
     }
   }
 
-  private void zeroOutDailyActivityTimeAndCalories() {
-    totalSetTimeForSpecificActivityForCurrentDayInMillis = 0;
-    totalCaloriesBurnedForSpecificActivityForCurrentDay = 0;
-    totalSetTimeForCurrentDayInMillis = 0;
-    totalCaloriesBurnedForCurrentDay = 0;
-  }
-
   private void changeDayOfYear(int day) {
     this.dayOfYear = day;
+  }
+
+  private void zeroOutDailyActivityTimeAndCalories() {
+    mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
+    infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
+    mHandler.post(infinityRunnableForDailyActivityTimer);
   }
 
   private boolean isDailyActivityTimeMaxed() {
@@ -2315,7 +2317,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setOldActivityPositionInListForCurrentDay(currentActivityPosition);
     }
 
-    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+//    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
 
     StatsForEachActivity statsForEachActivity = dailyStatsAccess.getStatsForEachActivityEntity();
