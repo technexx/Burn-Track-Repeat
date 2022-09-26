@@ -645,6 +645,10 @@ public class DailyStatsAccess {
         return mActivityString;
     }
 
+    public StatsForEachActivity getStatsForEachActivityEntity() {
+        return mStatsForEachActivity;
+    }
+
     public String getActivityStringFromSelectedActivity() {
         return mStatsForEachActivity.getActivity();
     }

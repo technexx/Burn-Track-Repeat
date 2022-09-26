@@ -621,9 +621,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Test createNewListOfActivitiesIfDayHasChanged().
-  //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
+  //Todo: createNewListOfActivitiesIfDayHasChanged() does not iterate for new day. Also need to reset the millis values.
 
+  //Todo: Huge text size on resuming cycle.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -631,6 +631,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
+  //Todo: Time String in notifications can still skip numbers.
   //Todo: Can still have +/- 1 in total activity/calories in stats fragment.
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
@@ -902,7 +903,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(position);
     }
 
-    setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(position);
+    setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(position);
 
     if (cycleHasActivityAssigned) {
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
@@ -1301,12 +1302,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
 
     next_round.setOnClickListener(v -> {
-      if (mode==1) {
-        nextRound(true);
-      }
-      if (mode==3) {
-        nextPomRound(true);
-      }
+      changeDayOfYear(280);
+//      if (mode==1) {
+//        nextRound(true);
+//      }
+//      if (mode==3) {
+//        nextPomRound(true);
+//      }
     });
 
     reset.setOnClickListener(v -> {
@@ -2215,12 +2217,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         if (mode==1) {
-          cycles.setTotalSetTime(totalCycleSetTimeInMillis);
-          cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
-          cycles.setCyclesCompleted(cyclesCompleted);
-          cyclesDatabase.cyclesDao().updateCycles(cycles);
+          if (!trackActivityWithinCycle) {
+            cycles.setTotalSetTime(totalCycleSetTimeInMillis);
+            cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
+            cycles.setCyclesCompleted(cyclesCompleted);
+            cyclesDatabase.cyclesDao().updateCycles(cycles);
+          }
         }
-
         if (mode==3) {
           pomCycles.setTotalWorkTime(totalCycleWorkTimeInMillis);
           pomCycles.setTotalRestTime(totalCycleRestTimeInMillis);
@@ -2258,15 +2261,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void createNewListOfActivitiesIfDayHasChanged() {
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
-    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+//    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+    Log.i("testChange", "day of year is " + dayOfYear);
 
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
 
-      Log.i("testActivityInsert", "added blank from save runnable!");
+      Log.i("testChange", "day of year changed to " + dayOfYear);
     }
+  }
+
+  private void changeDayOfYear(int day) {
+    this.dayOfYear = day;
   }
 
   private boolean isDailyActivityTimeMaxed() {
@@ -2289,6 +2297,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
+
+    StatsForEachActivity statsForEachActivity = dailyStatsAccess.getStatsForEachActivityEntity();
+    Log.i("testChange", "activity from entity is " + statsForEachActivity.getActivity());
+    Log.i("testChange", "time from entity is " + statsForEachActivity.getTotalSetTimeForEachActivity());
+    Log.i("testChange", "unique ID from entity is " + statsForEachActivity.getUniqueIdTiedToTheSelectedActivity());
+
+//    Log.i("testChange", "activity time variable is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+
   }
 
   private void fabLogic() {
@@ -2532,7 +2548,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
 
     if (cycleHasActivityAssigned) {
-      setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
@@ -3978,7 +3994,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         positionOfSelectedCycle = pomArray.size()-1;
       }
 
-      setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
       retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
 //      roundDownPomCycleWorkAndRestTimes();
 
@@ -4000,9 +4016,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-    Log.i("testDay", "day of year is " + dayOfYear);
-
-//    dayOfYear = 250;
 
     if (savedCycleAdapter.isCycleActive()) {
       savedCycleAdapter.removeActiveCycleLayout();
@@ -4044,7 +4057,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       if (!trackActivityWithinCycle) {
-        setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
 //        roundDownCycleSetAndBreakTimes();
       } else {
@@ -4150,7 +4163,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setCyclesAndPomCyclesEntityInstanceToSelectedListPosition(int position) {
+  private void setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(int position) {
     if (mode==1) cycles = cyclesList.get(position);
     if (mode==3) pomCycles = pomCyclesList.get(position);
   }
