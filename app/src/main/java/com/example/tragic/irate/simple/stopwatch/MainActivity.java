@@ -2276,11 +2276,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
+      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
       Log.i("testChange", "boolean is " + dailyStatsAccess.doesActivityExistsForSpecificDay());
+
       if (!dailyStatsAccess.doesActivityExistsForSpecificDay()) {
         dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
       } else {
         //Set single item list and get entity from it to update.
+        dailyStatsAccess.setStatsForEachActivityEntityFromPosition(0);
       }
 
       Log.i("testChange", "day of year changed to " + dayOfYear);
@@ -2294,11 +2297,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private boolean isDailyActivityTimeMaxed() {
     long dividedDailyTotal = totalSetTimeForCurrentDayInMillis/1000/60;
     long dividedDailyCap = dailyStatsAccess.getTwentyFourHoursInMillis()/1000/60;
-    if (dividedDailyTotal >= dividedDailyCap) {
-      return true;
-    }
 
-    return false;
+    return dividedDailyTotal >= dividedDailyCap;
   }
 
   private void setAndUpdateStatsForEachActivityValuesInDatabase() {
