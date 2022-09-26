@@ -412,6 +412,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         setCalendarAnimationListeners();
 
+
+
         areActivityStatsSimplified = sharedPref.getBoolean("areActivityStatsSimplified", false);
         toggleSimplifiedStatsButtonView(false);
         toggleSimplifiedStatViewsWithinActivityTab(false);

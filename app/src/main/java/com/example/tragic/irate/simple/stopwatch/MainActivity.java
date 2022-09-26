@@ -60,6 +60,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -1460,9 +1461,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapAdapter.notifyDataSetChanged();
 
     lapsNumber++;
-    lapAdapter.resetLapAnimation();
+    lapAdapter.setHaveWeBegunScrolling(false);
 
     laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
+  }
+
+  private void setLapRecyclerListener() {
+    lapRecycler.addOnScrollListener(new RecyclerView.OnScrollListener() {
+      @Override
+      public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+        super.onScrollStateChanged(recyclerView, newState);
+        if (!lapAdapter.getHaveWeBegunScrolling()) {
+          lapAdapter.setHaveWeBegunScrolling(true);
+        }
+      }
+    });
   }
 
   @Override
@@ -1538,6 +1551,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setDefaultLayoutTexts();
     setDefaultTimerValuesAndTheirEditTextViews();
     setDefaultLayoutVisibilities();
+
+    setLapRecyclerListener();
 
     dotsAdapter.onAlphaSend(MainActivity.this);
     pomDotsAdapter.onPomAlphaSend(MainActivity.this);

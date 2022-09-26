@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.R;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
@@ -21,7 +22,9 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
   List<String> mCurrentLap;
   List<String> mSavedLap;
   Animation anim;
-  boolean animateLaps;
+
+  int mOnScreenItemCount;
+  boolean mHaveWeBegunScrolling;
 
   public LapAdapter(Context context, List<String> currentLap, List<String> savedLap) {
     mContext = context; mCurrentLap = currentLap; mSavedLap = savedLap;
@@ -50,16 +53,21 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
       holder.lapNumber.setText("# " + (position+1));
     }
 
-    if (animateLaps) {
+    if (!mHaveWeBegunScrolling) {
       holder.fullView.startAnimation(anim);
     }
+  }
 
-    //We reverse recyclerView positions in this adapter.
-    //Todo: Once auto-scroll (from lap addition) past position 0, this will not reset until we scroll back up and hit position 0, thus we'll get a single unwanted animation during that scroll.
-    if (position==0) {
-      animateLaps = false;
-      Log.i("testAnim", "boolean setting to false!");
-    }
+  public void setHaveWeBegunScrolling(boolean haveWeBegun) {
+    this.mHaveWeBegunScrolling = haveWeBegun;
+  }
+
+  public boolean getHaveWeBegunScrolling() {
+    return mHaveWeBegunScrolling;
+  }
+
+  public void setOnScreenItemCount(int itemCount) {
+    this.mOnScreenItemCount = itemCount;
   }
 
   @Override
@@ -80,9 +88,5 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
       savedLapTime = itemView.findViewById(R.id.saved_laps);
       fullView = itemView;
     }
-  }
-
-  public void resetLapAnimation() {
-    animateLaps = true;
   }
 }
