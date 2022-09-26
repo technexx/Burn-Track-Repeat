@@ -29,6 +29,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.PowerManager;
+import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -620,9 +621,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Stopwatch animation should be removed or changed to sliding down.
-  //Todo: Resolve vibration issue.
-
   //Todo: Test createNewListOfActivitiesIfDayHasChanged().
   //Todo: Longer total time/calorie values exceed width allowances - test w/ large numbers.
 
@@ -637,6 +635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
+  //Todo: Likely a more efficient way to handle disabling lap adapter animation.
 
   //Todo: Add Day/Night modes.
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
@@ -2818,51 +2817,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
-//    if (!dismissNotification && vibrationSetting != 0) {
-//      if (!repeat) {
-//        mediaPlayer.setLooping(false);
-//      } else {
-//        mediaPlayer.setLooping(true);
-//      }
-//      mediaPlayer.start();
-//    } else {
-//
-//      switch (vibrationSetting) {
-//        case 1: case 2: case 3:
-//          if (repeat) {
-//            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
-//          } else {
-//            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
-//          }
-//          break;
-//        case 4:
-//          if (!repeat) {
-//            mediaPlayer.setLooping(false);
-//          } else {
-//            mediaPlayer.setLooping(true);
-//          }
-//          mediaPlayer.start();
-//          break;
-//      }
-//    }
+    long[] vibrationEffect = changeSettingsValues.getVibrationSetting(vibrationSetting);
 
-    switch (vibrationSetting) {
-      case 1: case 2: case 3:
-        if (repeat) {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+    if (vibrationSetting != 4) {
+      if (vibrator.hasVibrator()) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+          AudioAttributes audioAttributes = new AudioAttributes.Builder()
+                  .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                  .setUsage(AudioAttributes.USAGE_ALARM)
+                  .build();
+          if (repeat) {
+            vibrator.vibrate(vibrationEffect, 0, audioAttributes);
+          } else {
+            vibrator.vibrate(vibrationEffect, -1, audioAttributes);
+          }
         } else {
-          vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
-
+          if (repeat) {
+            if (repeat) {
+              vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+            } else {
+              vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+            }
+          }
         }
-        break;
-      case 4:
-        if (!repeat) {
-          mediaPlayer.setLooping(false);
-        } else {
-          mediaPlayer.setLooping(true);
-        }
-        mediaPlayer.start();
-        break;
+      }
+    } else {
+      if (!repeat) {
+        mediaPlayer.setLooping(false);
+      } else {
+        mediaPlayer.setLooping(true);
+      }
+      mediaPlayer.start();
     }
   }
 
