@@ -622,6 +622,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean isAppStopped;
 
   //Todo: createNewListOfActivitiesIfDayHasChanged() does not iterate for new day. Also need to reset the millis values.
+      //Todo: It's also creating duplicates!
 
   //Todo: Huge text size on resuming cycle.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
@@ -1302,7 +1303,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
 
     next_round.setOnClickListener(v -> {
+      AsyncTask.execute(new Runnable() {
+        @Override
+        public void run() {
+//          cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(280);
+        }
+      });
+
       changeDayOfYear(280);
+
 //      if (mode==1) {
 //        nextRound(true);
 //      }
@@ -2267,7 +2276,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
-      dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+      Log.i("testChange", "boolean is " + dailyStatsAccess.doesActivityExistsForSpecificDay());
+      if (!dailyStatsAccess.doesActivityExistsForSpecificDay()) {
+        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+      } else {
+        //Set single item list and get entity from it to update.
+      }
 
       Log.i("testChange", "day of year changed to " + dayOfYear);
     }
@@ -2302,9 +2316,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testChange", "activity from entity is " + statsForEachActivity.getActivity());
     Log.i("testChange", "time from entity is " + statsForEachActivity.getTotalSetTimeForEachActivity());
     Log.i("testChange", "unique ID from entity is " + statsForEachActivity.getUniqueIdTiedToTheSelectedActivity());
-
-//    Log.i("testChange", "activity time variable is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-
   }
 
   private void fabLogic() {
