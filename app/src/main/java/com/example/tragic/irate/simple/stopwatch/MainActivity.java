@@ -917,12 +917,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       savedCycleAdapter.removeActiveCycleLayout();
       launchTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
-      savedCycleAdapter.notifyDataSetChanged();
     }
     if (mode==3) {
       savedPomCycleAdapter.removeActiveCycleLayout();
       launchPomTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
-      savedPomCycleAdapter.notifyDataSetChanged();
     }
   }
 
@@ -1104,8 +1102,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     timerPopUpWindow.setOnDismissListener(() -> {
       timerPopUpDismissalLogic();
-      Log.i("testBack", "dismissed!");
-
 
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
@@ -2943,13 +2939,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
 
     if (mode==1) {
-//      savedCycleRecycler.setVisibility(View.VISIBLE);
-//      savedCycleAdapter.notifyDataSetChanged();
+      savedCycleAdapter.notifyDataSetChanged();
       pauseAndResumeTimer(PAUSING_TIMER);
     } else if (mode==3){
       pauseAndResumePomodoroTimer(PAUSING_TIMER);
-//      savedPomCycleRecycler.setVisibility(View.VISIBLE);
-//      savedPomCycleAdapter.notifyDataSetChanged();
+      savedPomCycleAdapter.notifyDataSetChanged();
     }
     mHandler.removeCallbacksAndMessages(null);
   }
