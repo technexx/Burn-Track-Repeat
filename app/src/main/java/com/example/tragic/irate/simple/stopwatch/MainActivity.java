@@ -624,8 +624,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Test minimized vibrations on <26 api
+  //Todo: Skipping in set/break/daily times.
+
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
+
+  //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
   //Todo: Test everything 10x. Incl. round selection/replacement.
@@ -4558,7 +4561,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (textViewDisplaySync.areTextViewsDifferent()) {
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
       setNotificationValues();
-      Log.i("testNote", "timeLeft changed to " + timeLeft.getText());
     }
   }
 
@@ -4577,7 +4579,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: Needs to also be put in non-activity runnable.
+  //Todo: May be due to textChange boolean, since (same issue we had w/ notificatioms) timeLeft textView only changes from 1->0 during endOfRound.
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -4592,10 +4594,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
     textViewDisplaySync.setSecondTextView((String) timeLeft.getText());
-
-//    TextViewDisplaySync textViewDisplaySyncForNotifications = new TextViewDisplaySync();
-//    textViewDisplaySyncForNotifications.setFirstTextView((String) timeLeft.getText());
-//    textViewDisplaySyncForNotifications.setSecondTextView((String) timeLeft.getText());
 
     setNotificationValues();
 
@@ -4619,7 +4617,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
-//        updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySyncForNotifications);
 
         mHandler.postDelayed(this, 10);
       }
@@ -5005,8 +5002,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!endingEarly) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
         timeLeft.setText("0");
-        setNotificationValues();
+        setAllActivityTimesAndCaloriesToTextViews();
       }
+      setNotificationValues();
     }
 
     globalNextRoundLogic();
