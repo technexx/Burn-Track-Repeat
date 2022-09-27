@@ -623,7 +623,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Huge text size on resuming cycle.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -672,6 +671,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       notificationsRunnable = notificationsRunnable();
       mHandler.post(notificationsRunnable);
 
+      setNotificationValues();
+
       isAppStopped = true;
 
     }
@@ -681,8 +682,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-//        instantiateNotifications();
-        setNotificationValues();
+//        setNotificationValues();
         mHandler.postDelayed(this, 1000);
       }
     };
@@ -4557,6 +4557,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  private void updateNotificationsIfTimerTextViewHasChanged(TextViewDisplaySync textViewDisplaySync) {
+    textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
+
+    if (textViewDisplaySync.areTextViewsDifferent()) {
+      textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
+      setNotificationValues();
+    }
+  }
+
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -4571,6 +4580,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
     textViewDisplaySync.setSecondTextView((String) timeLeft.getText());
+
+    TextViewDisplaySync textViewDisplaySyncForNotifications = new TextViewDisplaySync();
+    textViewDisplaySyncForNotifications.setFirstTextView((String) timeLeft.getText());
+    textViewDisplaySyncForNotifications.setSecondTextView((String) timeLeft.getText());
 
     return new Runnable() {
       @Override
@@ -4592,6 +4605,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
+        updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySyncForNotifications);
 
         mHandler.postDelayed(this, 10);
       }
