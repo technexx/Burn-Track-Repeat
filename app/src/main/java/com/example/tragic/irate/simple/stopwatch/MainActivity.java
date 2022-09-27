@@ -917,10 +917,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       savedCycleAdapter.removeActiveCycleLayout();
       launchTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
+      savedCycleAdapter.notifyDataSetChanged();;
     }
     if (mode==3) {
       savedPomCycleAdapter.removeActiveCycleLayout();
       launchPomTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
+      savedPomCycleAdapter.notifyDataSetChanged();
     }
   }
 
