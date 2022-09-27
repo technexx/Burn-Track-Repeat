@@ -917,7 +917,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode==1) {
       savedCycleAdapter.removeActiveCycleLayout();
       launchTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
-      savedCycleAdapter.notifyDataSetChanged();;
+      savedCycleAdapter.notifyDataSetChanged();
     }
     if (mode==3) {
       savedPomCycleAdapter.removeActiveCycleLayout();
@@ -2044,7 +2044,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     slideInFromLeftLong.setDuration(600);
 
     slideOutFromLeftLong = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_out_from_left);
-    slideOutFromLeftLong.setDuration(300);
+    slideOutFromLeftLong.setDuration(600);
 
     slideInFromLeftShort = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_from_left);
     slideInFromLeftShort.setDuration(300);
@@ -4152,9 +4152,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode==1) {
       changeTextSizeWithoutAnimator(workoutTime.get(0));
+      savedCycleRecycler.startAnimation(slideOutFromLeftLong);
     }
     if (mode==3) {
       changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+      savedPomCycleRecycler.startAnimation(slideOutFromLeftLong);
     }
 
     if (editCyclesPopupWindow.isShowing()) {
