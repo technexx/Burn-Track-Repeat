@@ -624,6 +624,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
+  //Todo: Test minimized vibrations on <26 api
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -2863,7 +2864,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
     long[] vibrationEffect = changeSettingsValues.getVibrationSetting(vibrationSetting);
 
-    if (vibrationSetting != 4) {
+    Log.i("testVib", "array size is " + vibrationEffect.length);
+
+    if (vibrationSetting == 1 || vibrationSetting == 2 || vibrationSetting == 3) {
       if (vibrator.hasVibrator()) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
           AudioAttributes audioAttributes = new AudioAttributes.Builder()
@@ -2877,15 +2880,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         } else {
           if (repeat) {
-            if (repeat) {
-              vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
-            } else {
-              vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
-            }
+            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), 0);
+          } else {
+            vibrator.vibrate(changeSettingsValues.getVibrationSetting(vibrationSetting), -1);
+
           }
         }
       }
-    } else {
+    } else if (vibrationSetting == 4) {
       if (!repeat) {
         mediaPlayer.setLooping(false);
       } else {
@@ -5029,6 +5031,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) {
       isAlertRepeating = true;
     }
+
+    Log.i("testVib", "vibe settings for sets it " + vibrationSettingForSets);
 
     switch (typeOfRound.get(currentRound)) {
       case 1:
