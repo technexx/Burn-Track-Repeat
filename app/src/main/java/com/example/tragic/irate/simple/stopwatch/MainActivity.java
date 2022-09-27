@@ -931,13 +931,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsInAndOut(FADE_IN_HIGHLIGHT_MODE);
     }
 
-    if (edit_highlighted_cycle.getAlpha()!=1 && receivedHighlightPositions.size()==1) {
-      edit_highlighted_cycle.setAlpha(1.0f);
-      edit_highlighted_cycle.setEnabled(true);
-    } else if (edit_highlighted_cycle.getAlpha()==1 && receivedHighlightPositions.size()!=1) {
-      edit_highlighted_cycle.setAlpha(0.4f);
-      edit_highlighted_cycle.setEnabled(false);
-    }
+    //Todo: This seems to be it.
+//    if (edit_highlighted_cycle.getAlpha()!=1 && receivedHighlightPositions.size()==1) {
+//      edit_highlighted_cycle.setAlpha(1.0f);
+//      edit_highlighted_cycle.setEnabled(true);
+//    } else if (edit_highlighted_cycle.getAlpha()==1 && receivedHighlightPositions.size()!=1) {
+//      edit_highlighted_cycle.setAlpha(0.4f);
+//      edit_highlighted_cycle.setEnabled(false);
+//    }
   }
 
   @Override
@@ -3558,6 +3559,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //We've added fadeIn/fadeOut cancels to timer launch for moment.
   private void fadeEditCycleButtonsInAndOut(int typeOfFade) {
+    //Only executing FADE_IN_HIGHLIGHT and FADE_OUT_HIGHLIGHT during bug.
+    Log.i("testFade", "executing with fadeType " + typeOfFade);
     if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
       delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
