@@ -485,6 +485,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable infinityRunnableForPomCyclesTimer;
   Runnable infinityRunnableForDailyActivityTimer;
 
+  Runnable globalNotficationsRunnable;
+
   int CYCLE_TIME_TO_ITERATE;
 
   int CYCLE_SETS = 0;
@@ -502,7 +504,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder notificationManagerBuilder;
   static boolean dismissNotification = true;
-  Runnable notificationsRunnable;
 
   String oldCycleTitleString;
   ArrayList<String> oldCycleRoundListOne;
@@ -652,7 +653,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVisible(true);
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
-    mHandler.removeCallbacks(notificationsRunnable);
+
+    mHandler.removeCallbacks(globalNotficationsRunnable);
 
     isAppStopped = false;
   }
@@ -668,24 +670,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVisible(false);
     if (timerPopUpWindow.isShowing() || stopWatchPopUpWindow.isShowing()) {
       dismissNotification = false;
-      notificationsRunnable = notificationsRunnable();
-      mHandler.post(notificationsRunnable);
 
-      setNotificationValues();
+      globalNotficationsRunnable = notifcationsRunnable();
+      mHandler.post(globalNotficationsRunnable);
 
       isAppStopped = true;
 
     }
-  }
-
-  private Runnable notificationsRunnable() {
-    return new Runnable() {
-      @Override
-      public void run() {
-//        setNotificationValues();
-        mHandler.postDelayed(this, 1000);
-      }
-    };
   }
 
   @Override
@@ -4565,11 +4556,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (textViewDisplaySync.areTextViewsDifferent()) {
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
       setNotificationValues();
-      //Todo: timeLeft only changes to "0" on nextRound().
       Log.i("testNote", "timeLeft changed to " + timeLeft.getText());
     }
   }
 
+  private Runnable notifcationsRunnable() {
+    TextViewDisplaySync textViewDisplaySyncForNotifications = new TextViewDisplaySync();
+    textViewDisplaySyncForNotifications.setFirstTextView((String) timeLeft.getText());
+    textViewDisplaySyncForNotifications.setSecondTextView((String) timeLeft.getText());
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySyncForNotifications);
+
+        mHandler.postDelayed(this, 10);
+      }
+    };
+  }
+
+  //Todo: Needs to also be put in non-activity runnable.
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -4585,9 +4591,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
     textViewDisplaySync.setSecondTextView((String) timeLeft.getText());
 
-    TextViewDisplaySync textViewDisplaySyncForNotifications = new TextViewDisplaySync();
-    textViewDisplaySyncForNotifications.setFirstTextView((String) timeLeft.getText());
-    textViewDisplaySyncForNotifications.setSecondTextView((String) timeLeft.getText());
+//    TextViewDisplaySync textViewDisplaySyncForNotifications = new TextViewDisplaySync();
+//    textViewDisplaySyncForNotifications.setFirstTextView((String) timeLeft.getText());
+//    textViewDisplaySyncForNotifications.setSecondTextView((String) timeLeft.getText());
+
+    setNotificationValues();
 
     return new Runnable() {
       @Override
@@ -4609,7 +4617,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
         updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
-        updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySyncForNotifications);
+//        updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySyncForNotifications);
 
         mHandler.postDelayed(this, 10);
       }
@@ -5244,10 +5252,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           timerPauseLogic();
           removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
-        } else if (pausing == RESUMING_TIMER) {
-          infinityTimerForSetsRunnable = infinityRunnableForSets();
-          infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
 
+        } else if (pausing == RESUMING_TIMER) {
           switch (typeOfRound.get(currentRound)) {
             case 1:
               if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
@@ -5256,6 +5262,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
             case 2:
+              infinityTimerForSetsRunnable = infinityRunnableForSets();
               if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
                 mHandler.post(infinityTimerForSetsRunnable);
               }
@@ -5267,12 +5274,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
             case 4:
+              infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
               if (!mHandler.hasCallbacks(infinityTimerForBreaksRunnable)) {
                 mHandler.post(infinityTimerForBreaksRunnable);
               }
               break;
           }
           postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
+
           timerResumeLogic();
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
