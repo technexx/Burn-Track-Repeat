@@ -3487,6 +3487,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeRemaining = convertTimerValuesToStringForNotifications((timeLeft+999) / 1000);
     }
 
+//    Log.i("testNote", "time remaining millis is " + timeLeft);
+//    Log.i("testNote", "time remaining String is " + timeRemaining);
+
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
   }
 
@@ -3503,7 +3506,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     return stringToReturn;
   }
-
 
   private void activateResumeOrResetOptionForCycle() {
     if (mode==1) {
@@ -4563,6 +4565,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (textViewDisplaySync.areTextViewsDifferent()) {
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
       setNotificationValues();
+      //Todo: timeLeft only changes to "0" on nextRound().
+      Log.i("testNote", "timeLeft changed to " + timeLeft.getText());
     }
   }
 
@@ -4982,16 +4986,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextRound(boolean endingEarly) {
-    if (!endingEarly) {
-      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
-        timeLeft.setText("0");
-      }
-    }
-
     if (numberOfRoundsLeft==0) {
       mHandler.removeCallbacks(endFadeForModeOne);
       resetTimer();
       return;
+    }
+
+    if (!endingEarly) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
+        timeLeft.setText("0");
+        setNotificationValues();
+      }
     }
 
     globalNextRoundLogic();
@@ -5056,6 +5061,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mHandler.removeCallbacks(endFadeForModeThree);
       resetTimer();
       return;
+    }
+
+    if (!endingEarly) {
+      timeLeft.setText("0");
+      setNotificationValues();
     }
 
     globalNextRoundLogic();
