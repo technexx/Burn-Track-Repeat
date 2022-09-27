@@ -302,8 +302,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean currentlyEditingACycle;
   InputMethodManager inputMethodManager;
 
-  AlphaAnimation fadeIn;
-  AlphaAnimation fadeOut;
+  AlphaAnimation fadeInForCustomActionBar;
+  AlphaAnimation fadeOutForCustomActionBar;
+  AlphaAnimation fadeInForEditCycleButton;
+  AlphaAnimation fadeOutForEditCycleButton;
   Animation slideLeft;
   Animation slideInFromLeftLong;
   Animation slideOutFromLeftLong;
@@ -621,7 +623,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Ghost pencil and bugged (non-responsive) highlight menu on returning to Main after quick presses to launching timer.
   //Todo: Huge text size on resuming cycle.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Test extra-large screens as well
@@ -931,14 +932,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsInAndOut(FADE_IN_HIGHLIGHT_MODE);
     }
 
-    //Todo: This seems to be it.
-//    if (edit_highlighted_cycle.getAlpha()!=1 && receivedHighlightPositions.size()==1) {
-//      edit_highlighted_cycle.setAlpha(1.0f);
-//      edit_highlighted_cycle.setEnabled(true);
-//    } else if (edit_highlighted_cycle.getAlpha()==1 && receivedHighlightPositions.size()!=1) {
-//      edit_highlighted_cycle.setAlpha(0.4f);
-//      edit_highlighted_cycle.setEnabled(false);
-//    }
+    if (edit_highlighted_cycle.getAlpha()!=1 && receivedHighlightPositions.size()==1) {
+      edit_highlighted_cycle.setEnabled(true);
+      edit_highlighted_cycle.setAlpha(1.0f);
+    } else if (edit_highlighted_cycle.getAlpha()==1 && receivedHighlightPositions.size()!=1) {
+      edit_highlighted_cycle.setEnabled(false);
+      edit_highlighted_cycle.setAlpha(0.4f);
+    }
   }
 
   @Override
@@ -1108,6 +1108,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       toggleCycleAndPomCycleRecyclerViewVisibilities(false);
+
+      toggleCustomActionBarButtonVisibilities(false);
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
@@ -2017,13 +2019,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateAnimationAndColorMethods() {
-    fadeIn = new AlphaAnimation(0.0f, 1.0f);
-    fadeIn.setDuration(750);
-    fadeIn.setFillAfter(true);
+    fadeInForCustomActionBar = new AlphaAnimation(0.0f, 1.0f);
+    fadeInForCustomActionBar.setDuration(750);
+    fadeInForCustomActionBar.setFillAfter(true);
 
-    fadeOut = new AlphaAnimation(1.0f, 0.0f);
-    fadeOut.setDuration(750);
-    fadeOut.setFillAfter(true);
+    fadeOutForCustomActionBar = new AlphaAnimation(1.0f, 0.0f);
+    fadeOutForCustomActionBar.setDuration(750);
+    fadeOutForCustomActionBar.setFillAfter(true);
+
+    fadeInForEditCycleButton = new AlphaAnimation(0.0f, 1.0f);
+    fadeInForEditCycleButton.setDuration(750);
+    fadeInForEditCycleButton.setFillAfter(true);
+
+    fadeOutForEditCycleButton = new AlphaAnimation(1.0f, 0.0f);
+    fadeOutForEditCycleButton.setDuration(750);
+    fadeOutForEditCycleButton.setFillAfter(true);
 
     slideLeft =  AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
     slideLeft.setDuration(400);
@@ -2045,13 +2055,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onAnimationStart(Animation animation) {
         isAnimationActive = true;
       }
-
       @Override
       public void onAnimationEnd(Animation animation) {
         mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
         isAnimationActive = false;
       }
+      @Override
+      public void onAnimationRepeat(Animation animation) {
+      }
+    });
 
+    fadeOutForEditCycleButton.setAnimationListener(new Animation.AnimationListener() {
+      @Override
+      public void onAnimationStart(Animation animation) {
+      }
+      @Override
+      public void onAnimationEnd(Animation animation) {
+        edit_highlighted_cycle.clearAnimation();
+      }
       @Override
       public void onAnimationRepeat(Animation animation) {
       }
@@ -2079,19 +2100,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_main_activity, null);
     aboutSettingsPopUpView = inflater.inflate(R.layout.about_settings_popup_layout, null);
 
-//    editCyclesPopupView = inflater.inflate(R.layout.editing_cycles, null);
-//    timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
-//    stopWatchPopUpView = inflater.inflate(R.layout.stopwatch_popup, null);
-
     savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, convertDensityPixelsToScalable(250), convertDensityPixelsToScalable(450), true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, convertDensityPixelsToScalable(300), convertDensityPixelsToScalable(150), true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     addTdeePopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     aboutSettingsPopUpWindow = new PopupWindow(aboutSettingsPopUpView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-//    editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-//    timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-//    stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
 
     setEditCyclesLayoutForDifferentHeights();
     setTimerLayoutForDifferentHeights();
@@ -3557,10 +3571,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //We've added fadeIn/fadeOut cancels to timer launch for moment.
   private void fadeEditCycleButtonsInAndOut(int typeOfFade) {
-    //Only executing FADE_IN_HIGHLIGHT and FADE_OUT_HIGHLIGHT during bug.
-    Log.i("testFade", "executing with fadeType " + typeOfFade);
     if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
       delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
@@ -3572,11 +3583,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.setEnabled(false);
     }
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
-      appHeader.startAnimation(fadeOut);
-      sortButton.startAnimation(fadeOut);
-      edit_highlighted_cycle.startAnimation(fadeIn);
-      delete_highlighted_cycle.startAnimation(fadeIn);
-      cancelHighlight.startAnimation(fadeIn);
+      appHeader.startAnimation(fadeOutForCustomActionBar);
+      sortButton.startAnimation(fadeOutForCustomActionBar);
+      delete_highlighted_cycle.startAnimation(fadeInForCustomActionBar);
+      cancelHighlight.startAnimation(fadeInForCustomActionBar);
+
+      edit_highlighted_cycle.startAnimation(fadeInForEditCycleButton);
 
       sortButton.setEnabled(false);
       edit_highlighted_cycle.setEnabled(true);
@@ -3584,11 +3596,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.setEnabled(true);
     }
     if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE || typeOfFade == FADE_IN_EDIT_CYCLE) {
-      appHeader.startAnimation(fadeIn);
-      sortButton.startAnimation(fadeIn);
-      edit_highlighted_cycle.startAnimation(fadeOut);
-      delete_highlighted_cycle.startAnimation(fadeOut);
-      cancelHighlight.startAnimation(fadeOut);
+      appHeader.startAnimation(fadeInForCustomActionBar);
+      sortButton.startAnimation(fadeInForCustomActionBar);
+      delete_highlighted_cycle.startAnimation(fadeOutForCustomActionBar);
+      cancelHighlight.startAnimation(fadeOutForCustomActionBar);
+
+      edit_highlighted_cycle.startAnimation(fadeOutForEditCycleButton);
 
       sortButton.setEnabled(true);
       edit_highlighted_cycle.setEnabled(false);
@@ -3614,7 +3627,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void clearRoundAndCycleAdapterArrayLists() {
-    Log.i("testClear", "arrays being cleared!");
     if (mode==1) {
       convertedWorkoutTime.clear();
       workoutStringListOfRoundValuesForFirstAdapter.clear();
