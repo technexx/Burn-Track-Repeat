@@ -621,8 +621,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: createNewListOfActivitiesIfDayHasChanged() does not iterate for new day. Also need to reset the millis values.
-
   //Todo: Ghost pencil and bugged (non-responsive) highlight menu on returning to Main after quick presses to launching timer.
   //Todo: Huge text size on resuming cycle.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
@@ -638,6 +636,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
+  //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
 
   //Todo: Add Day/Night modes.
   //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
@@ -1306,18 +1305,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(new Runnable() {
         @Override
         public void run() {
-          cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(280);
+//          cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(280);
         }
       });
 
-      changeDayOfYear(280);
+//      changeDayOfYear(280);
 
-//      if (mode==1) {
-//        nextRound(true);
-//      }
-//      if (mode==3) {
-//        nextPomRound(true);
-//      }
+      if (mode==1) {
+        nextRound(true);
+      }
+      if (mode==3) {
+        nextPomRound(true);
+      }
     });
 
     reset.setOnClickListener(v -> {
@@ -2268,11 +2267,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: Also need to update timer w/ new day values + header.
   private void createNewListOfActivitiesIfDayHasChanged() {
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
-//    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-    Log.i("testChange", "day of year is " + dayOfYear);
+    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
     if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
       dailyStatsAccess.setOldDayHolderId(dayOfYear);
@@ -2286,10 +2283,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
       dailyStatsAccess.setStatsForEachActivityEntityFromPosition(0);
 
-      //      setTrackingDailyStatsHeaderTextView();
       tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, "TEST!"));
-
-      Log.i("testChange", "day of year changed to " + dayOfYear);
     }
   }
 
@@ -2327,9 +2321,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
 
     StatsForEachActivity statsForEachActivity = dailyStatsAccess.getStatsForEachActivityEntity();
-    Log.i("testChange", "activity from entity is " + statsForEachActivity.getActivity());
-    Log.i("testChange", "time from entity is " + statsForEachActivity.getTotalSetTimeForEachActivity());
-    Log.i("testChange", "unique ID from entity is " + statsForEachActivity.getUniqueIdTiedToTheSelectedActivity());
+
+//    Log.i("testChange", "activity from entity is " + statsForEachActivity.getActivity());
+//    Log.i("testChange", "time from entity is " + statsForEachActivity.getTotalSetTimeForEachActivity());
+//    Log.i("testChange", "unique ID from entity is " + statsForEachActivity.getUniqueIdTiedToTheSelectedActivity());
   }
 
   private void fabLogic() {
@@ -2562,6 +2557,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void editHighlightedCycleLogic() {
+    if (receivedHighlightPositions.size()==0) {
+      return;
+    }
+
     editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
     currentlyEditingACycle = true;
     isNewCycle = false;
@@ -3571,10 +3570,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
       appHeader.startAnimation(fadeOut);
+      sortButton.startAnimation(fadeOut);
       edit_highlighted_cycle.startAnimation(fadeIn);
       delete_highlighted_cycle.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeIn);
-      sortButton.startAnimation(fadeOut);
 
       sortButton.setEnabled(false);
       edit_highlighted_cycle.setEnabled(true);
@@ -3583,16 +3582,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE || typeOfFade == FADE_IN_EDIT_CYCLE) {
       appHeader.startAnimation(fadeIn);
+      sortButton.startAnimation(fadeIn);
       edit_highlighted_cycle.startAnimation(fadeOut);
       delete_highlighted_cycle.startAnimation(fadeOut);
-      appHeader.startAnimation(fadeIn);
-      sortButton.startAnimation(fadeIn);
       cancelHighlight.startAnimation(fadeOut);
 
       sortButton.setEnabled(true);
       edit_highlighted_cycle.setEnabled(false);
       delete_highlighted_cycle.setEnabled(false);
       cancelHighlight.setEnabled(false);
+    }
+  }
+
+  private void toggleCustomActionBarButtonVisibilities(boolean highlightMode) {
+    if (highlightMode) {
+      appHeader.setVisibility(View.GONE);
+      sortButton.setVisibility(View.GONE);
+      edit_highlighted_cycle.setVisibility(View.VISIBLE);
+      delete_highlighted_cycle.setVisibility(View.VISIBLE);
+      cancelHighlight.setVisibility(View.VISIBLE);
+    } else {
+      appHeader.setVisibility(View.VISIBLE);
+      sortButton.setVisibility(View.VISIBLE);
+      edit_highlighted_cycle.setVisibility(View.GONE);
+      delete_highlighted_cycle.setVisibility(View.GONE);
+      cancelHighlight.setVisibility(View.GONE);
     }
   }
 
@@ -4111,9 +4125,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (trackingActivity) {
       setAllActivityTimesAndCaloriesToTextViews();
     }
-
-    fadeIn.cancel();
-    fadeOut.cancel();
 
     resetTimer();
   }
