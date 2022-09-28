@@ -635,6 +635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
+      //Todo: Lap adapter b0rks.
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
@@ -1422,50 +1423,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
 
     stopWatchPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-  }
-
-  private void newLapLogic() {
-    if (lapAdapter.getItemCount()>98) {
-      return;
-    }
-
-    if (empty_laps.getVisibility()==View.VISIBLE) {
-      empty_laps.setVisibility(View.INVISIBLE);
-    }
-
-    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
-
-    if (savedLapList.size()>0) {
-      String retrievedLap = savedLapList.get(savedLapList.size()-1);
-      String[] splitLap = retrievedLap.split(":");
-      int pulledMinute = Integer.parseInt(splitLap[0]) / 60;
-      int convertedMinute = pulledMinute * 60 * 1000;
-      int convertedSecond = Integer.parseInt(splitLap[1]) * 1000;
-      int convertedMs = Integer.parseInt(splitLap[2]) * 10;
-
-      int totalMs = convertedMinute + convertedSecond + convertedMs;
-
-      int totalNewTime = ( (int) stopWatchTotalTime - totalMs);
-
-      int newMinutes = (totalNewTime/1000) / 60;
-      int newSeconds = (totalNewTime/1000) % 60;
-      double newMS = ((double) totalNewTime%1000) / 10;
-
-      newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, (int) newMS);
-    } else {
-      newEntries = savedEntries;
-    }
-
-    currentLapList.add(newEntries);
-    savedLapList.add(savedEntries);
-    lapRecyclerLayoutManager.scrollToPosition(savedLapList.size() - 1);
-
-    lapAdapter.notifyDataSetChanged();
-
-    lapsNumber++;
-    lapAdapter.setHaveWeBegunScrolling(false);
-
-    laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
   }
 
   private void setLapRecyclerListener() {
@@ -4552,8 +4509,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         long timeToIterate = timerIteration.getDifference();
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
 
-        stopWatchTotalTime = timerIteration.getNewTotal();
+        stopWatchTotalTime = timerIteration.getNewTotal() + 0;
 
+        //Todo: Does not cap @ 2 digits.
         stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
         stopWatchMinutes = (int) stopWatchSeconds/60;
         stopWatchMs = (stopWatchTotalTime%1000) / 10;
@@ -4569,6 +4527,55 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler.postDelayed(this, 10);
       }
     };
+  }
+
+  private void newLapLogic() {
+    if (lapAdapter.getItemCount()>98) {
+      return;
+    }
+
+    if (empty_laps.getVisibility()==View.VISIBLE) {
+      empty_laps.setVisibility(View.INVISIBLE);
+    }
+
+    DecimalFormat df = new DecimalFormat("00");
+
+//    savedEntries = df.format(stopWatchMinutes) + ":" + df.format(stopWatchSeconds) + ":" + df.format(stopWatchMs);
+//    savedEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) stopWatchMinutes, (int) stopWatchSeconds, (int) stopWatchMs);
+
+    savedEntries = longToStringConverters.convertMillisStopWatchString(stopWatchTotalTime);
+
+    if (savedLapList.size()>0) {
+//      String retrievedLap = savedLapList.get(savedLapList.size()-1);
+//      String[] splitLap = retrievedLap.split(":");
+//      int pulledMinute = Integer.parseInt(splitLap[0]) / 60;
+//      int convertedMinute = pulledMinute * 60 * 1000;
+//      int convertedSecond = Integer.parseInt(splitLap[1]) * 1000;
+//      int convertedMs = Integer.parseInt(splitLap[2]) * 10;
+//
+//      int totalMs = convertedMinute + convertedSecond + convertedMs;
+//
+//      int totalNewTime = ( (int) stopWatchTotalTime - totalMs);
+//
+//      int newMinutes = (totalNewTime/1000) / 60;
+//      int newSeconds = (totalNewTime/1000) % 60;
+//      double newMS = ((double) totalNewTime%1000) / 10;
+
+//      newEntries = String.format(Locale.getDefault(), "%02d:%02d:%02d", (int) newMinutes, (int) newSeconds, (int) newMS);
+    } else {
+      newEntries = savedEntries;
+    }
+
+    currentLapList.add(newEntries);
+    savedLapList.add(savedEntries);
+    lapRecyclerLayoutManager.scrollToPosition(savedLapList.size() - 1);
+
+    lapAdapter.notifyDataSetChanged();
+
+    lapsNumber++;
+    lapAdapter.setHaveWeBegunScrolling(false);
+
+    laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
   }
 
   private void updateNotificationsIfTimerTextViewHasChanged(TextViewDisplaySync textViewDisplaySync) {
