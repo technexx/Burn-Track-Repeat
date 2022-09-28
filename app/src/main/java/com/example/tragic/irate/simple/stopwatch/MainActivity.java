@@ -354,7 +354,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView reset;
   ObjectAnimator objectAnimator;
   ObjectAnimator objectAnimatorPom;
-  Animation endAnimation;
+  Animation endAnimationForTimer;
+  Animation endAnimationForStopwatch;
 
   TextView tracking_daily_stats_header_textView;
   TextView cycle_title_textView;
@@ -459,6 +460,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean timerDisabled;
   boolean timerIsPaused = true;
   boolean stopWatchIsPaused = true;
+  boolean stopWatchTimerEnded;
 
   LinearLayoutManager lapRecyclerLayoutManager;
   ConstraintLayout roundRecyclerLayout;
@@ -3659,14 +3661,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void animateEnding() {
-    endAnimation = new AlphaAnimation(1.0f, 0.0f);
-    endAnimation.setDuration(300);
-    endAnimation.setStartOffset(0);
-    endAnimation.setRepeatMode(Animation.REVERSE);
-    endAnimation.setRepeatCount(Animation.INFINITE);
-    progressBar.startAnimation(endAnimation);
-    timeLeft.startAnimation(endAnimation);
+  private void animateTimerEnding() {
+    endAnimationForTimer = new AlphaAnimation(1.0f, 0.0f);
+    endAnimationForTimer.setDuration(300);
+    endAnimationForTimer.setStartOffset(0);
+    endAnimationForTimer.setRepeatMode(Animation.REVERSE);
+    endAnimationForTimer.setRepeatCount(Animation.INFINITE);
+    progressBar.startAnimation(endAnimationForTimer);
+    timeLeft.startAnimation(endAnimationForTimer);
+  }
+
+  private void animateStopwatchEnding() {
+    endAnimationForStopwatch = new AlphaAnimation(1.0f, 0.0f);
+    endAnimationForStopwatch.setDuration(300);
+    endAnimationForStopwatch.setStartOffset(0);
+    endAnimationForStopwatch.setRepeatMode(Animation.REVERSE);
+    endAnimationForStopwatch.setRepeatCount(Animation.INFINITE);
+    stopWatchPauseResumeButton.startAnimation(endAnimationForStopwatch);
+    stopWatchTimeTextView.startAnimation(endAnimationForStopwatch);
   }
 
   private void adjustCustom(boolean adding) {
@@ -4498,20 +4510,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable stopWatchRunnable() {
+    stopWatchTotalTime = 3595000;
+
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(stopWatchTotalTime);
 
+
     return new Runnable() {
       @Override
       public void run() {
+
         DecimalFormat df2 = new DecimalFormat("00");
 
         timerIteration.setCurrentTime(System.currentTimeMillis());
         long timeToIterate = timerIteration.getDifference();
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
 
-        stopWatchTotalTime = timerIteration.getNewTotal() + 0;
+        stopWatchTotalTime = timerIteration.getNewTotal();
 
         stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
         stopWatchMinutes = (int) stopWatchSeconds/60;
@@ -4525,7 +4541,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         decreaseTextSizeForTimersForStopWatch(stopWatchTotalTime);
 
-        mHandler.postDelayed(this, 10);
+        if (stopWatchTotalTime < 3600000) {
+          mHandler.postDelayed(this, 10);
+        } else {
+          animateStopwatchEnding();
+          new_lap.setEnabled(false);
+
+          stopWatchTimerEnded = true;
+          mHandler.removeCallbacks(stopWatchTimerRunnable);
+        }
       }
     };
   }
@@ -5187,7 +5211,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
         } else {
-          animateEnding();
+          animateTimerEnding();
           currentRound = 0;
           timerEnded = true;
           cyclesCompleted++;
@@ -5218,7 +5242,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           postPomCycleTimeRunnable();
         } else {
-          animateEnding();
+          animateTimerEnding();
           progressBar.setProgress(0);
           timerEnded = true;
           setCyclesCompletedTextView();
@@ -5398,30 +5422,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumeStopwatch (int pausing) {
-    if (pausing == PAUSING_TIMER) {
-      stopWatchIsPaused = true;
+    if (!stopWatchTimerEnded) {
+      if (pausing == PAUSING_TIMER) {
+        stopWatchIsPaused = true;
 
-      new_lap.setAlpha(0.3f);
-      new_lap.setEnabled(false);
+        new_lap.setAlpha(0.3f);
+        new_lap.setEnabled(false);
 
-      stopwatchReset.setVisibility(View.VISIBLE);
+        stopwatchReset.setVisibility(View.VISIBLE);
 
-      mHandler.removeCallbacks(stopWatchTimerRunnable);
-    } else if (pausing == RESUMING_TIMER) {
-      stopWatchIsPaused = false;
-      stopWatchstartTime = System.currentTimeMillis();
+        mHandler.removeCallbacks(stopWatchTimerRunnable);
+      } else if (pausing == RESUMING_TIMER) {
+        stopWatchIsPaused = false;
+        stopWatchstartTime = System.currentTimeMillis();
 
-      new_lap.setAlpha(1.0f);
-      new_lap.setEnabled(true);
+        new_lap.setAlpha(1.0f);
+        new_lap.setEnabled(true);
 
-      stopwatchReset.setVisibility(View.INVISIBLE);
+        stopwatchReset.setVisibility(View.INVISIBLE);
 
-      stopWatchTimerRunnable = stopWatchRunnable();
-      mHandler.post(stopWatchTimerRunnable);
+        stopWatchTimerRunnable = stopWatchRunnable();
+        mHandler.post(stopWatchTimerRunnable);
+      }
+    } else {
+      resetStopwatchTimer();
     }
   }
 
   private void resetStopwatchTimer() {
+    stopWatchTimerEnded = false;
     stopWatchIsPaused = true;
 
     stopWatchstartTime = 0;
@@ -5445,6 +5474,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopwatchReset.setVisibility(View.INVISIBLE);
     empty_laps.setVisibility(View.VISIBLE);
     setInitialTextSizeForStopWatch();
+
+    if (endAnimationForStopwatch != null) {
+      endAnimationForStopwatch.cancel();
+      new_lap.setAlpha(0.3f);
+      new_lap.setEnabled(false);
+    }
   }
 
   private void startObjectAnimatorAndTotalCycleTimeCounters() {
@@ -5633,7 +5668,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     vibrator.cancel();
     if (timer != null) timer.cancel();
-    if (endAnimation!=null) endAnimation.cancel();
+    if (endAnimationForTimer!=null) endAnimationForTimer.cancel();
 
     if (mediaPlayer.isPlaying()) {
       mediaPlayer.stop();
