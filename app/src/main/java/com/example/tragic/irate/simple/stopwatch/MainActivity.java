@@ -5480,6 +5480,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       new_lap.setAlpha(0.3f);
       new_lap.setEnabled(false);
     }
+
+    setHasTextSizeChangedForStopWatch(false);
   }
 
   private void startObjectAnimatorAndTotalCycleTimeCounters() {
@@ -5665,6 +5667,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void resetTimer() {
     mHandler.removeCallbacks(infinityTimerForSetsRunnable);
     mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
+
+    setHasTextSizeChangedForTimers(false);
 
     vibrator.cancel();
     if (timer != null) timer.cancel();
