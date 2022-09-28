@@ -956,6 +956,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyTotalExpendedTimeElapsedTextView.setText(expendedTimeString);
         dailyTotalExpendedCaloriesBurnedTextView.setText(expendedCaloriesString);
+
+        Log.i("testTime", "total activity is " + totalActivityTime);
     }
 
     private int valueToAddForFutureYears() {
@@ -2075,7 +2077,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void instantiateAboutStatsPopUpViews() {
         aboutStatsPopUpView = inflater.inflate(R.layout.about_stats_popup_layout, null);
         aboutStatsPopUpWindow = new PopupWindow(aboutStatsPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-//        aboutStatsPopUpWindow = new PopupWindow(aboutStatsPopUpView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(440), true);
         aboutStatsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     }
 
@@ -2108,11 +2109,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesComparisonTabLayout = mRoot.findViewById(R.id.calorie_comparison_tab_layout);
 
         if (phoneHeight <= 1920) {
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Expended"));
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Burned"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Consumed"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Compared"));
         } else {
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Expended"));
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Burned"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));
         }
@@ -2253,6 +2254,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         } else {
             return calories;
         }
+    }
+
+    private long roundDownMillisValues(long millisToRound) {
+        return millisToRound -= (millisToRound%1000);
     }
 
     private int dpToPxConv(float pixels) {

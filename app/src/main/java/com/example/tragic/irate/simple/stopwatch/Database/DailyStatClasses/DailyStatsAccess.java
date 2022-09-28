@@ -657,10 +657,6 @@ public class DailyStatsAccess {
         return mStatsForEachActivity.getTotalSetTimeForEachActivity();
     }
 
-    public long getTotalBreakTimeForSelectedActivity() {
-        return mStatsForEachActivity.getTotalBreakTimeForEachActivity();
-    }
-
     public double getMetScore() {
         return mMetScore;
     }
@@ -715,6 +711,7 @@ public class DailyStatsAccess {
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
 
                     long timeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
+                    timeToAdd = roundDownMillisValues(timeToAdd);
                     totalSetTimeListForEachActivityForSelectedDuration.add(timeToAdd);
 
                     double caloriesToAdd = mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
@@ -731,6 +728,10 @@ public class DailyStatsAccess {
     private long roundUpMillisValues(long millisToRound) {
         long remainder = millisToRound%1000;
         return millisToRound += (1000-remainder);
+    }
+
+    private long roundDownMillisValues(long millisToRound) {
+        return millisToRound -= (millisToRound%1000);
     }
 
     private boolean doesTotalActivitiesListContainSelectedString(String stringToCheck) {
