@@ -624,8 +624,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Skipping in set/break/daily times.
+  //Todo: Slight iteration issues. Total times may iterate slightly past the 1000ms mark by the time textView changes, thus skipping a second. We can resolve this by hedging the long->String display AND/OR reducing runnable delay for countDownTimers.
+      //Todo: E.g. error: 3950 -> 3 seconds, 5050 -> 5 seconds OR 3050 -> 3 seconds, 3950 -> 3 seconds.
 
+  //Todo: Long-String in notifications will need different method for infinity rounds (not +999).
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
@@ -3377,10 +3379,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       NotificationChannel channel = new NotificationChannel("1", name, importance);
       channel.setDescription(description);
 
-      channel.enableLights(true);
-      channel.enableVibration(true);
-      channel.setVibrationPattern(new long[]{0, 300, 250, 300, 250, 300});
-
       // Register the channel with the system; you can't change the importance or other notification behaviors after this.
       NotificationManager notificationManager = getSystemService(NotificationManager.class);
       notificationManager.createNotificationChannel(channel);
@@ -3392,7 +3390,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     notificationManagerBuilder.setSmallIcon(R.drawable.start_cycle);
     notificationManagerBuilder.setAutoCancel(false);
-    notificationManagerBuilder.setPriority(Notification.PRIORITY_MAX);
+    notificationManagerBuilder.setPriority(Notification.PRIORITY_HIGH);
     notificationManagerBuilder.setDeleteIntent(dismissNotificationIntent(this, 1));
 
     PackageManager pm = getApplicationContext().getPackageManager();
@@ -3482,9 +3480,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       timeRemaining = convertTimerValuesToStringForNotifications((timeLeft+999) / 1000);
     }
-
-//    Log.i("testNote", "time remaining millis is " + timeLeft);
-//    Log.i("testNote", "time remaining String is " + timeRemaining);
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
   }
@@ -4435,7 +4430,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private long dividedMillisForTotalTimesDisplay(long millis) {
-    return millis/1000;
+    return (millis) /1000;
+  }
+
+  private long roundToNearestFullThousandth(long valueToRound) {
+    long remainder = valueToRound % 1000;
+    if (remainder<=500) {
+      return valueToRound -= remainder;
+    } else {
+      return valueToRound += (1000 - remainder);
+    }
   }
 
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
@@ -4491,12 +4495,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setTotalCycleTimeValuesToTextView() {
     if (mode==1) {
-      total_set_time.setText(convertSeconds(totalCycleSetTimeInMillis/1000));
-      total_break_time.setText(convertSeconds(totalCycleBreakTimeInMillis/1000));
+      long roundedSetTime = roundToNearestFullThousandth(totalCycleSetTimeInMillis);
+      long roundedBreakTime = roundToNearestFullThousandth(totalCycleBreakTimeInMillis);
+
+      Log.i("testTime", "set time is " + totalCycleSetTimeInMillis);
+      Log.i("testTime", "rounded set time is " + roundedSetTime);
+      Log.i("testTime", "display is " + convertSeconds(dividedMillisForTotalTimesDisplay(roundedSetTime)));
+
+      total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedSetTime)));
+      total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedBreakTime)));
     }
     if (mode==3) {
-      total_set_time.setText(convertSeconds(totalCycleWorkTimeInMillis/1000));
-      total_break_time.setText(convertSeconds(totalCycleRestTimeInMillis/1000));
+      long roundedWorkTime = roundToNearestFullThousandth(totalCycleWorkTimeInMillis);
+      long roundedRestTime = roundToNearestFullThousandth(totalCycleRestTimeInMillis);
+
+      total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedWorkTime)));
+      total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedRestTime)));
     }
   }
 
@@ -4579,7 +4593,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: May be due to textChange boolean, since (same issue we had w/ notificatioms) timeLeft textView only changes from 1->0 during endOfRound.
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -5002,7 +5015,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!endingEarly) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
         timeLeft.setText("0");
-        setAllActivityTimesAndCaloriesToTextViews();
       }
       setNotificationValues();
     }
@@ -5034,24 +5046,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     switch (typeOfRound.get(currentRound)) {
       case 1:
-        total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
         setEndOfRoundSounds(vibrationSettingForSets, isAlertRepeating);
         break;
       case 2:
-        total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
-
         mHandler.removeCallbacks(infinityTimerForSetsRunnable);
         setEndOfRoundSounds(vibrationSettingForSets, isAlertRepeating);
         break;
       case 3:
-        total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
-
         setEndOfRoundSounds(vibrationSettingForBreaks, isAlertRepeating);
         break;
       case 4:
         mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
-        total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
-
         setEndOfRoundSounds(vibrationSettingForBreaks, isAlertRepeating);
         break;
     }
@@ -5097,20 +5102,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     switch (pomDotCounter) {
       case 0: case 2: case 4: case 6:
-        total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleWorkTimeInMillis)));
         setEndOfRoundSounds(vibrationSettingForWork, false);
 
         roundPomWorkTimeUpOrDown(endingEarly);
         break;
       case 1: case 3: case 5:
-        total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
 
         roundPomRestTimeUpOrDown(endingEarly);
         break;
       case 7:
-        total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
-
         boolean isAlertRepeating = false;
         if (isFullBreakSoundContinuous) isAlertRepeating = true;
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, isAlertRepeating);
