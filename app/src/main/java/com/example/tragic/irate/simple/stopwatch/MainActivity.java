@@ -624,7 +624,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: May want to replace any +999/1000 hack to our new rounded method.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
@@ -635,7 +634,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
 
   //Todo: Can still have +/- 1 in total activity/calories in stats fragment.
-      //Todo: Solution is in rounding just the long value we want to display in String.
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
@@ -768,6 +766,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case R.id.about_stats:
         dailyStatsFragment.launchAboutStatsPopUpWindow();
+        break;
       case R.id.about_settings:
         aboutSettingsPopUpWindow.showAtLocation(mainView, Gravity.CENTER_VERTICAL, 0 ,0);
     }
