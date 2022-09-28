@@ -4447,35 +4447,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
-      setTotalDailyTimeToTextView();
-      setTotalActivityTimeToTextView();
+      setTotalDailyActivityTimeToTextView();
+      setTotalSingleActivityTimeToTextView();
     }
 
     setTotalDailyCaloriesToTextView();
-    setTotalActivityCaloriesToTextView();
+    setTotalSingleActivityCaloriesToTextView();
   }
 
   private void setAllActivityTimesAndCaloriesToTextViews() {
-    setTotalDailyTimeToTextView();
+    setTotalDailyActivityTimeToTextView();
     setTotalDailyCaloriesToTextView();
-    setTotalActivityTimeToTextView();
-    setTotalActivityCaloriesToTextView();
+    setTotalSingleActivityTimeToTextView();
+    setTotalSingleActivityCaloriesToTextView();
     dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
   }
 
-  private void setTotalDailyTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
+  private void setTotalDailyActivityTimeToTextView() {
+    long roundedTotalDailyActivityTime = roundToNearestFullThousandth(totalSetTimeForCurrentDayInMillis);
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(roundedTotalDailyActivityTime));
   }
 
   private void setTotalDailyCaloriesToTextView() {
     dailyTotalCaloriesTextView.setText(formatCalorieString(totalCaloriesBurnedForCurrentDay));
   }
 
-  private void setTotalActivityTimeToTextView() {
-    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+  private void setTotalSingleActivityTimeToTextView() {
+    long roundedSingleActivityTime = roundToNearestFullThousandth(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedString(roundedSingleActivityTime));
   }
 
-  private void setTotalActivityCaloriesToTextView() {
+  private void setTotalSingleActivityCaloriesToTextView() {
     dailyTotalCaloriesForSingleActivityTextView.setText(formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
   }
 
@@ -5041,8 +5043,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) {
       isAlertRepeating = true;
     }
-
-    Log.i("testVib", "vibe settings for sets it " + vibrationSettingForSets);
 
     switch (typeOfRound.get(currentRound)) {
       case 1:
