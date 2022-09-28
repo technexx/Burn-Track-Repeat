@@ -624,10 +624,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean isAppStopped;
 
-  //Todo: Slight iteration issues. Total times may iterate slightly past the 1000ms mark by the time textView changes, thus skipping a second. We can resolve this by hedging the long->String display AND/OR reducing runnable delay for countDownTimers.
-      //Todo: E.g. error: 3950 -> 3 seconds, 5050 -> 5 seconds OR 3050 -> 3 seconds, 3950 -> 3 seconds.
-
-  //Todo: Long-String in notifications will need different method for infinity rounds (not +999).
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
@@ -637,8 +633,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
-  //Todo: Time String in notifications can still skip numbers.
   //Todo: Can still have +/- 1 in total activity/calories in stats fragment.
+      //Todo: Solution is in rounding just the long value we want to display in String.
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
@@ -3478,7 +3474,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (timeLeft < 100) {
       timeRemaining = "00:00";
     } else {
-      timeRemaining = convertTimerValuesToStringForNotifications((timeLeft+999) / 1000);
+      long roundedTimeLeft = roundToNearestFullThousandth(timeLeft);
+      timeRemaining = convertTimerValuesToStringForNotifications(roundedTimeLeft/1000);
+
+      Log.i("testNote", "timeleft is " + timeLeft);
+      Log.i("testNote", "rounded timeLeft is " + roundToNearestFullThousandth(timeLeft));
+      Log.i("testNote", "display string is " + convertTimerValuesToStringForNotifications(roundedTimeLeft/1000));
     }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
