@@ -712,6 +712,7 @@ public class DailyStatsAccess {
 
                     long timeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
                     timeToAdd = roundDownMillisValues(timeToAdd);
+
                     totalSetTimeListForEachActivityForSelectedDuration.add(timeToAdd);
 
                     double caloriesToAdd = mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
@@ -730,6 +731,15 @@ public class DailyStatsAccess {
         return millisToRound += (1000-remainder);
     }
 
+    private long roundUpMillisValuesIfMoreThanZero(long millisToRound) {
+        if (millisToRound > 0) {
+            long remainder = millisToRound%1000;
+            return millisToRound += (1000-remainder);
+        } else {
+            return millisToRound;
+        }
+    }
+
     private long roundDownMillisValues(long millisToRound) {
         return millisToRound -= (millisToRound%1000);
     }
@@ -746,6 +756,7 @@ public class DailyStatsAccess {
 
     private long combinedSetTimeFromExistingAndRepeatingPositions(int position) {
         long iteratingValue = mStatsForEachActivityList.get(position).getTotalSetTimeForEachActivity();
+        iteratingValue = roundDownMillisValues(iteratingValue);
         long presentValue =  totalSetTimeListForEachActivityForSelectedDuration.get(duplicateStringPosition);
         return iteratingValue + presentValue;
     }
@@ -802,6 +813,8 @@ public class DailyStatsAccess {
 
     public void setUnassignedDailyTotalTime() {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
+
+        Log.i("testTime", "total activity time is " + totalSetTimeForSelectedDuration);
     }
 
     public long getUnassignedSetTimeForSelectedDuration() {

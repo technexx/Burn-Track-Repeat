@@ -197,8 +197,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
-    Log.i("testActive", "active cycle position is " + mPositionOfActiveCycle + " and boolean is " + mActiveCycle);
-
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
@@ -207,7 +205,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
         });
       }
-      Log.i("testActive", "active cycle at position " + mPositionOfActiveCycle);
     }
 
     if (mTdeeActivityExistsInCycleList.get(position)) {

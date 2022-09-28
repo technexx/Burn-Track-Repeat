@@ -956,8 +956,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyTotalExpendedTimeElapsedTextView.setText(expendedTimeString);
         dailyTotalExpendedCaloriesBurnedTextView.setText(expendedCaloriesString);
-
-        Log.i("testTime", "total activity is " + totalActivityTime);
     }
 
     private int valueToAddForFutureYears() {
@@ -2237,15 +2235,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             public void onAnimationRepeat(Animation animation) {
             }
         });
-    }
-
-    private long roundUpMillisValuesIfMoreThanZero(long millisToRound) {
-        if (millisToRound > 0) {
-            long remainder = millisToRound%1000;
-            return millisToRound += (1000-remainder);
-        } else {
-            return millisToRound;
-        }
     }
 
     private double roundUpCaloriesIfMoreThanZero(double calories) {

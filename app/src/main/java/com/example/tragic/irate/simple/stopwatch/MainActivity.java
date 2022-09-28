@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
-  //Todo: Can still have +/- 1 in total activity/calories in stats fragment.
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: 99+ minutes on stopwatch outside of circle borders.
   //Todo: Settings popUps should be darker color (not white).
