@@ -1915,6 +1915,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCycleAdapter.setResumeOrResetCycle(MainActivity.this);
 
     savedCycleAdapter.setScreenHeight(phoneHeight);
+    savedCycleAdapter.setDayOrNightMode(colorThemeMode);
 
     savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
     savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);

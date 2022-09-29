@@ -72,6 +72,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   Typeface moonFace;
 
+  int mThemeMode;
+  int DAY_MODE = 0;
+  int NIGHT_MODE = 1;
+
   public void changeColorSetting(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
     if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -119,6 +123,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public void setScreenHeight(int height) {
     this.mScreenHeight = height;
+  }
+
+  public void setDayOrNightMode(int themeMode) {
+    this.mThemeMode = themeMode;
   }
 
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
@@ -207,27 +215,34 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
     }
 
+    if (mThemeMode == DAY_MODE) {
+      workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.BLACK);
+    }
+    if (mThemeMode == NIGHT_MODE) {
+      workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.WHITE);
+    }
+
     if (mTdeeActivityExistsInCycleList.get(position)) {
-      workoutHolder.tdeeActivityStringToggle.setText(mWorkoutActivityString.get(position));
-      workoutHolder.tdeeActivityStringToggle.setVisibility(View.VISIBLE);
+      workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
+      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
 
       workoutHolder.workoutNameLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
       workoutHolder.workoutCyclesLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
 
     } else {
-      workoutHolder.tdeeActivityStringToggle.setVisibility(View.GONE);
+      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
       workoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
       workoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
 
 
     if (mActiveTdeeModeBooleanList.get(position)) {
-      workoutHolder.tdeeActivityStringToggle.setAlpha(1.0f);
+      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(1.0f);
     } else {
-      workoutHolder.tdeeActivityStringToggle.setAlpha(0.3f);
+      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.3f);
     }
 
-    workoutHolder.tdeeActivityStringToggle.setOnClickListener(v-> {
+    workoutHolder.tdeeActivityStringToggleTextView.setOnClickListener(v-> {
       if (!mActiveCycle && !mHighlightMode) {
         mOnTdeeModeToggle.toggleTdeeMode(position);
       }
@@ -389,7 +404,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public TextView workoutName;
     public TextView workOutCycle;
     public TextView resetCycle;
-    public TextView tdeeActivityStringToggle;
+    public TextView tdeeActivityStringToggleTextView;
 
     ConstraintLayout.LayoutParams workoutNameLayoutParams;
     ConstraintLayout.LayoutParams workoutCyclesLayoutParams;
@@ -401,7 +416,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
-      tdeeActivityStringToggle = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
+      tdeeActivityStringToggleTextView = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
 
       workoutNameLayoutParams = (ConstraintLayout.LayoutParams) workoutName.getLayoutParams();
       workoutCyclesLayoutParams = (ConstraintLayout.LayoutParams) workOutCycle.getLayoutParams();
