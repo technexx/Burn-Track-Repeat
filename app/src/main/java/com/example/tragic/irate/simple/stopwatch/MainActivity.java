@@ -1059,6 +1059,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
+
     toggleDayAndNightModesForTimer(DAY_MODE);
 
     stopWatchTimerRunnable = stopWatchRunnable();
@@ -1426,6 +1427,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_set_time.setTextColor(getColor(R.color.black));
       total_break_header.setTextColor(getColor(R.color.black));
       total_break_time.setTextColor(getColor(R.color.black));
+
+      //      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.black));
+      dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.black));
+      dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.black));
+      dailySingleActivityStringHeader.setTextColor(getColor(R.color.black));
+      dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
+      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
+
+//      dailyTotalTimeTextView.setTextColor(getColor(R.color.black));
+//      dailyTotalCaloriesTextView.setTextColor(getColor(R.color.black));
+//      dailyTotalTimeForSingleActivityTextView.setTextColor(getColor(R.color.black));
+//      dailyTotalCaloriesForSingleActivityTextView.setTextColor(getColor(R.color.black));
+
       timeLeft.setTextColor(getColor(R.color.black));
 
       DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.BLACK);
@@ -1436,11 +1450,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (themeMode == NIGHT_MODE){
       timerView.setBackgroundColor(getColor(R.color.black));
-      cycles_completed_textView.setBackgroundColor(getColor(R.color.white));
+      cycles_completed_textView.setTextColor(getColor(R.color.white));
       total_set_header.setTextColor(getColor(R.color.white));
       total_set_time.setTextColor(getColor(R.color.white));
       total_break_header.setTextColor(getColor(R.color.white));
       total_break_time.setTextColor(getColor(R.color.white));
+
+//      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.white));
+      dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.white));
+      dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.white));
+      dailySingleActivityStringHeader.setTextColor(getColor(R.color.white));
+      dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
+      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
+
+//      dailyTotalTimeTextView.setTextColor(getColor(R.color.white));
+//      dailyTotalCaloriesTextView.setTextColor(getColor(R.color.white));
+//      dailyTotalTimeForSingleActivityTextView.setTextColor(getColor(R.color.white));
+//      dailyTotalCaloriesForSingleActivityTextView.setTextColor(getColor(R.color.white));
+
       timeLeft.setTextColor(getColor(R.color.white));
 
       DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.WHITE);
@@ -5847,7 +5874,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleLayoutParamsForCyclesAndStopwatch() {
     if (mode!=4) {
-      cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(30);
+      cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(15);
       cyclesCompletedLayoutParams.topMargin = convertDensityPixelsToScalable(12);
     } else {
       cyclesCompletedLayoutParams.topMargin = 0;
