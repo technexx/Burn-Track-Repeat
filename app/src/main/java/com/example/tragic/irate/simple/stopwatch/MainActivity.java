@@ -18,6 +18,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
+import android.graphics.drawable.GradientDrawable;
 import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -1416,15 +1417,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleDayAndNightModesForMain(int themeMode) {
+    GradientDrawable fabDrawable = (GradientDrawable) fab.getBackground();
+    fabDrawable.mutate();
+    GradientDrawable stopWatchDrawable = (GradientDrawable) stopWatchLaunchButton.getBackground();
+
     if (themeMode == DAY_MODE) {
       mainView.setBackgroundColor(Color.WHITE);
       savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
       savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.BLACK);
+
+      fabDrawable.setStroke(3, Color.BLACK);
+      stopWatchDrawable.setStroke(3, Color.BLACK);
     }
     if (themeMode == NIGHT_MODE) {
       mainView.setBackgroundColor(Color.BLACK);
       savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
       savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.WHITE);
+
+      fabDrawable.setStroke(3, Color.WHITE);
+      stopWatchDrawable.setStroke(3, Color.WHITE);
     }
   }
 
