@@ -630,6 +630,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int DAY_MODE = 0;
   int NIGHT_MODE = 1;
+  int colorThemeMode = DAY_MODE;
 
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
@@ -1060,7 +1061,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setPhoneDimensions();
     groupAllAppStartInstantiations();
 
-    toggleDayAndNightModesForTimer(DAY_MODE);
+    toggleDayAndNightModesForMain(colorThemeMode);
+    toggleDayAndNightModesForTimer(colorThemeMode);
 
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSets();
@@ -1411,6 +1413,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       savedCyclesTabLayout.setVisibility(View.VISIBLE);
     });
+  }
+
+  private void toggleDayAndNightModesForMain(int themeMode) {
+    if (themeMode == DAY_MODE) {
+      mainView.setBackgroundColor(Color.WHITE);
+      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
+      savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.BLACK);
+    }
+    if (themeMode == NIGHT_MODE) {
+      mainView.setBackgroundColor(Color.BLACK);
+      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
+      savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.WHITE);
+    }
   }
 
   private void toggleDayAndNightModesForTimer(int themeMode) {
@@ -3265,7 +3280,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleCycleAndPomCycleRecyclerViewVisibilities(boolean launchingPopUp) {
-    mainView.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.black));
+    toggleDayAndNightModesForMain(colorThemeMode);
 
     if (launchingPopUp) {
       if (mode==1) {
