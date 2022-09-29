@@ -630,7 +630,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int DAY_MODE = 0;
   int NIGHT_MODE = 1;
-  int colorThemeMode = DAY_MODE;
+  int colorThemeMode = NIGHT_MODE;
 
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 

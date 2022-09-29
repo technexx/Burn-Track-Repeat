@@ -126,7 +126,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         if (mRoundTypeList.get(position) == 1 || mRoundTypeList.get(position) == 3) {
             holder.roundText.setTextColor(Color.BLACK);
         } else {
-            holder.roundText.setTextColor(Color.WHITE);
+            holder.roundText.setTextColor(dotTextColorForInfinityRounds(mThemeMode));
         }
 
         if (mScreenHeight <= 1920) {
@@ -145,22 +145,22 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
         if (mRoundTypeList.get(position) == 1) {
             dotsBorder.setColor(SET_COLOR);
-            dotsBorder.setStroke(3, dotColorStroke(mThemeMode));
+            dotsBorder.setStroke(3, dotColorStrokeForNonInfinityRounds(mThemeMode));
         }
 
         if (mRoundTypeList.get(position) == 2) {
             dotsBorder.setColor(0);
-            dotsBorder.setStroke(3, dotColorStroke(mThemeMode));
+            dotsBorder.setStroke(3, dotColorStrokeForInfinityRounds(mThemeMode));
         }
 
         if (mRoundTypeList.get(position) == 3) {
             dotsBorder.setColor(BREAK_COLOR);
-            dotsBorder.setStroke(3, dotColorStroke(mThemeMode));
+            dotsBorder.setStroke(3, dotColorStrokeForNonInfinityRounds(mThemeMode));
         }
 
         if (mRoundTypeList.get(position) == 4) {
             dotsBorder.setColor(0);
-            dotsBorder.setStroke(3, dotColorStroke(mThemeMode));
+            dotsBorder.setStroke(3, dotColorStrokeForInfinityRounds(mThemeMode));
         }
 
         if (mCyclesRoundCount - mCycleRoundsLeft == position) {
@@ -173,7 +173,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
     }
 
-    private int dotColorStroke(int theme) {
+    private int dotTextColorForInfinityRounds(int theme) {
         int colorToReturn = 0;
 
         if (theme == DAY_MODE) {
@@ -181,6 +181,32 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
         if (theme == NIGHT_MODE) {
             colorToReturn = Color.WHITE;
+        }
+
+        return colorToReturn;
+    }
+
+    private int dotColorStrokeForNonInfinityRounds(int theme) {
+        int colorToReturn = 0;
+
+        if (theme == DAY_MODE) {
+            colorToReturn = Color.BLACK;
+        }
+        if (theme == NIGHT_MODE) {
+            colorToReturn = Color.WHITE;
+        }
+
+        return colorToReturn;
+    }
+
+    private int dotColorStrokeForInfinityRounds(int theme) {
+        int colorToReturn = 0;
+
+        if (theme == DAY_MODE) {
+            colorToReturn = SET_COLOR;
+        }
+        if (theme == NIGHT_MODE) {
+            colorToReturn = SET_COLOR;
         }
 
         return colorToReturn;
