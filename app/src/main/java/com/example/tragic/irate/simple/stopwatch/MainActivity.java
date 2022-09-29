@@ -64,10 +64,12 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
@@ -1416,6 +1418,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleDayAndNightModesForTimer(boolean night) {
+    Drawable resetCyclesDrawableUnwrapped = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.reset_24);
+    Drawable resetCyclesDrawableWrapped = DrawableCompat.wrap(resetCyclesDrawableUnwrapped);
+
+    Drawable nextRoundDrawableUnwrapped = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.double_arrow_large);
+    Drawable nextRoundDrawableWrapped = DrawableCompat.wrap(nextRoundDrawableUnwrapped);
+
     if (night) {
       timerView.setBackgroundColor(getColor(R.color.black));
       cycles_completed_textView.setBackgroundColor(getColor(R.color.white));
@@ -1432,7 +1440,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_header.setTextColor(getColor(R.color.black));
       total_break_time.setTextColor(getColor(R.color.black));
       timeLeft.setTextColor(getColor(R.color.black));
+
+      DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.BLACK);
+      reset_total_cycle_times.setBackgroundColor(Color.WHITE);
+      DrawableCompat.setTint(nextRoundDrawableWrapped, Color.BLACK);
+      next_round.setBackgroundColor(Color.WHITE);
     }
+
+    reset_total_cycle_times.setImageDrawable(resetCyclesDrawableWrapped);
+    next_round.setImageDrawable(nextRoundDrawableWrapped);
   }
 
   private void stopWatchLaunchLogic() {
