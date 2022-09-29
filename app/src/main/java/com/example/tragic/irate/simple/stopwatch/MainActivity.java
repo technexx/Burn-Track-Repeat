@@ -480,7 +480,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean pomCyclesTextSizeHasChanged;
   boolean stopWatchTextSizeHasChanged;
 
-//  int receivedAlpha;
+  //  int receivedAlpha;
   float receivedDotAlpha;
   float receivedPomDotAlpha;
   View pauseResumeButton;
@@ -689,7 +689,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Remember, this does not execute if we are dismissing a popUp.
   @Override
   public void onBackPressed() {
-    if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
+    if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
       return;
     }
 
@@ -703,7 +703,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dailyStatsFragment.executeTurnOffEditModeMethod();
           mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
           sortButton.setAlpha(1.0f);
-          sortButton.setEnabled(true);        }
+          sortButton.setEnabled(true);
+        }
 
         setTypeOfOnOptionsSelectedMenu(DEFAULT_MENU);
         toggleSortMenuViewBetweenCyclesAndActivities(SORTING_CYCLES);
@@ -735,7 +736,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         launchGlobalSettingsFragment();
         break;
       case R.id.delete_all_cycles:
-        if (mode==1 && workoutCyclesArray.size()==0 || mode==3 && pomArray.size()==0) {
+        if (mode == 1 && workoutCyclesArray.size() == 0 || mode == 3 && pomArray.size() == 0) {
           showToastIfNoneActive("No cycles to delete!");
         } else {
           delete_all_text.setText(R.string.delete_all_cycles);
@@ -743,20 +744,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case R.id.delete_single_day_from_daily_stats:
-        if (dailyStatsFragment.getSelectedTab()==0) {
+        if (dailyStatsFragment.getSelectedTab() == 0) {
           delete_all_text.setText(R.string.delete_activities_from_selected_duration);
         }
-        if (dailyStatsFragment.getSelectedTab()==1) {
+        if (dailyStatsFragment.getSelectedTab() == 1) {
           delete_all_text.setText(R.string.delete_food_from_single_day);
         }
 
         deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
         break;
       case R.id.delete_all_days_from_daily_stats:
-        if (dailyStatsFragment.getSelectedTab()==0) {
+        if (dailyStatsFragment.getSelectedTab() == 0) {
           delete_all_text.setText(R.string.delete_all_activities);
         }
-        if (dailyStatsFragment.getSelectedTab()==1) {
+        if (dailyStatsFragment.getSelectedTab() == 1) {
           delete_all_text.setText(R.string.delete_all_foods);
         }
 
@@ -766,7 +767,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dailyStatsFragment.launchAboutStatsPopUpWindow();
         break;
       case R.id.about_settings:
-        aboutSettingsPopUpWindow.showAtLocation(mainView, Gravity.CENTER_VERTICAL, 0 ,0);
+        aboutSettingsPopUpWindow.showAtLocation(mainView, Gravity.CENTER_VERTICAL, 0, 0);
     }
     return super.onOptionsItemSelected(item);
   }
@@ -775,16 +776,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public boolean onPrepareOptionsMenu(Menu menu) {
     menu.clear();
 
-    if (mOnOptionsSelectedMenuType==DEFAULT_MENU) {
+    if (mOnOptionsSelectedMenuType == DEFAULT_MENU) {
       getMenuInflater().inflate(R.menu.main_options_menu, menu);
     }
-    if (mOnOptionsSelectedMenuType==STATS_MENU) {
+    if (mOnOptionsSelectedMenuType == STATS_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_options_menu, menu);
     }
-    if (mOnOptionsSelectedMenuType==FILLER_MENU) {
+    if (mOnOptionsSelectedMenuType == FILLER_MENU) {
       getMenuInflater().inflate(R.menu.daily_stats_option_menu_comparison_tab, menu);
     }
-    if (mOnOptionsSelectedMenuType==SETTINGS_MENU) {
+    if (mOnOptionsSelectedMenuType == SETTINGS_MENU) {
       getMenuInflater().inflate(R.menu.settings_menu, menu);
     }
     return super.onPrepareOptionsMenu(menu);
@@ -797,11 +798,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchGlobalSettingsFragment() {
-    if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
+    if (mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
       mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
       mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
 
-      if (rootSettingsFragment !=null) {
+      if (rootSettingsFragment != null) {
         getSupportFragmentManager().beginTransaction()
                 .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
                 .commit();
@@ -815,10 +816,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void settingsData(int settingNumber) {
     Fragment fragmentToReplace = new Fragment();
-    if (settingNumber==1) fragmentToReplace = soundSettingsFragment;
-    if (settingNumber==2) fragmentToReplace = colorSettingsFragment;
-    if (settingNumber==3) fragmentToReplace = tdeeSettingsFragment;
-    if (settingNumber==4) fragmentToReplace = disclaimerFragment;
+    if (settingNumber == 1) fragmentToReplace = soundSettingsFragment;
+    if (settingNumber == 2) fragmentToReplace = colorSettingsFragment;
+    if (settingNumber == 3) fragmentToReplace = tdeeSettingsFragment;
+    if (settingNumber == 4) fragmentToReplace = disclaimerFragment;
 
     getSupportFragmentManager().beginTransaction()
             .replace(R.id.settings_fragment_frameLayout, fragmentToReplace)
@@ -835,14 +836,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.changeColorSetting(typeOFRound, settingNumber);
     cycleRoundsAdapterTwo.changeColorSetting(typeOFRound, settingNumber);
 
-    if (receivedMode==1) {
+    if (receivedMode == 1) {
       savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
       savedCycleAdapter.notifyDataSetChanged();
 
       dotsAdapter.changeColorSetting(typeOFRound, settingNumber);
     }
 
-    if (receivedMode==3) {
+    if (receivedMode == 3) {
       savedPomCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
       savedPomCycleAdapter.notifyDataSetChanged();
 
@@ -865,10 +866,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
-    if (resumingOrResetting==RESUMING_CYCLE_FROM_ADAPTER) {
+    if (resumingOrResetting == RESUMING_CYCLE_FROM_ADAPTER) {
       resumeOrResetCycleFromAdapterList(RESUMING_CYCLE_FROM_ADAPTER);
-    }
-    else if (resumingOrResetting==RESETTING_CYCLE_FROM_ADAPTER){
+    } else if (resumingOrResetting == RESETTING_CYCLE_FROM_ADAPTER) {
       resumeOrResetCycleFromAdapterList(RESETTING_CYCLE_FROM_ADAPTER);
     }
   }
@@ -890,7 +890,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     isNewCycle = false;
     positionOfSelectedCycle = position;
 
-    if (mode==1) {
+    if (mode == 1) {
       cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
       trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(position);
     }
@@ -905,11 +905,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dotsAdapter.notifyDataSetChanged();
 
-    if (mode==1) {
+    if (mode == 1) {
       savedCycleAdapter.removeActiveCycleLayout();
       launchTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
     }
-    if (mode==3) {
+    if (mode == 3) {
       savedPomCycleAdapter.removeActiveCycleLayout();
       launchPomTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
     }
@@ -923,10 +923,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsInAndOut(FADE_IN_HIGHLIGHT_MODE);
     }
 
-    if (edit_highlighted_cycle.getAlpha()!=1 && receivedHighlightPositions.size()==1) {
+    if (edit_highlighted_cycle.getAlpha() != 1 && receivedHighlightPositions.size() == 1) {
       edit_highlighted_cycle.setEnabled(true);
       edit_highlighted_cycle.setAlpha(1.0f);
-    } else if (edit_highlighted_cycle.getAlpha()==1 && receivedHighlightPositions.size()!=1) {
+    } else if (edit_highlighted_cycle.getAlpha() == 1 && receivedHighlightPositions.size() != 1) {
       edit_highlighted_cycle.setEnabled(false);
       edit_highlighted_cycle.setAlpha(0.4f);
     }
@@ -938,13 +938,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     removeRound();
     if (consolidateRoundAdapterLists) {
       //Adapters only need adjusting if second one is populated.
-      if (workoutTime.size()>=8){
+      if (workoutTime.size() >= 8) {
         workoutStringListOfRoundValuesForFirstAdapter.clear();
         workoutIntegerListOfRoundTypeForFirstAdapter.clear();
         workoutStringListOfRoundValuesForSecondAdapter.clear();
         workoutIntegerListOfRoundTypeForSecondAdapter.clear();
-        for (int i=0; i<workoutTime.size(); i++) {
-          if (i<=7) {
+        for (int i = 0; i < workoutTime.size(); i++) {
+          if (i <= 7) {
             workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTime.get(i));
             workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
           } else {
@@ -958,7 +958,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       consolidateRoundAdapterLists = false;
     }
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
-    if (mode==3) {
+    if (mode == 3) {
       pomValuesTime.clear();
       pomStringListOfRoundValues.clear();
       cycleRoundsAdapter.notifyDataSetChanged();
@@ -1069,18 +1069,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityTimerForSetsRunnable = infinityRunnableForSets();
     infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
 
-    addTDEEfirstMainTextView.setOnClickListener(v-> {
+    addTDEEfirstMainTextView.setOnClickListener(v -> {
       View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
 
       addTdeePopUpWindow.showAsDropDown(testView);
     });
 
-    confirmActivityAdditionValues.setOnClickListener(v-> {
+    confirmActivityAdditionValues.setOnClickListener(v -> {
       addTdeePopUpWindow.dismiss();
       toggleEditPopUpViewsForAddingActivity(true);
     });
 
-    removeTdeeActivityImageView.setOnClickListener(v-> {
+    removeTdeeActivityImageView.setOnClickListener(v -> {
       toggleEditPopUpViewsForAddingActivity(false);
     });
 
@@ -1090,8 +1090,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     });
 
-    sortButton.setOnClickListener(v-> {
-      sortPopupWindow.showAtLocation(mainView, Gravity.END|Gravity.TOP, 0, 0);
+    sortButton.setOnClickListener(v -> {
+      sortPopupWindow.showAtLocation(mainView, Gravity.END | Gravity.TOP, 0, 0);
     });
 
     timerPopUpWindow.setOnDismissListener(() -> {
@@ -1113,13 +1113,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
 
-    edit_highlighted_cycle.setOnClickListener(v-> {
+    edit_highlighted_cycle.setOnClickListener(v -> {
       fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
       removeCycleHighlights();
       editHighlightedCycleLogic();
 
-      if (mode==1) cycles = cyclesList.get(positionOfSelectedCycle);
-      if (mode==3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+      if (mode == 1) cycles = cyclesList.get(positionOfSelectedCycle);
+      if (mode == 3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
 
       clearRoundAndCycleAdapterArrayLists();
 
@@ -1131,54 +1131,57 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     //Turns off our cycle highlight mode from adapter.
-    cancelHighlight.setOnClickListener(v-> {
+    cancelHighlight.setOnClickListener(v -> {
       removeCycleHighlights();
       fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
     });
 
-    delete_highlighted_cycle.setOnClickListener(v-> {
-      AsyncTask.execute(()-> {
+    delete_highlighted_cycle.setOnClickListener(v -> {
+      AsyncTask.execute(() -> {
         deleteHighlightedCycles();
       });
 
       delete_highlighted_cycle.setEnabled(false);
       fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
 
-      if (mode==1) savedCycleAdapter.removeHighlight();
-      if (mode==3) savedPomCycleAdapter.removeHighlight();
+      if (mode == 1) savedCycleAdapter.removeHighlight();
+      if (mode == 3) savedPomCycleAdapter.removeHighlight();
 
       showToastIfNoneActive("Deleted!");
     });
 
     //Selects all text when long clicking in editText.
-    cycleNameEdit.setOnLongClickListener(v-> {
+    cycleNameEdit.setOnLongClickListener(v -> {
       cycleNameEdit.selectAll();
       return true;
     });
 
-    firstRoundTypeHeaderInEditPopUp.setOnClickListener(v->{
+    firstRoundTypeHeaderInEditPopUp.setOnClickListener(v -> {
       setEditPopUpTimerHeaders(1);
     });
 
-    secondRoundTypeHeaderInEditPopUp.setOnClickListener(v-> {
+    secondRoundTypeHeaderInEditPopUp.setOnClickListener(v -> {
       setEditPopUpTimerHeaders(2);
     });
 
-    thirdRoundTypeHeaderInEditPopUp.setOnClickListener(v-> {
+    thirdRoundTypeHeaderInEditPopUp.setOnClickListener(v -> {
       setEditPopUpTimerHeaders(3);
     });
 
     View.OnClickListener numberPadListener = view -> {
       TextView textButton = (TextView) view;
 
-      if (mode==1) {
+      if (mode == 1) {
         addToEditPopUpTimerArrays(editPopUpTimerArray, textButton);
       }
 
-      if (mode==3) {
-        if (editHeaderSelected==1) addToEditPopUpTimerArrays(savedEditPopUpArrayForFirstHeaderModeThree, textButton);
-        if (editHeaderSelected==2) addToEditPopUpTimerArrays(savedEditPopUpArrayForSecondHeaderModeThree, textButton);
-        if (editHeaderSelected==3) addToEditPopUpTimerArrays(savedEditPopUpArrayForThirdHeader, textButton);
+      if (mode == 3) {
+        if (editHeaderSelected == 1)
+          addToEditPopUpTimerArrays(savedEditPopUpArrayForFirstHeaderModeThree, textButton);
+        if (editHeaderSelected == 2)
+          addToEditPopUpTimerArrays(savedEditPopUpArrayForSecondHeaderModeThree, textButton);
+        if (editHeaderSelected == 3)
+          addToEditPopUpTimerArrays(savedEditPopUpArrayForThirdHeader, textButton);
 
       }
       setEditPopUpTimerStringValues();
@@ -1195,22 +1198,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_nine.setOnClickListener(numberPadListener);
     number_zero.setOnClickListener(numberPadListener);
 
-    deleteEditPopUpTimerNumbers.setOnClickListener(v-> {
-      if (mode==1) {
-        if (editPopUpTimerArray.size()>0) {
-          editPopUpTimerArray.remove(editPopUpTimerArray.size()-1);
+    deleteEditPopUpTimerNumbers.setOnClickListener(v -> {
+      if (mode == 1) {
+        if (editPopUpTimerArray.size() > 0) {
+          editPopUpTimerArray.remove(editPopUpTimerArray.size() - 1);
         }
       }
 
-      if (mode==3) {
-        if (editHeaderSelected==1 && savedEditPopUpArrayForFirstHeaderModeThree.size()>0) {
-          savedEditPopUpArrayForFirstHeaderModeThree.remove(savedEditPopUpArrayForFirstHeaderModeThree.size()-1);
+      if (mode == 3) {
+        if (editHeaderSelected == 1 && savedEditPopUpArrayForFirstHeaderModeThree.size() > 0) {
+          savedEditPopUpArrayForFirstHeaderModeThree.remove(savedEditPopUpArrayForFirstHeaderModeThree.size() - 1);
         }
-        if (editHeaderSelected==2 && savedEditPopUpArrayForSecondHeaderModeThree.size()>0) {
-          savedEditPopUpArrayForSecondHeaderModeThree.remove(savedEditPopUpArrayForSecondHeaderModeThree.size()-1);
+        if (editHeaderSelected == 2 && savedEditPopUpArrayForSecondHeaderModeThree.size() > 0) {
+          savedEditPopUpArrayForSecondHeaderModeThree.remove(savedEditPopUpArrayForSecondHeaderModeThree.size() - 1);
         }
-        if (editHeaderSelected==3 && savedEditPopUpArrayForThirdHeader.size()>0){
-          savedEditPopUpArrayForThirdHeader.remove(savedEditPopUpArrayForThirdHeader.size()-1);
+        if (editHeaderSelected == 3 && savedEditPopUpArrayForThirdHeader.size() > 0) {
+          savedEditPopUpArrayForThirdHeader.remove(savedEditPopUpArrayForThirdHeader.size() - 1);
         }
       }
 
@@ -1226,23 +1229,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       adjustCustom(false);
     });
 
-    toggleInfinityRounds.setOnClickListener(v-> {
-      if (toggleInfinityRounds.getAlpha()==1.0f) {
+    toggleInfinityRounds.setOnClickListener(v -> {
+      if (toggleInfinityRounds.getAlpha() == 1.0f) {
         toggleInfinityRounds.setAlpha(0.3f);
-        if (editHeaderSelected==1) isSavedInfinityOptionActiveForSets = false;
-        if (editHeaderSelected==2) isSavedInfinityOptionActiveForBreaks = false;
+        if (editHeaderSelected == 1) isSavedInfinityOptionActiveForSets = false;
+        if (editHeaderSelected == 2) isSavedInfinityOptionActiveForBreaks = false;
       } else {
         toggleInfinityRounds.setAlpha(1.0f);
-        if (editHeaderSelected==1) isSavedInfinityOptionActiveForSets = true;
-        if (editHeaderSelected==2) isSavedInfinityOptionActiveForBreaks = true;
+        if (editHeaderSelected == 1) isSavedInfinityOptionActiveForSets = true;
+        if (editHeaderSelected == 2) isSavedInfinityOptionActiveForBreaks = true;
       }
     });
 
-    buttonToLaunchTimerFromEditPopUp.setOnClickListener(v-> {
-      if (mode==1) {
+    buttonToLaunchTimerFromEditPopUp.setOnClickListener(v -> {
+      if (mode == 1) {
         launchTimerCycle(CYCLES_LAUNCHED_FROM_EDIT_POPUP);
       }
-      if (mode==3) {
+      if (mode == 3) {
         launchPomTimerCycle(CYCLES_LAUNCHED_FROM_EDIT_POPUP);
       }
     });
@@ -1252,6 +1255,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onAnimationStart(Animation animation) {
       }
+
       @Override
       public void onAnimationEnd(Animation animation) {
         progressBar.startAnimation(fadeProgressIn);
@@ -1259,6 +1263,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         //Resets progressBar to max (full blue) value at same time we fade it back in (looks nicer).
         progressBar.setProgress(maxProgress);
       }
+
       @Override
       public void onAnimationRepeat(Animation animation) {
       }
@@ -1306,10 +1311,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 //      changeDayOfYear(280);
 
-      if (mode==1) {
+      if (mode == 1) {
         nextRound(true);
       }
-      if (mode==3) {
+      if (mode == 3) {
         nextPomRound(true);
       }
     });
@@ -1317,10 +1322,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setOnClickListener(v -> {
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
-      if (mode==1) {
+      if (mode == 1) {
         resetTimer();
       }
-      if (mode==3) {
+      if (mode == 3) {
         if (reset.getText().toString().equals(getString(R.string.reset))) {
           reset.setText(R.string.confirm_cycle_reset);
         } else {
@@ -1331,17 +1336,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     pauseResumeButton.setOnClickListener(v -> {
       if (!timerIsPaused) {
-        if (mode==1) {
+        if (mode == 1) {
           pauseAndResumeTimer(PAUSING_TIMER);
         }
-        if (mode==3) {
+        if (mode == 3) {
           pauseAndResumePomodoroTimer(PAUSING_TIMER);
         }
       } else {
-        if (mode==1) {
+        if (mode == 1) {
           pauseAndResumeTimer(RESUMING_TIMER);
         }
-        if (mode==3) {
+        if (mode == 3) {
           pauseAndResumePomodoroTimer(RESUMING_TIMER);
         }
       }
@@ -1352,8 +1357,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER_HORIZONTAL, 0, -100);
     });
 
-    delete_all_confirm.setOnClickListener(v-> {
-      AsyncTask.execute(()-> {
+    delete_all_confirm.setOnClickListener(v -> {
+      AsyncTask.execute(() -> {
         if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
           deleteTotalCycleTimes();
         }
@@ -1370,7 +1375,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           deleteFoodStatsForAllDays();
         }
 
-        runOnUiThread(()-> {
+        runOnUiThread(() -> {
           if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
           Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
         });
@@ -1381,19 +1386,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
     });
 
-    stopWatchLaunchButton.setOnClickListener(v-> {
+    stopWatchLaunchButton.setOnClickListener(v -> {
       stopWatchLaunchLogic();
     });
 
-    stopWatchPauseResumeButton.setOnClickListener(v-> {
+    stopWatchPauseResumeButton.setOnClickListener(v -> {
       if (!stopWatchIsPaused) {
         pauseAndResumeStopwatch(PAUSING_TIMER);
       } else {
         pauseAndResumeStopwatch(RESUMING_TIMER);
-        }
+      }
     });
 
-    stopwatchReset.setOnClickListener(v-> {
+    stopwatchReset.setOnClickListener(v -> {
       resetStopwatchTimer();
     });
 
@@ -1401,111 +1406,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       newLapLogic();
     });
 
-    stopWatchPopUpWindow.setOnDismissListener(()-> {
+    stopWatchPopUpWindow.setOnDismissListener(() -> {
       getSupportActionBar().show();
       removeCycleHighlights();
 
-      if (mode==1) {
+      if (mode == 1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
       }
-      if (mode==3) {
+      if (mode == 3) {
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
       }
 
       savedCyclesTabLayout.setVisibility(View.VISIBLE);
     });
-  }
-
-  private void toggleDayAndNightModesForMain(int themeMode) {
-    GradientDrawable fabDrawable = (GradientDrawable) fab.getBackground();
-    fabDrawable.mutate();
-    GradientDrawable stopWatchDrawable = (GradientDrawable) stopWatchLaunchButton.getBackground();
-
-    if (themeMode == DAY_MODE) {
-      mainView.setBackgroundColor(Color.WHITE);
-      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
-      savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.BLACK);
-
-      fabDrawable.setStroke(3, Color.BLACK);
-      stopWatchDrawable.setStroke(3, Color.BLACK);
-    }
-    if (themeMode == NIGHT_MODE) {
-      mainView.setBackgroundColor(Color.BLACK);
-      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
-      savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.WHITE);
-
-      fabDrawable.setStroke(3, Color.WHITE);
-      stopWatchDrawable.setStroke(3, Color.WHITE);
-    }
-  }
-
-  private void toggleDayAndNightModesForTimer(int themeMode) {
-    Drawable resetCyclesDrawableUnwrapped = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.reset_24);
-    Drawable resetCyclesDrawableWrapped = DrawableCompat.wrap(resetCyclesDrawableUnwrapped);
-
-    Drawable nextRoundDrawableUnwrapped = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.double_arrow_large);
-    Drawable nextRoundDrawableWrapped = DrawableCompat.wrap(nextRoundDrawableUnwrapped);
-
-    if (themeMode == DAY_MODE) {
-      timerView.setBackgroundColor(getColor(R.color.white));
-      cycles_completed_textView.setTextColor(getColor(R.color.black));
-      total_set_header.setTextColor(getColor(R.color.black));
-      total_set_time.setTextColor(getColor(R.color.black));
-      total_break_header.setTextColor(getColor(R.color.black));
-      total_break_time.setTextColor(getColor(R.color.black));
-
-      //      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.black));
-      dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.black));
-      dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.black));
-      dailySingleActivityStringHeader.setTextColor(getColor(R.color.black));
-      dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
-      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
-
-//      dailyTotalTimeTextView.setTextColor(getColor(R.color.black));
-//      dailyTotalCaloriesTextView.setTextColor(getColor(R.color.black));
-//      dailyTotalTimeForSingleActivityTextView.setTextColor(getColor(R.color.black));
-//      dailyTotalCaloriesForSingleActivityTextView.setTextColor(getColor(R.color.black));
-
-      timeLeft.setTextColor(getColor(R.color.black));
-
-      DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.BLACK);
-      reset_total_cycle_times.setBackgroundColor(Color.WHITE);
-      DrawableCompat.setTint(nextRoundDrawableWrapped, Color.BLACK);
-      next_round.setBackgroundColor(Color.WHITE);
-    }
-
-    if (themeMode == NIGHT_MODE){
-      timerView.setBackgroundColor(getColor(R.color.black));
-      cycles_completed_textView.setTextColor(getColor(R.color.white));
-      total_set_header.setTextColor(getColor(R.color.white));
-      total_set_time.setTextColor(getColor(R.color.white));
-      total_break_header.setTextColor(getColor(R.color.white));
-      total_break_time.setTextColor(getColor(R.color.white));
-
-//      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.white));
-      dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.white));
-      dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.white));
-      dailySingleActivityStringHeader.setTextColor(getColor(R.color.white));
-      dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
-      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
-
-//      dailyTotalTimeTextView.setTextColor(getColor(R.color.white));
-//      dailyTotalCaloriesTextView.setTextColor(getColor(R.color.white));
-//      dailyTotalTimeForSingleActivityTextView.setTextColor(getColor(R.color.white));
-//      dailyTotalCaloriesForSingleActivityTextView.setTextColor(getColor(R.color.white));
-
-      timeLeft.setTextColor(getColor(R.color.white));
-
-      DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.WHITE);
-      reset_total_cycle_times.setBackgroundColor(Color.BLACK);
-      DrawableCompat.setTint(nextRoundDrawableWrapped, Color.WHITE);
-      next_round.setBackgroundColor(Color.BLACK);
-    }
-
-    reset_total_cycle_times.setImageDrawable(resetCyclesDrawableWrapped);
-    next_round.setImageDrawable(nextRoundDrawableWrapped);
-
-    dotsAdapter.setDayOrNightMode(themeMode);
   }
 
   private void stopWatchLaunchLogic() {
@@ -1550,10 +1463,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleSortMenuViewBetweenCyclesAndActivities(int typeOfSort) {
-    if (typeOfSort==SORTING_CYCLES) {
+    if (typeOfSort == SORTING_CYCLES) {
       sortPopupWindow.setContentView(sortCyclePopupView);
     }
-    if (typeOfSort==SORTING_ACTIVITIES) {
+    if (typeOfSort == SORTING_ACTIVITIES) {
       sortPopupWindow.setContentView(sortActivitiesPopupView);
     }
   }
@@ -1621,14 +1534,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     mHandler = new Handler();
     mSavingCycleHandler = new Handler();
-    inputMethodManager =  (InputMethodManager)getSystemService(Context.INPUT_METHOD_SERVICE);
+    inputMethodManager = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
     sharedPreferences = getApplicationContext().getSharedPreferences("pref", 0);
     prefEdit = sharedPreferences.edit();
 
     cycles = new Cycles();
     pomCycles = new PomCycles();
 
-    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress",  maxProgress, 0);
+    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
     objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
     Log.i("testProg", "prog bar value on activity launch is " + objectAnimator.getAnimatedValue());
 
@@ -1647,7 +1560,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateTabSelectionListeners() {
-    savedCyclesTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener(){
+    savedCyclesTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
       @Override
       public void onTabSelected(TabLayout.Tab tab) {
         savedCyclesTab = tab;
@@ -1684,21 +1597,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCyclesTab = tab;
         tabUnselectedLogic();
 
-        if (savedCyclesTab.getPosition()==0) {
-          if (savedCycleAdapter.isCycleHighlighted()==true) {
+        if (savedCyclesTab.getPosition() == 0) {
+          if (savedCycleAdapter.isCycleHighlighted() == true) {
             removeCycleHighlights();
             savedCycleAdapter.notifyDataSetChanged();
           }
           dotsAdapter.saveModeOneAlpha();
         }
-        if (savedCyclesTab.getPosition()==1) {
-          if (savedPomCycleAdapter.isCycleHighlighted()==true) {
+        if (savedCyclesTab.getPosition() == 1) {
+          if (savedPomCycleAdapter.isCycleHighlighted() == true) {
             removeCycleHighlights();
             savedPomCycleAdapter.notifyDataSetChanged();
           }
           pomDotsAdapter.saveModeThreeAlpha();
         }
       }
+
       @Override
       public void onTabReselected(TabLayout.Tab tab) {
       }
@@ -1831,7 +1745,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_set_time = timerPopUpView.findViewById(R.id.total_set_time);
     total_break_time = timerPopUpView.findViewById(R.id.total_break_time);
 
-    dailySingleActivityStringHeader = timerPopUpView.findViewById(R.id.daily_single_activity_string_header);;
+    dailySingleActivityStringHeader = timerPopUpView.findViewById(R.id.daily_single_activity_string_header);
+    ;
     dailyTotalTimeTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_time_textView_header);
     dailyTotalTimeTextView = timerPopUpView.findViewById(R.id.daily_total_time_textView);
     dailyTotalCaloriesTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_calories_textView_header);
@@ -1856,7 +1771,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopWatchPauseResumeButton = stopWatchPopUpView.findViewById(R.id.stopwatchPauseResumeButton);
     stopWatchTimeTextView = stopWatchPopUpView.findViewById(R.id.stopWatchTimeTextView);
     stopWatchTimeTextView.setTextSize(120f);
-    new_lap =  stopWatchPopUpView.findViewById(R.id.new_lap);
+    new_lap = stopWatchPopUpView.findViewById(R.id.new_lap);
     msTimeTextView = stopWatchPopUpView.findViewById(R.id.msTimeTextView);
     empty_laps = stopWatchPopUpView.findViewById(R.id.empty_laps_text);
     empty_laps.setText(R.string.empty_laps_list);
@@ -1873,7 +1788,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignSortPopUpLayoutClassesToTheirIds() {
     sortCycleTitleAToZ = sortCyclePopupView.findViewById(R.id.sort_title_start);
-    sortCycleTitleZtoA = sortCyclePopupView.findViewById(R.id.sort_title_end);;
+    sortCycleTitleZtoA = sortCyclePopupView.findViewById(R.id.sort_title_end);
+    ;
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
     sortActivityTitleAtoZ = sortCyclePopupView.findViewById(R.id.sort_activity_ascending_from_cycles);
@@ -1886,10 +1802,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityStatsByMostCaloriesTextView = sortActivitiesPopupView.findViewById(R.id.sort_calories_expended_most);
     sortActivityStatsByLeastCaloriesTextView = sortActivitiesPopupView.findViewById(R.id.sort_calories_expended_least);
 
-    sortFoodConsumedStatsAToZTextView =sortFoodConsumedPopupView.findViewById(R.id.sort_food_name_start);
-    sortFoodConsumedStatsZToATextView =sortFoodConsumedPopupView.findViewById(R.id.sort_food_name_end);
-    sortFoodConsumedCaloriesByMostTextView =sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_most);
-    sortFoodConsumedCaloriesByLeastTextView =sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_least);
+    sortFoodConsumedStatsAToZTextView = sortFoodConsumedPopupView.findViewById(R.id.sort_food_name_start);
+    sortFoodConsumedStatsZToATextView = sortFoodConsumedPopupView.findViewById(R.id.sort_food_name_end);
+    sortFoodConsumedCaloriesByMostTextView = sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_most);
+    sortFoodConsumedCaloriesByLeastTextView = sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_least);
   }
 
   private void assignDeletePopUpLayoutClassesToTheirIds() {
@@ -1970,7 +1886,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setVerticalSpaceDecorationForCycleRecyclerViewBasedOnAspectRatio() {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()>=1.8) {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() >= 1.8) {
       verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
               -10);
     } else {
@@ -1989,8 +1905,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void instantiateDotsRecyclerAndAdapter() {
     roundListForDots = new ArrayList<>();
-    for (int i=0; i<16; i++) {
-      roundListForDots.add(String.valueOf(i+1));
+    for (int i = 0; i < 16; i++) {
+      roundListForDots.add(String.valueOf(i + 1));
     }
 
     ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
@@ -2043,13 +1959,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Weight on layout that contains recyclerView is not the same as weight on view itself.
   private void adjustDotRecyclerViewSize(int numberOfRows) {
     if (phoneHeight <= 1920) {
-      if (numberOfRows<=8) {
+      if (numberOfRows <= 8) {
         dotsRecyclerLayoutParams.height = dpConv(80);
       } else {
         dotsRecyclerLayoutParams.height = dpConv(140);
       }
     } else {
-      if (numberOfRows<=8) {
+      if (numberOfRows <= 8) {
         dotsRecyclerLayoutParams.height = dpConv(95);
       } else {
         dotsRecyclerLayoutParams.height = dpConv(160);
@@ -2078,7 +1994,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fadeOutForEditCycleButton.setDuration(750);
     fadeOutForEditCycleButton.setFillAfter(true);
 
-    slideLeft =  AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
+    slideLeft = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
     slideLeft.setDuration(400);
 
     slideInFromLeftLong = AnimationUtils.loadAnimation(getApplicationContext(), R.anim.slide_in_from_left);
@@ -2098,11 +2014,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onAnimationStart(Animation animation) {
         isAnimationActive = true;
       }
+
       @Override
       public void onAnimationEnd(Animation animation) {
         mainActivityFragmentFrameLayout.setVisibility(View.INVISIBLE);
         isAnimationActive = false;
       }
+
       @Override
       public void onAnimationRepeat(Animation animation) {
       }
@@ -2112,10 +2030,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onAnimationStart(Animation animation) {
       }
+
       @Override
       public void onAnimationEnd(Animation animation) {
         edit_highlighted_cycle.clearAnimation();
       }
+
       @Override
       public void onAnimationRepeat(Animation animation) {
       }
@@ -2282,7 +2202,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalSaveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
-        if (mode==1) {
+        if (mode == 1) {
           if (!trackActivityWithinCycle) {
             cycles.setTotalSetTime(totalCycleSetTimeInMillis);
             cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
@@ -2290,7 +2210,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cyclesDatabase.cyclesDao().updateCycles(cycles);
           }
         }
-        if (mode==3) {
+        if (mode == 3) {
           pomCycles.setTotalWorkTime(totalCycleWorkTimeInMillis);
           pomCycles.setTotalRestTime(totalCycleRestTimeInMillis);
           pomCycles.setCyclesCompleted(cyclesCompleted);
@@ -2314,7 +2234,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     };
-  };
+  }
+
+  ;
 
   private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
     globalSaveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
@@ -2361,8 +2283,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private boolean isDailyActivityTimeMaxed() {
-    long dividedDailyTotal = totalSetTimeForCurrentDayInMillis/1000/60;
-    long dividedDailyCap = dailyStatsAccess.getTwentyFourHoursInMillis()/1000/60;
+    long dividedDailyTotal = totalSetTimeForCurrentDayInMillis / 1000 / 60;
+    long dividedDailyCap = dailyStatsAccess.getTwentyFourHoursInMillis() / 1000 / 60;
 
     return dividedDailyTotal >= dividedDailyCap;
   }
@@ -2415,18 +2337,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (textButton.getText().toString().equals("Activity Title: A - Z")) sortHolder = 5;
       if (textButton.getText().toString().equals("Activity Title: Z - A")) sortHolder = 6;
 
-      if (mode==1) sortMode = sortHolder; else if (mode==3) sortModePom = sortHolder;
+      if (mode == 1) sortMode = sortHolder;
+      else if (mode == 3) sortModePom = sortHolder;
 
       unHighlightSortTextViews();
       highlightSortTextView();
 
-      AsyncTask.execute(()-> {
+      AsyncTask.execute(() -> {
         queryAndSortAllCyclesFromDatabase(true);
 
-        runOnUiThread(()->{
+        runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-          if (mode==1) savedCycleAdapter.notifyDataSetChanged();
-          if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();
+          if (mode == 1) savedCycleAdapter.notifyDataSetChanged();
+          if (mode == 3) savedPomCycleAdapter.notifyDataSetChanged();
         });
       });
 
@@ -2442,17 +2365,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int colorToHighlight = getResources().getColor(R.color.test_highlight);
     switch (sortHolder) {
       case 1:
-        sortCycleTitleAToZ.setBackgroundColor(colorToHighlight); break;
+        sortCycleTitleAToZ.setBackgroundColor(colorToHighlight);
+        break;
       case 2:
-        sortCycleTitleZtoA.setBackgroundColor(colorToHighlight); break;
+        sortCycleTitleZtoA.setBackgroundColor(colorToHighlight);
+        break;
       case 3:
-        sortHigh.setBackgroundColor(colorToHighlight); break;
+        sortHigh.setBackgroundColor(colorToHighlight);
+        break;
       case 4:
-        sortLow.setBackgroundColor(colorToHighlight); break;
+        sortLow.setBackgroundColor(colorToHighlight);
+        break;
       case 5:
-        sortActivityTitleAtoZ.setBackgroundColor(colorToHighlight); break;
+        sortActivityTitleAtoZ.setBackgroundColor(colorToHighlight);
+        break;
       case 6:
-        sortActivityTitleZToA.setBackgroundColor(colorToHighlight); break;
+        sortActivityTitleZToA.setBackgroundColor(colorToHighlight);
+        break;
     }
   }
 
@@ -2467,28 +2396,48 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void queryAndSortAllCyclesFromDatabase(boolean useSortMode) {
-    if (mode==1) {
+    if (mode == 1) {
       if (useSortMode) {
         switch (sortMode) {
-          case 1: cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ(); break;
-          case 2: cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA(); break;
-          case 3: cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems(); break;
-          case 4: cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems(); break;
-          case 5: cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ(); break;
-          case 6: cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA(); break;
+          case 1:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ();
+            break;
+          case 2:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA();
+            break;
+          case 3:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
+            break;
+          case 4:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
+            break;
+          case 5:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ();
+            break;
+          case 6:
+            cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA();
+            break;
         }
       } else {
         cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
       }
     }
 
-    if (mode==3) {
+    if (mode == 3) {
       if (useSortMode) {
         switch (sortModePom) {
-          case 1: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent(); break;
-          case 2: pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent(); break;
-          case 3: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart(); break;
-          case 4: pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd(); break;
+          case 1:
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
+            break;
+          case 2:
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
+            break;
+          case 3:
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart();
+            break;
+          case 4:
+            pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd();
+            break;
         }
       } else {
         pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
@@ -2527,10 +2476,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         highlightSelectedSortTextViewForStats(sortActivityStatsByLeastCaloriesTextView);
       }
 
-      AsyncTask.execute(()-> {
+      AsyncTask.execute(() -> {
         dailyStatsFragment.setActivitySortMode(sortModeForActivities);
         dailyStatsFragment.sortActivityStatsAsACallFromMainActivity();
-        runOnUiThread(()-> {
+        runOnUiThread(() -> {
           sortPopupWindow.dismiss();
         });
       });
@@ -2560,10 +2509,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         highlightSelectedSortTextViewForStats(sortFoodConsumedCaloriesByLeastTextView);
       }
 
-      AsyncTask.execute(()-> {
+      AsyncTask.execute(() -> {
         dailyStatsFragment.setFoodConsumedSortMode(sortModeForFoodConsumed);
         dailyStatsFragment.sortFoodConsumedStatsAsACallFromMainActivity();
-        runOnUiThread(()-> {
+        runOnUiThread(() -> {
           sortPopupWindow.dismiss();
         });
       });
@@ -2615,7 +2564,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void editHighlightedCycleLogic() {
-    if (receivedHighlightPositions.size()==0) {
+    if (receivedHighlightPositions.size() == 0) {
       return;
     }
 
@@ -2638,8 +2587,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTdeeSpinnersToDefaultValues();
     addTDEEfirstMainTextView.setText(tdeeString);
 
-    if (mode==1) cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
-    if (mode==3) cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
+    if (mode == 1) cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
+    if (mode == 3) cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
 
     cycleNameEdit.setText(cycleTitle);
   }
@@ -2647,46 +2596,46 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void populateRoundAdapterArraysForHighlightedCycle() {
     switch (mode) {
       case 1:
-        for (int i=0; i<workoutTime.size(); i++) {
-          convertedWorkoutTime.add(convertSeconds(workoutTime.get(i)/1000));
-          if (i<=7) {
-            workoutStringListOfRoundValuesForFirstAdapter.add(convertSeconds(workoutTime.get(i)/1000));
+        for (int i = 0; i < workoutTime.size(); i++) {
+          convertedWorkoutTime.add(convertSeconds(workoutTime.get(i) / 1000));
+          if (i <= 7) {
+            workoutStringListOfRoundValuesForFirstAdapter.add(convertSeconds(workoutTime.get(i) / 1000));
             workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
           }
-          if (i>=8) {
-            workoutStringListOfRoundValuesForSecondAdapter.add(convertSeconds(workoutTime.get(i)/1000));
+          if (i >= 8) {
+            workoutStringListOfRoundValuesForSecondAdapter.add(convertSeconds(workoutTime.get(i) / 1000));
             workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(i));
           }
         }
-        roundSelectedPosition = workoutTime.size()-1;
+        roundSelectedPosition = workoutTime.size() - 1;
         break;
       case 3:
         cycleRoundsAdapter.disablePomFade();
 
         pomStringListOfRoundValues.clear();
-        for (int i=0; i<pomValuesTime.size(); i++) {
-          pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(i)/1000));
+        for (int i = 0; i < pomValuesTime.size(); i++) {
+          pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(i) / 1000));
         }
         break;
     }
   }
 
   private void deleteHighlightedCycles() {
-    if ((mode==1 && cyclesList.size()==0 || (mode==3 && pomCyclesList.size()==0))) {
+    if ((mode == 1 && cyclesList.size() == 0 || (mode == 3 && pomCyclesList.size() == 0))) {
       runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
       return;
     }
 
     int cycleID = 0;
-    if (mode==1) {
-      for (int i=0; i<receivedHighlightPositions.size(); i++) {
+    if (mode == 1) {
+      for (int i = 0; i < receivedHighlightPositions.size(); i++) {
         cycleID = cyclesList.get(receivedHighlightPositions.get(i)).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
         cyclesDatabase.cyclesDao().deleteCycle(cycles);
       }
     }
-    if (mode==3) {
-      for (int i=0; i<receivedHighlightPositions.size(); i++) {
+    if (mode == 3) {
+      for (int i = 0; i < receivedHighlightPositions.size(); i++) {
         cycleID = pomCyclesList.get(receivedHighlightPositions.get(i)).getId();
         pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
         cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
@@ -2697,50 +2646,53 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     queryAndSortAllCyclesFromDatabase(false);
 
-    runOnUiThread(()->{
+    runOnUiThread(() -> {
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-      if (mode==1) savedCycleAdapter.notifyDataSetChanged();
-      if (mode==3) savedPomCycleAdapter.notifyDataSetChanged();;
+      if (mode == 1) savedCycleAdapter.notifyDataSetChanged();
+      if (mode == 3) savedPomCycleAdapter.notifyDataSetChanged();
+      ;
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
     });
   }
 
   private void deleteAllCycles() {
-    if (mode==1) {
-      if (cyclesList.size()>0) {
+    if (mode == 1) {
+      if (cyclesList.size() > 0) {
         cyclesDatabase.cyclesDao().deleteAllCycles();
         queryAndSortAllCyclesFromDatabase(false);
 
-        runOnUiThread(()->{
+        runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
           savedCycleAdapter.notifyDataSetChanged();
         });
       }
     }
-    if (mode==3) {
-      if (pomCyclesList.size()>0) {
+    if (mode == 3) {
+      if (pomCyclesList.size() > 0) {
         cyclesDatabase.cyclesDao().deleteAllPomCycles();
         queryAndSortAllCyclesFromDatabase(false);
 
-        runOnUiThread(()->{
+        runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
           savedPomCycleAdapter.notifyDataSetChanged();
         });
       }
     }
-  };
+  }
+
+  ;
 
   private void deleteTotalCycleTimes() {
-    if (mode==1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
-    if (mode==3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
+    if (mode == 1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
+    if (mode == 3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
 
-    runOnUiThread(()->{
+    runOnUiThread(() -> {
       deleteCyclePopupWindow.dismiss();
-      if (mode==1) {
+      if (mode == 1) {
         totalCycleSetTimeInMillis = 0;
         totalCycleBreakTimeInMillis = 0;
       }
-      if (mode==3) {
+      if (mode == 3) {
         totalCycleWorkTimeInMillis = 0;
         totalCycleRestTimeInMillis = 0;
       }
@@ -2773,11 +2725,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
     String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "magenta_setting");
 
-    vibrationSettingForSets  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
+    vibrationSettingForSets = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
     isLastRoundSoundContinuous = changeSettingsValues.assignFinalRoundSwitchValue(defaultSoundSettingForLastRound);
 
-    vibrationSettingForWork  = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
+    vibrationSettingForWork = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
     vibrationSettingForMiniBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreak);
     isFullBreakSoundContinuous = changeSettingsValues.assignFinalRoundSwitchValue(defaultSoundSettingForFullBreak);
 
@@ -2824,7 +2776,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchDailyStatsFragment() {
-    if (mainActivityFragmentFrameLayout.getVisibility()==View.INVISIBLE) {
+    if (mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
       mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
     }
 
@@ -2844,7 +2796,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleSortMenuViewBetweenCyclesAndActivities(SORTING_ACTIVITIES);
 
     mHandler.postDelayed(() -> {
-      AsyncTask.execute(()-> {
+      AsyncTask.execute(() -> {
         dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
       });
     }, 100);
@@ -2853,13 +2805,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void setTypeOfOnOptionsSelectedMenu(int menuType) {
     mOnOptionsSelectedMenuType = menuType;
   }
+
   private void deleteActivityStatsForSelectedDays() {
     List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
 
     List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
     List<Long> longListOfStatsForEachIdsToDelete = new ArrayList<>();
 
-    for (int i=0; i<statsForEachActivityList.size(); i++) {
+    for (int i = 0; i < statsForEachActivityList.size(); i++) {
       longListOfStatsForEachIdsToDelete.add(statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
     }
 
@@ -2874,7 +2827,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     List<Long> longListOfFoodIdsToDelete = new ArrayList<>();
 
-    for (int i=0; i<caloriesForEachFoodList.size(); i++) {
+    for (int i = 0; i < caloriesForEachFoodList.size(); i++) {
       longListOfFoodIdsToDelete.add(caloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood());
     }
 
@@ -2897,21 +2850,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private boolean areAllDaysEmptyOfActivities(List<StatsForEachActivity> statsForEachActivityList) {
     List<String> listOfActivities = new ArrayList<>();
 
-    for (int i=0; i<statsForEachActivityList.size(); i++) {
+    for (int i = 0; i < statsForEachActivityList.size(); i++) {
       listOfActivities.add(statsForEachActivityList.get(i).getActivity());
     }
 
-    return listOfActivities.size()==0;
+    return listOfActivities.size() == 0;
   }
 
   private boolean areAllDaysEmptyOfFoods(List<CaloriesForEachFood> caloriesForEachFoodList) {
     List<String> listOfFoods = new ArrayList<>();
 
-    for (int i=0; i<caloriesForEachFoodList.size(); i++) {
+    for (int i = 0; i < caloriesForEachFoodList.size(); i++) {
       listOfFoods.add(caloriesForEachFoodList.get(i).getTypeOfFood());
     }
 
-    return listOfFoods.size()==0;
+    return listOfFoods.size() == 0;
   }
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
@@ -2954,28 +2907,37 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int color = changeSettingsValues.assignColor(settingsNumber);
     switch (typeOfRound) {
       case 1:
-        setColor = color; break;
+        setColor = color;
+        break;
       case 2:
-        breakColor = color; break;
+        breakColor = color;
+        break;
       case 3:
-        workColor = color; break;
+        workColor = color;
+        break;
       case 4:
-        miniBreakColor = color; break;
+        miniBreakColor = color;
+        break;
       case 5:
-        fullBreakColor = color; break;
+        fullBreakColor = color;
+        break;
     }
   }
 
   private void assignSoundSettingValues(int typeOfRound, int settingNumber) {
     switch (typeOfRound) {
       case 1:
-        vibrationSettingForSets = settingNumber; break;
+        vibrationSettingForSets = settingNumber;
+        break;
       case 2:
-        vibrationSettingForBreaks = settingNumber; break;
+        vibrationSettingForBreaks = settingNumber;
+        break;
       case 4:
-        vibrationSettingForWork = settingNumber; break;
+        vibrationSettingForWork = settingNumber;
+        break;
       case 5:
-        vibrationSettingForMiniBreaks = settingNumber; break;
+        vibrationSettingForMiniBreaks = settingNumber;
+        break;
     }
   }
 
@@ -2984,10 +2946,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = false;
     reset.setVisibility(View.INVISIBLE);
 
-    if (mode==1) {
+    if (mode == 1) {
       savedCycleAdapter.notifyDataSetChanged();
       pauseAndResumeTimer(PAUSING_TIMER);
-    } else if (mode==3){
+    } else if (mode == 3) {
       pauseAndResumePomodoroTimer(PAUSING_TIMER);
       savedPomCycleAdapter.notifyDataSetChanged();
     }
@@ -3010,11 +2972,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignOldCycleValuesToCheckForChanges() {
     oldCycleTitleString = cycleTitle;
-    if (mode==1) {
+    if (mode == 1) {
       oldCycleRoundListOne = new ArrayList<>(workoutStringListOfRoundValuesForFirstAdapter);
       oldCycleRoundListTwo = new ArrayList<>(workoutStringListOfRoundValuesForSecondAdapter);
     }
-    if (mode==3) {
+    if (mode == 3) {
       oldPomRoundList = new ArrayList<>(pomArray);
     }
   }
@@ -3025,7 +2987,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       editHeaderSelected = 1;
 
-      if (mode==1) {
+      if (mode == 1) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(setColor);
 
         Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_green);
@@ -3036,7 +2998,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         editPopUpTimerArray = savedEditPopUpArrayForFirstHeaderModeOne;
       }
-      if (mode==3) {
+      if (mode == 3) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
 
         pomTimerValueInEditPopUpTextViewOne.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.blue));
@@ -3050,7 +3012,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       thirdRoundTypeHeaderInEditPopUp.setTextColor(Color.GRAY);
       editHeaderSelected = 2;
 
-      if (mode==1) {
+      if (mode == 1) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(breakColor);
 
         Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_green);
@@ -3060,7 +3022,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         editPopUpTimerArray = savedEditPopUpArrayForSecondHeaderModeOne;
       }
-      if (mode==3) {
+      if (mode == 3) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(miniBreakColor);
 
         pomTimerValueInEditPopUpTextViewTwo.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.blue));
@@ -3081,7 +3043,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       editHeaderSelected = 3;
     }
 
-    if (mode==1) {
+    if (mode == 1) {
       String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
       timerValueInEditPopUpTextView.setText(savedTimerString);
 
@@ -3093,7 +3055,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleInfinityModeAndSetRoundType() {
-    if (editHeaderSelected==1) {
+    if (editHeaderSelected == 1) {
       if (isSavedInfinityOptionActiveForSets) {
         toggleInfinityRounds.setAlpha(1.0f);
         roundType = 2;
@@ -3103,7 +3065,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       setAndCapTimerValues(setValue);
     }
-    if (editHeaderSelected==2) {
+    if (editHeaderSelected == 2) {
       if (isSavedInfinityOptionActiveForBreaks) {
         toggleInfinityRounds.setAlpha(1.0f);
         roundType = 4;
@@ -3123,7 +3085,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
   private void changeEditTimerTextViewColorIfNotEmpty() {
-    if (editPopUpTimerArray.size()>0) {
+    if (editPopUpTimerArray.size() > 0) {
       timerValueInEditPopUpTextView.setTextColor(ContextCompat.getColor(getApplicationContext(), R.color.blue));
     } else {
       timerValueInEditPopUpTextView.setTextColor(Color.WHITE);
@@ -3131,15 +3093,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void saveEditHeaderTimerStringValues() {
-    if (mode==1) {
-      if (editHeaderSelected == 1) savedEditPopUpArrayForFirstHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
-      if (editHeaderSelected == 2) savedEditPopUpArrayForSecondHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
+    if (mode == 1) {
+      if (editHeaderSelected == 1)
+        savedEditPopUpArrayForFirstHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
+      if (editHeaderSelected == 2)
+        savedEditPopUpArrayForSecondHeaderModeOne = new ArrayList<>(editPopUpTimerArray);
     }
   }
 
   private void addToEditPopUpTimerArrays(ArrayList<String> arrayList, TextView textView) {
-    if (arrayList.size()<=3) {
-      for (int i=0; i<10; i++)  {
+    if (arrayList.size() <= 3) {
+      for (int i = 0; i < 10; i++) {
         if (textView.getText().equals(String.valueOf(i))) {
           arrayList.add(String.valueOf(i));
         }
@@ -3149,7 +3113,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setEditPopUpTimerStringValues() {
     String editPopUpTimerString = "";
-    if (mode==1) {
+    if (mode == 1) {
       editPopUpTimerString = convertedTimerArrayToString(editPopUpTimerArray);
       saveEditHeaderTimerStringValues();
       timerValueInEditPopUpTextView.setText(editPopUpTimerString);
@@ -3158,7 +3122,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setAndCapTimerValues(totalTime);
     }
 
-    if (mode==3) {
+    if (mode == 3) {
       int totalTimeOne = 0;
       int totalTimeTwo = 0;
       int totalTimeThree = 0;
@@ -3166,7 +3130,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String editPopUptimerTextViewStringTwo = "";
       String editPopUpTimerStringThree = "";
 
-      editPopUptimerTextViewStringOne =  convertedTimerArrayToString(savedEditPopUpArrayForFirstHeaderModeThree);
+      editPopUptimerTextViewStringOne = convertedTimerArrayToString(savedEditPopUpArrayForFirstHeaderModeThree);
       totalTimeOne = convertStringToSecondsValue(editPopUptimerTextViewStringOne);
       pomTimerValueInEditPopUpTextViewOne.setText(editPopUptimerTextViewStringOne);
 
@@ -3187,7 +3151,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void convertEditPopUpTimerArrayToStringValues(int chosenMode) {
-    if (chosenMode==1) {
+    if (chosenMode == 1) {
 
     }
   }
@@ -3198,14 +3162,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     String editPopUpTimerString;
     switch (arrayToConvert.size()) {
-      default: case 0: case 1:
-        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0); break;
+      default:
+      case 0:
+      case 1:
+        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(0);
+        break;
       case 2:
-        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(0) + timeLeft.get(1); break;
+        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(3) + timeLeft.get(2) + timeLeft.get(0) + timeLeft.get(1);
+        break;
       case 3:
-        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(0) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(3); break;
+        editPopUpTimerString = timeLeft.get(4) + timeLeft.get(0) + timeLeft.get(2) + timeLeft.get(1) + timeLeft.get(3);
+        break;
       case 4:
-        editPopUpTimerString = timeLeft.get(0) + timeLeft.get(1) + timeLeft.get(2) + timeLeft.get(3) + timeLeft.get(4); break;
+        editPopUpTimerString = timeLeft.get(0) + timeLeft.get(1) + timeLeft.get(2) + timeLeft.get(3) + timeLeft.get(4);
+        break;
     }
     return editPopUpTimerString;
   }
@@ -3218,12 +3188,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeft.add("0");
     timeLeft.add("0");
 
-    for (int i=0; i<arrayToPopulate.size(); i++) {
+    for (int i = 0; i < arrayToPopulate.size(); i++) {
       //Third index of timeLeft list is colon, so we never want to replace it.
-      if (i<2) {
+      if (i < 2) {
         timeLeft.set(i, arrayToPopulate.get(i));
       } else {
-        timeLeft.set(i+1, arrayToPopulate.get(i));
+        timeLeft.set(i + 1, arrayToPopulate.get(i));
       }
     }
     return timeLeft;
@@ -3232,17 +3202,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public int convertStringToSecondsValue(String timerString) {
     int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
     int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
-    if (totalSeconds>60) {
-      totalSeconds = totalSeconds%60;
-      totalMinutes +=1;
+    if (totalSeconds > 60) {
+      totalSeconds = totalSeconds % 60;
+      totalMinutes += 1;
     }
-    int totalTime = (totalMinutes*60) + totalSeconds;
+    int totalTime = (totalMinutes * 60) + totalSeconds;
     return totalTime;
   }
 
   public ArrayList<String> convertIntegerToStringArray(int timerInteger) {
-    String minutes = String.valueOf(timerInteger/60);
-    String seconds = String.valueOf(timerInteger%60);
+    String minutes = String.valueOf(timerInteger / 60);
+    String seconds = String.valueOf(timerInteger % 60);
 
     String indexOne = "0";
     String indexTwo = "0";
@@ -3251,17 +3221,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     int indexPlaces = 0;
 
-    if (minutes.length()<=1) {
+    if (minutes.length() <= 1) {
       indexTwo = minutes;
     } else {
       indexOne = minutes.substring(0, 1);
       indexTwo = minutes.substring(1, 2);
     }
 
-    if (seconds.length()<=1) {
+    if (seconds.length() <= 1) {
       indexFour = seconds;
     } else {
-      indexThree = seconds.substring(0 ,1);
+      indexThree = seconds.substring(0, 1);
       indexFour = seconds.substring(1, 2);
     }
 
@@ -3271,14 +3241,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editPopUpTimerArrayCapped.add(indexThree);
     editPopUpTimerArrayCapped.add(indexFour);
 
-    if (timerInteger>0) indexPlaces++;
-    if (timerInteger>9) indexPlaces++;
-    if (timerInteger>59) indexPlaces++;
-    if (timerInteger>599) indexPlaces++;
+    if (timerInteger > 0) indexPlaces++;
+    if (timerInteger > 9) indexPlaces++;
+    if (timerInteger > 59) indexPlaces++;
+    if (timerInteger > 599) indexPlaces++;
 
     ArrayList<String> newList = new ArrayList<>();
-    for (int i=0; i<indexPlaces; i++) {
-      newList.add(editPopUpTimerArrayCapped.get(i+(4-indexPlaces)));
+    for (int i = 0; i < indexPlaces; i++) {
+      newList.add(editPopUpTimerArrayCapped.get(i + (4 - indexPlaces)));
     }
 
     return newList;
@@ -3286,8 +3256,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setEditPopUpArrayWithCappedValues(ArrayList<String> arrayToSet, int numberOfIndices) {
     arrayToSet.clear();
-    for (int i=0; i<numberOfIndices; i++) {
-      arrayToSet.add(editPopUpTimerArrayCapped.get(i+(4-numberOfIndices)));
+    for (int i = 0; i < numberOfIndices; i++) {
+      arrayToSet.add(editPopUpTimerArrayCapped.get(i + (4 - numberOfIndices)));
     }
   }
 
@@ -3295,61 +3265,61 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleDayAndNightModesForMain(colorThemeMode);
 
     if (launchingPopUp) {
-      if (mode==1) {
+      if (mode == 1) {
         savedCycleRecycler.setVisibility(View.GONE);
       }
-      if (mode==3) {
+      if (mode == 3) {
         savedPomCycleRecycler.setVisibility(View.GONE);
       }
       emptyCycleList.setVisibility(View.GONE);
     } else {
-      if (mode==1) {
+      if (mode == 1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
       }
-      if (mode==3) {
+      if (mode == 3) {
         savedPomCycleRecycler.setVisibility(View.VISIBLE);
       }
     }
   }
 
-  private void resumeOrResetCycleFromAdapterList(int resumeOrReset){
-    if (resumeOrReset==RESUMING_CYCLE_FROM_ADAPTER) {
+  private void resumeOrResetCycleFromAdapterList(int resumeOrReset) {
+    if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
       timerIsPaused = true;
       progressBar.setProgress(currentProgressBarValue);
       timeLeft.setText(retrieveTimerValueString());
 
       toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
-      AsyncTask.execute(()-> {
+      AsyncTask.execute(() -> {
         if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
           insertActivityIntoDatabaseAndAssignItsValueToObjects();
           dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
         }
 
-       runOnUiThread(()->{
-         if (mode==1) {
-           changeTextSizeWithoutAnimator(workoutTime.get(0));
+        runOnUiThread(() -> {
+          if (mode == 1) {
+            changeTextSizeWithoutAnimator(workoutTime.get(0));
 
-           if (trackActivityWithinCycle) {
-             setAllActivityTimesAndCaloriesToTextViews();
-           } else {
-             setCyclesCompletedTextView();
-           }
-         }
-         if (mode==3) {
-           changeTextSizeWithoutAnimator(pomValuesTime.get(0));
-           setCyclesCompletedTextView();
-           toggleViewsForTotalDailyAndCycleTimes(false);
-         }
-         timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-       });
+            if (trackActivityWithinCycle) {
+              setAllActivityTimesAndCaloriesToTextViews();
+            } else {
+              setCyclesCompletedTextView();
+            }
+          }
+          if (mode == 3) {
+            changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+            setCyclesCompletedTextView();
+            toggleViewsForTotalDailyAndCycleTimes(false);
+          }
+          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+        });
       });
-    } else if (resumeOrReset==RESETTING_CYCLE_FROM_ADAPTER) {
-      if (mode==1) {
+    } else if (resumeOrReset == RESETTING_CYCLE_FROM_ADAPTER) {
+      if (mode == 1) {
         savedCycleAdapter.removeActiveCycleLayout();
         savedCycleAdapter.notifyDataSetChanged();
       }
-      if (mode==3) {
+      if (mode == 3) {
         savedPomCycleAdapter.removeActiveCycleLayout();
         savedPomCycleAdapter.notifyDataSetChanged();
       }
@@ -3358,11 +3328,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
 
-
   private String retrieveTimerValueString() {
     long millis;
-    if (mode==1) {
-      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==2) {
+    if (mode == 1) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
         millis = setMillis;
       } else {
         millis = breakMillis;
@@ -3390,6 +3359,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     public MyIntentService() {
       super("MyIntentService");
     }
+
     @Override
     protected void onHandleIntent(Intent intent) {
       Bundle extras = intent.getExtras();
@@ -3461,7 +3431,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (timerPopUpWindow.isShowing() || stopWatchPopUpWindow.isShowing()) {
 
         if (timerPopUpWindow.isShowing()) {
-          if (mode==1) {
+          if (mode == 1) {
             if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
               headerOne = setNotificationHeader("Workout", "Set", timerIsPaused);
               bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
@@ -3471,14 +3441,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
           }
 
-          if (mode==3) {
-            int numberOfRoundsLeft = 8-pomDotCounter;
+          if (mode == 3) {
+            int numberOfRoundsLeft = 8 - pomDotCounter;
             switch (pomDotCounter) {
-              case 0: case 2: case 4: case 6:
+              case 0:
+              case 2:
+              case 4:
+              case 6:
                 headerOne = setNotificationHeader("Pomodoro", "Work", timerIsPaused);
                 bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
                 break;
-              case 1: case 3: case 5: case 7:
+              case 1:
+              case 3:
+              case 5:
+              case 7:
                 headerOne = setNotificationHeader("Pomodoro", "Break", timerIsPaused);
                 bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
                 break;
@@ -3514,8 +3490,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private String setNotificationBody(int roundsLeft, int startRounds, long timeLeft) {
     String currentTimerRound = "";
 
-    if (roundsLeft!=0) {
-      currentTimerRound = String.valueOf(startRounds-roundsLeft + 1);
+    if (roundsLeft != 0) {
+      currentTimerRound = String.valueOf(startRounds - roundsLeft + 1);
     } else {
       currentTimerRound = String.valueOf(startRounds);
     }
@@ -3527,11 +3503,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeRemaining = "00:00";
     } else {
       long roundedTimeLeft = roundToNearestFullThousandth(timeLeft);
-      timeRemaining = convertTimerValuesToStringForNotifications(roundedTimeLeft/1000);
+      timeRemaining = convertTimerValuesToStringForNotifications(roundedTimeLeft / 1000);
 
       Log.i("testNote", "timeleft is " + timeLeft);
       Log.i("testNote", "rounded timeLeft is " + roundToNearestFullThousandth(timeLeft));
-      Log.i("testNote", "display string is " + convertTimerValuesToStringForNotifications(roundedTimeLeft/1000));
+      Log.i("testNote", "display string is " + convertTimerValuesToStringForNotifications(roundedTimeLeft / 1000));
     }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
@@ -3540,24 +3516,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private String getUpOrDownArrowForNotifications() {
     String stringToReturn = "";
 
-    if (mode==1) {
-      if (typeOfRound.get(currentRound)==1 || typeOfRound.get(currentRound)==3) {
+    if (mode == 1) {
+      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
         stringToReturn = getString(R.string.arrow_down);
       } else {
         stringToReturn = getString(R.string.arrow_up);
       }
-    };
+    }
+    ;
 
     return stringToReturn;
   }
 
   private void activateResumeOrResetOptionForCycle() {
-    if (mode==1) {
+    if (mode == 1) {
       if (activeCycle) {
-        if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size()-1;
+        if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size() - 1;
         savedCycleAdapter.setActiveCycleLayout();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
-        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds-numberOfRoundsLeft);
+        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeft);
 
         savedCycleAdapter.notifyDataSetChanged();
       }
@@ -3572,9 +3549,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       prefEdit.putBoolean("modeOneTimerDisabled", timerDisabled);
     }
 
-    if (mode==3) {
+    if (mode == 3) {
       if (activeCycle) {
-        if (isNewCycle) positionOfSelectedCycle = pomArray.size()-1;
+        if (isNewCycle) positionOfSelectedCycle = pomArray.size() - 1;
         savedPomCycleAdapter.setActiveCycleLayout();
         savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(pomDotCounter);
@@ -3598,33 +3575,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void replaceCycleListWithEmptyTextViewIfNoCyclesExist() {
-    if (mode==1) if (workoutCyclesArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
-    if (mode==3) if (pomArray.size()!=0) emptyCycleList.setVisibility(View.GONE); else emptyCycleList.setVisibility(View.VISIBLE);
+    if (mode == 1) if (workoutCyclesArray.size() != 0) emptyCycleList.setVisibility(View.GONE);
+    else emptyCycleList.setVisibility(View.VISIBLE);
+    if (mode == 3) if (pomArray.size() != 0) emptyCycleList.setVisibility(View.GONE);
+    else emptyCycleList.setVisibility(View.VISIBLE);
   }
 
   private void removeCycleHighlights() {
-    if (mode==1) {
+    if (mode == 1) {
       savedCycleAdapter.removeHighlight();
       savedCycleAdapter.notifyDataSetChanged();
     }
-    if (mode==3) {
+    if (mode == 3) {
       savedPomCycleAdapter.removeHighlight();
       savedPomCycleAdapter.notifyDataSetChanged();
     }
   }
 
   private void fadeEditCycleButtonsInAndOut(int typeOfFade) {
-    if (typeOfFade!=FADE_IN_EDIT_CYCLE) {
+    if (typeOfFade != FADE_IN_EDIT_CYCLE) {
       delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
     }
-    if (typeOfFade==FADE_OUT_EDIT_CYCLE) {
+    if (typeOfFade == FADE_OUT_EDIT_CYCLE) {
       delete_highlighted_cycle.setEnabled(false);
       sortButton.setEnabled(true);
       edit_highlighted_cycle.setEnabled(false);
       cancelHighlight.setEnabled(false);
     }
-    if (typeOfFade==FADE_IN_HIGHLIGHT_MODE) {
+    if (typeOfFade == FADE_IN_HIGHLIGHT_MODE) {
       appHeader.startAnimation(fadeOutForCustomActionBar);
       sortButton.startAnimation(fadeOutForCustomActionBar);
       delete_highlighted_cycle.startAnimation(fadeInForCustomActionBar);
@@ -3637,7 +3616,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       delete_highlighted_cycle.setEnabled(true);
       cancelHighlight.setEnabled(true);
     }
-    if (typeOfFade==FADE_OUT_HIGHLIGHT_MODE || typeOfFade == FADE_IN_EDIT_CYCLE) {
+    if (typeOfFade == FADE_OUT_HIGHLIGHT_MODE || typeOfFade == FADE_IN_EDIT_CYCLE) {
       appHeader.startAnimation(fadeInForCustomActionBar);
       sortButton.startAnimation(fadeInForCustomActionBar);
       delete_highlighted_cycle.startAnimation(fadeOutForCustomActionBar);
@@ -3669,7 +3648,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void clearRoundAndCycleAdapterArrayLists() {
-    if (mode==1) {
+    if (mode == 1) {
       convertedWorkoutTime.clear();
       workoutStringListOfRoundValuesForFirstAdapter.clear();
       workoutStringListOfRoundValuesForSecondAdapter.clear();
@@ -3680,7 +3659,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       typeOfRound.clear();
     }
 
-    if (mode==3) {
+    if (mode == 3) {
       pomValuesTime.clear();
       pomStringListOfRoundValues.clear();
     }
@@ -3692,8 +3671,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setAndCapTimerValues(int value) {
     switch (mode) {
       case 1:
-        if (editHeaderSelected==1) setValue = timerValueBoundsFormula(5, 5400, value);
-        if (editHeaderSelected==2) breakValue = timerValueBoundsFormula(5, 5400, value);
+        if (editHeaderSelected == 1) setValue = timerValueBoundsFormula(5, 5400, value);
+        if (editHeaderSelected == 2) breakValue = timerValueBoundsFormula(5, 5400, value);
         break;
       case 3:
         pomValue1 = timerValueBoundsFormula(600, 3600, value);
@@ -3704,9 +3683,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setAndCapPomValuesForEditTimer(int value, int variableToCap) {
-    if (variableToCap==1) pomValue1 = timerValueBoundsFormula(600, 3600, value);
-    if (variableToCap==2) pomValue2 = timerValueBoundsFormula(180, 600, value);
-    if (variableToCap==3) pomValue3 = timerValueBoundsFormula(900, 3600, value);
+    if (variableToCap == 1) pomValue1 = timerValueBoundsFormula(600, 3600, value);
+    if (variableToCap == 2) pomValue2 = timerValueBoundsFormula(180, 600, value);
+    if (variableToCap == 3) pomValue3 = timerValueBoundsFormula(900, 3600, value);
   }
 
   public int timerValueBoundsFormula(int min, int max, int value) {
@@ -3740,7 +3719,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (totalSeconds >= 60) {
       String formattedSeconds = df.format(remainingSeconds);
       if (formattedSeconds.length() > 2) formattedSeconds = "0" + formattedSeconds;
-      if (totalSeconds>=600) {
+      if (totalSeconds >= 600) {
         return (minutes + ":" + formattedSeconds);
       } else {
         return ("0" + minutes + ":" + formattedSeconds);
@@ -3776,7 +3755,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void adjustCustom(boolean adding) {
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
     if (adding) {
-      if (mode==1) {
+      if (mode == 1) {
         toggleInfinityModeAndSetRoundType();
 
         switch (roundType) {
@@ -3800,22 +3779,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             return;
         }
       }
-      if (mode==3) {
+      if (mode == 3) {
         savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomValue1);
         savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
         savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
 
         setEditPopUpTimerStringValues();
 
-        if (pomValuesTime.size()==0) {
+        if (pomValuesTime.size() == 0) {
           for (int i = 0; i < 3; i++) {
             pomValuesTime.add(pomValue1 * 1000);
             pomValuesTime.add(pomValue2 * 1000);
           }
           pomValuesTime.add(pomValue1 * 1000);
           pomValuesTime.add(pomValue3 * 1000);
-          for (int j=0; j<pomValuesTime.size(); j++) {
-            pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(j)/1000));
+          for (int j = 0; j < pomValuesTime.size(); j++) {
+            pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(j) / 1000));
           }
 
           cycleRoundsAdapter.setPomFade(true);
@@ -3825,23 +3804,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     } else {
-      if (mode==1) {
+      if (mode == 1) {
         if (subtractedRoundIsFading) {
           removeRound();
         }
-        if (workoutTime.size()>0) {
-          if (roundSelectedPosition<=7) {
+        if (workoutTime.size() > 0) {
+          if (roundSelectedPosition <= 7) {
             cycleRoundsAdapter.setFadeOutPosition(roundSelectedPosition);
             cycleRoundsAdapter.notifyDataSetChanged();
           } else {
-            cycleRoundsAdapterTwo.setFadeOutPosition(roundSelectedPosition-8);
+            cycleRoundsAdapterTwo.setFadeOutPosition(roundSelectedPosition - 8);
             cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
           subtractedRoundIsFading = true;
         } else {
           showToastIfNoneActive("No rounds to clear!");
         }
-      } else if (mode==3) {
+      } else if (mode == 3) {
         if (pomValuesTime.size() != 0) {
           cycleRoundsAdapter.setPomFade(false);
           cycleRoundsAdapter.notifyDataSetChanged();
@@ -3854,23 +3833,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void addOrReplaceRounds(int integerValue, boolean replacingValue) {
-    if (mode==1) {
+    if (mode == 1) {
       if (!replacingValue) {
-        if (workoutTime.size()<16) {
+        if (workoutTime.size() < 16) {
           workoutTime.add(integerValue * 1000);
           convertedWorkoutTime.add(convertSeconds(integerValue));
           typeOfRound.add(roundType);
-          roundSelectedPosition = workoutTime.size()-1;
+          roundSelectedPosition = workoutTime.size() - 1;
 
-          if (workoutTime.size()<=8) {
-            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-            workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(typeOfRound.size()-1));
+          if (workoutTime.size() <= 8) {
+            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTime.get(convertedWorkoutTime.size() - 1));
+            workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(typeOfRound.size() - 1));
             cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
             cycleRoundsAdapter.notifyDataSetChanged();
           } else {
-            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTime.get(convertedWorkoutTime.size()-1));
-            workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(typeOfRound.size()-1));
-            cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
+            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTime.get(convertedWorkoutTime.size() - 1));
+            workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(typeOfRound.size() - 1));
+            cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition - 8);
             cycleRoundsAdapterTwo.notifyDataSetChanged();
           }
         } else {
@@ -3878,10 +3857,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
       } else {
-        workoutTime.set(roundSelectedPosition, integerValue*1000);
+        workoutTime.set(roundSelectedPosition, integerValue * 1000);
         convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
         typeOfRound.set(roundSelectedPosition, roundType);
-        if (roundSelectedPosition<=7) {
+        if (roundSelectedPosition <= 7) {
           workoutStringListOfRoundValuesForFirstAdapter.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
           workoutIntegerListOfRoundTypeForFirstAdapter.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
 
@@ -3889,11 +3868,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
-          workoutStringListOfRoundValuesForSecondAdapter.set(roundSelectedPosition-8, convertedWorkoutTime.get(roundSelectedPosition));
-          workoutIntegerListOfRoundTypeForSecondAdapter.set(roundSelectedPosition-8, typeOfRound.get(roundSelectedPosition));
+          workoutStringListOfRoundValuesForSecondAdapter.set(roundSelectedPosition - 8, convertedWorkoutTime.get(roundSelectedPosition));
+          workoutIntegerListOfRoundTypeForSecondAdapter.set(roundSelectedPosition - 8, typeOfRound.get(roundSelectedPosition));
 
           cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
-          cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition-8);
+          cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition - 8);
           cycleRoundsAdapterTwo.notifyDataSetChanged();
         }
         roundIsSelected = false;
@@ -3902,20 +3881,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void removeRound() {
-    if (mode==1) {
-      if (workoutTime.size()>0) {
-        if (workoutTime.size()-1>=roundSelectedPosition) {
-          if (workoutTime.size()<=8 || (roundIsSelected && roundSelectedPosition<=7)) {
-            if (workoutStringListOfRoundValuesForFirstAdapter.size()-1>=roundSelectedPosition) {
+    if (mode == 1) {
+      if (workoutTime.size() > 0) {
+        if (workoutTime.size() - 1 >= roundSelectedPosition) {
+          if (workoutTime.size() <= 8 || (roundIsSelected && roundSelectedPosition <= 7)) {
+            if (workoutStringListOfRoundValuesForFirstAdapter.size() - 1 >= roundSelectedPosition) {
               workoutStringListOfRoundValuesForFirstAdapter.remove(roundSelectedPosition);
               workoutIntegerListOfRoundTypeForFirstAdapter.remove(roundSelectedPosition);
               cycleRoundsAdapter.setFadeOutPosition(-1);
               cycleRoundsAdapter.notifyDataSetChanged();
             }
           } else {
-            if (workoutStringListOfRoundValuesForSecondAdapter.size()-1>=roundSelectedPosition-8) {
-              workoutStringListOfRoundValuesForSecondAdapter.remove(roundSelectedPosition-8);
-              workoutIntegerListOfRoundTypeForSecondAdapter.remove(roundSelectedPosition-8);
+            if (workoutStringListOfRoundValuesForSecondAdapter.size() - 1 >= roundSelectedPosition - 8) {
+              workoutStringListOfRoundValuesForSecondAdapter.remove(roundSelectedPosition - 8);
+              workoutIntegerListOfRoundTypeForSecondAdapter.remove(roundSelectedPosition - 8);
               cycleRoundsAdapterTwo.setFadeInPosition(-1);
               cycleRoundsAdapterTwo.notifyDataSetChanged();
             }
@@ -3930,7 +3909,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           subtractedRoundIsFading = false;
         }
         if (roundIsSelected) {
-          if (roundSelectedPosition<=7) {
+          if (roundSelectedPosition <= 7) {
             cycleRoundsAdapter.isRoundCurrentlySelected(false);
             cycleRoundsAdapter.notifyDataSetChanged();
           } else {
@@ -3940,7 +3919,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           consolidateRoundAdapterLists = true;
           roundIsSelected = false;
         }
-        roundSelectedPosition = workoutTime.size()-1;
+        roundSelectedPosition = workoutTime.size() - 1;
       } else {
         showToastIfNoneActive("Empty!");
       }
@@ -3948,8 +3927,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setRoundRecyclerViewsWhenChangingAdapterCount(ArrayList<Integer> adapterList) {
-    if (mode==1) {
-      if (adapterList.size()<=8) {
+    if (mode == 1) {
+      if (adapterList.size() <= 8) {
         roundRecyclerTwo.setVisibility(View.GONE);
         roundListDivider.setVisibility(View.GONE);
 
@@ -3988,7 +3967,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
-    if (mode==1 || forAllModes) {
+    if (mode == 1 || forAllModes) {
       workoutCyclesArray.clear();
       typeOfRoundArray.clear();
       workoutTitleArray.clear();
@@ -3996,7 +3975,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       tdeeActivityExistsInCycleList.clear();
       tdeeIsBeingTrackedInCycleList.clear();
 
-      for (int i=0; i<cyclesList.size(); i++) {
+      for (int i = 0; i < cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
 
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
@@ -4007,11 +3986,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       }
     }
-    if (mode==3 || forAllModes) {
+    if (mode == 3 || forAllModes) {
       pomArray.clear();
       pomTitleArray.clear();
 
-      for (int i=0; i<pomCyclesList.size(); i++) {
+      for (int i = 0; i < pomCyclesList.size(); i++) {
         pomArray.add(pomCyclesList.get(i).getFullCycle());
         pomTitleArray.add(pomCyclesList.get(i).getTitle());
       }
@@ -4023,14 +4002,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         workoutTime.clear();
         typeOfRound.clear();
-        if (workoutCyclesArray.size()-1>=positionOfSelectedCycle) {
+        if (workoutCyclesArray.size() - 1 >= positionOfSelectedCycle) {
           String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
           String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
 
-          for (int i=0; i<fetchedRounds.length; i++) {
+          for (int i = 0; i < fetchedRounds.length; i++) {
             workoutTime.add(Integer.parseInt(fetchedRounds[i]));
           }
-          for (int j=0; j<fetchedRoundType.length; j++) {
+          for (int j = 0; j < fetchedRoundType.length; j++) {
             typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           }
 
@@ -4049,15 +4028,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValuesTime.clear();
         pomStringListOfRoundValues.clear();
 
-        if (pomArray.size()-1>=positionOfSelectedCycle) {
+        if (pomArray.size() - 1 >= positionOfSelectedCycle) {
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
 
           /////---------Testing pom round iterations---------------/////////
 //          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
-          for (int i=0; i<fetchedPomCycle.length; i++) {
+          for (int i = 0; i < fetchedPomCycle.length; i++) {
             int integerValue = Integer.parseInt(fetchedPomCycle[i]);
             pomValuesTime.add(integerValue);
-            pomStringListOfRoundValues.add(convertSeconds(integerValue/1000));
+            pomStringListOfRoundValues.add(convertSeconds(integerValue / 1000));
           }
 
           pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
@@ -4071,7 +4050,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchPomTimerCycle(int typeOfLaunch) {
-    if (pomValuesTime.size()==0) {
+    if (pomValuesTime.size() == 0) {
       showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
@@ -4089,7 +4068,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    AsyncTask.execute(()-> {
+    AsyncTask.execute(() -> {
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromDatabase(false);
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
@@ -4097,7 +4076,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!isNewCycle) {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       } else {
-        positionOfSelectedCycle = pomArray.size()-1;
+        positionOfSelectedCycle = pomArray.size() - 1;
       }
 
       setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
@@ -4115,7 +4094,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchTimerCycle(int typeOfLaunch) {
-    if (workoutTime.size()==0) {
+    if (workoutTime.size() == 0) {
       showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
@@ -4128,7 +4107,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.notifyDataSetChanged();
     }
 
-    AsyncTask.execute(()-> {
+    AsyncTask.execute(() -> {
       if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
         if (cycleNameEdit.getText().toString().isEmpty()) {
           cycleTitle = getCurrentDateAsFullTextString();
@@ -4159,7 +4138,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (isNewCycle) {
-        positionOfSelectedCycle = workoutCyclesArray.size()-1;
+        positionOfSelectedCycle = workoutCyclesArray.size() - 1;
       }
 
       if (!trackActivityWithinCycle) {
@@ -4200,11 +4179,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = true;
     cycle_title_textView.setText(cycleTitle);
 
-    if (mode==1) {
+    if (mode == 1) {
       changeTextSizeWithoutAnimator(workoutTime.get(0));
       savedCycleRecycler.startAnimation(slideOutFromLeftLong);
     }
-    if (mode==3) {
+    if (mode == 3) {
       changeTextSizeWithoutAnimator(pomValuesTime.get(0));
       savedPomCycleRecycler.startAnimation(slideOutFromLeftLong);
     }
@@ -4269,8 +4248,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(int position) {
-    if (mode==1) cycles = cyclesList.get(position);
-    if (mode==3) pomCycles = pomCyclesList.get(position);
+    if (mode == 1) cycles = cyclesList.get(position);
+    if (mode == 3) pomCycles = pomCyclesList.get(position);
   }
 
   //Getting toggle stat from adapter on timer launch and saving that. Retrieve w/ everything else coming back.
@@ -4281,10 +4260,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String pomString = "";
 
     int cycleID;
-    if (mode==1) {
+    if (mode == 1) {
       if (isNewCycle) {
         cycles = new Cycles();
-      } else if (cyclesList.size()>0) {
+      } else if (cyclesList.size() > 0) {
         cycleID = cyclesList.get(positionOfSelectedCycle).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
@@ -4322,17 +4301,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTitle(cycleTitle);
 
         if (isNewCycle) {
-          cycles.setTimeAdded(System.currentTimeMillis());;
+          cycles.setTimeAdded(System.currentTimeMillis());
+          ;
           cyclesDatabase.cyclesDao().insertCycle(cycles);
         } else {
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
       }
     }
-    if (mode==3) {
+    if (mode == 3) {
       if (isNewCycle) {
         pomCycles = new PomCycles();
-      } else if (pomCyclesList.size()>0) {
+      } else if (pomCyclesList.size() > 0) {
         cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
         pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
       }
@@ -4354,7 +4334,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    runOnUiThread(()-> {
+    runOnUiThread(() -> {
       cycle_title_textView.setText(cycleTitle);
     });
   }
@@ -4371,7 +4351,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private double calculateCaloriesBurnedPerMillis() {
-    return calculateCaloriesBurnedPerSecond()/1000;
+    return calculateCaloriesBurnedPerSecond() / 1000;
   }
 
   private double calculateCaloriesBurnedForElapsedTime(long elapsedTimeInSeconds) {
@@ -4472,12 +4452,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private long roundDownMillisValues(long millisToRound) {
-    return millisToRound -= (millisToRound%1000);
+    return millisToRound -= (millisToRound % 1000);
   }
 
   private long roundUpMillisValues(long millisToRound) {
-    long remainder = millisToRound%1000;
-    return millisToRound += (1000-remainder);
+    long remainder = millisToRound % 1000;
+    return millisToRound += (1000 - remainder);
   }
 
   private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
@@ -4489,16 +4469,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private long dividedMillisForTimerDisplay(long millis) {
-    return (millis+999)/1000;
+    return (millis + 999) / 1000;
   }
 
   private long dividedMillisForTotalTimesDisplay(long millis) {
-    return (millis) /1000;
+    return (millis) / 1000;
   }
 
   private long roundToNearestFullThousandth(long valueToRound) {
     long remainder = valueToRound % 1000;
-    if (remainder<=500) {
+    if (remainder <= 500) {
       return valueToRound -= remainder;
     } else {
       return valueToRound += (1000 - remainder);
@@ -4559,7 +4539,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalCycleTimeValuesToTextView() {
-    if (mode==1) {
+    if (mode == 1) {
       long roundedSetTime = roundToNearestFullThousandth(totalCycleSetTimeInMillis);
       long roundedBreakTime = roundToNearestFullThousandth(totalCycleBreakTimeInMillis);
 
@@ -4570,7 +4550,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedSetTime)));
       total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedBreakTime)));
     }
-    if (mode==3) {
+    if (mode == 3) {
       long roundedWorkTime = roundToNearestFullThousandth(totalCycleWorkTimeInMillis);
       long roundedRestTime = roundToNearestFullThousandth(totalCycleRestTimeInMillis);
 
@@ -4589,12 +4569,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    if (mode==3) {
+    if (mode == 3) {
       switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
+        case 0:
+        case 2:
+        case 4:
+        case 6:
           CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
           break;
-        case 1: case 3: case 5: case 7:
+        case 1:
+        case 3:
+        case 5:
+        case 7:
           CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
           break;
       }
@@ -4621,11 +4607,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         stopWatchTotalTime = timerIteration.getNewTotal();
 
-        stopWatchSeconds = (int) (stopWatchTotalTime)/1000;
-        stopWatchMinutes = (int) stopWatchSeconds/60;
-        stopWatchMs = (stopWatchTotalTime%1000) / 10;
+        stopWatchSeconds = (int) (stopWatchTotalTime) / 1000;
+        stopWatchMinutes = (int) stopWatchSeconds / 60;
+        stopWatchMs = (stopWatchTotalTime % 1000) / 10;
 
-        displayTime = convertSeconds( (long) stopWatchSeconds);
+        displayTime = convertSeconds((long) stopWatchSeconds);
         displayMs = df2.format(stopWatchMs);
 
         stopWatchTimeTextView.setText(displayTime);
@@ -4647,18 +4633,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void newLapLogic() {
-    if (lapAdapter.getItemCount()>98) {
+    if (lapAdapter.getItemCount() > 98) {
       return;
     }
 
-    if (empty_laps.getVisibility()==View.VISIBLE) {
+    if (empty_laps.getVisibility() == View.VISIBLE) {
       empty_laps.setVisibility(View.INVISIBLE);
     }
 
     savedEntries = longToStringConverters.convertMillisStopWatchString(stopWatchTotalTime);
 
-    if (savedLapList.size()>0) {
-      String retrievedLap = savedLapList.get(savedLapList.size()-1);
+    if (savedLapList.size() > 0) {
+      String retrievedLap = savedLapList.get(savedLapList.size() - 1);
       String[] splitLap = retrievedLap.split(":");
       int pulledMinute = Integer.parseInt(splitLap[0]) / 60;
       int convertedMinute = pulledMinute * 60 * 1000;
@@ -4667,7 +4653,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       int totalMs = convertedMinute + convertedSecond + convertedMs;
 
-      int totalNewTime = ( (int) stopWatchTotalTime - totalMs);
+      int totalNewTime = ((int) stopWatchTotalTime - totalMs);
 
       newEntries = longToStringConverters.convertMillisStopWatchString(totalNewTime);
     } else {
@@ -4850,7 +4836,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         setMillis = timerIteration.getNewTotal();
 
-        timeLeft.setText(convertSeconds(setMillis/1000));
+        timeLeft.setText(convertSeconds(setMillis / 1000));
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
@@ -4887,7 +4873,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         breakMillis = timerIteration.getNewTotal();
 
-        timeLeft.setText(convertSeconds(breakMillis/1000));
+        timeLeft.setText(convertSeconds(breakMillis / 1000));
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
@@ -4907,8 +4893,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private ArrayList<String> convertMillisIntegerListToTimerStringList(ArrayList<Integer> listToConvert) {
     ArrayList<String> listToReturn = new ArrayList<>();
 
-    for (int i=0; i<listToConvert.size(); i++) {
-      listToReturn.add(convertSeconds(listToConvert.get(i)/1000));
+    for (int i = 0; i < listToConvert.size(); i++) {
+      listToReturn.add(convertSeconds(listToConvert.get(i) / 1000));
     }
 
     return listToReturn;
@@ -4992,7 +4978,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void increaseTextSizeForTimers(long startMillis, long iteratingMillis) {
-    if (startMillis<60000) {
+    if (startMillis < 60000) {
       return;
     }
 
@@ -5023,20 +5009,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private boolean getHasTextSizeChangedForTimers() {
-    if (mode==1) {
+    if (mode == 1) {
       return cyclesTextSizeHasChanged;
     }
-    if (mode==3) {
+    if (mode == 3) {
       return pomCyclesTextSizeHasChanged;
     }
     return false;
   }
 
   private void setHasTextSizeChangedForTimers(boolean hasChanged) {
-    if (mode==1) {
+    if (mode == 1) {
       cyclesTextSizeHasChanged = hasChanged;
     }
-    if (mode==3) {
+    if (mode == 3) {
       pomCyclesTextSizeHasChanged = hasChanged;
     }
   }
@@ -5057,14 +5043,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       valueAnimatorUp.cancel();
     }
 
-    if (millis>=60000) {
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+    if (millis >= 60000) {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
         timeLeft.setTextSize(70f);
       } else {
         timeLeft.setTextSize(90f);
       }
     } else {
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
         timeLeft.setTextSize(90f);
       } else {
         timeLeft.setTextSize(120f);
@@ -5077,7 +5063,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       valueAnimatorDown.cancel();
     }
 
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
       stopWatchTimeTextView.setTextSize(90f);
     } else {
       stopWatchTimeTextView.setTextSize(120f);
@@ -5096,7 +5082,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void changeValueAnimatorNumbers() {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
       valueAnimatorDown.setFloatValues(90f, 70f);
       valueAnimatorUp.setFloatValues(70f, 90f);
     } else {
@@ -5106,7 +5092,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void changeTextSizeWithoutAnimator(long millis) {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
 
       if (millis < 60000) {
         timeLeft.setTextSize(90f);
@@ -5123,7 +5109,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextRound(boolean endingEarly) {
-    if (numberOfRoundsLeft==0) {
+    if (numberOfRoundsLeft == 0) {
       mHandler.removeCallbacks(endFadeForModeOne);
       resetTimer();
       return;
@@ -5155,7 +5141,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     boolean isAlertRepeating = false;
 
-    if (numberOfRoundsLeft==1 && isLastRoundSoundContinuous) {
+    if (numberOfRoundsLeft == 1 && isLastRoundSoundContinuous) {
       isAlertRepeating = true;
     }
 
@@ -5179,7 +5165,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
     numberOfRoundsLeft--;
-    if (currentRound < typeOfRound.size()-1) {
+    if (currentRound < typeOfRound.size() - 1) {
       currentRound++;
     }
 
@@ -5187,7 +5173,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextPomRound(boolean endingEarly) {
-    if (pomDotCounter==8) {
+    if (pomDotCounter == 8) {
       mHandler.removeCallbacks(endFadeForModeThree);
       resetTimer();
       return;
@@ -5216,12 +5202,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     switch (pomDotCounter) {
-      case 0: case 2: case 4: case 6:
+      case 0:
+      case 2:
+      case 4:
+      case 6:
         setEndOfRoundSounds(vibrationSettingForWork, false);
 
         roundPomWorkTimeUpOrDown(endingEarly);
         break;
-      case 1: case 3: case 5:
+      case 1:
+      case 3:
+      case 5:
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
 
         roundPomRestTimeUpOrDown(endingEarly);
@@ -5252,6 +5243,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     currentProgressBarValue = 10000;
     next_round.setEnabled(false);
 
+    enableOrDisableCycleResetButton(false);
+
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
   }
 
@@ -5267,7 +5260,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breakMillis = 0;
         timerIsPaused = false;
 
-        if (numberOfRoundsLeft>0) {
+        if (numberOfRoundsLeft > 0) {
           switch (typeOfRound.get(currentRound)) {
             case 1:
               setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
@@ -5313,7 +5306,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         next_round.setEnabled(true);
       }
     };
-  };
+  }
+
+  ;
 
   private Runnable postRoundRunnableForThirdMode() {
     return new Runnable() {
@@ -5325,7 +5320,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomDotsAdapter.setModeThreeAlpha();
         dotsAdapter.notifyDataSetChanged();
 
-        if (pomDotCounter<=7) {
+        if (pomDotCounter <= 7) {
           pomMillis = pomValuesTime.get(pomDotCounter);
           timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
           if (!objectAnimatorPom.isStarted()) {
@@ -5420,8 +5415,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void timerResumeLogic() {
     activeCycle = true;
     timerIsPaused = false;
-    enableOrDisableCycleResetButton(false);
     reset.setVisibility(View.INVISIBLE);
+    enableOrDisableCycleResetButton(false);
   }
 
   private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
@@ -5485,8 +5480,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void pomTimerResumeLogic() {
     activeCycle = true;
     timerIsPaused = false;
-    enableOrDisableCycleResetButton(false);
     reset.setVisibility(View.INVISIBLE);
+    enableOrDisableCycleResetButton(false);
   }
 
   private void postPomCycleTimeRunnable() {
@@ -5513,7 +5508,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void pauseAndResumeStopwatch (int pausing) {
+  private void pauseAndResumeStopwatch(int pausing) {
     if (!stopWatchTimerEnded) {
       if (pausing == PAUSING_TIMER) {
         stopWatchIsPaused = true;
@@ -5580,7 +5575,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
-          if (currentProgressBarValue==maxProgress) {
+          if (currentProgressBarValue == maxProgress) {
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(setMillis);
           } else {
@@ -5590,7 +5585,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
-          if (currentProgressBarValue==maxProgress) {
+          if (currentProgressBarValue == maxProgress) {
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(breakMillis);
           } else {
@@ -5602,7 +5597,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 3:
-        if (currentProgressBarValue==maxProgress){
+        if (currentProgressBarValue == maxProgress) {
           timerIsPaused = false;
           pomMillis = pomValuesTime.get(pomDotCounter);
           instantiateAndStartObjectAnimator(pomMillis);
@@ -5615,13 +5610,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateAndStartObjectAnimator(long duration) {
-    if (mode==1) {
-      objectAnimator = ObjectAnimator.ofInt(progressBar, "progress",maxProgress, 0);
+    if (mode == 1) {
+      objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
       objectAnimator.setInterpolator(new LinearInterpolator());
       objectAnimator.setDuration(duration);
       objectAnimator.start();
     }
-    if (mode==3) {
+    if (mode == 3) {
       objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
       objectAnimatorPom.setInterpolator(new LinearInterpolator());
       objectAnimatorPom.setDuration(duration);
@@ -5727,7 +5722,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         roundRecyclerTwo.setVisibility(View.GONE);
         roundListDivider.setVisibility(View.GONE);
 
-        addTDEEfirstMainTextView.setVisibility(View.INVISIBLE);;
+        addTDEEfirstMainTextView.setVisibility(View.INVISIBLE);
+        ;
         total_set_header.setText(R.string.total_work);
 
 //        savedCycleRecycler.setVisibility(View.GONE);
@@ -5737,7 +5733,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void getTimerVariablesForEachMode() {
-    if (mode==1) {
+    if (mode == 1) {
       currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 10000);
       timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
       positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
@@ -5746,7 +5742,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerDisabled = sharedPreferences.getBoolean("modeOneTimerDisabled", false);
     }
 
-    if (mode==3) {
+    if (mode == 3) {
       currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 10000);
       timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
       positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
@@ -5764,7 +5760,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     vibrator.cancel();
     if (timer != null) timer.cancel();
-    if (endAnimationForTimer!=null) endAnimationForTimer.cancel();
+    if (endAnimationForTimer != null) endAnimationForTimer.cancel();
 
     if (mediaPlayer.isPlaying()) {
       mediaPlayer.stop();
@@ -5792,8 +5788,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
-    if (mode==1) {
-      if (workoutTime.size()>0) {
+    if (mode == 1) {
+      if (workoutTime.size() > 0) {
         switch (typeOfRound.get(0)) {
           case 1:
             setMillis = workoutTime.get(0);
@@ -5815,10 +5811,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timeLeft.setText("0");
             setInitialTextSizeForTimers(0);
             break;
-        };
+        }
+        ;
 
-        for (int i=0; i<workoutTime.size(); i++) {
-          if (typeOfRound.get(i)==2 || typeOfRound.get(i)==4) {
+        for (int i = 0; i < workoutTime.size(); i++) {
+          if (typeOfRound.get(i) == 2 || typeOfRound.get(i) == 4) {
             workoutTime.set(i, 0);
           }
         }
@@ -5847,14 +5844,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           objectAnimator.cancel();
         }
 
-        if (savedCycleAdapter.isCycleActive()==true) {
+        if (savedCycleAdapter.isCycleActive() == true) {
           savedCycleAdapter.removeActiveCycleLayout();
           savedCycleAdapter.notifyDataSetChanged();
         }
       }
     }
 
-    if (mode==3) {
+    if (mode == 3) {
       pomDotCounter = 0;
       if (pomValuesTime.size() > 0) {
         pomMillis = pomValuesTime.get(0);
@@ -5875,7 +5872,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         objectAnimatorPom.cancel();
       }
 
-      if (savedPomCycleAdapter.isCycleActive()==true) {
+      if (savedPomCycleAdapter.isCycleActive() == true) {
         savedPomCycleAdapter.removeActiveCycleLayout();
         savedPomCycleAdapter.notifyDataSetChanged();
       }
@@ -5900,7 +5897,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   private void toggleLayoutParamsForCyclesAndStopwatch() {
-    if (mode!=4) {
+    if (mode != 4) {
       cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(15);
       cyclesCompletedLayoutParams.topMargin = convertDensityPixelsToScalable(12);
     } else {
@@ -5910,7 +5907,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleEditPopUpViewsForAddingActivity(boolean activityExists) {
-    if (mode==1) {
+    if (mode == 1) {
       if (activityExists) {
         String activity = (String) tdee_sub_category_spinner.getSelectedItem();
         addTDEEfirstMainTextView.setText(activity);
@@ -6071,7 +6068,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
   }
 
-  private void showToastIfNoneActive (String message){
+  private void showToastIfNoneActive(String message) {
     if (mToast != null) {
       mToast.cancel();
     }
@@ -6079,47 +6076,89 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mToast.show();
   }
 
-  private void logCycleHighlights() {
-    Log.i("testHighlight", "highlisted list is " + receivedHighlightPositions);
-  }
+  private void toggleDayAndNightModesForMain(int themeMode) {
+    GradientDrawable fabDrawable = (GradientDrawable) fab.getBackground();
+    fabDrawable.mutate();
+    GradientDrawable stopWatchDrawable = (GradientDrawable) stopWatchLaunchButton.getBackground();
 
-  private void logCycleHighlightsRoundValues() {
-    for (int i=0; i<receivedHighlightPositions.size(); i++) {
-      Log.i("testHighlight", "workout rounds for highlighted cycles are " + workoutCyclesArray.get(receivedHighlightPositions.get(i)));
+    if (themeMode == DAY_MODE) {
+      mainView.setBackgroundColor(Color.WHITE);
+      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
+      savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.BLACK);
+
+      fabDrawable.setStroke(3, Color.BLACK);
+      stopWatchDrawable.setStroke(3, Color.BLACK);
+    }
+    if (themeMode == NIGHT_MODE) {
+      mainView.setBackgroundColor(Color.BLACK);
+      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
+      savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.WHITE);
+
+      fabDrawable.setStroke(3, Color.WHITE);
+      stopWatchDrawable.setStroke(3, Color.WHITE);
     }
   }
 
-  private void logCyclesActivitiesFromDatabase() {
-    AsyncTask.execute(()-> {
-      for (int i=0; i<cyclesList.size(); i++) {
-        Log.i("testCycleDb", "Activity String is " + cyclesList.get(i).getActivityString());
-      }
-    });
+  private void toggleDayAndNightModesForTimer(int themeMode) {
+    Drawable resetCyclesDrawableUnwrapped = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.reset_24);
+    Drawable resetCyclesDrawableWrapped = DrawableCompat.wrap(resetCyclesDrawableUnwrapped);
+
+    Drawable nextRoundDrawableUnwrapped = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.double_arrow_large);
+    Drawable nextRoundDrawableWrapped = DrawableCompat.wrap(nextRoundDrawableUnwrapped);
+
+    if (themeMode == DAY_MODE) {
+      timerView.setBackgroundColor(getColor(R.color.white));
+      cycles_completed_textView.setTextColor(getColor(R.color.black));
+      total_set_header.setTextColor(getColor(R.color.black));
+      total_set_time.setTextColor(getColor(R.color.black));
+      total_break_header.setTextColor(getColor(R.color.black));
+      total_break_time.setTextColor(getColor(R.color.black));
+
+      //      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.black));
+      dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.black));
+      dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.black));
+      dailySingleActivityStringHeader.setTextColor(getColor(R.color.black));
+      dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
+      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
+
+      timeLeft.setTextColor(getColor(R.color.black));
+
+      DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.BLACK);
+      reset_total_cycle_times.setBackgroundColor(Color.WHITE);
+      DrawableCompat.setTint(nextRoundDrawableWrapped, Color.BLACK);
+      next_round.setBackgroundColor(Color.WHITE);
+    }
+
+    if (themeMode == NIGHT_MODE){
+      timerView.setBackgroundColor(getColor(R.color.black));
+      cycles_completed_textView.setTextColor(getColor(R.color.white));
+      total_set_header.setTextColor(getColor(R.color.white));
+      total_set_time.setTextColor(getColor(R.color.white));
+      total_break_header.setTextColor(getColor(R.color.white));
+      total_break_time.setTextColor(getColor(R.color.white));
+
+//      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.white));
+      dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.white));
+      dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.white));
+      dailySingleActivityStringHeader.setTextColor(getColor(R.color.white));
+      dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
+      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
+
+      timeLeft.setTextColor(getColor(R.color.white));
+
+      DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.WHITE);
+      reset_total_cycle_times.setBackgroundColor(Color.BLACK);
+      DrawableCompat.setTint(nextRoundDrawableWrapped, Color.WHITE);
+      next_round.setBackgroundColor(Color.BLACK);
+    }
+
+    reset_total_cycle_times.setImageDrawable(resetCyclesDrawableWrapped);
+    next_round.setImageDrawable(nextRoundDrawableWrapped);
+
+    dotsAdapter.setDayOrNightMode(themeMode);
   }
 
-  private void logCyclesTitlesFromDatabase() {
-    AsyncTask.execute(()-> {
-      for (int i=0; i<cyclesList.size(); i++) {
-        Log.i("testCycleDb", "Title String is " + cyclesList.get(i).getTitle());
-      }
-    });
-  }
+  private void toggleDayAndNightModeForStatsFragment() {
 
-  private void logStatsForEachActivityDatabase() {
-    AsyncTask.execute(()->{
-      List<StatsForEachActivity> listOfActivities = new ArrayList<>();
-
-      for (int i=0; i<listOfActivities.size(); i++) {
-        Log.i("testStatsDb", "entry position is " + i);
-        Log.i("testStatsDb", "Day ID is " + listOfActivities.get(i).getUniqueIdTiedToTheSelectedActivity());
-        Log.i("testStatsDb", "Activity String is " + listOfActivities.get(i).getActivity());
-        Log.i("testStatsDb", "Set time elapsed for activity is " + listOfActivities.get(i).getTotalSetTimeForEachActivity());
-      }
-
-      if (listOfActivities.size()==0) {
-        Log.i("testStatsDb", "Empty list!");
-      }
-
-    });
   }
 }
