@@ -132,6 +132,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FragmentManager fragmentManager;
   TabLayout savedCyclesTabLayout;
   TabLayout.Tab savedCyclesTab;
+  View timerView;
   View mainView;
   View actionBarView;
   Calendar calendar;
@@ -638,17 +639,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
 
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
-  //Todo: 99+ minutes on stopwatch outside of circle borders.
-      //Todo: Lap adapter b0rks.
   //Todo: Settings popUps should be darker color (not white).
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
 
   //Todo: Add Day/Night modes.
-  //Todo: Custom should be an option in both timer additions and stats frag. Removed it for moment.
-      //Todo: Can have "Custom" as Category spinner, and custom additions in Sub-Category spinner.
-      //Todo: If too convoluted for app use, can just have a custom add in daily stats fragment.
-      //Todo: Custom activity edits can reset calorie count.
 
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
@@ -1067,6 +1062,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
+    toggleDayAndNightModesForTimer(false);
 
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSets();
@@ -1419,6 +1415,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  private void toggleDayAndNightModesForTimer(boolean night) {
+    if (night) {
+      timerView.setBackgroundColor(getColor(R.color.black));
+      cycles_completed_textView.setBackgroundColor(getColor(R.color.white));
+      total_set_header.setTextColor(getColor(R.color.white));
+      total_set_time.setTextColor(getColor(R.color.white));
+      total_break_header.setTextColor(getColor(R.color.white));
+      total_break_time.setTextColor(getColor(R.color.white));
+      timeLeft.setTextColor(getColor(R.color.white));
+    } else {
+      timerView.setBackgroundColor(getColor(R.color.white));
+      cycles_completed_textView.setTextColor(getColor(R.color.black));
+      total_set_header.setTextColor(getColor(R.color.black));
+      total_set_time.setTextColor(getColor(R.color.black));
+      total_break_header.setTextColor(getColor(R.color.black));
+      total_break_time.setTextColor(getColor(R.color.black));
+      timeLeft.setTextColor(getColor(R.color.black));
+    }
+  }
+
   private void stopWatchLaunchLogic() {
     setInitialTextSizeForStopWatch();
 
@@ -1722,6 +1738,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void assignTimerPopUpLayoutClassesToTheirIds() {
+    timerView = timerPopUpView.findViewById(R.id.main_timer_layout);
+
     reset = timerPopUpView.findViewById(R.id.reset);
 
     nonTrackingTimerHeaderLayout = timerPopUpView.findViewById(R.id.non_tracking_timer_stat_headers_layout);
