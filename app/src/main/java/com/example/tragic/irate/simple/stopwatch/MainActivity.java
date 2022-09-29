@@ -626,10 +626,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams nonTrackingHeaderLayoutParams;
 
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
-
   ConstraintLayout progressBarLayout;
 
-  boolean isAppStopped;
+  int DAY_MODE = 0;
+  int NIGHT_MODE = 1;
 
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
@@ -657,8 +657,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat.cancel(1);
 
     mHandler.removeCallbacks(globalNotficationsRunnable);
-
-    isAppStopped = false;
   }
 
   @Override
@@ -675,9 +673,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       globalNotficationsRunnable = notifcationsRunnable();
       mHandler.post(globalNotficationsRunnable);
-
-      isAppStopped = true;
-
     }
   }
 
@@ -1064,7 +1059,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
-    toggleDayAndNightModesForTimer(false);
+    toggleDayAndNightModesForTimer(DAY_MODE);
 
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSets();
@@ -1417,22 +1412,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  private void toggleDayAndNightModesForTimer(boolean night) {
+  private void toggleDayAndNightModesForTimer(int themeMode) {
     Drawable resetCyclesDrawableUnwrapped = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.reset_24);
     Drawable resetCyclesDrawableWrapped = DrawableCompat.wrap(resetCyclesDrawableUnwrapped);
 
     Drawable nextRoundDrawableUnwrapped = AppCompatResources.getDrawable(getApplicationContext(), R.drawable.double_arrow_large);
     Drawable nextRoundDrawableWrapped = DrawableCompat.wrap(nextRoundDrawableUnwrapped);
 
-    if (night) {
-      timerView.setBackgroundColor(getColor(R.color.black));
-      cycles_completed_textView.setBackgroundColor(getColor(R.color.white));
-      total_set_header.setTextColor(getColor(R.color.white));
-      total_set_time.setTextColor(getColor(R.color.white));
-      total_break_header.setTextColor(getColor(R.color.white));
-      total_break_time.setTextColor(getColor(R.color.white));
-      timeLeft.setTextColor(getColor(R.color.white));
-    } else {
+    if (themeMode == DAY_MODE) {
       timerView.setBackgroundColor(getColor(R.color.white));
       cycles_completed_textView.setTextColor(getColor(R.color.black));
       total_set_header.setTextColor(getColor(R.color.black));
@@ -1447,8 +1434,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       next_round.setBackgroundColor(Color.WHITE);
     }
 
+    if (themeMode == NIGHT_MODE){
+      timerView.setBackgroundColor(getColor(R.color.black));
+      cycles_completed_textView.setBackgroundColor(getColor(R.color.white));
+      total_set_header.setTextColor(getColor(R.color.white));
+      total_set_time.setTextColor(getColor(R.color.white));
+      total_break_header.setTextColor(getColor(R.color.white));
+      total_break_time.setTextColor(getColor(R.color.white));
+      timeLeft.setTextColor(getColor(R.color.white));
+
+      DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.WHITE);
+      reset_total_cycle_times.setBackgroundColor(Color.BLACK);
+      DrawableCompat.setTint(nextRoundDrawableWrapped, Color.WHITE);
+      next_round.setBackgroundColor(Color.BLACK);
+    }
+
     reset_total_cycle_times.setImageDrawable(resetCyclesDrawableWrapped);
     next_round.setImageDrawable(nextRoundDrawableWrapped);
+
+    dotsAdapter.setDayOrNightMode(themeMode);
   }
 
   private void stopWatchLaunchLogic() {

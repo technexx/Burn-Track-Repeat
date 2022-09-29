@@ -55,6 +55,10 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     Typeface ignotum;
     Typeface sixCaps;
 
+    int mThemeMode;
+    int DAY_MODE = 0;
+    int NIGHT_MODE = 1;
+
     public DotsAdapter(Context context, List<String> cycleRoundsAsStringList, List<Integer> typeOfRoundList) {
         this.mContext = context; this.mCyclesRoundsAsStringsList = cycleRoundsAsStringList; this.mRoundTypeList = typeOfRoundList;
         instantiateMiscObjects();
@@ -71,6 +75,10 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     public void setScreenHeight(int height) {
         this.mScreenHeight = height;
+    }
+
+    public void setDayOrNightMode(int themeMode) {
+        this.mThemeMode = themeMode;
     }
 
     @NonNull
@@ -137,22 +145,22 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
         if (mRoundTypeList.get(position) == 1) {
             dotsBorder.setColor(SET_COLOR);
-            dotsBorder.setStroke(3, Color.WHITE);
+            dotsBorder.setStroke(3, dotColorStroke(mThemeMode));
         }
 
         if (mRoundTypeList.get(position) == 2) {
             dotsBorder.setColor(0);
-            dotsBorder.setStroke(3, SET_COLOR);
+            dotsBorder.setStroke(3, dotColorStroke(mThemeMode));
         }
 
         if (mRoundTypeList.get(position) == 3) {
             dotsBorder.setColor(BREAK_COLOR);
-            dotsBorder.setStroke(3, Color.WHITE);
+            dotsBorder.setStroke(3, dotColorStroke(mThemeMode));
         }
 
         if (mRoundTypeList.get(position) == 4) {
             dotsBorder.setColor(0);
-            dotsBorder.setStroke(3, BREAK_COLOR);
+            dotsBorder.setStroke(3, dotColorStroke(mThemeMode));
         }
 
         if (mCyclesRoundCount - mCycleRoundsLeft == position) {
@@ -163,6 +171,19 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         } else {
             holder.fullView.setAlpha(1.0f);
         }
+    }
+
+    private int dotColorStroke(int theme) {
+        int colorToReturn = 0;
+
+        if (theme == DAY_MODE) {
+            colorToReturn = Color.BLACK;
+        }
+        if (theme == NIGHT_MODE) {
+            colorToReturn = Color.WHITE;
+        }
+
+        return colorToReturn;
     }
 
     public interface sendDotAlpha {
