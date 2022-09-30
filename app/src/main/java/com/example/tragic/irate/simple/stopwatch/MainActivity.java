@@ -5844,6 +5844,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           objectAnimator.cancel();
         }
 
+        if (mHandler.hasCallbacks(endFadeForModeOne)) {
+          mHandler.removeCallbacks(endFadeForModeOne);
+        }
+
         if (savedCycleAdapter.isCycleActive() == true) {
           savedCycleAdapter.removeActiveCycleLayout();
           savedCycleAdapter.notifyDataSetChanged();
@@ -5870,6 +5874,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (objectAnimatorPom != null) {
         objectAnimatorPom.cancel();
+      }
+
+      if (mHandler.hasCallbacks(endFadeForModeThree)) {
+        mHandler.removeCallbacks(endFadeForModeThree);
       }
 
       if (savedPomCycleAdapter.isCycleActive() == true) {

@@ -166,6 +166,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         if (mCyclesRoundCount - mCycleRoundsLeft == position) {
             fadeAlpha();
             holder.fullView.setAlpha(mAlpha);
+            Log.i("testDots", "running fadeAlpha() method at position " + position);
         } else if (mCycleRoundsLeft + position < mCyclesRoundCount) {
             holder.fullView.setAlpha(0.36f);
         } else {
