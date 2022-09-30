@@ -934,7 +934,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double totalBmrCalories = dailyStatsAccess.getUnassignedCaloriesForSelectedDuration();
 
         String bmrTimeString = longToStringConverters.convertMillisToHourBasedString(totalBmrTime);
-        String bmrCaloriesString = formatDoubleToStringWithoutDecimals(roundUpCaloriesIfMoreThanZero(totalBmrCalories));
+        String bmrCaloriesString = formatDoubleToStringWithoutDecimals(totalBmrCalories);
 
         long totalActivityTime = dailyStatsAccess.getTotalActivityTimeForSelectedDuration();
         double totalActivityCalories = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
