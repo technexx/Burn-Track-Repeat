@@ -633,8 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Some editPopUp issues (2 column adapter doesn't reset to 1 if hitting FAB).
-  //Todo: Rounds pushing past buttom of screen.
+  //Todo: From edit popUp, slide into timer also shows cycle recycler. Need to make invisible.
   //Todo: Cycle title can extend into activity string.
   //Todo: Activity string click disabled even when we haven't started another cycle we've clicked on.
   //Todo: Allowing enable would b0rk resume headers unless we accounted for that.
@@ -4134,6 +4133,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle);
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
+
+        if (mode == 1) savedCycleRecycler.startAnimation(slideOutFromLeftLong);
+        if (mode == 3) savedPomCycleRecycler.startAnimation(slideOutFromLeftLong);
       }
 
       if (cycleHasActivityAssigned) {
@@ -4151,9 +4153,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!trackActivityWithinCycle) {
         setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-//        roundDownCycleSetAndBreakTimes();
-      } else {
-//        roundDownDailyStatTimes();
       }
 
       runOnUiThread(new Runnable() {
@@ -4188,11 +4187,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode == 1) {
       changeTextSizeWithoutAnimator(workoutTime.get(0));
-      savedCycleRecycler.startAnimation(slideOutFromLeftLong);
     }
     if (mode == 3) {
       changeTextSizeWithoutAnimator(pomValuesTime.get(0));
-      savedPomCycleRecycler.startAnimation(slideOutFromLeftLong);
     }
 
     if (editCyclesPopupWindow.isShowing()) {
