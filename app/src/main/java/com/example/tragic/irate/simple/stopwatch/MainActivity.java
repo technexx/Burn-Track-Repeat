@@ -633,6 +633,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
+  //Todo: Some editPopUp issues (2 column adapter doesn't reset to 1 if hitting FAB).
+  //Todo: Rounds pushing past buttom of screen.
+  //Todo: Cycle title can extend into activity string.
+  //Todo: Activity string click disabled even when we haven't started another cycle we've clicked on.
+  //Todo: Allowing enable would b0rk resume headers unless we accounted for that.
+  //Todo: Narrow->Wide space between two rows of rounds when clicking activity string on lower row.
+  //Todo: May be related to way title interacts with activity string.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
@@ -1496,7 +1503,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateRoundAdaptersAndTheirCallbacks();
     setRoundRecyclersOnAdaptersAndLayoutManagers();
     setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
-    setVerticalSpaceDecorationForCycleRecyclerViewBasedOnAspectRatio();
+    setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight();
     instantiateLapAdapterAndSetRecyclerOnIt();
 
     retrieveAndImplementCycleSorting();
@@ -1885,13 +1892,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecyclerTwo.setLayoutManager(roundRecyclerTwoLayoutManager);
   }
 
-  private void setVerticalSpaceDecorationForCycleRecyclerViewBasedOnAspectRatio() {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() >= 1.8) {
-      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
-              -10);
-    } else {
+  private void setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight() {
+    if (phoneHeight <= 1920) {
       verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
               -25);
+    } else {
+      verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
+              -10);
     }
     roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
     roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);

@@ -77,7 +77,6 @@
         android:layout_width="1dp"
         android:layout_height="match_parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toEndOf="@id/saved_custom_set_view"
-        app:layout_constraintEnd_toStartOf="@id/activity_string_textView_for_tracking_cycles">
+        app:layout_constraintStart_toStartOf="@id/activity_string_textView_for_tracking_cycles">
     </View>
 </androidx.constraintlayout.widget.ConstraintLayout>

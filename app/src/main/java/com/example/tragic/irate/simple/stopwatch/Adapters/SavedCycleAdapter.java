@@ -56,7 +56,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   List<Integer> mPositionList;
   CharSequence permSpan;
   Spannable span;
-  ImageSpan imageSpan;
 
   boolean mActiveCycle;
   int mPositionOfActiveCycle;
