@@ -633,12 +633,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: From edit popUp, slide into timer also shows cycle recycler. Need to make invisible.
-  //Todo: Cycle title can extend into activity string.
+  //Todo: Adjusted width of title to 0 and constrained it, but issues w/ round views.
+      //Todo: Top row title and rounds cut off when clicking activity String. Might be related to fullView click - activity string click does not affect it.
   //Todo: Activity string click disabled even when we haven't started another cycle we've clicked on.
-  //Todo: Allowing enable would b0rk resume headers unless we accounted for that.
-  //Todo: Narrow->Wide space between two rows of rounds when clicking activity string on lower row.
-  //Todo: May be related to way title interacts with activity string.
+      //Todo: Allowing enable would b0rk resume headers unless we accounted for that.
+  //Todo: Non-active cycles set to active on app restart.
+  //Todo: Clicking outside of soft kb should dismiss it (esp. in editing title of cycle).
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
