@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
- // Todo: Clicking outside of soft kb should dismiss it (esp. in editing title of cycle).
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
@@ -1247,7 +1246,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     toggleInfinityRounds.setOnClickListener(v -> {
       if (toggleInfinityRounds.getAlpha() == 1.0f) {
-        toggleInfinityRounds.setAlpha(0.3f);
+        toggleInfinityRounds.setAlpha(0.4f);
         if (editHeaderSelected == 1) isSavedInfinityOptionActiveForSets = false;
         if (editHeaderSelected == 2) isSavedInfinityOptionActiveForBreaks = false;
       } else {
@@ -3076,7 +3075,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleInfinityRounds.setAlpha(1.0f);
         roundType = 2;
       } else {
-        toggleInfinityRounds.setAlpha(0.3f);
+        toggleInfinityRounds.setAlpha(0.4f);
         roundType = 1;
       }
       setAndCapTimerValues(setValue);
@@ -3086,7 +3085,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleInfinityRounds.setAlpha(1.0f);
         roundType = 4;
       } else {
-        toggleInfinityRounds.setAlpha(0.3f);
+        toggleInfinityRounds.setAlpha(0.4f);
         roundType = 3;
       }
       setAndCapTimerValues(breakValue);
@@ -3096,7 +3095,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void resetEditPopUpTimerHeaders() {
     editHeaderSelected = 1;
     roundType = 1;
-    toggleInfinityRounds.setAlpha(0.3f);
+    toggleInfinityRounds.setAlpha(0.4f);
   }
 
 
@@ -5661,7 +5660,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setDefaultEditRoundViews() {
-    toggleInfinityRounds.setAlpha(0.3f);
+    toggleInfinityRounds.setAlpha(0.4f);
     removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
     setDefaultTimerValuesAndTheirEditTextViews();
 
