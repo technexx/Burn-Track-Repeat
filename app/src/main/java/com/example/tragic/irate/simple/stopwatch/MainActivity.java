@@ -633,12 +633,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Adjusted width of title to 0 and constrained it, but issues w/ round views.
-      //Todo: Top row title and rounds cut off when clicking activity String. Might be related to fullView click - activity string click does not affect it.
-  //Todo: Activity string click disabled even when we haven't started another cycle we've clicked on.
-      //Todo: Allowing enable would b0rk resume headers unless we accounted for that.
-  //Todo: Non-active cycles set to active on app restart.
-  //Todo: Clicking outside of soft kb should dismiss it (esp. in editing title of cycle).
+  //Todo: Tracking boolean ddesn't save on toggle, only if we launch cycle. Should remove from 2 sec save runnable as well, but make sure initial value is saved on timer launch.
+      //Todo: Most of Cycle class stuff in save runnable should be removed and set into timer launch.
+  // Todo: Clicking outside of soft kb should dismiss it (esp. in editing title of cycle).
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
@@ -686,9 +683,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void onDestroy() {
-    dismissNotification = true;
-    notificationManagerCompat.cancel(1);
-
     super.onDestroy();
   }
 
@@ -884,11 +878,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
 
+  //Todo: DB save here.
   @Override
   public void toggleTdeeMode(int positionToToggle) {
     savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
     savedCycleAdapter.setPositionToToggle(positionToToggle);
     savedCycleAdapter.notifyDataSetChanged();
+
+    AsyncTask.execute(()-> {
+      int cycleId = cyclesList.get(positionToToggle).getId();
+      Cycles cyclesToUpdate = cyclesDatabase.cyclesDao().loadSingleCycle(cycleId).get(0);
+
+      boolean newTrackingBoolean = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionToToggle);
+      cyclesToUpdate.setCurrentlyTrackingCycle(newTrackingBoolean);
+
+      cyclesDatabase.cyclesDao().updateCycles(cyclesToUpdate);
+
+      Log.i("testTrack", "new boolean is " + newTrackingBoolean);
+    });
   }
 
   @Override
@@ -3988,6 +3995,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
+
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
       }
@@ -4283,7 +4291,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
         if (!isNewCycle) {
-//          boolean trackingToggle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
           cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
         } else {
           cycles.setCurrentlyTrackingCycle(true);
@@ -4306,7 +4313,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (isNewCycle) {
           cycles.setTimeAdded(System.currentTimeMillis());
-          ;
           cyclesDatabase.cyclesDao().insertCycle(cycles);
         } else {
           cyclesDatabase.cyclesDao().updateCycles(cycles);
