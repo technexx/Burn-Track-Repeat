@@ -240,7 +240,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (mActiveTdeeModeBooleanList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setAlpha(1.0f);
     } else {
-      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.3f);
+      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.4f);
     }
 
     workoutHolder.tdeeActivityStringToggleTextView.setOnClickListener(v-> {

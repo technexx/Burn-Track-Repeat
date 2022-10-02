@@ -611,7 +611,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int ON_STATS_ACTIVITY_TAB = 0;
   int ON_STATS_FOOD_TAB = 1;
 
-  boolean statsHaveBeenEdited;
   Toast mToast;
 
   RecyclerView dotsRecycler;
@@ -643,7 +642,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
 
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
-  //Todo: Settings popUps should be darker color (not white).
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
 
@@ -860,7 +858,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     receivedPomDotAlpha = alpha;
   }
 
-
   @Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
     if (resumingOrResetting == RESUMING_CYCLE_FROM_ADAPTER) {
@@ -870,8 +867,49 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public void setStatsHaveBeenEditedBoolean(boolean haveBeenEdited) {
-    this.statsHaveBeenEdited = haveBeenEdited;
+  private void resumeOrResetCycleFromAdapterList(int resumeOrReset) {
+    if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
+      timerIsPaused = true;
+      progressBar.setProgress(currentProgressBarValue);
+      timeLeft.setText(retrieveTimerValueString());
+
+      toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
+
+      AsyncTask.execute(() -> {
+        if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
+          insertActivityIntoDatabaseAndAssignItsValueToObjects();
+          dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
+        }
+
+        runOnUiThread(() -> {
+          if (mode == 1) {
+            changeTextSizeWithoutAnimator(workoutTime.get(0));
+
+            if (trackActivityWithinCycle) {
+              setAllActivityTimesAndCaloriesToTextViews();
+            } else {
+              setCyclesCompletedTextView();
+            }
+          }
+          if (mode == 3) {
+            changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+            setCyclesCompletedTextView();
+            toggleViewsForTotalDailyAndCycleTimes(false);
+          }
+          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+        });
+      });
+    } else if (resumeOrReset == RESETTING_CYCLE_FROM_ADAPTER) {
+      if (mode == 1) {
+        savedCycleAdapter.removeActiveCycleLayout();
+        savedCycleAdapter.notifyDataSetChanged();
+      }
+      if (mode == 3) {
+        savedPomCycleAdapter.removeActiveCycleLayout();
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
+      resetTimer();
+    }
   }
 
   @Override
@@ -3296,52 +3334,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
   }
-
-  private void resumeOrResetCycleFromAdapterList(int resumeOrReset) {
-    if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
-      timerIsPaused = true;
-      progressBar.setProgress(currentProgressBarValue);
-      timeLeft.setText(retrieveTimerValueString());
-
-      toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
-
-      AsyncTask.execute(() -> {
-        if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
-          insertActivityIntoDatabaseAndAssignItsValueToObjects();
-          dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
-        }
-
-        runOnUiThread(() -> {
-          if (mode == 1) {
-            changeTextSizeWithoutAnimator(workoutTime.get(0));
-
-            if (trackActivityWithinCycle) {
-              setAllActivityTimesAndCaloriesToTextViews();
-            } else {
-              setCyclesCompletedTextView();
-            }
-          }
-          if (mode == 3) {
-            changeTextSizeWithoutAnimator(pomValuesTime.get(0));
-            setCyclesCompletedTextView();
-            toggleViewsForTotalDailyAndCycleTimes(false);
-          }
-          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-        });
-      });
-    } else if (resumeOrReset == RESETTING_CYCLE_FROM_ADAPTER) {
-      if (mode == 1) {
-        savedCycleAdapter.removeActiveCycleLayout();
-        savedCycleAdapter.notifyDataSetChanged();
-      }
-      if (mode == 3) {
-        savedPomCycleAdapter.removeActiveCycleLayout();
-        savedPomCycleAdapter.notifyDataSetChanged();
-      }
-      resetTimer();
-    }
-  }
-
 
   private String retrieveTimerValueString() {
     long millis;
