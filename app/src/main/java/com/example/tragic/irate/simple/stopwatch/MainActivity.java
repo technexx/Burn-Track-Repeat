@@ -633,9 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Tracking boolean ddesn't save on toggle, only if we launch cycle. Should remove from 2 sec save runnable as well, but make sure initial value is saved on timer launch.
-      //Todo: Most of Cycle class stuff in save runnable should be removed and set into timer launch.
-  // Todo: Clicking outside of soft kb should dismiss it (esp. in editing title of cycle).
+ // Todo: Clicking outside of soft kb should dismiss it (esp. in editing title of cycle).
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
@@ -1075,6 +1073,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setPhoneDimensions();
     groupAllAppStartInstantiations();
 
+//    ConstraintLayout editCyclesLayout = editCyclesPopupView.findViewById(R.id.edit_cycle_layout);
+//    editCyclesLayout.setOnClickListener(v-> {
+//    });
+
     toggleDayAndNightModesForMain(colorThemeMode);
     toggleDayAndNightModesForTimer(colorThemeMode);
 
@@ -1083,8 +1085,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
 
     addTDEEfirstMainTextView.setOnClickListener(v -> {
-      View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
+      inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
 
+      View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
       addTdeePopUpWindow.showAsDropDown(testView);
     });
 
