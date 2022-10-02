@@ -877,8 +877,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     this.statsHaveBeenEdited = haveBeenEdited;
   }
 
-
-  //Todo: DB save here.
   @Override
   public void toggleTdeeMode(int positionToToggle) {
     savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
@@ -886,16 +884,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCycleAdapter.notifyDataSetChanged();
 
     AsyncTask.execute(()-> {
-      int cycleId = cyclesList.get(positionToToggle).getId();
-      Cycles cyclesToUpdate = cyclesDatabase.cyclesDao().loadSingleCycle(cycleId).get(0);
-
-      boolean newTrackingBoolean = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionToToggle);
-      cyclesToUpdate.setCurrentlyTrackingCycle(newTrackingBoolean);
-
-      cyclesDatabase.cyclesDao().updateCycles(cyclesToUpdate);
-
-      Log.i("testTrack", "new boolean is " + newTrackingBoolean);
+      saveActivityTrackingToggleToDatabase(positionToToggle);
     });
+  }
+
+  private void saveActivityTrackingToggleToDatabase(int positionToggled) {
+    int cycleId = cyclesList.get(positionToggled).getId();
+    Cycles cyclesToUpdate = cyclesDatabase.cyclesDao().loadSingleCycle(cycleId).get(0);
+
+    boolean newTrackingBoolean = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionToggled);
+    cyclesToUpdate.setCurrentlyTrackingCycle(newTrackingBoolean);
+
+    cyclesDatabase.cyclesDao().updateCycles(cyclesToUpdate);
   }
 
   @Override
