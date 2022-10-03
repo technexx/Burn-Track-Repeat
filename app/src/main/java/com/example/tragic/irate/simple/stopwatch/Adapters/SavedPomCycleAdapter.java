@@ -137,6 +137,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                     mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
                 });
             }
+
+            pomHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+        } else {
+            pomHolder.fullView.setBackgroundColor(Color.BLACK);
         }
 
         if (mHighlightDeleted) {
@@ -144,10 +148,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             mPositionList.clear();
             //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
             mHighlightMode = false;
-            //Sets all of our backgrounds to black (unhighlighted).
-            for (int i=0; i<mPomList.size(); i++) {
-                pomHolder.fullView.setBackgroundColor(Color.BLACK);
-            }
         }
 
 
@@ -203,7 +203,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 for (int i=0; i<mPomList.size(); i++) {
                     //Using tempList for stable loop since mPositionList changes.
                     for (int j=0; j<tempList.size(); j++) {
-                        //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
                         if (position==tempList.get(j)) {
                             pomHolder.fullView.setBackgroundColor(Color.BLACK);
                             mPositionList.remove(Integer.valueOf(position));

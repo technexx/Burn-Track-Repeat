@@ -212,8 +212,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
         });
 
-        workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
+        workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
       }
+    } else {
+      workoutHolder.fullView.setBackgroundColor(Color.BLACK);
     }
 
     if (mThemeMode == DAY_MODE) {
@@ -278,6 +280,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           //Adds the position at its identical index for easy removal access.
           mPositionList.add(position);
           workoutHolder.fullView.setBackgroundColor(Color.GRAY);
+          Log.i("testHighlight", "bg set to gray at position " + position);
         }
         //Callback to send position list (Using Strings to make removing values easier) back to Main.
         mOnHighlightListener.onCycleHighlight(mPositionList, false);
@@ -288,11 +291,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (!mHighlightMode) {
         //Adds position of clicked item to position list.
         mPositionList.add(position);
-        //Sets background of list item to gray, to indicate it is selected.
         workoutHolder.fullView.setBackgroundColor(Color.GRAY);
-        //Sets highlight mode to true, since at least one item is selected.
+
         mHighlightMode = true;
-        //Calls back for initial highlighted position, Also to set actionBar views for highlight mode.
         mOnHighlightListener.onCycleHighlight(mPositionList, true);
       }
       return true;
@@ -390,8 +391,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       mPositionList.clear();
       //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
       mHighlightMode = false;
-      //Sets all of our backgrounds to black (unhighlighted).
-      workoutHolder.fullView.setBackgroundColor(Color.BLACK);
     }
   }
 

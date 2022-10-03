@@ -633,7 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Due to weight constraints, a cycle w/ >8 rounds and larger dots recyclerView will push progressBar down and squish its reset button.
+  //Todo: Dark theme mode may be causing some changes.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
@@ -5814,8 +5814,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             timeLeft.setText("0");
             setInitialTextSizeForTimers(0);
             break;
-        }
-        ;
+        };
 
         for (int i = 0; i < workoutTime.size(); i++) {
           if (typeOfRound.get(i) == 2 || typeOfRound.get(i) == 4) {
