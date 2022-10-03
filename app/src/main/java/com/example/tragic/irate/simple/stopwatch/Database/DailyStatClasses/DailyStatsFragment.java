@@ -1932,8 +1932,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         } else {
             if (phoneHeight <= 1920) {
                 minimizeCalendarButton.setImageResource(R.drawable.arrow_down_small);
+            } else {
+                minimizeCalendarButton.setImageResource(R.drawable.arrow_down);
             }
-            minimizeCalendarButton.setImageResource(R.drawable.arrow_down);
         }
     }
 
@@ -1944,7 +1945,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             recyclerParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
             recyclerParams.bottomToTop = R.id.total_activity_stats_values_textView_layout;
         } else {
-//            textViewParams.bottomToTop = R.id.minimize_calendarView_button;
             textViewParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
             textViewParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
 

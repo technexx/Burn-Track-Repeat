@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Dark theme mode may be causing some changes.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Had a crash when switching cycle tabs relatied to AUDIO_CONTENT_TYPE_UNKNOWN.
 
