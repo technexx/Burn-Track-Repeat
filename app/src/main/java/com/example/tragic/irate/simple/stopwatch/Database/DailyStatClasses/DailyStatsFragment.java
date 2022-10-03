@@ -372,18 +372,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         mRoot = root;
         fragmentIsAttached = true;
 
-        notifyDataSetChangedRunnable = new Runnable() {
-            @Override
-            public void run() {
-                dailyStatsAdapter.notifyDataSetChanged();
-                caloriesConsumedAdapter.notifyDataSetChanged();
-
-                mHandler.removeCallbacks(this);
-            }
-        };
-
-
-
         mToast = new Toast(getContext());
         dailyStatsAccess = new DailyStatsAccess(getContext());
 
@@ -772,7 +760,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setUnassignedDailyTotalTime();
 
         getActivity().runOnUiThread(()-> {
-            mHandler.post(notifyDataSetChangedRunnable);
+            dailyStatsAdapter.notifyDataSetChanged();
+            caloriesConsumedAdapter.notifyDataSetChanged();
 
             setTotalActivityStatsFooterTextViews();
             setTotalCaloriesConsumedFooterTextViews();
@@ -1295,9 +1284,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             dailyStatsAccess.deleteTotalTimesAndCaloriesForSelectedActivityForSelectedDays(position);
 
             populateListsAndTextViewsFromEntityListsInDatabase();
-
-            long totalSetTimeFromAllActivities = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(daySelectedFromCalendar);
-            double totalCaloriesBurnedFromAllActivities = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(daySelectedFromCalendar);
 
             setStatsHaveBeenEditedForCurrentDay(true);
 
@@ -2114,8 +2100,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Burned"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));
-        }
 
+//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setIcon(R.drawable.run_icon));
+//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setIcon(R.drawable.food_icon));
+//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setIcon(R.drawable.compare_icon));
+        }
 
         activityStatsDurationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);
         activityStatsDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);

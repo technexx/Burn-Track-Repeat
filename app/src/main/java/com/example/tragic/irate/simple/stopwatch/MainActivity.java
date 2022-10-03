@@ -633,6 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
+  //Todo: Delay in adapter refresh when deleting activities in stats frag, food is fine though.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Had a crash when switching cycle tabs relatied to AUDIO_CONTENT_TYPE_UNKNOWN.
 
@@ -769,6 +770,90 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return super.onOptionsItemSelected(item);
   }
 
+  private void launchGlobalSettingsFragment() {
+    if (mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
+      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
+      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+
+      if (rootSettingsFragment != null) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
+                .commit();
+      }
+      sortButton.setVisibility(View.INVISIBLE);
+
+      setTypeOfOnOptionsSelectedMenu(SETTINGS_MENU);
+    }
+  }
+
+  private void launchDailyStatsFragment() {
+    if (mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
+      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
+    }
+
+    mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+
+    getSupportFragmentManager().beginTransaction()
+            .setCustomAnimations(
+                    R.anim.slide_in_from_left,  // enter
+                    R.anim.slide_out_from_right,  // exit
+                    R.anim.slide_in_from_left_short,   // popEnter (backstack)
+                    R.anim.slide_out_from_right  // popExit (backstack)
+            )
+            .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
+            .commit();
+
+    setTypeOfOnOptionsSelectedMenu(STATS_MENU);
+    toggleSortMenuViewBetweenCyclesAndActivities(SORTING_ACTIVITIES);
+
+    mHandler.postDelayed(() -> {
+      AsyncTask.execute(() -> {
+        dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+      });
+    }, 100);
+  }
+
+  private void deleteActivityStatsForSelectedDays() {
+    List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
+
+    List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
+    List<Long> longListOfStatsForEachIdsToDelete = new ArrayList<>();
+
+    for (int i = 0; i < statsForEachActivityList.size(); i++) {
+      longListOfStatsForEachIdsToDelete.add(statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
+    }
+
+    dailyStatsAccess.deleteMultipleStatsForEachActivityEntries(longListOfStatsForEachIdsToDelete);
+
+    dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
+    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+  }
+
+  private void deleteFoodStatsForSelectedDays() {
+    List<CaloriesForEachFood> caloriesForEachFoodList = dailyStatsFragment.getCaloriesForEachFoodList();
+
+    List<Long> longListOfFoodIdsToDelete = new ArrayList<>();
+
+    for (int i = 0; i < caloriesForEachFoodList.size(); i++) {
+      longListOfFoodIdsToDelete.add(caloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood());
+    }
+
+    dailyStatsAccess.deleteMultipleFoodEntries(longListOfFoodIdsToDelete);
+    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+  }
+
+  private void deleteActivityStatsForAllDays() {
+    dailyStatsAccess.deleteAllStatsForEachActivityEntries();
+
+    dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
+    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+  }
+
+  private void deleteFoodStatsForAllDays() {
+    dailyStatsAccess.deleteAllFoodEntries();
+    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
+  }
+
   @Override
   public boolean onPrepareOptionsMenu(Menu menu) {
     menu.clear();
@@ -792,22 +877,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onChangeOnOptionsMenu(int menuNumber) {
     mOnOptionsSelectedMenuType = menuNumber;
 //    invalidateOptionsMenu();
-  }
-
-  private void launchGlobalSettingsFragment() {
-    if (mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
-      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
-
-      if (rootSettingsFragment != null) {
-        getSupportFragmentManager().beginTransaction()
-                .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
-                .commit();
-      }
-      sortButton.setVisibility(View.INVISIBLE);
-
-      setTypeOfOnOptionsSelectedMenu(SETTINGS_MENU);
-    }
   }
 
   @Override
@@ -1409,6 +1478,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     delete_all_confirm.setOnClickListener(v -> {
+      if (deleteCyclePopupWindow.isShowing()) {
+        deleteCyclePopupWindow.dismiss();
+      }
+      Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
+
       AsyncTask.execute(() -> {
         if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
           deleteTotalCycleTimes();
@@ -1425,11 +1499,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (delete_all_text.getText().equals(getString(R.string.delete_all_foods))) {
           deleteFoodStatsForAllDays();
         }
-
-        runOnUiThread(() -> {
-          if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
-          Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
-        });
       });
     });
 
@@ -2827,76 +2896,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     userHeight = sp.getInt("tdeeHeight,", 66);
   }
 
-  private void launchDailyStatsFragment() {
-    if (mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
-      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
-    }
-
-    mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
-
-    getSupportFragmentManager().beginTransaction()
-            .setCustomAnimations(
-                    R.anim.slide_in_from_left,  // enter
-                    R.anim.slide_out_from_right,  // exit
-                    R.anim.slide_in_from_left_short,   // popEnter (backstack)
-                    R.anim.slide_out_from_right  // popExit (backstack)
-            )
-            .replace(R.id.settings_fragment_frameLayout, dailyStatsFragment)
-            .commit();
-
-    setTypeOfOnOptionsSelectedMenu(STATS_MENU);
-    toggleSortMenuViewBetweenCyclesAndActivities(SORTING_ACTIVITIES);
-
-    mHandler.postDelayed(() -> {
-      AsyncTask.execute(() -> {
-        dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
-      });
-    }, 100);
-  }
-
   public void setTypeOfOnOptionsSelectedMenu(int menuType) {
     mOnOptionsSelectedMenuType = menuType;
-  }
-
-  private void deleteActivityStatsForSelectedDays() {
-    List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
-
-    List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
-    List<Long> longListOfStatsForEachIdsToDelete = new ArrayList<>();
-
-    for (int i = 0; i < statsForEachActivityList.size(); i++) {
-      longListOfStatsForEachIdsToDelete.add(statsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity());
-    }
-
-    dailyStatsAccess.deleteMultipleStatsForEachActivityEntries(longListOfStatsForEachIdsToDelete);
-
-    dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
-    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
-  }
-
-  private void deleteFoodStatsForSelectedDays() {
-    List<CaloriesForEachFood> caloriesForEachFoodList = dailyStatsFragment.getCaloriesForEachFoodList();
-
-    List<Long> longListOfFoodIdsToDelete = new ArrayList<>();
-
-    for (int i = 0; i < caloriesForEachFoodList.size(); i++) {
-      longListOfFoodIdsToDelete.add(caloriesForEachFoodList.get(i).getUniqueIdTiedToEachFood());
-    }
-
-    dailyStatsAccess.deleteMultipleFoodEntries(longListOfFoodIdsToDelete);
-    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
-  }
-
-  private void deleteActivityStatsForAllDays() {
-    dailyStatsAccess.deleteAllStatsForEachActivityEntries();
-
-    dailyStatsFragment.setNumberOfDaysWithActivitiesHasChangedBoolean(true);
-    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
-  }
-
-  private void deleteFoodStatsForAllDays() {
-    dailyStatsAccess.deleteAllFoodEntries();
-    dailyStatsFragment.populateListsAndTextViewsFromEntityListsInDatabase();
   }
 
   private boolean areAllDaysEmptyOfActivities(List<StatsForEachActivity> statsForEachActivityList) {

@@ -226,7 +226,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
         mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
         mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
-
     }
 
     private void setHolderViewTextStyles(int textStyle) {
