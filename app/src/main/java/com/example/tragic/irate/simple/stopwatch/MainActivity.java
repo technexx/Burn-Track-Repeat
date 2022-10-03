@@ -626,12 +626,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams nonTrackingHeaderLayoutParams;
 
   ConstraintLayout.LayoutParams dotsRecyclerLayoutParams;
+  ConstraintLayout.LayoutParams dotsRecyclerConstraintLayout_LayoutParams;
   ConstraintLayout progressBarLayout;
 
   int DAY_MODE = 0;
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
+  //Todo: Due to weight constraints, a cycle w/ >8 rounds and larger dots recyclerView will push progressBar down and squish its reset button.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
 
   //Todo: Test minimized vibrations on <26 api
@@ -1109,10 +1111,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
-
-//    ConstraintLayout editCyclesLayout = editCyclesPopupView.findViewById(R.id.edit_cycle_layout);
-//    editCyclesLayout.setOnClickListener(v-> {
-//    });
 
     toggleDayAndNightModesForMain(colorThemeMode);
     toggleDayAndNightModesForTimer(colorThemeMode);
@@ -1976,6 +1974,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
     dotsRecyclerLayout = timerPopUpView.findViewById(R.id.dots_recycler_layout);
 
+    dotsRecyclerConstraintLayout_LayoutParams = (ConstraintLayout.LayoutParams) dotsRecyclerLayout.getLayoutParams();
     dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
 
     dotsRecycler.setAdapter(dotsAdapter);
