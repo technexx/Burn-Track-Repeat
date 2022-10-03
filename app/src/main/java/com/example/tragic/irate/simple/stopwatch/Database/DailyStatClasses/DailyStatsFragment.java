@@ -767,9 +767,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             setTotalCaloriesConsumedFooterTextViews();
 
             setTotalCaloriesComparedTextViews(false);
-            setSimplifiedViewTextViews();
+
+//            setSimplifiedViewTextViews();
         });
     }
+
+
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {

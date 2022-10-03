@@ -53,6 +53,7 @@
             app:layout_constraintEnd_toStartOf="@id/activity_stats_duration_header_textView"
             android:layout_marginEnd="12dp"
             android:backgroundTint="@color/test_bg2"
+            android:background="@color/test_bg2"
             android:src="@drawable/double_arrow_left_small">
         </ImageButton>
 
@@ -64,6 +65,7 @@
             app:layout_constraintStart_toEndOf="@id/activity_stats_duration_header_textView"
             android:layout_marginStart="12dp"
             android:backgroundTint="@color/test_bg2"
+            android:background="@color/test_bg2"
             android:src="@drawable/double_arrow_right_small">
         </ImageButton>
 
@@ -160,6 +162,7 @@
         app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/edit_icon"
+        android:background="@color/test_bg2"
         android:layout_marginEnd="10dp"
         android:backgroundTint="@color/test_bg2">
     </ImageButton>

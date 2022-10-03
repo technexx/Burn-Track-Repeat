@@ -815,8 +815,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void deleteActivityStatsForSelectedDays() {
     List<StatsForEachActivity> statsForEachActivityList = dailyStatsFragment.getStatsForEachActivityList();
-
-    List<Long> longListOfDayIdsToToDelete = new ArrayList<>();
     List<Long> longListOfStatsForEachIdsToDelete = new ArrayList<>();
 
     for (int i = 0; i < statsForEachActivityList.size(); i++) {
@@ -831,7 +829,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void deleteFoodStatsForSelectedDays() {
     List<CaloriesForEachFood> caloriesForEachFoodList = dailyStatsFragment.getCaloriesForEachFoodList();
-
     List<Long> longListOfFoodIdsToDelete = new ArrayList<>();
 
     for (int i = 0; i < caloriesForEachFoodList.size(); i++) {
