@@ -635,6 +635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Dark theme mode may be causing some changes.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
+  //Todo: Had a crash when switching cycle tabs relatied to AUDIO_CONTENT_TYPE_UNKNOWN.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well

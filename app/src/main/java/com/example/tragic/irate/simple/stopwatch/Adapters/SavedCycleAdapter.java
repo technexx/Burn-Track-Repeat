@@ -288,7 +288,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     });
 
     workoutHolder.fullView.setOnLongClickListener(v -> {
-      if (!mHighlightMode) {
+      if (!mHighlightMode && !mActiveCycle) {
         //Adds position of clicked item to position list.
         mPositionList.add(position);
         workoutHolder.fullView.setBackgroundColor(Color.GRAY);

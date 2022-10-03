@@ -223,7 +223,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         });
 
         pomHolder.fullView.setOnLongClickListener(v-> {
-            if (!mHighlightMode) {
+            if (!mHighlightMode && !mActiveCycle) {
                 mPositionList.add(position);
                 pomHolder.fullView.setBackgroundColor(Color.GRAY);
                 mHighlightMode = true;
