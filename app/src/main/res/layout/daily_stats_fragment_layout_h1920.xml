@@ -18,6 +18,7 @@
         app:tabIndicatorColor="@color/off_white"
         app:tabSelectedTextColor="@color/blue_2"
         app:tabTextAppearance="@style/TabLayoutTextStyle_h1920"
+        app:tabRippleColor="@android:color/transparent"
         app:tabIndicatorFullWidth="true"
         app:tabMode="fixed"/>
 

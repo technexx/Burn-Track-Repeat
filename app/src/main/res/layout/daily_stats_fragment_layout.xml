@@ -18,6 +18,7 @@
         app:tabIndicatorColor="@color/off_white"
         app:tabSelectedTextColor="@color/blue_2"
         app:tabTextAppearance="@style/TabLayoutTextStyle"
+        app:tabRippleColor="@android:color/transparent"
         app:tabIndicatorFullWidth="true" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

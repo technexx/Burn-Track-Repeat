@@ -19,7 +19,8 @@
         app:tabSelectedTextColor="@color/blue_2"
         app:tabIndicatorColor="@color/white"
         app:tabTextAppearance="@style/TabLayoutTextStyle"
-        app:tabIndicatorFullWidth="true">
+        app:tabIndicatorFullWidth="true"
+        app:tabRippleColor="@android:color/transparent">
     </com.google.android.material.tabs.TabLayout>
 
     <androidx.recyclerview.widget.RecyclerView
