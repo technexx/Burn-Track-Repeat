@@ -625,6 +625,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
+  String savedTotalDailyTimeString;
+  String savedSingleActivityString;
+
   //Todo: Still +1 on daily and activity total on resume.
       //Todo: This is because we set these textViews as roundToNearestThousandth, so they will round up if closer to next second, but when iterating in cycle they only change when timer changes.
   //Todo: If deleting stats and in reset/resume mode, stats will not show as reset in Timer.
@@ -936,6 +939,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setTotalCycleTimeValuesToTextView();
       if (mode == 1 && trackActivityWithinCycle) {
         setAllActivityTimesAndCaloriesToTextViews();
+        setStoredDailyTimesOnCycleResume();
       }
 
       AsyncTask.execute(() -> {
@@ -1216,9 +1220,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleCycleAndPomCycleRecyclerViewVisibilities(false);
 
       toggleCustomActionBarButtonVisibilities(false);
-
-//      Log.i("testTime", "activity total on timer dismissal is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-//      Log.i("testTime", "daily total on timer dismissal is " + totalSetTimeForCurrentDayInMillis);
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
@@ -1862,7 +1863,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_break_time = timerPopUpView.findViewById(R.id.total_break_time);
 
     dailySingleActivityStringHeader = timerPopUpView.findViewById(R.id.daily_single_activity_string_header);
-    ;
     dailyTotalTimeTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_time_textView_header);
     dailyTotalTimeTextView = timerPopUpView.findViewById(R.id.daily_total_time_textView);
     dailyTotalCaloriesTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_calories_textView_header);
@@ -2997,11 +2997,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       savedCycleAdapter.notifyDataSetChanged();
       pauseAndResumeTimer(PAUSING_TIMER);
+
+      if (trackActivityWithinCycle) {
+        storeDailyTimesForCycleResuming();
+      }
     } else if (mode == 3) {
       pauseAndResumePomodoroTimer(PAUSING_TIMER);
       savedPomCycleAdapter.notifyDataSetChanged();
     }
     mHandler.removeCallbacksAndMessages(null);
+  }
+
+  private void storeDailyTimesForCycleResuming() {
+    savedTotalDailyTimeString = (String) dailyTotalTimeTextView.getText();
+    savedSingleActivityString = (String) dailyTotalTimeForSingleActivityTextView.getText();
+  }
+
+  private void setStoredDailyTimesOnCycleResume() {
+    dailyTotalTimeTextView.setText(savedTotalDailyTimeString);
+    dailyTotalTimeForSingleActivityTextView.setText(savedSingleActivityString);
   }
 
   private void editCyclesPopUpDismissalLogic() {
