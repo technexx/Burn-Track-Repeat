@@ -3,14 +3,11 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Application;
-import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
-import android.content.ContentResolver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -29,8 +26,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
-import android.os.PowerManager;
-import android.os.VibrationEffect;
 import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -74,8 +69,6 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.legacy.content.WakefulBroadcastReceiver;
-import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -98,7 +91,6 @@ import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.Stats
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalorieIteration;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TextViewDisplaySync;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TimerIteration;
@@ -563,7 +555,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long stopWatchNewLapTime;
   long stopWatchNewLapHolder;
 
-  ScreenRatioLayoutChanger screenRatioLayoutChanger;
   View.MeasureSpec measureSpec;
   int phoneHeight;
   int phoneWidth;
@@ -634,8 +625,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Delay in adapter refresh when deleting activities in stats frag, food is fine though and so is activity addition.
-
+  //Todo: Giant textSize if resetting in one mode and resuming timer in other (likely it resetting to large default).
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -1637,7 +1627,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void instantiateGlobalClasses() {
     fragmentManager = getSupportFragmentManager();
-    screenRatioLayoutChanger = new ScreenRatioLayoutChanger(getApplicationContext());
     changeSettingsValues = new ChangeSettingsValues();
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
     dailyStatsAccess = new DailyStatsAccess(getApplicationContext());
@@ -1877,6 +1866,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     laps_completed_textView = stopWatchPopUpView.findViewById(R.id.laps_completed_textView);
 
     lapListCanvas = stopWatchPopUpView.findViewById(R.id.lapCanvas);
+    lapListCanvas.setScreenHeight(phoneHeight);
 
     lapRecycler = stopWatchPopUpView.findViewById(R.id.lap_recycler);
     stopWatchPauseResumeButton = stopWatchPopUpView.findViewById(R.id.stopwatchPauseResumeButton);
@@ -4947,13 +4937,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (millis >= 60000) {
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
+      if (phoneHeight < 1920) {
         timeLeft.setTextSize(70f);
       } else {
         timeLeft.setTextSize(90f);
       }
     } else {
-      if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
+      if (phoneHeight < 1920) {
         timeLeft.setTextSize(90f);
       } else {
         timeLeft.setTextSize(120f);
@@ -4966,7 +4956,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       valueAnimatorDown.cancel();
     }
 
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
+    if (phoneHeight < 1920) {
       stopWatchTimeTextView.setTextSize(90f);
     } else {
       stopWatchTimeTextView.setTextSize(120f);
@@ -4985,7 +4975,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void changeValueAnimatorNumbers() {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
+    if (phoneHeight < 1920) {
       valueAnimatorDown.setFloatValues(90f, 70f);
       valueAnimatorUp.setFloatValues(70f, 90f);
     } else {
@@ -4995,7 +4985,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void changeTextSizeWithoutAnimator(long millis) {
-    if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges() < 1.8f) {
+    if (phoneHeight < 1920) {
 
       if (millis < 60000) {
         timeLeft.setTextSize(90f);

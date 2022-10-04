@@ -11,22 +11,24 @@ import android.view.View;
 
 import androidx.annotation.Nullable;
 
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.ScreenRatioLayoutChanger;
-
 public class LapListCanvas extends View {
     Canvas mCanvas;
     Paint mPaint;
 
-    ScreenRatioLayoutChanger screenRatioLayoutChanger;
     int gradientWidthAndHeight;
     int gradientShadeMovement;
     int gradientYAxisMovement;
 
+    int mScreenHeight;
+
     public LapListCanvas(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mPaint = new Paint();
-        screenRatioLayoutChanger = new ScreenRatioLayoutChanger(context);
         setGradientWidth();
+    }
+
+    public void setScreenHeight(int height) {
+        this.mScreenHeight = height;
     }
 
     private void drawOutlineBox() {
@@ -55,7 +57,7 @@ public class LapListCanvas extends View {
     }
 
     private void setGradientWidth() {
-        if (screenRatioLayoutChanger.setScreenRatioBasedLayoutChanges()<1.8f) {
+        if (mScreenHeight < 1920) {
             gradientWidthAndHeight = 240;
             gradientShadeMovement = 12;
             gradientYAxisMovement = 5;
