@@ -633,7 +633,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Delay in adapter refresh when deleting activities in stats frag, food is fine though.
+  //Todo: Infinity rounds get rounded up on resume, before dropping back down when unpaused.
+  //Todo: Delay in adapter refresh when deleting activities in stats frag, food is fine though and so is activity addition.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Had a crash when switching cycle tabs relatied to AUDIO_CONTENT_TYPE_UNKNOWN.
 
@@ -940,7 +941,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
       timerIsPaused = true;
       progressBar.setProgress(currentProgressBarValue);
-      timeLeft.setText(retrieveTimerValueString());
 
       toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
@@ -3333,48 +3333,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private String retrieveTimerValueString() {
-    long millis;
-    if (mode == 1) {
-      if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-        millis = setMillis;
-      } else {
-        millis = breakMillis;
-      }
-    } else {
-      millis = pomMillis;
-    }
-    return (convertSeconds((millis + 999) / 1000));
-  }
-
-  public class MyWakefulReceiver extends WakefulBroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-
-      // Start the service, keeping the device awake while the service is
-      // launching. This is the Intent to deliver to the service.
-
-
-      Intent service = new Intent(context, MyIntentService.class);
-      startWakefulService(context, service);
-    }
-  }
-
-  public class MyIntentService extends IntentService {
-    public MyIntentService() {
-      super("MyIntentService");
-    }
-
-    @Override
-    protected void onHandleIntent(Intent intent) {
-      Bundle extras = intent.getExtras();
-      // Do the work that requires your app to keep the CPU running.
-      // ...
-      // Release the wake lock provided by the WakefulBroadcastReceiver.
-      MyWakefulReceiver.completeWakefulIntent(intent);
-    }
-  }
-
   //These broadcast the Pending Intents we have created. MUST BE DECLARED IN MANIFEST.
   public static class DismissReceiver extends BroadcastReceiver {
     @Override
@@ -3580,10 +3538,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void replaceCycleListWithEmptyTextViewIfNoCyclesExist() {
-    if (mode == 1) if (workoutCyclesArray.size() != 0) emptyCycleList.setVisibility(View.GONE);
-    else emptyCycleList.setVisibility(View.VISIBLE);
-    if (mode == 3) if (pomArray.size() != 0) emptyCycleList.setVisibility(View.GONE);
-    else emptyCycleList.setVisibility(View.VISIBLE);
+    if (mode == 1) {
+      if (workoutCyclesArray.size() != 0) {
+        emptyCycleList.setVisibility(View.GONE);
+      }
+      else {
+        emptyCycleList.setVisibility(View.VISIBLE);
+      }
+    }
+    if (mode == 3) {
+      if (pomArray.size() != 0) {
+        emptyCycleList.setVisibility(View.GONE);
+      } else {
+        emptyCycleList.setVisibility(View.VISIBLE);
+      }
+    }
   }
 
   private void removeCycleHighlights() {
