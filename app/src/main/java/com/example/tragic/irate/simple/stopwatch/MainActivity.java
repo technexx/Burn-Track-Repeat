@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Infinity rounds get rounded up on resume, before dropping back down when unpaused.
   //Todo: Delay in adapter refresh when deleting activities in stats frag, food is fine though and so is activity addition.
   //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
   //Todo: Had a crash when switching cycle tabs relatied to AUDIO_CONTENT_TYPE_UNKNOWN.
