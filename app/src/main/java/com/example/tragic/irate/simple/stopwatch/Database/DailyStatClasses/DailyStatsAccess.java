@@ -679,8 +679,11 @@ public class DailyStatsAccess {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day) {
                 valueToReturn += mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
+                Log.i("testTime", "single totals are " + mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
             }
         }
+
+        Log.i("testTime", "total retrieved in db method is " + valueToReturn);
 
         return valueToReturn;
     }
@@ -813,8 +816,6 @@ public class DailyStatsAccess {
 
     public void setUnassignedDailyTotalTime() {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
-
-        Log.i("testTime", "total activity time is " + totalSetTimeForSelectedDuration);
     }
 
     public long getUnassignedSetTimeForSelectedDuration() {

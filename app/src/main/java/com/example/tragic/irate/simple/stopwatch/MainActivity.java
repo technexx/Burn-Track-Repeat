@@ -75,6 +75,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.legacy.content.WakefulBroadcastReceiver;
+import androidx.loader.content.AsyncTaskLoader;
 import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -1218,6 +1219,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleCycleAndPomCycleRecyclerViewVisibilities(false);
 
       toggleCustomActionBarButtonVisibilities(false);
+
+      Log.i("testTime", "activity total on timer dismissal is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+      Log.i("testTime", "daily total on timer dismissal is " + totalSetTimeForCurrentDayInMillis);
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
@@ -2414,14 +2418,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setOldActivityPositionInListForCurrentDay(currentActivityPosition);
     }
 
-//    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+    Log.i("testTime", "activity total being updated in database is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    Log.i("testTime", "time being updated in database is " + totalSetTimeForCurrentDayInMillis);
+
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
 
     StatsForEachActivity statsForEachActivity = dailyStatsAccess.getStatsForEachActivityEntity();
-
-//    Log.i("testChange", "activity from entity is " + statsForEachActivity.getActivity());
-//    Log.i("testChange", "time from entity is " + statsForEachActivity.getTotalSetTimeForEachActivity());
-//    Log.i("testChange", "unique ID from entity is " + statsForEachActivity.getUniqueIdTiedToTheSelectedActivity());
   }
 
   private void fabLogic() {
@@ -4141,11 +4143,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     clearRoundAndCycleAdapterArrayLists();
     populateCycleRoundAndRoundTypeArrayLists();
 
+    resetTimer();
+
     if (trackingActivity) {
       setAllActivityTimesAndCaloriesToTextViews();
     }
 
-    resetTimer();
+    Log.i("testTime", "activity total in timer launch logic is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    Log.i("testTime", "daily total in timer launch logic is " + totalSetTimeForCurrentDayInMillis);
   }
 
   private void setTimerLaunchViews(int typeOfLaunch) {
@@ -4195,11 +4200,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
       totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(dayOfYear);
     }
+
+    Log.i("testTime", "daily total retrieved from db list during launch is " + totalSetTimeForCurrentDayInMillis);
   }
 
   private void retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
     totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
+
+    Log.i("testTime", "activity total retrieved from db list during launch is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
@@ -4355,7 +4364,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void roundDailyStatTimesDown() {
     totalSetTimeForCurrentDayInMillis = roundDownMillisValues(totalSetTimeForCurrentDayInMillis);
-
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValues(totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
@@ -4471,10 +4479,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       long roundedSetTime = roundToNearestFullThousandth(totalCycleSetTimeInMillis);
       long roundedBreakTime = roundToNearestFullThousandth(totalCycleBreakTimeInMillis);
-
-      Log.i("testTime", "set time is " + totalCycleSetTimeInMillis);
-      Log.i("testTime", "rounded set time is " + roundedSetTime);
-      Log.i("testTime", "display is " + convertSeconds(dividedMillisForTotalTimesDisplay(roundedSetTime)));
 
       total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedSetTime)));
       total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedBreakTime)));
@@ -4665,6 +4669,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     };
   }
+
+
 
   private Runnable infinityRunnableForCyclesTimer() {
     setCycleTimeToIterate();
@@ -5154,8 +5160,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerIsPaused = false;
     timerDisabled = true;
     setHasTextSizeChangedForTimers(false);
-
-    setAllActivityTimesAndCaloriesToTextViews();
 
     progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
