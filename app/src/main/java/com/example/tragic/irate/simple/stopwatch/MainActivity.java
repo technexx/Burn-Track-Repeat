@@ -4558,8 +4558,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable stopWatchRunnable() {
-    stopWatchTotalTime = 3595000;
-
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(stopWatchTotalTime);
@@ -5143,6 +5141,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextPomRound(boolean endingEarly) {
+    Log.i("testPom", "dot counter is " + pomDotCounter);
     if (pomDotCounter == 8) {
       mHandler.removeCallbacks(endFadeForModeThree);
       resetTimer();
@@ -5161,7 +5160,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     removePomCycleTimeRunnable();
 
-    if (pomDotCounter < 7) {
+    if (pomDotCounter < 8) {
       pomDotCounter++;
     }
 
