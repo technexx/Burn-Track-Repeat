@@ -54,7 +54,7 @@
     <color name="light_black">#2f2f2f</color>
     <color name="grey_2">#424949</color>
     <color name="test_bg"> #212f3c </color>
-    <color name="test_bg2"> #201d1d </color>
+    <color name="darkest_gray"> #201d1d </color>
 
     <color name="android_green">#ff00ff00</color>
     <color name="android_red">#ffff0000</color>

@@ -62,8 +62,10 @@
     </style>
 
     <style name="TabLayoutTextStyle">
-        <item name="android:textSize">24sp</item>
-        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">20sp</item>
+    </style>
+
+    <style name="SmallTabLayoutStyle">
     </style>
 
     <style name="TabLayoutTextStyle_h1920">

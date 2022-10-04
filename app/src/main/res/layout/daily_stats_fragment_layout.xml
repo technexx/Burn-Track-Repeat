@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/StatFragmentThemeDark"
-    android:background="@color/test_bg2">
+    android:background="@color/darkest_gray">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/calorie_comparison_tab_layout"
@@ -13,11 +13,11 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/test_bg2"
+        android:background="@color/darkest_gray"
         app:tabTextColor="@color/white"
         app:tabIndicatorColor="@color/off_white"
         app:tabSelectedTextColor="@color/blue_2"
-        app:tabTextAppearance="@style/TabLayoutTextStyle"
+        app:tabTextAppearance="@style/SmallTabLayoutStyle"
         app:tabRippleColor="@android:color/transparent"
         app:tabIndicatorFullWidth="true" />
 
@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="0dp"
         android:background="@drawable/daily_total_stats_border"
-        android:backgroundTint="@color/test_bg2">
+        android:backgroundTint="@color/darkest_gray">
 
         <TextView
             android:id="@+id/activity_stats_duration_header_textView"
@@ -51,7 +51,7 @@
             app:layout_constraintBottom_toTopOf="@id/duration_date_range_textView"
             app:layout_constraintEnd_toStartOf="@id/activity_stats_duration_header_textView"
             android:layout_marginEnd="20dp"
-            android:background="@color/test_bg2"
+            android:background="@color/darkest_gray"
             android:src="@drawable/double_arrow_left">
         </ImageButton>
 
@@ -63,7 +63,7 @@
             app:layout_constraintBottom_toTopOf="@id/duration_date_range_textView"
             app:layout_constraintStart_toEndOf="@id/activity_stats_duration_header_textView"
             android:layout_marginStart="20dp"
-            android:background="@color/test_bg2"
+            android:background="@color/darkest_gray"
             android:src="@drawable/double_arrow_right">
         </ImageButton>
 
@@ -150,7 +150,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="10dp"
         android:src="@drawable/collapse_1"
-        android:backgroundTint="@color/test_bg2">
+        android:backgroundTint="@color/darkest_gray">
     </ImageButton>
 
     <ImageButton
@@ -174,7 +174,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/edit_icon"
         android:layout_marginEnd="10dp"
-        android:background="@color/test_bg2">
+        android:background="@color/darkest_gray">
     </ImageButton>
 
     <androidx.recyclerview.widget.RecyclerView
