@@ -634,7 +634,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Clicking on a cycle while another is active can sometimes show +1 for total daily time, which then SKIPS that iteration for the first second of its cycle. So, time seems to be correct, but the display gets rounded up.
   //Todo: Delay in adapter refresh when deleting activities in stats frag, food is fine though and so is activity addition.
 
   //Todo: Test minimized vibrations on <26 api
@@ -941,8 +940,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerIsPaused = true;
       progressBar.setProgress(currentProgressBarValue);
 
-      toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
-
       AsyncTask.execute(() -> {
         if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
           insertActivityIntoDatabaseAndAssignItsValueToObjects();
@@ -951,6 +948,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         runOnUiThread(() -> {
           if (mode == 1) {
+            toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
             changeTextSizeWithoutAnimator(workoutTime.get(0));
           }
           if (mode == 3) {
@@ -4343,16 +4341,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalCycleSetTimeInMillis = roundDownMillisValues(totalCycleSetTimeInMillis);
   }
 
-  private void roundCycleSetTimeUp() {
-    totalCycleSetTimeInMillis = roundUpMillisValues(totalCycleSetTimeInMillis);
-  }
-
   private void roundCycleBreakTimeDown() {
     totalCycleBreakTimeInMillis = roundDownMillisValues(totalCycleBreakTimeInMillis);
-  }
-
-  private void roundCycleBreakTimeUp() {
-    totalCycleBreakTimeInMillis = roundUpMillisValues(totalCycleBreakTimeInMillis);
   }
 
   private void roundDailyStatTimesDown() {
@@ -4360,25 +4350,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValues(totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
-  private void roundDailyStatTimesUp() {
-    totalSetTimeForCurrentDayInMillis = roundUpMillisValues(totalSetTimeForCurrentDayInMillis);
-    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundUpMillisValues(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-  }
-
   private void roundDownPomCycleWorkTime() {
     totalCycleWorkTimeInMillis = roundDownMillisValues(totalCycleWorkTimeInMillis);
   }
 
-  private void roundUpPomCycleWorkTime() {
-    totalCycleWorkTimeInMillis = roundUpMillisValues(totalCycleWorkTimeInMillis);
-  }
-
   private void roundDownPomCycleRestTime() {
     totalCycleRestTimeInMillis = roundDownMillisValues(totalCycleRestTimeInMillis);
-  }
-
-  private void roundUpPomCycleRestTime() {
-    totalCycleRestTimeInMillis = roundUpMillisValues(totalCycleRestTimeInMillis);
   }
 
   private long roundDownMillisValues(long millisToRound) {
@@ -5375,7 +5352,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             startObjectAnimatorAndTotalCycleTimeCounters();
             startPomTimer();
           }
-
           pomTimerResumeLogic();
           postPomCycleTimeRunnable();
         }
@@ -5848,8 +5824,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleViewsForTotalDailyAndCycleTimes(boolean trackingCycle) {
     if (!trackingCycle) {
-      setTotalCycleTimeValuesToTextView();
-
       cycle_title_textView.setVisibility(View.VISIBLE);
       tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
       cycles_completed_textView.setVisibility(View.VISIBLE);
