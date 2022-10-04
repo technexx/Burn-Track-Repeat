@@ -952,16 +952,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(() -> {
           if (mode == 1) {
             changeTextSizeWithoutAnimator(workoutTime.get(0));
-
-            if (trackActivityWithinCycle) {
-              setAllActivityTimesAndCaloriesToTextViews();
-            } else {
-              setCyclesCompletedTextView();
-            }
           }
           if (mode == 3) {
             changeTextSizeWithoutAnimator(pomValuesTime.get(0));
-            setCyclesCompletedTextView();
             toggleViewsForTotalDailyAndCycleTimes(false);
           }
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
