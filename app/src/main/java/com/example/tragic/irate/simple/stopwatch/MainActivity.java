@@ -625,6 +625,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
+  //Todo: Still +1 on daily and activity total on resume.
+      //Todo: This is because we set these textViews as roundToNearestThousandth, so they will round up if closer to next second, but when iterating in cycle they only change when timer changes.
+  //Todo: If deleting stats and in reset/resume mode, stats will not show as reset in Timer.
+
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -1213,8 +1217,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       toggleCustomActionBarButtonVisibilities(false);
 
-      Log.i("testTime", "activity total on timer dismissal is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-      Log.i("testTime", "daily total on timer dismissal is " + totalSetTimeForCurrentDayInMillis);
+//      Log.i("testTime", "activity total on timer dismissal is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+//      Log.i("testTime", "daily total on timer dismissal is " + totalSetTimeForCurrentDayInMillis);
 
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
     });
