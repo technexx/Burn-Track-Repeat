@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:backgroundTint="@color/test_grey"
+    android:backgroundTint="@color/darker_grey"
     android:background="@drawable/rounded_corners">
 
     <TextView
@@ -15,12 +15,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
         android:lineSpacingMultiplier="1.25"
-        android:textSize="18sp"
+        android:textSize="20sp"
         android:textColor="@color/white"
         android:gravity="center">
     </TextView>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:text="Yes"
         android:id="@+id/confirm_yes"
         android:layout_width="70dp"
@@ -28,11 +28,15 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/confirm_no"
+        android:textColor="@color/white"
         android:textSize="16sp"
-        android:textColor="@color/white">
-    </Button>
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
 
-    <Button
+    <com.google.android.material.button.MaterialButton
         android:text="No"
         android:id="@+id/confirm_no"
         android:layout_width="70dp"
@@ -40,9 +44,12 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toEndOf="@id/confirm_yes"
-        android:textSize="16sp"
         android:textColor="@color/white"
-        android:src="@drawable/rectangle_shape">
-    </Button>
+        android:textSize="16sp"
+        app:cornerRadius="10dp"
+        app:rippleColor="#33AAAAAA"
+        app:strokeColor="@color/white"
+        app:strokeWidth="1dp">
+    </com.google.android.material.button.MaterialButton>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

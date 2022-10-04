@@ -643,6 +643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test everything 10x. Incl. round selection/replacement.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
+  //Todo: Backup cloud option.
 
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
