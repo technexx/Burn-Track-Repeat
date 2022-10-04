@@ -7,6 +7,7 @@ import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -136,9 +137,9 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 pomHolder.resetCycle.setOnClickListener(v-> {
                     mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
                 });
-            }
 
-            pomHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+                pomHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+            }
         } else {
             pomHolder.fullView.setBackgroundColor(Color.BLACK);
         }
@@ -216,6 +217,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                     //Adds the position at its identical index for easy removal access.
                     mPositionList.add(position);
                     pomHolder.fullView.setBackgroundColor(Color.GRAY);
+
                 }
                 //Callback to send position list (Using Strings to make removing values easier) back to Main.
                 mOnHighlightListener.onCycleHighlight(mPositionList, false);

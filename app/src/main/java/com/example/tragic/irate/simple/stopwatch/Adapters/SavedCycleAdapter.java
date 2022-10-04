@@ -280,7 +280,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           //Adds the position at its identical index for easy removal access.
           mPositionList.add(position);
           workoutHolder.fullView.setBackgroundColor(Color.GRAY);
-          Log.i("testHighlight", "bg set to gray at position " + position);
         }
         //Callback to send position list (Using Strings to make removing values easier) back to Main.
         mOnHighlightListener.onCycleHighlight(mPositionList, false);
