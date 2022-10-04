@@ -2096,17 +2096,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesComparisonTabLayout = mRoot.findViewById(R.id.calorie_comparison_tab_layout);
 
         if (phoneHeight <= 1920) {
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Burned"));
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Consumed"));
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Compared"));
+//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Burned"));
+//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Consumed"));
+//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Compared"));
+
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Burned"));
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
+            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));
         } else {
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Burned"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));
-
-//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setIcon(R.drawable.run_icon));
-//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setIcon(R.drawable.food_icon));
-//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setIcon(R.drawable.compare_icon));
         }
 
         activityStatsDurationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);

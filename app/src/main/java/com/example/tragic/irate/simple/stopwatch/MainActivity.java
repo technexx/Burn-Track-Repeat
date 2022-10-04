@@ -633,9 +633,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
+  //Todo: Clicking on a cycle while another is active can sometimes show +1 for total daily time, which then SKIPS that iteration for the first second of its cycle. So, time seems to be correct, but the display gets rounded up.
   //Todo: Delay in adapter refresh when deleting activities in stats frag, food is fine though and so is activity addition.
-  //Todo: Calories tab in Stats Frag needs changing in <=1920 devices.
-  //Todo: Had a crash when switching cycle tabs relatied to AUDIO_CONTENT_TYPE_UNKNOWN.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
@@ -4338,46 +4337,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return df.format(calories);
   }
 
-  private void roundCycleSetTimeUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundCycleSetTimeDown();
-    } else {
-      roundCycleSetTimeUp();
-    }
-  }
-
-  private void roundCycleBreakTimeUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundCycleBreakTimeDown();
-    } else {
-      roundCycleBreakTimeUp();
-    }
-  }
-
-  private void roundDailyStatTimesUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundDailyStatTimesDown();
-    } else {
-      roundDailyStatTimesUp();
-    }
-  }
-
-  private void roundPomWorkTimeUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundDownPomCycleWorkTime();
-    } else {
-      roundUpPomCycleWorkTime();
-    }
-  }
-
-  private void roundPomRestTimeUpOrDown(boolean endingCycleEarly) {
-    if (endingCycleEarly) {
-      roundDownPomCycleRestTime();
-    } else {
-      roundUpPomCycleRestTime();
-    }
-  }
-
   private void roundCycleSetTimeDown() {
     totalCycleSetTimeInMillis = roundDownMillisValues(totalCycleSetTimeInMillis);
   }
@@ -5091,7 +5050,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     globalNextRoundLogic();
-
     mHandler.post(endFadeForModeOne);
 
     if (endingEarly) {
@@ -5176,22 +5134,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 4:
       case 6:
         setEndOfRoundSounds(vibrationSettingForWork, false);
-
-        roundPomWorkTimeUpOrDown(endingEarly);
         break;
       case 1:
       case 3:
       case 5:
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
-
-        roundPomRestTimeUpOrDown(endingEarly);
         break;
       case 7:
         boolean isAlertRepeating = false;
         if (isFullBreakSoundContinuous) isAlertRepeating = true;
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, isAlertRepeating);
-
-        roundPomRestTimeUpOrDown(endingEarly);
     }
 
     mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
