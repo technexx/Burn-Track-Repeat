@@ -625,7 +625,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  //Todo: Giant textSize if resetting in one mode and resuming timer in other (likely it resetting to large default).
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -940,10 +939,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (mode == 1) {
             toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
             changeTextSizeWithoutAnimator(workoutTime.get(0));
+            if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+              timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
+            } else {
+              timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
+            }
           }
           if (mode == 3) {
             changeTextSizeWithoutAnimator(pomValuesTime.get(0));
             toggleViewsForTotalDailyAndCycleTimes(false);
+            timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
           }
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
         });
@@ -4630,8 +4635,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-
-
   private Runnable infinityRunnableForCyclesTimer() {
     setCycleTimeToIterate();
 
@@ -4940,12 +4943,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (phoneHeight < 1920) {
         timeLeft.setTextSize(70f);
       } else {
+        Log.i("testChange", "changing to smaller size!");
         timeLeft.setTextSize(90f);
       }
     } else {
       if (phoneHeight < 1920) {
         timeLeft.setTextSize(90f);
       } else {
+        Log.i("testChange", "changing to larger size!");
         timeLeft.setTextSize(120f);
       }
     }
