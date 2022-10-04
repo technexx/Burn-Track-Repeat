@@ -625,6 +625,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
+  //Todo: Each row highlighting when adding Pom cycles.
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -929,6 +930,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerIsPaused = true;
       progressBar.setProgress(currentProgressBarValue);
 
+      setTotalCycleTimeValuesToTextView();
+      if (mode == 1 && trackActivityWithinCycle) {
+        setAllActivityTimesAndCaloriesToTextViews();
+      }
+
       AsyncTask.execute(() -> {
         if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
           insertActivityIntoDatabaseAndAssignItsValueToObjects();
@@ -939,11 +945,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (mode == 1) {
             toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
             changeTextSizeWithoutAnimator(workoutTime.get(0));
+
             if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
               timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
             } else {
               timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
             }
+
           }
           if (mode == 3) {
             changeTextSizeWithoutAnimator(pomValuesTime.get(0));
@@ -4133,6 +4141,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (trackingActivity) {
       setAllActivityTimesAndCaloriesToTextViews();
+    } else {
+      setTotalCycleTimeValuesToTextView();
     }
 
     Log.i("testTime", "activity total in timer launch logic is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
