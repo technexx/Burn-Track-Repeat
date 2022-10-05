@@ -628,10 +628,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Our String -> Int -> Long method needs to account for hours display, as well.
-  //Todo: Cycles set/break time will also start 1 higher if dismissed/resumed from close to next second.
+  //Todo: Cycles set/break time will start 1 higher if dismissed/resumed from close to next second.
+      //Todo: Do same String -> Int/Long, since the sync issue is the same.
   //Todo: Cap @ test infinity rounds at 90 minutes.
-  //Todo: If deleting stats and in reset/resume mode, stats will not show as reset in Timer.
+  //Todo: If editing/deleting and in reset/resume mode, stats will not show as reset in Timer.
   //Todo: Had two rows highlights (as in reset/resume) in Cycles.
 
   //Todo: Test minimized vibrations on <26 api
@@ -2464,34 +2464,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int totalHours = 0;
     int totalMinutes = 0;
     int totalSeconds = 0;
+    timerString = timerString.replace(":", "");
 
     //Range is exclusive of last position.
-    if (timerString.length() == 4) {
+    if (timerString.length() == 3) {
       totalMinutes = Integer.parseInt(timerString.substring(0, 1));
-      //colon
+      totalSeconds = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
+    }
+
+    if (timerString.length() == 4) {
+      totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
       totalSeconds = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
     }
 
     if (timerString.length() == 5) {
-      totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
-      //colon
+      totalHours = Integer.parseInt(timerString.substring(0, 1));
+      totalMinutes = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
       totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
     }
 
-    if (timerString.length() == 7) {
-      totalHours = Integer.parseInt(timerString.substring(0, 1));
-      ///colon
-      totalMinutes = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
-      //colon
-      totalSeconds = Integer.parseInt(timerString.substring(5, 6) + timerString.substring(6, 7));
-    }
-
-    if (timerString.length() == 8) {
+    if (timerString.length() == 6) {
       totalHours = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
-      ///colon
-      totalMinutes = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
-      //colon
-      totalSeconds = Integer.parseInt(timerString.substring(6, 7) + timerString.substring(7, 8));
+      totalMinutes = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
+      totalSeconds = Integer.parseInt(timerString.substring(4, 5) + timerString.substring(5, 6));
     }
 
     if (totalSeconds > 60) {
