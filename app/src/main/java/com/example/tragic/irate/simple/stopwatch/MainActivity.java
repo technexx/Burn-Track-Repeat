@@ -628,9 +628,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Still +1 on daily and activity total on resume.
-      //Todo: This is because we set these textViews as roundToNearestThousandth, so they will round up if closer to next second, but when iterating in cycle they only change when timer changes.
+  //Todo: If resuming @ 11 seconds total time, can be "10" in stats frag and also go back to "10" if resetting and selecting new cycle.
   //Todo: If deleting stats and in reset/resume mode, stats will not show as reset in Timer.
+  //Todo: Had two rows highlights (as in reset/resume) in Cycles.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
@@ -646,6 +646,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Add Day/Night modes.
 
+  //Todo: If still having sync issues w/ daily times it's because we set these textViews as roundToNearestThousandth, so they will round up if closer to next second, but when iterating in cycle they only change when timer changes. Current textView String save addresses this.
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
   @Override
@@ -979,6 +980,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       resetTimer();
     }
+  }
+
+  private void timerPopUpDismissalLogic() {
+    timerDisabled = false;
+    timerPopUpIsVisible = false;
+    reset.setVisibility(View.INVISIBLE);
+
+    if (mode == 1) {
+      savedCycleAdapter.notifyDataSetChanged();
+      pauseAndResumeTimer(PAUSING_TIMER);
+
+      if (trackActivityWithinCycle) {
+        storeDailyTimesForCycleResuming();
+      }
+    } else if (mode == 3) {
+      pauseAndResumePomodoroTimer(PAUSING_TIMER);
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
+    mHandler.removeCallbacksAndMessages(null);
+  }
+
+  private void storeDailyTimesForCycleResuming() {
+    savedTotalDailyTimeString = (String) dailyTotalTimeTextView.getText();
+    savedSingleActivityString = (String) dailyTotalTimeForSingleActivityTextView.getText();
+  }
+
+  private void setStoredDailyTimesOnCycleResume() {
+    dailyTotalTimeTextView.setText(savedTotalDailyTimeString);
+    dailyTotalTimeForSingleActivityTextView.setText(savedSingleActivityString);
   }
 
   @Override
@@ -2796,8 +2826,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  ;
-
   private void deleteTotalCycleTimes() {
     if (mode == 1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
     if (mode == 3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
@@ -2987,35 +3015,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         vibrationSettingForMiniBreaks = settingNumber;
         break;
     }
-  }
-
-  private void timerPopUpDismissalLogic() {
-    timerDisabled = false;
-    timerPopUpIsVisible = false;
-    reset.setVisibility(View.INVISIBLE);
-
-    if (mode == 1) {
-      savedCycleAdapter.notifyDataSetChanged();
-      pauseAndResumeTimer(PAUSING_TIMER);
-
-      if (trackActivityWithinCycle) {
-        storeDailyTimesForCycleResuming();
-      }
-    } else if (mode == 3) {
-      pauseAndResumePomodoroTimer(PAUSING_TIMER);
-      savedPomCycleAdapter.notifyDataSetChanged();
-    }
-    mHandler.removeCallbacksAndMessages(null);
-  }
-
-  private void storeDailyTimesForCycleResuming() {
-    savedTotalDailyTimeString = (String) dailyTotalTimeTextView.getText();
-    savedSingleActivityString = (String) dailyTotalTimeForSingleActivityTextView.getText();
-  }
-
-  private void setStoredDailyTimesOnCycleResume() {
-    dailyTotalTimeTextView.setText(savedTotalDailyTimeString);
-    dailyTotalTimeForSingleActivityTextView.setText(savedSingleActivityString);
   }
 
   private void editCyclesPopUpDismissalLogic() {
