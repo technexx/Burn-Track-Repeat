@@ -2499,7 +2499,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalMinutes += 1;
     }
 
-    int totalTime = (totalMinutes * 60) + totalSeconds;
+    if (totalMinutes>=60) {
+      totalHours = totalMinutes/60;
+      totalMinutes = totalMinutes % 60;
+    }
+
+    int totalTime = (totalHours * totalMinutes * 60) + totalSeconds;
     return totalTime;
   }
 
