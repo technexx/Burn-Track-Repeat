@@ -632,6 +632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Cycles set/break time will start 1 higher if dismissed/resumed from close to next second.
       //Todo: Do same String -> Int/Long, since the sync issue is the same.
   //Todo: Cap @ test infinity rounds at 90 minutes.
+  //Todo: Set time not iterating after last second at end of round. but begins at +1 (e.g. end at 19, iterates to 21 next round).
   //Todo: If editing/deleting and in reset/resume mode, stats will not show as reset in Timer.
   //Todo: Had two rows highlights (as in reset/resume) in Cycles.
 
@@ -1481,12 +1482,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (mode == 1) {
         resetTimer();
+        if (!trackActivityWithinCycle) {
+          deleteTotalCycleTimes();
+        }
       }
       if (mode == 3) {
         if (reset.getText().toString().equals(getString(R.string.reset))) {
           reset.setText(R.string.confirm_cycle_reset);
         } else {
           resetTimer();
+          deleteTotalCycleTimes();
         }
       }
     });
@@ -1937,6 +1942,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     progressBarLayout = timerPopUpView.findViewById(R.id.timer_progress_bar_layout);
     timeLeft = timerPopUpView.findViewById(R.id.timeLeft);
     reset_total_cycle_times = timerPopUpView.findViewById(R.id.reset_total_cycle_times);
+    reset_total_cycle_times.setVisibility(View.GONE);
     pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
     next_round = timerPopUpView.findViewById(R.id.next_round);
 
@@ -2451,8 +2457,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString() {
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(getDailyActivityTimeFromTextView(), totalCaloriesBurnedForSpecificActivityForCurrentDay);
-
-    Log.i("testSave", "value saved is " + getDailyActivityTimeFromTextView());
   }
 
   private long getDailyActivityTimeFromTextView() {
@@ -2882,8 +2886,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteTotalCycleTimes() {
-    if (mode == 1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
-    if (mode == 3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
+//    if (mode == 1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
+//    if (mode == 3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
 
     runOnUiThread(() -> {
       deleteCyclePopupWindow.dismiss();
@@ -4110,14 +4114,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (!isNewCycle) {
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+//        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       } else {
         positionOfSelectedCycle = pomArray.size() - 1;
       }
 
       setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
-      retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-//      roundDownPomCycleWorkAndRestTimes();
+//      retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
 
       runOnUiThread(new Runnable() {
         @Override
@@ -4182,7 +4185,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (!trackActivityWithinCycle) {
         setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+//        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
       runOnUiThread(new Runnable() {
@@ -5210,7 +5213,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     currentProgressBarValue = 10000;
     next_round.setEnabled(false);
 
-    enableOrDisableCycleResetButton(false);
+//    enableOrDisableCycleResetButton(false);
 
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
   }
@@ -5383,7 +5386,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     activeCycle = true;
     timerIsPaused = false;
     reset.setVisibility(View.INVISIBLE);
-    enableOrDisableCycleResetButton(false);
+//    enableOrDisableCycleResetButton(false);
   }
 
   private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
@@ -5447,7 +5450,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     activeCycle = true;
     timerIsPaused = false;
     reset.setVisibility(View.INVISIBLE);
-    enableOrDisableCycleResetButton(false);
+//    enableOrDisableCycleResetButton(false);
   }
 
   private void postPomCycleTimeRunnable() {
@@ -5745,7 +5748,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     reset.setText(R.string.reset);
     reset.setVisibility(View.INVISIBLE);
-    enableOrDisableCycleResetButton(true);
+//    enableOrDisableCycleResetButton(true);
 
     cycles_completed_textView.setText(R.string.cycles_done);
 
@@ -5899,7 +5902,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycle_title_textView.setVisibility(View.VISIBLE);
       tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
       cycles_completed_textView.setVisibility(View.VISIBLE);
-      reset_total_cycle_times.setVisibility(View.VISIBLE);
+//      reset_total_cycle_times.setVisibility(View.VISIBLE);
 
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
@@ -5920,7 +5923,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycle_title_textView.setVisibility(View.GONE);
       tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
-      reset_total_cycle_times.setVisibility(View.INVISIBLE);
+//      reset_total_cycle_times.setVisibility(View.INVISIBLE);
 
       total_set_header.setVisibility(View.INVISIBLE);
       total_set_time.setVisibility(View.INVISIBLE);
