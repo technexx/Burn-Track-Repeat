@@ -621,6 +621,7 @@ public class DailyStatsAccess {
 
     public void assignPositionOfActivityListForRetrieveActivityToStatsEntity() {
         mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
+        Log.i("testStats", "entity activity time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
     }
 
     public int getActivityPosition() {

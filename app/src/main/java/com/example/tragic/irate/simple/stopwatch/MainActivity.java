@@ -635,7 +635,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Cap @ test infinity rounds at 90 minutes.
   //Todo: Set time not iterating after last second at end of round. but begins at +1 (e.g. end at 19, iterates to 21 next round).
-  //Todo: If editing/deleting and in reset/resume mode, stats will not show as reset in Timer.
   //Todo: Had two rows highlights (as in reset/resume) in Cycles.
 
   //Todo: Test minimized vibrations on <26 api
@@ -966,6 +965,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
             insertActivityIntoDatabaseAndAssignItsValueToObjects();
             dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
+
+            runOnUiThread(()-> {
+              retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+              setAllActivityTimesAndCaloriesToTextViews();
+            });
           }
         });
       }
@@ -1003,7 +1007,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.notifyDataSetChanged();
       pauseAndResumeTimer(PAUSING_TIMER);
 
-      //Todo: We need to ensure new values are set on textViews on resume, or else this will still overwrite.
       if (trackActivityWithinCycle) {
         storeDailyTimesForCycleResuming();
 
@@ -4249,9 +4252,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       setTotalCycleTimeValuesToTextView();
     }
-
-    Log.i("testTime", "activity total in timer launch logic is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    Log.i("testTime", "daily total in timer launch logic is " + totalSetTimeForCurrentDayInMillis);
   }
 
   private void setTimerLaunchViews(int typeOfLaunch) {
@@ -4284,6 +4284,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (dailyStatsAccess.doesActivityExistsForSpecificDay()) {
       dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
+      //Todo: We get an updated mStats entity here. It retrieves correctly when resuming (i.e. with changed activity time).
       dailyStatsAccess.assignPositionOfActivityListForRetrieveActivityToStatsEntity();
     } else {
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
@@ -4301,15 +4302,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
       totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(dayOfYear);
     }
-
-    Log.i("testTime", "daily total retrieved from db list during launch is " + totalSetTimeForCurrentDayInMillis);
   }
 
   private void retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
     totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
 
-    Log.i("testTime", "activity total retrieved from db list during launch is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    Log.i("testStats", "activity total retrieved from db is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
