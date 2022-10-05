@@ -626,6 +626,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
+  String savedTotalSetTime;
+  String savedTotalBreakTime;
+  String savedTotalWorkTime;
+  String savedTotalRestTime;
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
@@ -937,8 +941,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-
-
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset) {
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
       timerIsPaused = true;
@@ -946,36 +948,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setTotalCycleTimeValuesToTextView();
 
-      if (mode == 1 && trackActivityWithinCycle) {
-        setAllActivityTimesAndCaloriesToTextViews();
-        setStoredDailyTimesOnCycleResume();
-      }
-
-      AsyncTask.execute(() -> {
-        if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
-          insertActivityIntoDatabaseAndAssignItsValueToObjects();
-          dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
+      if (mode == 1) {
+        if (trackActivityWithinCycle) {
+          setAllActivityTimesAndCaloriesToTextViews();
+          setStoredDailyTimesOnCycleResume();
+        } else {
+          setStoredSetAndBreakTimeOnCycleResume();
         }
 
-        runOnUiThread(() -> {
-          if (mode == 1) {
-            toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
-            changeTextSizeWithoutAnimator(workoutTime.get(0));
+        toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
+        changeTextSizeWithoutAnimator(workoutTime.get(0));
 
-            if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-              timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
-            } else {
-              timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
-            }
+        if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+          timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
+        } else {
+          timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
+        }
+
+        AsyncTask.execute(()-> {
+          if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
+            insertActivityIntoDatabaseAndAssignItsValueToObjects();
+            dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
           }
-          if (mode == 3) {
-            changeTextSizeWithoutAnimator(pomValuesTime.get(0));
-            toggleViewsForTotalDailyAndCycleTimes(false);
-            timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
-          }
-          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
         });
-      });
+      }
+
+      if (mode == 3) {
+        setStoredSetAndBreakTimeOnPomCycleResume();
+
+        changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+        toggleViewsForTotalDailyAndCycleTimes(false);
+        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
+      }
+
+      timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+
     } else if (resumeOrReset == RESETTING_CYCLE_FROM_ADAPTER) {
       if (mode == 1) {
         savedCycleAdapter.removeActiveCycleLayout();
@@ -1001,12 +1008,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: We need to ensure new values are set on textViews on resume, or else this will still overwrite.
       if (trackActivityWithinCycle) {
         storeDailyTimesForCycleResuming();
+
         AsyncTask.execute(()-> {
-//          setAndUpdateActivityTimeAndCaloriesInDatabase();
           setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString();
         });
+      }  else {
+        storeSetAndBreakTimeForCycleResuming();
       }
+
     } else if (mode == 3) {
+      storeSetAndBreakTimeForPomCycleResuming();
       pauseAndResumePomodoroTimer(PAUSING_TIMER);
       savedPomCycleAdapter.notifyDataSetChanged();
     }
@@ -1022,6 +1033,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setStoredDailyTimesOnCycleResume() {
     dailyTotalTimeTextView.setText(savedTotalDailyTimeString);
     dailyTotalTimeForSingleActivityTextView.setText(savedSingleActivityString);
+  }
+
+  private void storeSetAndBreakTimeForCycleResuming() {
+    if (mode==1) {
+      savedTotalSetTime = (String) total_set_time.getText();
+      savedTotalBreakTime = (String) total_break_time.getText();
+    }
+  }
+
+  private void setStoredSetAndBreakTimeOnCycleResume() {
+    if (mode==1) {
+      total_set_time.setText(savedTotalSetTime);
+      total_break_time.setText(savedTotalBreakTime);
+    }
+  }
+
+  private void storeSetAndBreakTimeForPomCycleResuming() {
+    savedTotalWorkTime = (String) total_set_time.getText();
+    savedTotalRestTime = (String) total_break_time.getText();
+  }
+
+  private void setStoredSetAndBreakTimeOnPomCycleResume() {
+    total_set_time.setText(savedTotalWorkTime);
+    total_break_time.setText(savedTotalRestTime);
   }
 
   @Override
