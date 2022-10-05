@@ -651,7 +651,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Add Day/Night modes.
 
-  //Todo: ***If still having sync issues w/ daily times it's because they can be higher than their textView shows (e.g. 25200 can still show as "24") because their textView only changes when timer changes. We have a String->Int->Long method now to correct this.
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
   @Override
@@ -956,9 +955,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         changeTextSizeWithoutAnimator(workoutTime.get(0));
 
         if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-          timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
+          timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
         } else {
-          timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
+          timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
         }
 
         AsyncTask.execute(()-> {
@@ -979,7 +978,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         changeTextSizeWithoutAnimator(pomValuesTime.get(0));
         toggleViewsForTotalDailyAndCycleTimes(false);
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
+        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
       }
 
       timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
@@ -2839,13 +2838,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         for (int i = 0; i < workoutTime.size(); i++) {
-          convertedWorkoutTime.add(convertSeconds(workoutTime.get(i) / 1000));
+          convertedWorkoutTime.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTime.get(i) / 1000));
           if (i <= 7) {
-            workoutStringListOfRoundValuesForFirstAdapter.add(convertSeconds(workoutTime.get(i) / 1000));
+            workoutStringListOfRoundValuesForFirstAdapter.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTime.get(i) / 1000));
             workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
           }
           if (i >= 8) {
-            workoutStringListOfRoundValuesForSecondAdapter.add(convertSeconds(workoutTime.get(i) / 1000));
+            workoutStringListOfRoundValuesForSecondAdapter.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTime.get(i) / 1000));
             workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(i));
           }
         }
@@ -2856,7 +2855,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         pomStringListOfRoundValues.clear();
         for (int i = 0; i < pomValuesTime.size(); i++) {
-          pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(i) / 1000));
+          pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(pomValuesTime.get(i) / 1000));
         }
         break;
     }
@@ -3533,7 +3532,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (stopWatchPopUpWindow.isShowing()) {
           headerOne = getString(R.string.notification_stopwatch_header);
-          bodyOne = convertTimerValuesToStringForNotifications((long) stopWatchSeconds);
+          bodyOne = longToStringConverters.convertTimerValuesToStringForNotifications((long) stopWatchSeconds);
         }
 
         notificationManagerBuilder.setStyle(new NotificationCompat.InboxStyle()
@@ -3572,7 +3571,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeRemaining = "00:00";
     } else {
       long roundedTimeLeft = roundToNearestFullThousandth(timeLeft);
-      timeRemaining = convertTimerValuesToStringForNotifications(roundedTimeLeft / 1000);
+      timeRemaining = longToStringConverters.convertTimerValuesToStringForNotifications(roundedTimeLeft / 1000);
     }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
@@ -3770,44 +3769,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     else return value;
   }
 
-  private String convertSeconds(long totalSeconds) {
-    DecimalFormat df = new DecimalFormat("00");
-    long minutes;
-    long remainingSeconds;
-
-    if (totalSeconds >= 60) {
-      minutes = totalSeconds / 60;
-      remainingSeconds = totalSeconds % 60;
-      return (minutes + ":" + df.format(remainingSeconds));
-    } else {
-      return String.valueOf(totalSeconds);
-    }
-  }
-
-  public String convertTimerValuesToStringForNotifications(long totalSeconds) {
-    DecimalFormat df = new DecimalFormat("00");
-    long minutes;
-    long remainingSeconds;
-    minutes = totalSeconds / 60;
-
-    remainingSeconds = totalSeconds % 60;
-
-    if (totalSeconds >= 60) {
-      String formattedSeconds = df.format(remainingSeconds);
-      if (formattedSeconds.length() > 2) formattedSeconds = "0" + formattedSeconds;
-      if (totalSeconds >= 600) {
-        return (minutes + ":" + formattedSeconds);
-      } else {
-        return ("0" + minutes + ":" + formattedSeconds);
-      }
-    } else {
-      String totalStringSeconds = String.valueOf(totalSeconds);
-
-      if (totalStringSeconds.length() < 2) totalStringSeconds = "0" + totalStringSeconds;
-      return "00:" + totalStringSeconds;
-    }
-  }
-
   private void animateTimerEnding() {
     endAnimationForTimer = new AlphaAnimation(1.0f, 0.0f);
     endAnimationForTimer.setDuration(300);
@@ -3870,7 +3831,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomValuesTime.add(pomValue1 * 1000);
           pomValuesTime.add(pomValue3 * 1000);
           for (int j = 0; j < pomValuesTime.size(); j++) {
-            pomStringListOfRoundValues.add(convertSeconds(pomValuesTime.get(j) / 1000));
+            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(pomValuesTime.get(j) / 1000));
           }
 
           cycleRoundsAdapter.setPomFade(true);
@@ -3913,7 +3874,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!replacingValue) {
         if (workoutTime.size() < 16) {
           workoutTime.add(integerValue * 1000);
-          convertedWorkoutTime.add(convertSeconds(integerValue));
+          convertedWorkoutTime.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue));
           typeOfRound.add(roundType);
           roundSelectedPosition = workoutTime.size() - 1;
 
@@ -3934,7 +3895,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
       } else {
         workoutTime.set(roundSelectedPosition, integerValue * 1000);
-        convertedWorkoutTime.set(roundSelectedPosition, convertSeconds(integerValue));
+        convertedWorkoutTime.set(roundSelectedPosition, longToStringConverters.convertSecondsToMinutesBasedString(integerValue));
         typeOfRound.set(roundSelectedPosition, roundType);
         if (roundSelectedPosition <= 7) {
           workoutStringListOfRoundValuesForFirstAdapter.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
@@ -4113,7 +4074,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           for (int i = 0; i < fetchedPomCycle.length; i++) {
             int integerValue = Integer.parseInt(fetchedPomCycle[i]);
             pomValuesTime.add(integerValue);
-            pomStringListOfRoundValues.add(convertSeconds(integerValue / 1000));
+            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue / 1000));
           }
 
           pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
@@ -4157,7 +4118,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
-//      retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
 
       runOnUiThread(new Runnable() {
         @Override
@@ -4284,7 +4244,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (dailyStatsAccess.doesActivityExistsForSpecificDay()) {
       dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
-      //Todo: We get an updated mStats entity here. It retrieves correctly when resuming (i.e. with changed activity time).
+      //We get an updated mStats entity here.
       dailyStatsAccess.assignPositionOfActivityListForRetrieveActivityToStatsEntity();
     } else {
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
@@ -4523,7 +4483,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyActivityTimeToTextView() {
-//    long roundedTotalDailyActivityTime = roundToNearestFullThousandth(totalSetTimeForCurrentDayInMillis);
     dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
   }
 
@@ -4532,7 +4491,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalSingleActivityTimeToTextView() {
-//    long roundedSingleActivityTime = roundToNearestFullThousandth(totalSetTimeForSpecificActivityForCurrentDayInMillis);
     dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
   }
 
@@ -4609,7 +4567,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchMinutes = (int) stopWatchSeconds / 60;
         stopWatchMs = (stopWatchTotalTime % 1000) / 10;
 
-        displayTime = convertSeconds((long) stopWatchSeconds);
+        displayTime = longToStringConverters.convertSecondsToMinutesBasedString((long) stopWatchSeconds);
         displayMs = df2.format(stopWatchMs);
 
         stopWatchTimeTextView.setText(displayTime);
@@ -4834,7 +4792,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         setMillis = timerIteration.getNewTotal();
 
-        timeLeft.setText(convertSeconds(setMillis / 1000));
+        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(setMillis / 1000));
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
@@ -4871,7 +4829,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         breakMillis = timerIteration.getNewTotal();
 
-        timeLeft.setText(convertSeconds(breakMillis / 1000));
+        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(breakMillis / 1000));
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
@@ -4892,7 +4850,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<String> listToReturn = new ArrayList<>();
 
     for (int i = 0; i < listToConvert.size(); i++) {
-      listToReturn.add(convertSeconds(listToConvert.get(i) / 1000));
+      listToReturn.add(longToStringConverters.convertSecondsToMinutesBasedString(listToConvert.get(i) / 1000));
     }
 
     return listToReturn;
@@ -4908,7 +4866,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
+        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
 
         if (setMillis < 500) timerDisabled = true;
 
@@ -4934,7 +4892,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onTick(long millisUntilFinished) {
         currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
         breakMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
+        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
         if (breakMillis < 500) timerDisabled = true;
 
         increaseTextSizeForTimers(startMillis, breakMillis);
@@ -4960,7 +4918,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
+        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
 
         increaseTextSizeForTimers(startMillis, pomMillis);
@@ -5256,7 +5214,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           switch (typeOfRound.get(currentRound)) {
             case 1:
               setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
-              timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(setMillis)));
+              timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
 
               if (!objectAnimator.isStarted()) {
                 startObjectAnimatorAndTotalCycleTimeCounters();
@@ -5271,7 +5229,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 3:
               breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
-              timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(breakMillis)));
+              timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
 
               if (!objectAnimator.isStarted()) {
                 startObjectAnimatorAndTotalCycleTimeCounters();
@@ -5314,7 +5272,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (pomDotCounter <= 7) {
           pomMillis = pomValuesTime.get(pomDotCounter);
-          timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
+          timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
           if (!objectAnimatorPom.isStarted()) {
             startObjectAnimatorAndTotalCycleTimeCounters();
             startPomTimer();
@@ -5784,7 +5742,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         switch (typeOfRound.get(0)) {
           case 1:
             setMillis = workoutTime.get(0);
-            timeLeft.setText(convertSeconds((dividedMillisForTimerDisplay(setMillis))));
+            timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString((dividedMillisForTimerDisplay(setMillis))));
             setInitialTextSizeForTimers(setMillis);
             break;
           case 2:
@@ -5794,7 +5752,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
           case 3:
             breakMillis = workoutTime.get(0);
-            timeLeft.setText(convertSeconds(((dividedMillisForTimerDisplay(breakMillis)))));
+            timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(((dividedMillisForTimerDisplay(breakMillis)))));
             setInitialTextSizeForTimers(breakMillis);
             break;
           case 4:
@@ -5849,7 +5807,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       pomDotCounter = 0;
       if (pomValuesTime.size() > 0) {
         pomMillis = pomValuesTime.get(0);
-        timeLeft.setText(convertSeconds(dividedMillisForTimerDisplay(pomMillis)));
+        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
 
         pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
         pomDotsAdapter.updatePomDotCounter(pomDotCounter);

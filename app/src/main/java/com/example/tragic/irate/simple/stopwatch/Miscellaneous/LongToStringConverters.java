@@ -9,6 +9,20 @@ import java.text.DecimalFormat;
 
 public class LongToStringConverters {
 
+    public String convertSecondsToMinutesBasedString(long totalSeconds) {
+        DecimalFormat df = new DecimalFormat("00");
+        long minutes;
+        long remainingSeconds;
+
+        if (totalSeconds >= 60) {
+            minutes = totalSeconds / 60;
+            remainingSeconds = totalSeconds % 60;
+            return (minutes + ":" + df.format(remainingSeconds));
+        } else {
+            return String.valueOf(totalSeconds);
+        }
+    }
+
     public String convertMillisToHourBasedString(long millis) {
         DecimalFormat dfOneZero = new DecimalFormat("0");
         DecimalFormat dfTwoZeros = new DecimalFormat("00");
@@ -119,5 +133,29 @@ public class LongToStringConverters {
             minutes = minutes % 60;
         }
         return df.format(hours) + ":" + df.format(minutes) + ":" + df.format(seconds);
+    }
+
+    public String convertTimerValuesToStringForNotifications(long totalSeconds) {
+        DecimalFormat df = new DecimalFormat("00");
+        long minutes;
+        long remainingSeconds;
+        minutes = totalSeconds / 60;
+
+        remainingSeconds = totalSeconds % 60;
+
+        if (totalSeconds >= 60) {
+            String formattedSeconds = df.format(remainingSeconds);
+            if (formattedSeconds.length() > 2) formattedSeconds = "0" + formattedSeconds;
+            if (totalSeconds >= 600) {
+                return (minutes + ":" + formattedSeconds);
+            } else {
+                return ("0" + minutes + ":" + formattedSeconds);
+            }
+        } else {
+            String totalStringSeconds = String.valueOf(totalSeconds);
+
+            if (totalStringSeconds.length() < 2) totalStringSeconds = "0" + totalStringSeconds;
+            return "00:" + totalStringSeconds;
+        }
     }
 }
