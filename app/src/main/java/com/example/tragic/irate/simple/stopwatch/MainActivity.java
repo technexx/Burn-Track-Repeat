@@ -628,10 +628,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Daily times (see *** below) can display as 1 sec less than in stats fragment.
-      //Todo: We can save totals in db as rounded down values of the displayed time (e.g. 25300, still displayed as "24" because timeLeft textView has not changed, will be saved as 24000).
+  //Todo: Our String -> Int -> Long method needs to account for hours display, as well.
   //Todo: Cycles set/break time will also start 1 higher if dismissed/resumed from close to next second.
-  //Todo: Single activity header needs color.
   //Todo: Cap @ test infinity rounds at 90 minutes.
   //Todo: If deleting stats and in reset/resume mode, stats will not show as reset in Timer.
   //Todo: Had two rows highlights (as in reset/resume) in Cycles.
@@ -650,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Add Day/Night modes.
 
-  //Todo: ***If still having sync issues w/ daily times it's because we set these textViews as roundToNearestThousandth, so they will round up if closer to next second, but when iterating in cycle they only change when timer changes. Current textView String save addresses this.
+  //Todo: ***If still having sync issues w/ daily times it's because they can be higher than their textView shows (e.g. 25200 can still show as "24") because their textView only changes when timer changes. We have a String->Int->Long method now to correct this.
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
   @Override
@@ -2413,7 +2411,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
       dailyStatsAccess.setStatsForEachActivityEntityFromPosition(0);
 
-      tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, "TEST!"));
+      tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
     }
   }
 
@@ -6064,7 +6062,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.black));
       dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.black));
       dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.black));
-      dailySingleActivityStringHeader.setTextColor(getColor(R.color.black));
+//      dailySingleActivityStringHeader.setTextColor(getColor(R.color.black));
       dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
       dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
 
@@ -6087,7 +6085,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.white));
       dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.white));
       dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.white));
-      dailySingleActivityStringHeader.setTextColor(getColor(R.color.white));
+//      dailySingleActivityStringHeader.setTextColor(getColor(R.color.white));
       dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
       dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
 
