@@ -54,10 +54,8 @@ public class DailyStatsAccess {
     String mLastDayInDurationAsString;
 
     long mOldDayHolderId;
-    boolean doesDayExistInDatabase;
 
     int activityPositionInListForCurrentDay;
-    int mOldActivityPositionInListForCurrentDay;
     int duplicateStringPosition;
 
     String mActivityString = "";
@@ -627,14 +625,6 @@ public class DailyStatsAccess {
 
     public int getActivityPosition() {
         return activityPositionInListForCurrentDay;
-    }
-
-    public void setOldActivityPositionInListForCurrentDay(int oldActivityPositionInListForCurrentDay) {
-        this.mOldActivityPositionInListForCurrentDay = oldActivityPositionInListForCurrentDay;
-    }
-
-    public int getOldActivityPosition() {
-        return mOldActivityPositionInListForCurrentDay;
     }
 
     public void setActivityString(String activityString) {
