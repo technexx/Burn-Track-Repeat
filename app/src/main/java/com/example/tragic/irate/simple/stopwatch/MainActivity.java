@@ -3746,8 +3746,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setAndCapTimerValues(int value) {
     switch (mode) {
       case 1:
-        if (editHeaderSelected == 1) setValue = timerValueBoundsFormula(5, 5400, value);
-        if (editHeaderSelected == 2) breakValue = timerValueBoundsFormula(5, 5400, value);
+        if (editHeaderSelected == 1) setValue = timerValueBoundsFormula(5, 3600, value);
+        if (editHeaderSelected == 2) breakValue = timerValueBoundsFormula(5, 3600, value);
         break;
       case 3:
         pomValue1 = timerValueBoundsFormula(600, 3600, value);
@@ -4781,6 +4781,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
+
+    setMillis = setMillis + (3590000);
+
     timerIteration.setPreviousTotal(setMillis);
 
     return new Runnable() {
@@ -4792,7 +4795,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         setMillis = timerIteration.getNewTotal();
 
-        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(setMillis / 1000));
+        if (setMillis > 3600000) setMillis = 3600000;
+        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(setMillis/1000));
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
@@ -4829,7 +4833,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         breakMillis = timerIteration.getNewTotal();
 
-        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(breakMillis / 1000));
+        if (breakMillis > 3600000) breakMillis = 3600000;
+        timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(breakMillis/1000));
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
           workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
