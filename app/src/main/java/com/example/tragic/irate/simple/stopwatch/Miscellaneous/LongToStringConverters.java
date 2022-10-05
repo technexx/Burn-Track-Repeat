@@ -29,10 +29,14 @@ public class LongToStringConverters {
             minutes = minutes % 60;
         }
 
-        if (hours==0) {
-            return dfOneZero.format(minutes) + ":" + dfTwoZeros.format(seconds);
+        if (hours != 99) {
+            if (hours==0) {
+                return dfOneZero.format(minutes) + ":" + dfTwoZeros.format(seconds);
+            } else {
+                return dfOneZero.format(hours) + ":" + dfTwoZeros.format(minutes) + ":" + dfTwoZeros.format(seconds);
+            }
         } else {
-            return dfOneZero.format(hours) + ":" + dfTwoZeros.format(minutes) + ":" + dfTwoZeros.format(seconds);
+            return "99:00:00";
         }
     }
 

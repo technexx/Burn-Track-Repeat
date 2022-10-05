@@ -632,7 +632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Cycles set/break time will start 1 higher if dismissed/resumed from close to next second.
       //Todo: Do same String -> Int/Long, since the sync issue is the same.
   //Todo: Resetting from new cycle launch or reset/resume should also reset active cycle's set/break times.
-  //Todo: Cap set/break time @ 99 hours.
   //Todo: Cap @ test infinity rounds at 90 minutes.
   //Todo: Set time not iterating after last second at end of round. but begins at +1 (e.g. end at 19, iterates to 21 next round).
   //Todo: If editing/deleting and in reset/resume mode, stats will not show as reset in Timer.
