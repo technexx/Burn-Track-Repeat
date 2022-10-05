@@ -631,6 +631,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Cycles set/break time will start 1 higher if dismissed/resumed from close to next second.
       //Todo: Do same String -> Int/Long, since the sync issue is the same.
+  //Todo: Resetting from new cycle launch or reset/resume should also reset active cycle's set/break times.
+  //Todo: Cap set/break time @ 99 hours.
   //Todo: Cap @ test infinity rounds at 90 minutes.
   //Todo: Set time not iterating after last second at end of round. but begins at +1 (e.g. end at 19, iterates to 21 next round).
   //Todo: If editing/deleting and in reset/resume mode, stats will not show as reset in Timer.
@@ -4522,18 +4524,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setTotalCycleTimeValuesToTextView() {
     if (mode == 1) {
-//      long roundedSetTime = roundToNearestFullThousandth(totalCycleSetTimeInMillis);
-//      long roundedBreakTime = roundToNearestFullThousandth(totalCycleBreakTimeInMillis);
-
-      total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
-      total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
+      total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleSetTimeInMillis));
+      total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleBreakTimeInMillis));
     }
     if (mode == 3) {
-//      long roundedWorkTime = roundToNearestFullThousandth(totalCycleWorkTimeInMillis);
-//      long roundedRestTime = roundToNearestFullThousandth(totalCycleRestTimeInMillis);
-
-      total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleWorkTimeInMillis)));
-      total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
+      total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleWorkTimeInMillis));
+      total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleRestTimeInMillis));
     }
   }
 
@@ -4549,16 +4545,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode == 3) {
       switch (pomDotCounter) {
-        case 0:
-        case 2:
-        case 4:
-        case 6:
+        case 0: case 2: case 4: case 6:
           CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
           break;
-        case 1:
-        case 3:
-        case 5:
-        case 7:
+        case 1: case 3: case 5: case 7:
           CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
           break;
       }

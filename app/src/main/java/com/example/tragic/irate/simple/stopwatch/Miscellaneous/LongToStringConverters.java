@@ -36,6 +36,35 @@ public class LongToStringConverters {
         }
     }
 
+    public String convertMillisToHourBasedStringForCycleTimes(long millis) {
+        DecimalFormat dfOneZero = new DecimalFormat("0");
+        DecimalFormat dfTwoZeros = new DecimalFormat("00");
+
+        long seconds= 0;
+
+        seconds = millis/1000;
+        long minutes = 0;
+        long hours = 0;
+
+        if (seconds >=60) {
+            minutes = seconds / 60;
+            seconds = seconds % 60;
+        }
+
+        if (minutes>=60) {
+            hours = minutes/60;
+            minutes = minutes % 60;
+        }
+
+        if (millis < 60000) {
+            return String.valueOf(seconds);
+        } else if (hours==0) {
+            return dfOneZero.format(minutes) + ":" + dfTwoZeros.format(seconds);
+        } else {
+            return dfOneZero.format(hours) + ":" + dfTwoZeros.format(minutes) + ":" + dfTwoZeros.format(seconds);
+        }
+    }
+
     public String convertMillisStopWatchString(long millis) {
         DecimalFormat dfOneZero = new DecimalFormat("0");
         DecimalFormat dfTwoZeros = new DecimalFormat("00");
