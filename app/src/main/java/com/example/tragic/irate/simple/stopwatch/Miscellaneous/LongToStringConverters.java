@@ -29,7 +29,6 @@ public class LongToStringConverters {
             minutes = minutes % 60;
         }
 
-        Log.i("testStop", "minutes are " + minutes + " and hours are " + hours);
         if (hours==0) {
             return dfOneZero.format(minutes) + ":" + dfTwoZeros.format(seconds);
         } else {

@@ -2461,23 +2461,44 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private int convertStringToSecondsForTimerPopUp(String timerString) {
+    int totalHours = 0;
     int totalMinutes = 0;
     int totalSeconds = 0;
 
+    //Range is exclusive of last position.
     if (timerString.length() == 4) {
       totalMinutes = Integer.parseInt(timerString.substring(0, 1));
+      //colon
       totalSeconds = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
     }
 
     if (timerString.length() == 5) {
       totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+      //colon
       totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
+    }
+
+    if (timerString.length() == 7) {
+      totalHours = Integer.parseInt(timerString.substring(0, 1));
+      ///colon
+      totalMinutes = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
+      //colon
+      totalSeconds = Integer.parseInt(timerString.substring(5, 6) + timerString.substring(6, 7));
+    }
+
+    if (timerString.length() == 8) {
+      totalHours = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+      ///colon
+      totalMinutes = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
+      //colon
+      totalSeconds = Integer.parseInt(timerString.substring(6, 7) + timerString.substring(7, 8));
     }
 
     if (totalSeconds > 60) {
       totalSeconds = totalSeconds % 60;
       totalMinutes += 1;
     }
+
     int totalTime = (totalMinutes * 60) + totalSeconds;
     return totalTime;
   }
