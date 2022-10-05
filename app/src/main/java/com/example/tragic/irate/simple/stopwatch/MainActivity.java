@@ -628,7 +628,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: If resuming @ 11 seconds total time, can be "10" in stats frag and also go back to "10" if resetting and selecting new cycle.
+  //Todo: Daily times (see *** below) can display as 1 sec less than in stats fragment.
+      //Todo: We can save totals in db as rounded down values of the displayed time (e.g. 25300, still displayed as "24" because timeLeft textView has not changed, will be saved as 24000).
+  //Todo: Cycles set/break time will also start 1 higher if dismissed/resumed from close to next second.
+  //Todo: Single activity header needs color.
+  //Todo: Cap @ test infinity rounds at 90 minutes.
   //Todo: If deleting stats and in reset/resume mode, stats will not show as reset in Timer.
   //Todo: Had two rows highlights (as in reset/resume) in Cycles.
 
@@ -646,7 +650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Add Day/Night modes.
 
-  //Todo: If still having sync issues w/ daily times it's because we set these textViews as roundToNearestThousandth, so they will round up if closer to next second, but when iterating in cycle they only change when timer changes. Current textView String save addresses this.
+  //Todo: ***If still having sync issues w/ daily times it's because we set these textViews as roundToNearestThousandth, so they will round up if closer to next second, but when iterating in cycle they only change when timer changes. Current textView String save addresses this.
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
   @Override
@@ -2384,8 +2388,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  ;
-
   private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
     globalSaveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
       @Override
@@ -2445,12 +2447,41 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyStatsAccess.setOldActivityPositionInListForCurrentDay(currentActivityPosition);
     }
 
-    Log.i("testTime", "activity total being updated in database is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    Log.i("testTime", "time being updated in database is " + totalSetTimeForCurrentDayInMillis);
+    Log.i("testTime", "activity time before update is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
 
-    dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
+    Log.i("testTime", "activity time updated in database is " + getDailyActivityTimeFromTextView());
+    Log.i("testTime", "total time being updated is " + totalSetTimeForCurrentDayInMillis);
+
+    dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(getDailyActivityTimeFromTextView(), totalCaloriesBurnedForSpecificActivityForCurrentDay);
 
     StatsForEachActivity statsForEachActivity = dailyStatsAccess.getStatsForEachActivityEntity();
+  }
+
+  private long getDailyActivityTimeFromTextView() {
+    String textView = (String) dailyTotalTimeForSingleActivityTextView.getText().toString();
+    return convertStringToSecondsForTimerPopUp(textView) * 1000;
+  }
+
+  private int convertStringToSecondsForTimerPopUp(String timerString) {
+    int totalMinutes = 0;
+    int totalSeconds = 0;
+
+    if (timerString.length() == 4) {
+      totalMinutes = Integer.parseInt(timerString.substring(0, 1));
+      totalSeconds = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
+    }
+
+    if (timerString.length() == 5) {
+      totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+      totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
+    }
+
+    if (totalSeconds > 60) {
+      totalSeconds = totalSeconds % 60;
+      totalMinutes += 1;
+    }
+    int totalTime = (totalMinutes * 60) + totalSeconds;
+    return totalTime;
   }
 
   private void fabLogic() {
@@ -3108,7 +3139,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String savedTimerString = convertedTimerArrayToString(editPopUpTimerArray);
       timerValueInEditPopUpTextView.setText(savedTimerString);
 
-      int totalTime = convertStringToSecondsValue(savedTimerString);
+      int totalTime = convertStringToSecondsForEditPopUp(savedTimerString);
       setAndCapTimerValues(totalTime);
     }
 
@@ -3179,7 +3210,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       saveEditHeaderTimerStringValues();
       timerValueInEditPopUpTextView.setText(editPopUpTimerString);
 
-      int totalTime = convertStringToSecondsValue(editPopUpTimerString);
+      int totalTime = convertStringToSecondsForEditPopUp(editPopUpTimerString);
       setAndCapTimerValues(totalTime);
     }
 
@@ -3192,15 +3223,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String editPopUpTimerStringThree = "";
 
       editPopUptimerTextViewStringOne = convertedTimerArrayToString(savedEditPopUpArrayForFirstHeaderModeThree);
-      totalTimeOne = convertStringToSecondsValue(editPopUptimerTextViewStringOne);
+      totalTimeOne = convertStringToSecondsForEditPopUp(editPopUptimerTextViewStringOne);
       pomTimerValueInEditPopUpTextViewOne.setText(editPopUptimerTextViewStringOne);
 
       editPopUptimerTextViewStringTwo = convertedTimerArrayToString(savedEditPopUpArrayForSecondHeaderModeThree);
-      totalTimeTwo = convertStringToSecondsValue(editPopUptimerTextViewStringTwo);
+      totalTimeTwo = convertStringToSecondsForEditPopUp(editPopUptimerTextViewStringTwo);
       pomTimerValueInEditPopUpTextViewTwo.setText(editPopUptimerTextViewStringTwo);
 
       editPopUpTimerStringThree = convertedTimerArrayToString(savedEditPopUpArrayForThirdHeader);
-      totalTimeThree = convertStringToSecondsValue(editPopUpTimerStringThree);
+      totalTimeThree = convertStringToSecondsForEditPopUp(editPopUpTimerStringThree);
       pomTimerValueInEditPopUpTextViewThree.setText(editPopUpTimerStringThree);
 
       setAndCapPomValuesForEditTimer(totalTimeOne, 1);
@@ -3217,7 +3248,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  public String convertedTimerArrayToString(ArrayList<String> arrayToConvert) {
+  private String convertedTimerArrayToString(ArrayList<String> arrayToConvert) {
     ArrayList<String> timeLeft = new ArrayList<>();
     timeLeft = populateEditTimerArray(arrayToConvert);
 
@@ -3241,7 +3272,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return editPopUpTimerString;
   }
 
-  public ArrayList<String> populateEditTimerArray(ArrayList<String> arrayToPopulate) {
+  private ArrayList<String> populateEditTimerArray(ArrayList<String> arrayToPopulate) {
     ArrayList<String> timeLeft = new ArrayList<>();
     timeLeft.add("0");
     timeLeft.add("0");
@@ -3260,7 +3291,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return timeLeft;
   }
 
-  public int convertStringToSecondsValue(String timerString) {
+  private int convertStringToSecondsForEditPopUp(String timerString) {
     int totalMinutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
     int totalSeconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
     if (totalSeconds > 60) {
@@ -3271,7 +3302,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return totalTime;
   }
 
-  public ArrayList<String> convertIntegerToStringArray(int timerInteger) {
+  private ArrayList<String> convertIntegerToStringArray(int timerInteger) {
     String minutes = String.valueOf(timerInteger / 60);
     String seconds = String.valueOf(timerInteger % 60);
 
@@ -3477,10 +3508,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       long roundedTimeLeft = roundToNearestFullThousandth(timeLeft);
       timeRemaining = convertTimerValuesToStringForNotifications(roundedTimeLeft / 1000);
-
-      Log.i("testNote", "timeleft is " + timeLeft);
-      Log.i("testNote", "rounded timeLeft is " + roundToNearestFullThousandth(timeLeft));
-      Log.i("testNote", "display string is " + convertTimerValuesToStringForNotifications(roundedTimeLeft / 1000));
     }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
@@ -4435,8 +4462,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyActivityTimeToTextView() {
-    long roundedTotalDailyActivityTime = roundToNearestFullThousandth(totalSetTimeForCurrentDayInMillis);
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(roundedTotalDailyActivityTime));
+//    long roundedTotalDailyActivityTime = roundToNearestFullThousandth(totalSetTimeForCurrentDayInMillis);
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
   }
 
   private void setTotalDailyCaloriesToTextView() {
@@ -4444,8 +4471,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalSingleActivityTimeToTextView() {
-    long roundedSingleActivityTime = roundToNearestFullThousandth(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedString(roundedSingleActivityTime));
+//    long roundedSingleActivityTime = roundToNearestFullThousandth(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
   }
 
   private void setTotalSingleActivityCaloriesToTextView() {
@@ -4468,18 +4495,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setTotalCycleTimeValuesToTextView() {
     if (mode == 1) {
-      long roundedSetTime = roundToNearestFullThousandth(totalCycleSetTimeInMillis);
-      long roundedBreakTime = roundToNearestFullThousandth(totalCycleBreakTimeInMillis);
+//      long roundedSetTime = roundToNearestFullThousandth(totalCycleSetTimeInMillis);
+//      long roundedBreakTime = roundToNearestFullThousandth(totalCycleBreakTimeInMillis);
 
-      total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedSetTime)));
-      total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedBreakTime)));
+      total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleSetTimeInMillis)));
+      total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleBreakTimeInMillis)));
     }
     if (mode == 3) {
-      long roundedWorkTime = roundToNearestFullThousandth(totalCycleWorkTimeInMillis);
-      long roundedRestTime = roundToNearestFullThousandth(totalCycleRestTimeInMillis);
+//      long roundedWorkTime = roundToNearestFullThousandth(totalCycleWorkTimeInMillis);
+//      long roundedRestTime = roundToNearestFullThousandth(totalCycleRestTimeInMillis);
 
-      total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedWorkTime)));
-      total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(roundedRestTime)));
+      total_set_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleWorkTimeInMillis)));
+      total_break_time.setText(convertSeconds(dividedMillisForTotalTimesDisplay(totalCycleRestTimeInMillis)));
     }
   }
 
