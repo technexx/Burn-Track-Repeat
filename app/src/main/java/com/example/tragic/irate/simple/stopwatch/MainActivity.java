@@ -633,9 +633,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: New day started w/ 90 minutes of activity. Likely based on new textView save method.
-  //Todo: Activities assigned to cycles may appear as 0:00 on new day, even if not accessed through cycle.
+  //Todo: Would still likely to not have 0:00 in our stats.
   //Todo: Sort when in reset/resume.
+  //Todo: Had a bug of iterating calories but not time.
+  //Todo: For non-zero stats on new day: May have been a manual addition we did. If not, likely related to our resume settings textView string -> int value.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
@@ -749,6 +750,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (dailyStatsFragment.getSelectedTab() == 1) {
           delete_all_text.setText(R.string.delete_food_from_single_day);
         }
+        if (dailyStatsFragment.getSelectedTab() == 2) {
+          delete_all_text.setText(R.string.delete_activities_and_foods_from_selected_duration);
+        }
 
         deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
         break;
@@ -758,6 +762,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         if (dailyStatsFragment.getSelectedTab() == 1) {
           delete_all_text.setText(R.string.delete_all_foods);
+        }
+        if (dailyStatsFragment.getSelectedTab() == 2) {
+          delete_all_text.setText(R.string.delete_all_activities_and_foods);
         }
 
         deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
@@ -1568,6 +1575,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (delete_all_text.getText().equals(getString(R.string.delete_all_foods))) {
           deleteFoodStatsForAllDays();
         }
+
+        if (delete_all_text.getText().equals(getString(R.string.delete_activities_and_foods_from_selected_duration))) {
+          deleteActivityStatsForSelectedDays();
+          deleteFoodStatsForSelectedDays();
+        }
+        if (delete_all_text.getText().equals(getString(R.string.delete_all_activities_and_foods))) {
+          deleteActivityStatsForAllDays();
+          deleteFoodStatsForAllDays();
+        }
       });
     });
 
@@ -1641,11 +1657,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortPopupWindow.setContentView(sortFoodConsumedPopupView);
     }
     if (typeOfSort == DISABLE_SORTING) {
-      sortButton.setVisibility(View.GONE);
+//      sortButton.setVisibility(View.GONE);
       sortButton.setAlpha(0.3f);
       sortButton.setEnabled(false);
     } else {
-      sortButton.setVisibility(View.VISIBLE);
+//      sortButton.setVisibility(View.VISIBLE);
       sortButton.setAlpha(1.0f);
       sortButton.setEnabled(true);
     }

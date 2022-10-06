@@ -40,6 +40,9 @@
     <string name="delete_food_from_single_day">Delete all foods in current date range?</string>
     <string name="delete_all_foods">Delete all foods from all days?\nThis cannot be undone!</string>
 
+    <string name="delete_activities_and_foods_from_selected_duration">Delete all activities and foods in current date range?</string>
+    <string name="delete_all_activities_and_foods">Delete all activities and foods from all days?\nThis cannot be undone!</string>
+
     <string name="lap">New Lap</string>
     <string name="clear_laps">Clear Laps</string>
     <string name="laps_completed">Laps Completed: %1$s</string>
