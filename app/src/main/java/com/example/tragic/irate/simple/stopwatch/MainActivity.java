@@ -702,7 +702,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dailyStatsFragment.executeTurnOffEditModeMethod();
           mainActivityFragmentFrameLayout.startAnimation(slideOutFromLeftShort);
           sortButton.setAlpha(1.0f);
-          sortButton.setEnabled(true);
+          toggleSortButtonBasedOnIfCycleIsActive();
         }
 
         setTypeOfOnOptionsSelectedMenu(DEFAULT_MENU);
@@ -1001,6 +1001,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       deleteTotalCycleTimes();
       resetTimer();
     }
+
+    toggleSortButtonBasedOnIfCycleIsActive();
   }
 
   private void timerPopUpDismissalLogic() {
@@ -1317,13 +1319,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     timerPopUpWindow.setOnDismissListener(() -> {
-      timerPopUpDismissalLogic();
-
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       toggleCycleAndPomCycleRecyclerViewVisibilities(false);
 
       toggleCustomActionBarButtonVisibilities(false);
+
+      timerPopUpDismissalLogic();
     });
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
@@ -3609,7 +3611,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stringToReturn = getString(R.string.arrow_up);
       }
     }
-    ;
 
     return stringToReturn;
   }
@@ -5246,8 +5247,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     currentProgressBarValue = 10000;
     next_round.setEnabled(false);
-
-//    enableOrDisableCycleResetButton(false);
 
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
   }
