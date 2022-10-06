@@ -53,7 +53,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   boolean mHighlightDeleted;
   boolean mHighlightMode;
 
-  List<Integer> mPositionList;
+  List<Integer> mHighlightPositionList;
   CharSequence permSpan;
   Spannable span;
 
@@ -132,14 +132,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> typeOfRound, ArrayList<String> workoutTitle, ArrayList<Boolean> tdeeActivityExistsInCycleList, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
     this.mContext = context; mWorkoutList = workoutList; this.mTypeOfRound = typeOfRound; this.mWorkoutTitle = workoutTitle; this.mTdeeActivityExistsInCycleList = tdeeActivityExistsInCycleList; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
     //Must be instantiated here so it does not loop and reset in onBindView.
-    mPositionList = new ArrayList<>();
+    mHighlightPositionList = new ArrayList<>();
     //Resets our cancel so bindView does not continuously call black backgrounds.
     mHighlightDeleted = false;
 
     moonFace = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
   }
 
-  public void removeHighlight() {
+  public void exitHighlightMode() {
     mHighlightDeleted = true;
     mHighlightMode = false;
   }
@@ -204,6 +204,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
+
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
@@ -216,6 +217,15 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       } else {
         workoutHolder.fullView.setBackgroundColor(Color.BLACK);
       }
+    }
+
+    if (mHighlightDeleted) {
+      //Clears highlight list.
+      mHighlightPositionList.clear();
+      //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
+      mHighlightMode = false;
+
+      workoutHolder.fullView.setBackgroundColor(Color.BLACK);
     }
 
     if (mThemeMode == DAY_MODE) {
@@ -244,59 +254,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     } else {
       workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.4f);
     }
-
-    workoutHolder.tdeeActivityStringToggleTextView.setOnClickListener(v-> {
-      if (!mActiveCycle && !mHighlightMode) {
-        mOnTdeeModeToggle.toggleTdeeMode(position);
-      }
-    });
-
-    workoutHolder.fullView.setOnClickListener(v -> {
-      boolean changed = false;
-      //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
-      if (!mHighlightMode) {
-        if (mActiveCycle && position==mPositionOfActiveCycle) {
-          mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER);
-        } else {
-          mOnCycleClickListener.onCycleClick(position);
-        }
-      }
-      else {
-        ArrayList<Integer> tempList = new ArrayList<>(mPositionList);
-        for (int i = 0; i < mWorkoutList.size(); i++) {
-          //Using tempList for stable loop since mPositionList changes.
-          for (int j = 0; j < tempList.size(); j++) {
-            //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
-            if (position==tempList.get(j)) {
-              workoutHolder.fullView.setBackgroundColor(Color.BLACK);
-              mPositionList.remove(Integer.valueOf(position));
-              //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
-              changed = true;
-            }
-          }
-        }
-        //If we have not toggled our highlight off above, toggle it on below.
-        if (!changed) {
-          //Adds the position at its identical index for easy removal access.
-          mPositionList.add(position);
-          workoutHolder.fullView.setBackgroundColor(Color.GRAY);
-        }
-        //Callback to send position list (Using Strings to make removing values easier) back to Main.
-        mOnHighlightListener.onCycleHighlight(mPositionList, false);
-      }
-    });
-
-    workoutHolder.fullView.setOnLongClickListener(v -> {
-      if (!mHighlightMode && !mActiveCycle) {
-        //Adds position of clicked item to position list.
-        mPositionList.add(position);
-        workoutHolder.fullView.setBackgroundColor(Color.GRAY);
-
-        mHighlightMode = true;
-        mOnHighlightListener.onCycleHighlight(mPositionList, true);
-      }
-      return true;
-    });
 
     workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
     //Clearing Spannable object, since it will re-populate for every position passed in through this method.
@@ -382,15 +339,61 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
     }
 
-//    workoutHolder.workOutCycle.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
     workoutHolder.workOutCycle.setText(permSpan);
 
-    if (mHighlightDeleted) {
-      //Clears highlight list.
-      mPositionList.clear();
-      //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
-      mHighlightMode = false;
-    }
+    workoutHolder.tdeeActivityStringToggleTextView.setOnClickListener(v-> {
+      if (!mActiveCycle && !mHighlightMode) {
+        mOnTdeeModeToggle.toggleTdeeMode(position);
+      }
+    });
+
+    workoutHolder.fullView.setOnClickListener(v -> {
+      boolean changed = false;
+      //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
+      if (!mHighlightMode) {
+        if (mActiveCycle && position==mPositionOfActiveCycle) {
+          mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER);
+        } else {
+          mOnCycleClickListener.onCycleClick(position);
+        }
+        workoutHolder.fullView.setBackgroundColor(Color.BLACK);
+      }
+      else {
+        ArrayList<Integer> tempList = new ArrayList<>(mHighlightPositionList);
+        for (int i = 0; i < mWorkoutList.size(); i++) {
+          //Using tempList for stable loop since mHighlightPositionList changes.
+          for (int j = 0; j < tempList.size(); j++) {
+            //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
+            if (position==tempList.get(j)) {
+              workoutHolder.fullView.setBackgroundColor(Color.BLACK);
+              mHighlightPositionList.remove(Integer.valueOf(position));
+              //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
+              changed = true;
+            }
+          }
+        }
+        //If we have not toggled our highlight off above, toggle it on below.
+        if (!changed) {
+          //Adds the position at its identical index for easy removal access.
+          mHighlightPositionList.add(position);
+          workoutHolder.fullView.setBackgroundColor(Color.GRAY);
+        }
+        //Callback to send position list (Using Strings to make removing values easier) back to Main.
+        mOnHighlightListener.onCycleHighlight(mHighlightPositionList, false);
+      }
+    });
+
+    workoutHolder.fullView.setOnLongClickListener(v -> {
+      if (!mHighlightMode && !mActiveCycle) {
+        //Adds position of clicked item to position list.
+        mHighlightPositionList.add(position);
+        workoutHolder.fullView.setBackgroundColor(Color.GRAY);
+
+        mHighlightMode = true;
+        mOnHighlightListener.onCycleHighlight(mHighlightPositionList, true);
+      }
+      return true;
+    });
   }
 
   @Override

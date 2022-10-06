@@ -37,7 +37,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     boolean mHighlightDeleted;
     boolean mHighlightMode;
 
-    List<Integer> mPositionList;
+    List<Integer> mHighlightPositionList;
     ArrayList<Integer> mSizeToggle = new ArrayList<>();
     int RESUMING_CYCLE_FROM_TIMER = 1;
     int RESETTING_CYCLE_FROM_TIMER = 2;
@@ -93,10 +93,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         //Populates a toggle list for Pom's spannable colors so we can simply replace them at will w/ out resetting the list. This should only be called in our initial adapter instantiation.
         if (mSizeToggle.size()==0) for (int i=0; i<8; i++) mSizeToggle.add(0);
         //Must be instantiated here so it does not loop and reset in onBindView.
-        mPositionList = new ArrayList<>();
+        mHighlightPositionList = new ArrayList<>();
     }
 
-    public void removeHighlight() {
+    public void exitHighlightMode() {
         mHighlightDeleted = true;
         mHighlightMode = false;
     }
@@ -146,11 +146,12 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         if (mHighlightDeleted) {
             //Clears highlight list.
-            mPositionList.clear();
+            mHighlightPositionList.clear();
             //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
             mHighlightMode = false;
-        }
 
+            pomHolder.fullView.setBackgroundColor(Color.BLACK);
+        }
 
         pomHolder.pomName.setText(mPomTitle.get(position));
         String tempPom = (convertTime(mPomList).get(position));
@@ -199,14 +200,14 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                     mOnCycleClickListener.onCycleClick(position);
                 }
             } else {
-                ArrayList<Integer> tempList = new ArrayList<>(mPositionList);
+                ArrayList<Integer> tempList = new ArrayList<>(mHighlightPositionList);
                 //Iterate through every cycle in list.
                 for (int i=0; i<mPomList.size(); i++) {
-                    //Using tempList for stable loop since mPositionList changes.
+                    //Using tempList for stable loop since mHighlightPositionList changes.
                     for (int j=0; j<tempList.size(); j++) {
                         if (position==tempList.get(j)) {
                             pomHolder.fullView.setBackgroundColor(Color.BLACK);
-                            mPositionList.remove(Integer.valueOf(position));
+                            mHighlightPositionList.remove(Integer.valueOf(position));
                             //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
                             changed = true;
                         }
@@ -215,22 +216,22 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 //If we have not toggled our highlight off above, toggle it on below.
                 if (!changed) {
                     //Adds the position at its identical index for easy removal access.
-                    mPositionList.add(position);
+                    mHighlightPositionList.add(position);
                     pomHolder.fullView.setBackgroundColor(Color.GRAY);
 
                 }
                 //Callback to send position list (Using Strings to make removing values easier) back to Main.
-                mOnHighlightListener.onCycleHighlight(mPositionList, false);
+                mOnHighlightListener.onCycleHighlight(mHighlightPositionList, false);
             }
         });
 
         pomHolder.fullView.setOnLongClickListener(v-> {
             if (!mHighlightMode && !mActiveCycle) {
-                mPositionList.add(position);
+                mHighlightPositionList.add(position);
                 pomHolder.fullView.setBackgroundColor(Color.GRAY);
                 mHighlightMode = true;
                 //Calls back for initial highlighted position, Also to set actionBar views for highlight mode.
-                mOnHighlightListener.onCycleHighlight(mPositionList, true);
+                mOnHighlightListener.onCycleHighlight(mHighlightPositionList, true);
             }
             return true;
         });

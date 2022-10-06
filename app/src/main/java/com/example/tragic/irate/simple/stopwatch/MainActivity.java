@@ -633,9 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Had a bug of iterating calories but not time.
-      //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens agian.
-  //Todo: For non-zero stats on new day: May have been a manual addition we did. If not, likely related to our resume settings textView string -> int value.
+  //Todo: 2611 metabolic rate will, with several low second/0 calorie activities: show 2610 mbr + 1 activity = 2612 total.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
@@ -648,6 +646,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
+
+  //Todo: Had a bug of iterating calories but not time.
+  //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens agian.
+  //Todo: For non-zero stats on new day: May have been a manual addition we did. If not, likely related to our resume settings textView string -> int value.
 
   //Todo: Add Day/Night modes.
 
@@ -1389,14 +1391,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(() -> {
         deleteHighlightedCycles();
       });
-
-      delete_highlighted_cycle.setEnabled(false);
-      fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
-
-      if (mode == 1) savedCycleAdapter.removeHighlight();
-      if (mode == 3) savedPomCycleAdapter.removeHighlight();
-
-      showToastIfNoneActive("Deleted!");
     });
 
     //Selects all text when long clicking in editText.
@@ -2922,12 +2916,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     int cycleID = 0;
+
     if (mode == 1) {
       for (int i = 0; i < receivedHighlightPositions.size(); i++) {
         cycleID = cyclesList.get(receivedHighlightPositions.get(i)).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
         cyclesDatabase.cyclesDao().deleteCycle(cycles);
       }
+      runOnUiThread(()-> {
+        savedCycleAdapter.exitHighlightMode();
+        savedCycleAdapter.notifyDataSetChanged();
+      });
     }
     if (mode == 3) {
       for (int i = 0; i < receivedHighlightPositions.size(); i++) {
@@ -2935,6 +2934,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
         cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
       }
+      runOnUiThread(()-> {
+        savedPomCycleAdapter.exitHighlightMode();
+        savedPomCycleAdapter.notifyDataSetChanged();
+      });
     }
 
     receivedHighlightPositions.clear();
@@ -2942,11 +2945,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     queryAndSortAllCyclesFromDatabase(false);
 
     runOnUiThread(() -> {
+      delete_highlighted_cycle.setEnabled(false);
+      fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
+
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-      if (mode == 1) savedCycleAdapter.notifyDataSetChanged();
-      if (mode == 3) savedPomCycleAdapter.notifyDataSetChanged();
-      ;
+
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+
+      showToastIfNoneActive("Deleted!");
     });
   }
 
@@ -3711,11 +3717,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void removeCycleHighlights() {
     if (mode == 1) {
-      savedCycleAdapter.removeHighlight();
+      savedCycleAdapter.exitHighlightMode();
       savedCycleAdapter.notifyDataSetChanged();
     }
     if (mode == 3) {
-      savedPomCycleAdapter.removeHighlight();
+      savedPomCycleAdapter.exitHighlightMode();
       savedPomCycleAdapter.notifyDataSetChanged();
     }
   }
