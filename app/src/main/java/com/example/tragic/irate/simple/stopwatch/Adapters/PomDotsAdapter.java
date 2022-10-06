@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
+import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,6 +12,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.R;
@@ -39,6 +41,12 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
     sendPomDotAlpha mSendPomDotAlpha;
 
     int mScreenHeight;
+
+    Typeface narrowFont;
+    Typeface narrowFontBold;
+    Typeface bigShouldersFont;
+    Typeface ignotum;
+    Typeface sixCaps;
 
     public PomDotsAdapter(Context context, List<String> pomCycleRoundsAsStringList) {
         this.mContext = context; this.mPomCycleRoundsAsStringsList = pomCycleRoundsAsStringList;
@@ -86,6 +94,12 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
 
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
+        if (mCharactersInPomCyclesRoundsList.get(position) == 5) {
+            holder.roundText.setTypeface(narrowFont);
+        } else {
+            holder.roundText.setTypeface(Typeface.DEFAULT);
+        }
+
         switch (position) {
             case 0: case 2: case 4: case 6:
                 dotsBorder.setColor(WORK_COLOR);
@@ -114,10 +128,10 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         int floatToReturn = 0;
 
         if (numberOfRoundChars == 4) {
-            floatToReturn = 20;
+            floatToReturn = 21;
         }
         if (numberOfRoundChars == 5) {
-            floatToReturn = 16;
+            floatToReturn = 19;
         }
 
         return floatToReturn;
@@ -129,9 +143,6 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         if (timeString.length()==2 && timeString.substring(0, 1).equals("0")) {
             stringToReturn = timeString.substring(1);
         }
-        Log.i("testSize", "timer substring is " + timeString.substring(0, 1));
-
-
         return stringToReturn;
     }
 
@@ -196,6 +207,12 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
     private void instantiateMiscObjects() {
         changeSettingsValues = new ChangeSettingsValues();
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
+
+        narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
+        narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
+        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
+        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
+        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
     }
 
     public interface sendPomDotAlpha {

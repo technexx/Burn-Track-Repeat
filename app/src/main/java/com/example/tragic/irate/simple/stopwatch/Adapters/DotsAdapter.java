@@ -116,7 +116,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         holder.fullView.setBackground(dotsBorder);
 
         if (mCharactersInCyclesRoundsList.get(position) == 5) {
-            holder.roundText.setTypeface(bigShouldersFont);
+            holder.roundText.setTypeface(narrowFont);
             textLayoutParams.topMargin = 6;
         } else {
             holder.roundText.setTypeface(Typeface.DEFAULT);
@@ -232,23 +232,23 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         int floatToReturn = 0;
         if (numberOfRoundChars == 1) {
             if (mScreenHeight <= 1920) {
-                floatToReturn = 36;
-            } else {
-                floatToReturn = 42;
-            }
-        }
-        if (numberOfRoundChars == 2) {
-            if (mScreenHeight <= 1920) {
-                floatToReturn = 30;
+                floatToReturn = 28;
             } else {
                 floatToReturn = 34;
             }
         }
+        if (numberOfRoundChars == 2) {
+            if (mScreenHeight <= 1920) {
+                floatToReturn = 26;
+            } else {
+                floatToReturn = 32;
+            }
+        }
         if (numberOfRoundChars == 4) {
-            floatToReturn = 20;
+            floatToReturn = 21;
         }
         if (numberOfRoundChars == 5) {
-            floatToReturn = 18;
+            floatToReturn = 19;
         }
 
         return floatToReturn;
