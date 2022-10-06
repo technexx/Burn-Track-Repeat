@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Cap @ test infinity rounds at 90 minutes.
   //Todo: Set time not iterating after last second at end of round. but begins at +1 (e.g. end at 19, iterates to 21 next round).
   //Todo: Had two rows highlights (as in reset/resume) in Cycles.
 
@@ -4795,7 +4794,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         setMillis = timerIteration.getNewTotal();
 
-        if (setMillis > 3600000) setMillis = 3600000;
         timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(setMillis/1000));
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
@@ -4808,6 +4806,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(setMillis);
+
+        if (setMillis > 3600000) {
+          setMillis = 3600000;
+          nextRound(false);
+          return;
+        }
+
         mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
@@ -4833,7 +4838,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
         breakMillis = timerIteration.getNewTotal();
 
-        if (breakMillis > 3600000) breakMillis = 3600000;
         timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(breakMillis/1000));
 
         if (workoutTime.size() >= numberOfRoundsLeft) {
@@ -4846,6 +4850,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.notifyDataSetChanged();
 
         decreaseTextSizeForTimers(breakMillis);
+
+        if (breakMillis > 3600000) {
+          breakMillis = 3600000;
+          nextRound(false);
+          return;
+        }
         mHandler.postDelayed(this, timerRunnableDelay);
       }
     };
