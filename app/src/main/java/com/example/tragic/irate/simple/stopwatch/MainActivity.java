@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Set time not iterating after last second at end of round. but begins at +1 (e.g. end at 19, iterates to 21 next round).
   //Todo: Had two rows highlights (as in reset/resume) in Cycles.
 
   //Todo: Test minimized vibrations on <26 api
@@ -4515,11 +4514,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleSetTimeInMillis));
       total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleBreakTimeInMillis));
+
+      Log.i("testCycles", "set time is " + totalCycleSetTimeInMillis);
     }
     if (mode == 3) {
       total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleWorkTimeInMillis));
       total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleRestTimeInMillis));
     }
+  }
+
+  private void roundCycleTimeValuesForEndOfRoundDisplay() {
+    totalCycleSetTimeInMillis = roundToNearestFullThousandth(totalCycleSetTimeInMillis);
+    totalCycleBreakTimeInMillis = roundToNearestFullThousandth(totalCycleBreakTimeInMillis);
+  }
+
+  private void roundPomCycleTimeValuesForEndOfRoundDisplay() {
+    totalCycleWorkTimeInMillis = roundToNearestFullThousandth(totalCycleWorkTimeInMillis);
+    totalCycleRestTimeInMillis = roundToNearestFullThousandth(totalCycleRestTimeInMillis);
   }
 
   private void setCycleTimeToIterate() {
@@ -5108,6 +5119,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (trackActivityWithinCycle) {
       setAllActivityTimesAndCaloriesToTextViews();
     } else {
+      roundCycleTimeValuesForEndOfRoundDisplay();
       setTotalCycleTimeValuesToTextView();
     }
 
@@ -5159,6 +5171,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     globalNextRoundLogic();
 
+    roundPomCycleTimeValuesForEndOfRoundDisplay();
     setTotalCycleTimeValuesToTextView();
     mHandler.post(endFadeForModeThree);
 
