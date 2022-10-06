@@ -633,6 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  //Todo: Highlight edit -> Stats Frag bug.
   //Todo: Would still like to not have 0:00 in our stats.
   //Todo: Had a bug of iterating calories but not time.
   //Todo: For non-zero stats on new day: May have been a manual addition we did. If not, likely related to our resume settings textView string -> int value.
@@ -709,7 +710,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleSortMenuViewBetweenCyclesAndActivities(SORTING_CYCLES);
       }
 
-      sortButton.setVisibility(View.VISIBLE);
+//      sortButton.setVisibility(View.VISIBLE);
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || disclaimerFragment.isVisible()) {
@@ -730,9 +731,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (item.getItemId()) {
       case R.id.daily_stats:
         launchDailyStatsFragment();
+        disableHighlightModeIfActive();
         break;
       case R.id.global_settings:
         launchGlobalSettingsFragment();
+        disableHighlightModeIfActive();
         break;
       case R.id.delete_all_cycles:
         if (mode == 1 && workoutCyclesArray.size() == 0 || mode == 3 && pomArray.size() == 0) {
@@ -1152,6 +1155,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else if (edit_highlighted_cycle.getAlpha() == 1 && receivedHighlightPositions.size() != 1) {
       edit_highlighted_cycle.setEnabled(false);
       edit_highlighted_cycle.setAlpha(0.4f);
+    }
+  }
+
+  private void disableHighlightModeIfActive() {
+    if (mode==1) {
+      if (savedCycleAdapter.isCycleHighlighted()) {
+        removeCycleHighlights();
+        fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
+      }
+      if (mode==3) {
+        if (savedPomCycleAdapter.isCycleHighlighted()) {
+          removeCycleHighlights();
+          fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
+        }
+      }
     }
   }
 
@@ -1845,8 +1863,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void tabUnselectedLogic() {
     cycleTitle = "";
 
-    if (!sortButton.isEnabled()) fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
-    if (editCyclesPopupWindow.isShowing()) editCyclesPopupWindow.dismiss();
+    if (cancelHighlight.isEnabled()) {
+      fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
+    }
+
+    if (editCyclesPopupWindow.isShowing()) {
+      editCyclesPopupWindow.dismiss();
+    }
 
     receivedHighlightPositions.clear();
   }
