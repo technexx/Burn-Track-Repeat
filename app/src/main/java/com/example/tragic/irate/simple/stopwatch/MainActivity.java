@@ -633,8 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Would still likely to not have 0:00 in our stats.
-  //Todo: Sort when in reset/resume.
+  //Todo: Would still like to not have 0:00 in our stats.
   //Todo: Had a bug of iterating calories but not time.
   //Todo: For non-zero stats on new day: May have been a manual addition we did. If not, likely related to our resume settings textView string -> int value.
 
@@ -992,11 +991,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     } else if (resumeOrReset == RESETTING_CYCLE_FROM_ADAPTER) {
       if (mode == 1) {
-        savedCycleAdapter.removeActiveCycleLayout();
+        savedCycleAdapter.removeCycleAsActive();
         savedCycleAdapter.notifyDataSetChanged();
       }
       if (mode == 3) {
-        savedPomCycleAdapter.removeActiveCycleLayout();
+        savedPomCycleAdapter.removeCycleAsActive();
         savedPomCycleAdapter.notifyDataSetChanged();
       }
       deleteTotalCycleTimes();
@@ -1010,8 +1009,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
 
     if (mode == 1) {
-      savedCycleAdapter.notifyDataSetChanged();
       pauseAndResumeTimer(PAUSING_TIMER);
+      savedCycleAdapter.notifyDataSetChanged();
 
       if (trackActivityWithinCycle) {
         storeDailyTimesForCycleResuming();
@@ -1029,7 +1028,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedPomCycleAdapter.notifyDataSetChanged();
     }
 
+    toggleSortButtonBasedOnIfCycleIsActive();
+
     mHandler.removeCallbacksAndMessages(null);
+  }
+
+  private void toggleSortButtonBasedOnIfCycleIsActive() {
+    if (mode == 1) {
+      if (savedCycleAdapter.isCycleActive()) {
+        sortButton.setEnabled(false);
+      } else {
+        sortButton.setEnabled(true);
+      }
+      if (mode==3) {
+        if (savedPomCycleAdapter.isCycleActive()) {
+          sortButton.setEnabled(false);
+        } else {
+          sortButton.setEnabled(true);
+        }
+      }
+    }
+    Log.i("testSort", "button is " + sortButton.isEnabled());
   }
 
   private void storeDailyTimesForCycleResuming() {
@@ -1108,11 +1127,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsAdapter.notifyDataSetChanged();
 
     if (mode == 1) {
-      savedCycleAdapter.removeActiveCycleLayout();
+      savedCycleAdapter.removeCycleAsActive();
       launchTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
     }
     if (mode == 3) {
-      savedPomCycleAdapter.removeActiveCycleLayout();
+      savedPomCycleAdapter.removeCycleAsActive();
       launchPomTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
     }
   }
@@ -1657,11 +1676,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortPopupWindow.setContentView(sortFoodConsumedPopupView);
     }
     if (typeOfSort == DISABLE_SORTING) {
-//      sortButton.setVisibility(View.GONE);
       sortButton.setAlpha(0.3f);
       sortButton.setEnabled(false);
     } else {
-//      sortButton.setVisibility(View.VISIBLE);
       sortButton.setAlpha(1.0f);
       sortButton.setEnabled(true);
     }
@@ -3601,7 +3618,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       if (activeCycle) {
         if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size() - 1;
-        savedCycleAdapter.setActiveCycleLayout();
+        savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
         savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeft);
 
@@ -3621,7 +3638,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) {
       if (activeCycle) {
         if (isNewCycle) positionOfSelectedCycle = pomArray.size() - 1;
-        savedPomCycleAdapter.setActiveCycleLayout();
+        savedPomCycleAdapter.setCycleAsActive();
         savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(pomDotCounter);
 
@@ -4099,7 +4116,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (savedPomCycleAdapter.isCycleActive()) {
-      savedPomCycleAdapter.removeActiveCycleLayout();
+      savedPomCycleAdapter.removeCycleAsActive();
       savedPomCycleAdapter.notifyDataSetChanged();
     }
 
@@ -4144,7 +4161,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
     if (savedCycleAdapter.isCycleActive()) {
-      savedCycleAdapter.removeActiveCycleLayout();
+      savedCycleAdapter.removeCycleAsActive();
       savedCycleAdapter.notifyDataSetChanged();
     }
 
@@ -5120,8 +5137,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (endingEarly) {
       if (timer != null) timer.cancel();
       if (objectAnimator != null) objectAnimator.cancel();
-      if (!activeCycle) activeCycle = true;
       progressBar.setProgress(0);
+      savedCycleAdapter.setCycleAsActive();
     }
 
     if (trackActivityWithinCycle) {
@@ -5193,6 +5210,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (timer != null) timer.cancel();
       if (objectAnimatorPom != null) objectAnimatorPom.cancel();
       progressBar.setProgress(0);
+      savedPomCycleAdapter.setCycleAsActive();
     }
 
     switch (pomDotCounter) {
@@ -5349,7 +5367,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
           }
 
-          timerPauseLogic();
+          timerIsPaused = true;
+          reset.setVisibility(View.VISIBLE);
+
+          if (timer != null) timer.cancel();
+          if (objectAnimator != null) objectAnimator.pause();
+
           removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
         } else if (pausing == RESUMING_TIMER) {
@@ -5381,28 +5404,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
-          timerResumeLogic();
+          savedCycleAdapter.setCycleAsActive();
+          timerIsPaused = false;
+          reset.setVisibility(View.INVISIBLE);
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       } else {
         deleteTotalCycleTimes();
       }
     }
-  }
-
-  private void timerPauseLogic() {
-    timerIsPaused = true;
-    reset.setVisibility(View.VISIBLE);
-
-    if (timer != null) timer.cancel();
-    if (objectAnimator != null) objectAnimator.pause();
-  }
-
-  private void timerResumeLogic() {
-    activeCycle = true;
-    timerIsPaused = false;
-    reset.setVisibility(View.INVISIBLE);
-//    enableOrDisableCycleResetButton(false);
   }
 
   private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
@@ -5436,14 +5446,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!timerEnded) {
         if (pausing == PAUSING_TIMER) {
           pomMillisUntilFinished = pomMillis;
-          pomTimerPauseLogic();
+
+          if (objectAnimatorPom != null) objectAnimatorPom.pause();
+          if (timer != null) timer.cancel();
+
+          timerIsPaused = true;
+          reset.setText(R.string.reset);
+          reset.setVisibility(View.VISIBLE);
+
           removePomCycleTimeRunnable();
+
         } else if (pausing == RESUMING_TIMER) {
           if (objectAnimatorPom.isPaused() || !objectAnimatorPom.isStarted()) {
             startObjectAnimatorAndTotalCycleTimeCounters();
             startPomTimer();
           }
-          pomTimerResumeLogic();
+
+          savedPomCycleAdapter.setCycleAsActive();
+          timerIsPaused = false;
+          reset.setVisibility(View.INVISIBLE);
+
           postPomCycleTimeRunnable();
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
@@ -5451,22 +5473,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetTimer();
       }
     }
-  }
-
-  private void pomTimerPauseLogic() {
-    if (objectAnimatorPom != null) objectAnimatorPom.pause();
-    if (timer != null) timer.cancel();
-
-    timerIsPaused = true;
-    reset.setText(R.string.reset);
-    reset.setVisibility(View.VISIBLE);
-  }
-
-  private void pomTimerResumeLogic() {
-    activeCycle = true;
-    timerIsPaused = false;
-    reset.setVisibility(View.INVISIBLE);
-//    enableOrDisableCycleResetButton(false);
   }
 
   private void postPomCycleTimeRunnable() {
@@ -5752,7 +5758,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mediaPlayer.reset();
     }
 
-    activeCycle = false;
     timerIsPaused = true;
     timerEnded = false;
     timerDisabled = false;
@@ -5832,8 +5837,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           mHandler.removeCallbacks(endFadeForModeOne);
         }
 
+        savedCycleAdapter.removeCycleAsActive();
+
         if (savedCycleAdapter.isCycleActive() == true) {
-          savedCycleAdapter.removeActiveCycleLayout();
+          savedCycleAdapter.removeCycleAsActive();
           savedCycleAdapter.notifyDataSetChanged();
         }
       }
@@ -5864,8 +5871,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         mHandler.removeCallbacks(endFadeForModeThree);
       }
 
+      savedPomCycleAdapter.removeCycleAsActive();
+
       if (savedPomCycleAdapter.isCycleActive() == true) {
-        savedPomCycleAdapter.removeActiveCycleLayout();
+        savedPomCycleAdapter.removeCycleAsActive();
         savedPomCycleAdapter.notifyDataSetChanged();
       }
 

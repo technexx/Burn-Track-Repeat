@@ -101,11 +101,11 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         mHighlightMode = false;
     }
 
-    public void setActiveCycleLayout() {
+    public void setCycleAsActive() {
         mActiveCycle = true;
     }
 
-    public void removeActiveCycleLayout() {
+    public void removeCycleAsActive() {
         mActiveCycle = false;
     }
 
