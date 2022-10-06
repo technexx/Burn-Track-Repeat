@@ -633,9 +633,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Highlight edit -> Stats Frag bug.
-  //Todo: Would still like to not have 0:00 in our stats.
   //Todo: Had a bug of iterating calories but not time.
+      //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens agian.
   //Todo: For non-zero stats on new day: May have been a manual addition we did. If not, likely related to our resume settings textView string -> int value.
 
   //Todo: Test minimized vibrations on <26 api
@@ -1027,6 +1026,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         storeSetAndBreakTimeForCycleResuming();
       }
 
+      deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycle);
+
     } else if (mode == 3) {
       storeSetAndBreakTimeForPomCycleResuming();
       pauseAndResumePomodoroTimer(PAUSING_TIMER);
@@ -1036,6 +1037,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleSortButtonBasedOnIfCycleIsActive();
 
     mHandler.removeCallbacksAndMessages(null);
+  }
+
+  private void deleteLastAccessedActivityCycleIfItHasZeroTime(int positionOfCycle) {
+    if (dailyStatsAccess.getTotalSetTimeForSelectedActivity() == 0) {
+      AsyncTask.execute(() -> {
+        dailyStatsAccess.deleteTotalTimesAndCaloriesFromCurrentEntity();
+      });
+    }
   }
 
   private void toggleSortButtonBasedOnIfCycleIsActive() {
@@ -2534,8 +2543,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setAndUpdateActivityTimeAndCaloriesInDatabase() {
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
-
-//    Log.i("testRetrieve", "updated from db method is " + totalsett)
   }
 
   private void setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString() {
@@ -4519,7 +4526,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setTotalDailyActivityTimeToTextView();
       setTotalSingleActivityTimeToTextView();
     }
-
+    
     setTotalDailyCaloriesToTextView();
     setTotalSingleActivityCaloriesToTextView();
   }

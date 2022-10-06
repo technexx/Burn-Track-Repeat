@@ -559,6 +559,10 @@ public class DailyStatsAccess {
         }
     }
 
+    public void deleteTotalTimesAndCaloriesFromCurrentEntity() {
+        cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
+    }
+
     public void setStatsForEachActivityEntityFromPosition(int position) {
         mStatsForEachActivity = mStatsForEachActivityList.get(position);
     }
@@ -621,11 +625,6 @@ public class DailyStatsAccess {
 
     public void assignPositionOfActivityListForRetrieveActivityToStatsEntity() {
         mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
-        Log.i("testStats", "entity activity time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
-    }
-
-    public int getActivityPosition() {
-        return activityPositionInListForCurrentDay;
     }
 
     public void setActivityString(String activityString) {
@@ -634,14 +633,6 @@ public class DailyStatsAccess {
 
     public String getActivityStringVariable() {
         return mActivityString;
-    }
-
-    public StatsForEachActivity getStatsForEachActivityEntity() {
-        return mStatsForEachActivity;
-    }
-
-    public String getActivityStringFromSelectedActivity() {
-        return mStatsForEachActivity.getActivity();
     }
 
     public long getTotalSetTimeForSelectedActivity() {
@@ -670,11 +661,8 @@ public class DailyStatsAccess {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day) {
                 valueToReturn += mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
-                Log.i("testTime", "single totals are " + mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
             }
         }
-
-        Log.i("testTime", "total retrieved in db method is " + valueToReturn);
 
         return valueToReturn;
     }
