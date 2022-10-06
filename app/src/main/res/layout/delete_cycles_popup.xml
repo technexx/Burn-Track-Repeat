@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:backgroundTint="@color/darker_grey"
+    android:backgroundTint="@color/grey_2"
     android:background="@drawable/rounded_corners">
 
     <TextView
@@ -14,6 +14,8 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginTop="20dp"
+        android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:lineSpacingMultiplier="1.25"
         android:textSize="20sp"
         android:textColor="@color/white"

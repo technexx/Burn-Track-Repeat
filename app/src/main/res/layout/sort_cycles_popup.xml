@@ -4,7 +4,7 @@
     android:layout_height="wrap_content"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/rounded_corners"
-    android:backgroundTint="@color/grey_2"
+    android:backgroundTint="@color/test_grey"
     android:paddingTop="3dp"
     android:paddingBottom="12dp"
     android:paddingStart="5dp"

@@ -633,6 +633,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  //Todo: New day started w/ 90 minutes of activity. Likely based on new textView save method.
+  //Todo: Activities assigned to cycles may appear as 0:00 on new day, even if not accessed through cycle.
+  //Todo: Sort when in reset/resume.
+
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -1492,15 +1496,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
 
     next_round.setOnClickListener(v -> {
-      AsyncTask.execute(new Runnable() {
-        @Override
-        public void run() {
-//          cyclesDatabase.cyclesDao().deleteActivityStatsForSingleDay(280);
-        }
-      });
-
-//      changeDayOfYear(280);
-
       if (mode == 1) {
         nextRound(true);
       }
@@ -2461,10 +2456,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void changeDayOfYear(int day) {
-    this.dayOfYear = day;
-  }
-
   private void zeroOutDailyActivityTimeAndCalories() {
     totalSetTimeForCurrentDayInMillis = 0;
     totalCaloriesBurnedForCurrentDay = 0;
@@ -2485,6 +2476,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setAndUpdateActivityTimeAndCaloriesInDatabase() {
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
+
+//    Log.i("testRetrieve", "updated from db method is " + totalsett)
   }
 
   private void setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString() {
@@ -4230,7 +4223,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
 
+  //10/06 is 279.
   private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
+    Log.i("testDay", "day of year is " + dayOfYear);
+//    dayOfYear = 280;
+
     dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
     dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
