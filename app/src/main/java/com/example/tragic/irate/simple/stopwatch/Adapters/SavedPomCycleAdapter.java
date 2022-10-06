@@ -139,9 +139,9 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 });
 
                 pomHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+            } else {
+                pomHolder.fullView.setBackgroundColor(Color.BLACK);
             }
-        } else {
-            pomHolder.fullView.setBackgroundColor(Color.BLACK);
         }
 
         if (mHighlightDeleted) {

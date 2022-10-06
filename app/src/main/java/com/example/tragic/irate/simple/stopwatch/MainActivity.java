@@ -633,8 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Had two rows highlights (as in reset/resume) in Cycles.
-
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -4515,7 +4513,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleSetTimeInMillis));
       total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleBreakTimeInMillis));
 
-      Log.i("testCycles", "set time is " + totalCycleSetTimeInMillis);
     }
     if (mode == 3) {
       total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleWorkTimeInMillis));
@@ -4791,8 +4788,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
-
-    setMillis = setMillis + (3590000);
 
     timerIteration.setPreviousTotal(setMillis);
 

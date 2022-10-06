@@ -213,9 +213,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+      } else {
+        workoutHolder.fullView.setBackgroundColor(Color.BLACK);
       }
-    } else {
-      workoutHolder.fullView.setBackgroundColor(Color.BLACK);
     }
 
     if (mThemeMode == DAY_MODE) {
