@@ -948,6 +948,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyTotalExpendedCaloriesBurnedTextView.setText(expendedCaloriesString);
     }
 
+    private double roundDownCalories(double calories) {
+        return Math.floor(calories);
+    }
+
     private int valueToAddForFutureYears() {
         int additionModifier = 0;
         int year = mCalendar.get(Calendar.YEAR);

@@ -774,19 +774,22 @@ public class DailyStatsAccess {
 
         for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
+            valueToReturn = roundDownCalories(valueToReturn);
         }
 
         totalActivityCaloriesForSelectedDuration = valueToReturn;
     }
 
     public double getTotalCaloriesBurnedForSelectedDuration() {
-        double valueToReturn = 0;
-
-        for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
-            valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
-        }
-
-        return valueToReturn;
+//        double valueToReturn = 0;
+//
+//        for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
+//            valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
+//            valueToReturn = roundDownCalories(valueToReturn);
+//        }
+//
+//        return valueToReturn;
+        return totalActivityCaloriesForSelectedDuration;
     }
 
     private double roundDownCalories(double calories) {
@@ -802,7 +805,8 @@ public class DailyStatsAccess {
     }
 
     public void setUnassignedTotalCalories() {
-        totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
+        totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() - getTotalCaloriesBurnedForSelectedDuration();
+//        totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
     }
 
     public int bmrCaloriesBurned() {

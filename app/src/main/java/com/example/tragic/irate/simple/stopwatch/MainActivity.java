@@ -633,8 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: 2611 metabolic rate will, with several low second/0 calorie activities: show 2610 mbr + 1 activity = 2612 total.
-
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
