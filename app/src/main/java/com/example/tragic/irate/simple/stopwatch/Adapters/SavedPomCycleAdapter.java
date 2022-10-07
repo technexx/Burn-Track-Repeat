@@ -111,6 +111,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public void setActiveCyclePosition(int position) {
         this.mPositionOfActiveCycle = position;
+
     }
 
     public void setNumberOfRoundsCompleted(int number) {

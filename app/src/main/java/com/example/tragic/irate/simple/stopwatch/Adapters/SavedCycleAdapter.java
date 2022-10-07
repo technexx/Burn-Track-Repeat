@@ -85,7 +85,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   }
 
   public boolean isHighlightModeActive() {
-    Log.i("testHighlight", "highlight mode is " + mHighlightMode);
     return mHighlightMode;
   }
 
@@ -161,7 +160,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mNumberOfRoundsCompleted = number;
   }
 
-
   public void modifyActiveTdeeModeToggleList(int positionToToggle) {
     if (mActiveTdeeModeBooleanList.get(positionToToggle)) {
       mActiveTdeeModeBooleanList.set(positionToToggle, false);
@@ -205,19 +203,23 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
-
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
+        workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+
+        Log.i("testActive", "position set with colors is " + mPositionOfActiveCycle);
 
         workoutHolder.resetCycle.setOnClickListener(v-> {
           mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
         });
 
-        workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
       } else {
         workoutHolder.fullView.setBackgroundColor(Color.BLACK);
       }
+      Log.i("testActive", "position of active cycle in bindView is " + mPositionOfActiveCycle);
+    } else {
+      workoutHolder.fullView.setBackgroundColor(Color.BLACK);
     }
 
     if (mHighlightDeleted) {

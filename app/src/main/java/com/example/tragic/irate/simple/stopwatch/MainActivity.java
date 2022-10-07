@@ -396,7 +396,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView total_set_time;
   TextView total_break_time;
 
-  boolean activeCycle;
   int PAUSING_TIMER = 1;
   int RESUMING_TIMER = 2;
 
@@ -3662,7 +3661,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void activateResumeOrResetOptionForCycle() {
     if (mode == 1) {
-      if (activeCycle) {
+      Log.i("testActive", "activeCycle boolean in Main is " + savedCycleAdapter.isCycleActive());
+
+      if (savedCycleAdapter.isCycleActive()) {
         if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size() - 1;
         savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
@@ -3682,7 +3683,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode == 3) {
-      if (activeCycle) {
+      if (savedPomCycleAdapter.isCycleActive()) {
         if (isNewCycle) positionOfSelectedCycle = pomArray.size() - 1;
         savedPomCycleAdapter.setCycleAsActive();
         savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
@@ -5449,6 +5450,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
+          //Todo: Gets set as active here, but back to inactive before activateResumeOrResetOptionForCycle() executes.
           savedCycleAdapter.setCycleAsActive();
           timerIsPaused = false;
           reset.setVisibility(View.INVISIBLE);
