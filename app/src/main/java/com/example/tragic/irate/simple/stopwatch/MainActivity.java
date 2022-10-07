@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: LapListCanvas needs adjusting.
   //Todo: Adjust adjustDotRecyclerLayoutMargins() for <1920 height.
 
   //Todo: Test minimized vibrations on <26 api
@@ -1172,12 +1171,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void disableHighlightModeIfActive() {
     if (mode==1) {
-      if (savedCycleAdapter.isCycleHighlighted()) {
+      if (savedCycleAdapter.isHighlightModeActive()) {
         removeCycleHighlights();
         fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
       }
       if (mode==3) {
-        if (savedPomCycleAdapter.isCycleHighlighted()) {
+        if (savedPomCycleAdapter.isHighlightModeActive()) {
           removeCycleHighlights();
           fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
         }
@@ -1843,19 +1842,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tabUnselectedLogic();
 
         if (savedCyclesTab.getPosition() == 0) {
-          if (savedCycleAdapter.isCycleHighlighted() == true) {
-            removeCycleHighlights();
+          if (savedCycleAdapter.isHighlightModeActive()) {
             savedCycleAdapter.notifyDataSetChanged();
+            fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
           }
           dotsAdapter.saveModeOneAlpha();
         }
         if (savedCyclesTab.getPosition() == 1) {
-          if (savedPomCycleAdapter.isCycleHighlighted() == true) {
-            removeCycleHighlights();
+          if (savedPomCycleAdapter.isHighlightModeActive()) {
             savedPomCycleAdapter.notifyDataSetChanged();
+            fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
           }
           pomDotsAdapter.saveModeThreeAlpha();
         }
+
+        //Must execute after we check if highlight mode is active above.
+        removeCycleHighlights();
       }
 
       @Override
@@ -1866,10 +1868,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void tabUnselectedLogic() {
     cycleTitle = "";
-
-    if (cancelHighlight.isEnabled()) {
-      fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
-    }
 
     if (editCyclesPopupWindow.isShowing()) {
       editCyclesPopupWindow.dismiss();
@@ -2041,7 +2039,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void assignSortPopUpLayoutClassesToTheirIds() {
     sortCycleTitleAToZ = sortCyclePopupView.findViewById(R.id.sort_title_start);
     sortCycleTitleZtoA = sortCyclePopupView.findViewById(R.id.sort_title_end);
-    ;
     sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
     sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
     sortActivityTitleAtoZ = sortCyclePopupView.findViewById(R.id.sort_activity_ascending_from_cycles);

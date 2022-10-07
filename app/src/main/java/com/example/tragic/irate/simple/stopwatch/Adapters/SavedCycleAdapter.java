@@ -84,7 +84,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     return mActiveCycle;
   }
 
-  public boolean isCycleHighlighted() {
+  public boolean isHighlightModeActive() {
+    Log.i("testHighlight", "highlight mode is " + mHighlightMode);
     return mHighlightMode;
   }
 

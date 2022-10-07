@@ -66,10 +66,6 @@ public class LapAdapter extends RecyclerView.Adapter<LapAdapter.LapViewHolder> {
     return mHaveWeBegunScrolling;
   }
 
-  public void setOnScreenItemCount(int itemCount) {
-    this.mOnScreenItemCount = itemCount;
-  }
-
   @Override
   public int getItemCount() {
     return mSavedLap.size();
