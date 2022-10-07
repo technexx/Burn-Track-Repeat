@@ -2002,7 +2002,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateActivityEditPopUpViews() {
         tdeeEditView = inflater.inflate(R.layout.daily_stats_edit_popup, null);
-        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(280), true);
+        tdeeEditPopUpWindow = new PopupWindow(tdeeEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(300), true);
         tdeeEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         customActivityPopUpView = inflater.inflate(R.layout.custom_activity_popup_layout, null);
@@ -2044,7 +2044,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void instantiateCaloriesConsumedEditPopUpViews() {
         caloriesConsumedAddAndEditView = inflater.inflate(R.layout.calories_consumed_add_and_edit_popup, null);
-        caloriesConsumedAddAndEditPopUpWindow = new PopupWindow(caloriesConsumedAddAndEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(280), true);
+        caloriesConsumedAddAndEditPopUpWindow = new PopupWindow(caloriesConsumedAddAndEditView, WindowManager.LayoutParams.MATCH_PARENT, dpToPxConv(300), true);
         caloriesConsumedAddAndEditPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
         typeOfFoodHeaderTextView = caloriesConsumedAddAndEditView.findViewById(R.id.add_food_name_header);
@@ -2098,10 +2098,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesComparisonTabLayout = mRoot.findViewById(R.id.calorie_comparison_tab_layout);
 
         if (phoneHeight <= 1920) {
-//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Burned"));
-//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Consumed"));
-//            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Compared"));
-
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Burned"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));

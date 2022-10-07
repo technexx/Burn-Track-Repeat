@@ -142,7 +142,7 @@
 
     <string name="multiple_day_activity_addition_warning">This will add or update activity for all days in current date range!</string>
     <string name="multiple_day_activity_edit_warning">This will update or delete activity for all days in current date range!</string>
-    <string name="multiple_food_addition_warning">This will add or delete food for all days in current date range!</string>
+    <string name="multiple_food_addition_warning">This will add or update food for all days in current date range!</string>
     <string name="multiple_food_edit_warning">This will update or delete food for all days in current date range!</string>
 
     <string name="current_day">Selected day</string>

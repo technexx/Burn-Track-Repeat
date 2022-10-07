@@ -632,6 +632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
   //Todo: Adjust adjustDotRecyclerLayoutMargins() for <1920 height.
 
   //Todo: Test minimized vibrations on <26 api
@@ -647,7 +648,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
 
   //Todo: Had a bug of iterating calories but not time.
-  //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens agian.
+      //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens agian.
   //Todo: For non-zero stats on new day: May have been a manual addition we did. If not, likely related to our resume settings textView string -> int value.
 
   //Todo: Add Day/Night modes.
