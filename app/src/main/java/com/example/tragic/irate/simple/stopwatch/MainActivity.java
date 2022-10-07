@@ -633,6 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  //Todo: Adjust adjustDotRecyclerLayoutMargins() for <1920 height
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -2218,6 +2219,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsRecyclerLayoutParams.height = dpConv(95);
       } else {
         dotsRecyclerLayoutParams.height = dpConv(160);
+      }
+    }
+  }
+
+  private void adjustDotRecyclerLayoutMargins() {
+    if (mode == 1) {
+      if (trackActivityWithinCycle) {
+        dotsRecyclerConstraintLayout_LayoutParams.bottomMargin = dpConv(-8);
+      } else {
+        dotsRecyclerConstraintLayout_LayoutParams.bottomMargin = dpConv(32);
       }
     }
   }
@@ -4287,6 +4298,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     toggleCycleAndPomCycleRecyclerViewVisibilities(true);
+    adjustDotRecyclerLayoutMargins();
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }

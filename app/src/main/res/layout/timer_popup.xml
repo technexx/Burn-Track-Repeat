@@ -24,7 +24,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/open_sans"
             android:textColor="@color/teal_200"
-            android:textSize="24sp"
+            android:textSize="23sp"
             android:maxLines="1"
             android:maxLength="50"
             app:layout_constraintStart_toStartOf="parent"
@@ -124,7 +124,7 @@
             android:layout_marginStart="0dp"
             android:gravity="center_horizontal"
             android:textColor="@color/teal_200"
-            android:textSize="24sp"
+            android:textSize="21sp"
             android:textStyle="bold">
         </TextView>
 
@@ -135,9 +135,9 @@
             android:layout_marginStart="100dp"
             app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="6dp"
             android:textColor="@color/white"
-            android:textSize="22sp">
+            android:textSize="21sp">
         </TextView>
 
         <TextView
@@ -147,9 +147,9 @@
             app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toEndOf="@id/daily_total_time_textView_header"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="12dp"
+            android:layout_marginTop="6dp"
             android:textColor="@color/green"
-            android:textSize="22sp">
+            android:textSize="21sp">
         </TextView>
 
         <TextView
@@ -160,7 +160,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
             android:layout_marginTop="4dp"
-            android:textSize="22sp">
+            android:textSize="21sp">
         </TextView>
 
         <TextView
@@ -171,7 +171,7 @@
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
             app:layout_constraintStart_toEndOf="@id/daily_total_calories_textView_header"
             android:layout_marginTop="4dp"
-            android:textSize="22sp"
+            android:textSize="21sp"
             android:textColor="@color/purple_200">
         </TextView>
 
@@ -185,7 +185,7 @@
             android:gravity="center_horizontal"
             android:layout_marginTop="20dp"
             android:textColor="@color/light_blue"
-            android:textSize="22sp"
+            android:textSize="21sp"
             android:layout_marginStart="30dp"
             android:maxLines="2">
         </TextView>
@@ -194,7 +194,7 @@
             android:id="@+id/daily_total_time_for_single_activity_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="22sp"
+            android:textSize="21sp"
             android:layout_marginStart="100dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header">
@@ -207,7 +207,7 @@
             android:layout_marginStart="8dp"
             android:gravity="center"
             android:textColor="@color/green"
-            android:textSize="22sp"
+            android:textSize="21sp"
             app:layout_constraintStart_toEndOf="@id/daily_total_time_for_single_activity_textView_header"
             app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header">
         </TextView>
@@ -218,7 +218,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginStart="100dp"
-            android:textSize="22sp"
+            android:textSize="21sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header">
         </TextView>
@@ -231,7 +231,7 @@
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:textColor="@color/purple_200"
-            android:textSize="22sp"
+            android:textSize="21sp"
             app:layout_constraintStart_toEndOf="@id/daily_total_calories_for_single_activity_textView_header"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header">
         </TextView>
@@ -246,7 +246,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
         app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
-        android:layout_marginBottom="16dp">
+        android:layout_marginBottom="12dp">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dots_recyclerView"
