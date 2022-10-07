@@ -633,7 +633,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Adjust adjustDotRecyclerLayoutMargins() for <1920 height
+  //Todo: LapListCanvas needs adjusting.
+  //Todo: Adjust adjustDotRecyclerLayoutMargins() for <1920 height.
+
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -2014,6 +2016,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     lapListCanvas = stopWatchPopUpView.findViewById(R.id.lapCanvas);
     lapListCanvas.setScreenHeight(phoneHeight);
+    lapListCanvas.setGradientWidth();
 
     lapRecycler = stopWatchPopUpView.findViewById(R.id.lap_recycler);
     stopWatchPauseResumeButton = stopWatchPopUpView.findViewById(R.id.stopwatchPauseResumeButton);

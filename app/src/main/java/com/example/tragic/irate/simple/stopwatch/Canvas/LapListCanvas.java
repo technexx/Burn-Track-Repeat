@@ -24,11 +24,22 @@ public class LapListCanvas extends View {
     public LapListCanvas(Context context, @Nullable AttributeSet attrs) {
         super(context, attrs);
         mPaint = new Paint();
-        setGradientWidth();
     }
 
     public void setScreenHeight(int height) {
         this.mScreenHeight = height;
+    }
+
+    public void setGradientWidth() {
+        if (mScreenHeight < 1920) {
+            gradientWidthAndHeight = 240;
+            gradientShadeMovement = 12;
+            gradientYAxisMovement = 5;
+        } else {
+            gradientWidthAndHeight = 280;
+            gradientShadeMovement = 10;
+            gradientYAxisMovement = 7;
+        }
     }
 
     private void drawOutlineBox() {
@@ -53,18 +64,6 @@ public class LapListCanvas extends View {
 
             nextYCoord += convertDensityPixelsToScalable(gradientYAxisMovement);
             alpha+=gradientShadeMovement;
-        }
-    }
-
-    private void setGradientWidth() {
-        if (mScreenHeight < 1920) {
-            gradientWidthAndHeight = 240;
-            gradientShadeMovement = 12;
-            gradientYAxisMovement = 5;
-        } else {
-            gradientWidthAndHeight = 280;
-            gradientShadeMovement = 10;
-            gradientYAxisMovement = 7;
         }
     }
 
