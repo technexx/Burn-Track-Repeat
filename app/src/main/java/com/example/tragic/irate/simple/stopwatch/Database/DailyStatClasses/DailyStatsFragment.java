@@ -1206,8 +1206,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 //New instance to be capped for each iteration of loop.
                 finalNewActivityTime = newActivityTime;
-//                Log.i("testFetch", "day " + uniqueIdToCheck + " assigned time for activity is " + assignedTime/1000/60);
-//                Log.i("testFetch", "day " + uniqueIdToCheck + " unassigned time for activity is " + unassignedTime/1000/60);
 
                 finalNewActivityTime = cappedTimeForStatEdits(finalNewActivityTime, assignedTime, unassignedTime);
 

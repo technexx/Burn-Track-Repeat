@@ -4,13 +4,12 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:theme="@style/StatFragmentThemeDark"
     android:background="@color/darkest_gray">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/calorie_comparison_tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/darkest_gray"
@@ -25,10 +24,10 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_duration_header_layout"
         android:layout_width="match_parent"
-        android:layout_height="65dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
         app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginTop="0dp"
+        android:layout_marginTop="6dp"
         android:background="@drawable/daily_total_stats_border"
         android:backgroundTint="@color/darkest_gray">
 
@@ -77,7 +76,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="0dp"
-            android:layout_marginBottom="10dp"
+            android:layout_marginBottom="16dp"
             android:textSize="16sp"
             android:textColor="@color/yellow_1">
         </TextView>
@@ -147,8 +146,7 @@
         android:id="@+id/daily_stats_expanded_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
-        app:layout_constraintBottom_toTopOf="@id/daily_stats_recyclerView"
+        app:layout_constraintTop_toTopOf="@id/activity_duration_header_layout"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="16dp"
         android:src="@drawable/collapse_1_h1920"
@@ -156,15 +154,25 @@
     </ImageButton>
 
     <ImageButton
+        android:id="@+id/minimize_calendarView_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="@id/activity_duration_header_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="14dp"
+        android:src="@drawable/arrow_down_small"
+        android:background="#08000000">
+    </ImageButton>
+
+    <ImageButton
         android:id="@+id/edit_tdee_stats_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
-        app:layout_constraintBottom_toTopOf="@id/total_activity_stats_values_textView_layout"
+        app:layout_constraintTop_toTopOf="@id/activity_duration_header_layout"
         app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/edit_icon"
-        android:background="@color/darkest_gray"
-        android:layout_marginEnd="10dp">
+        android:src="@drawable/edit_icon_small"
+        android:layout_marginEnd="10dp"
+        android:background="@color/darkest_gray">
     </ImageButton>
 
     <androidx.recyclerview.widget.RecyclerView
@@ -595,16 +603,6 @@
         </TextView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <ImageButton
-        android:id="@+id/minimize_calendarView_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/arrow_down_small"
-        android:background="#08000000">
-    </ImageButton>
 
     <View
         android:id="@+id/tdee_edit_popUp_anchor_bottom"
