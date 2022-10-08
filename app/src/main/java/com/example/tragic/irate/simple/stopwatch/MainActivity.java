@@ -632,8 +632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: 10/8 stats will be empty to start.
-  //Todo: Changed back bmr calculation in total stats - may run a second off at times.
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
   //Todo: Adjust adjustDotRecyclerLayoutMargins() for <1920 height.
 
@@ -644,7 +642,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
-  //Todo: Twitter/FB/Insta share option.
 
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.

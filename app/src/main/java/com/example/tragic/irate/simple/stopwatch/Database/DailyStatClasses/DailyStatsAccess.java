@@ -805,8 +805,8 @@ public class DailyStatsAccess {
     }
 
     public void setUnassignedTotalCalories() {
-//        totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() - getTotalCaloriesBurnedForSelectedDuration();
-        totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
+        totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() - getTotalCaloriesBurnedForSelectedDuration();
+//        totalUnassignedCaloriesForSelectedDuration = bmrCaloriesBurned() * decimalPercentageOfUnAssignedTime();
     }
 
     public int bmrCaloriesBurned() {
