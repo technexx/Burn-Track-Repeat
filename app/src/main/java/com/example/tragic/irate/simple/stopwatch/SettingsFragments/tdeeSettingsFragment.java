@@ -88,6 +88,10 @@ public class tdeeSettingsFragment extends Fragment {
         heightList = new ArrayList<>();
         activityLevelList = new ArrayList<>();
 
+        //Need to have correct mode before we retrieve or populate spinner values, otherwise can have an index crash since they populate w/ different values.
+        metricMode = sharedPreferences.getBoolean("metricMode", false);
+        retrieveAndSetSpinnerValues(metricMode);
+
         populateAllSpinnerStringLists();
 
         genderAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, genderList);
@@ -107,8 +111,6 @@ public class tdeeSettingsFragment extends Fragment {
         weight_spinner.setAdapter(weightAdapter);
         height_spinner.setAdapter(heightAdapter);
         activity_level_spinner.setAdapter(activityLevelAdapter);
-
-        retrieveAndSetSpinnerValues(false);
 
         bmrTextView.setText(calculatedBMRString());
 
