@@ -632,8 +632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: On Moto: calculateBmr() tried to fetch indice of 72 when we had only populated w/ 52 items (which is an imperial population).
-      //Todo: We save the position, so if we save in Metric but default to non-metric mode, we'll have an index exception.
+  //Todo: Tdee settings reset on launch w/ our index fix.
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
   //Todo: Adjust adjustDotRecyclerLayoutMargins() for <1920 height.
 
