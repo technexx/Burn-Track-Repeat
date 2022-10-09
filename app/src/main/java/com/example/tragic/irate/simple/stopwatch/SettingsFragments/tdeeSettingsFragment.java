@@ -88,11 +88,11 @@ public class tdeeSettingsFragment extends Fragment {
         heightList = new ArrayList<>();
         activityLevelList = new ArrayList<>();
 
-        //Need to have correct mode before we retrieve or populate spinner values, otherwise can have an index crash since they populate w/ different values.
-//        metricMode = sharedPreferences.getBoolean("metricMode", false);
-        retrieveAndSetSpinnerValues(false);
-
-        populateAllSpinnerStringLists();
+        populateGenderSpinnerStringList();
+        populateAgeSpinnerStringList();
+        populateWeightSpinnerStringList();
+        populateHeightSpinnerStringList();
+        populateActivityLevelStringList();
 
         genderAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, genderList);
         ageAdapter = new ArrayAdapter<>(getContext(), R.layout.tdee_settings_spinner_layout, ageList);
@@ -111,6 +111,8 @@ public class tdeeSettingsFragment extends Fragment {
         weight_spinner.setAdapter(weightAdapter);
         height_spinner.setAdapter(heightAdapter);
         activity_level_spinner.setAdapter(activityLevelAdapter);
+
+        retrieveAndSetSpinnerValues(false);
 
         bmrTextView.setText(calculatedBMRString());
 
@@ -224,8 +226,11 @@ public class tdeeSettingsFragment extends Fragment {
 
 //        gender_spinner.setSelection(genderPosition);
 //        age_spinner.setSelection(agePosition);
+        //Todo: Setting but not showing in UI.
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
+
+        Log.i("testTdee", "setting imperial height at position " + heightPosition);
 
         int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 0);
         activity_level_spinner.setSelection(activityLevelPosition);
@@ -259,16 +264,6 @@ public class tdeeSettingsFragment extends Fragment {
     private void refreshWeightAndHeightSpinnerAdapters() {
         weightAdapter.notifyDataSetChanged();
         heightAdapter.notifyDataSetChanged();
-    }
-
-    private void populateAllSpinnerStringLists() {
-        populateGenderSpinnerStringList();
-        populateAgeSpinnerStringList();
-        populateWeightSpinnerStringList();
-        populateHeightSpinnerStringList();
-        populateActivityLevelStringList();
-
-        setActivityLevelSpinnerListener();
     }
 
     private void populateGenderSpinnerStringList() {
@@ -414,20 +409,6 @@ public class tdeeSettingsFragment extends Fragment {
         }
 
         return getString(R.string.spinner_value, String.valueOf(spinnerValue), append);
-    }
-
-    private void setActivityLevelSpinnerListener() {
-        activity_level_spinner.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                bmrTextView.setText(calculatedBMRString());
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
     }
 
     private double setActivityLevelMultiplier(int spinnerPositionSelected) {
