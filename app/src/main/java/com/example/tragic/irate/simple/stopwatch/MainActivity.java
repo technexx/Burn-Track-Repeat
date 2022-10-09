@@ -632,7 +632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Material buttons seem to need padding on lower APIs or they get smushed.
+  //Todo: Stats recycler alignment
   //Todo: <1920 stats frag ui
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
   //Todo: Check total stats in frag for +/- 1.
@@ -655,6 +655,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Add Day/Night modes.
 
+  //Todo: We can also commit just specific files, remember!
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
   @Override
