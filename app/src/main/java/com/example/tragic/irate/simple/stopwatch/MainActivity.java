@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedSingleActivityString;
 
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
-  //Todo: Disclaimer section should be centered.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
