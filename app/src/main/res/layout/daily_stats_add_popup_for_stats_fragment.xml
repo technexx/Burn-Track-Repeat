@@ -61,7 +61,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        android:paddingStart="16dp"
+        android:paddingEnd="16dp"
+        android:paddingTop="4dp"
+        android:paddingBottom="4dp"
         android:layout_marginBottom="4dp"
+
         android:backgroundTint="@color/darker_grey"
         android:textColor="@color/white"
         app:cornerRadius="10dp"

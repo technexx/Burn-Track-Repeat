@@ -632,8 +632,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  //Todo: Material buttons seem to need padding on lower APIs or they get smushed.
   //Todo: <1920 stats frag ui
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
+  //Todo: Check total stats in frag for +/- 1.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
@@ -643,7 +645,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
 
-  //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: First time pref fragment popUp is accessed, nothing is selected (e.g. silent is active, but not selected).
@@ -1311,6 +1312,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+   Log.i("testVer", "ver is " + Build.VERSION.SDK_INT);
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
@@ -5452,7 +5455,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
-          //Todo: Gets set as active here, but back to inactive before activateResumeOrResetOptionForCycle() executes.
           savedCycleAdapter.setCycleAsActive();
           timerIsPaused = false;
           reset.setVisibility(View.INVISIBLE);
