@@ -115,7 +115,6 @@ public class tdeeSettingsFragment extends Fragment {
         retrieveAndSetSpinnerValues(false);
 
         bmrTextView.setText(calculatedBMRString());
-
         imperialSettingButton.setAlpha(1.0f);
         metricSettingButton.setAlpha(0.5f);
 
@@ -159,6 +158,22 @@ public class tdeeSettingsFragment extends Fragment {
             retrieveAndSetSpinnerValues(selectingMetric);
             bmrTextView.setText(calculatedBMRString());
         }
+    }
+
+
+    private void clearAndRepopulateWeightAndHeightSpinnerAdapters() {
+        weightAdapter.addAll(weightList);
+        heightAdapter.addAll(heightList);
+    }
+
+    private void refreshWeightAndHeightSpinnerAdapters() {
+        weightAdapter.notifyDataSetChanged();
+        heightAdapter.notifyDataSetChanged();
+    }
+
+    private void populateGenderSpinnerStringList() {
+        genderList.add(getString(R.string.male));
+        genderList.add(getString(R.string.female));
     }
 
     private void saveSpinnerStatsToSharedPreferences(boolean savingMetric) {
@@ -213,24 +228,17 @@ public class tdeeSettingsFragment extends Fragment {
             agePosition = sharedPreferences.getInt("agePositionMetric", 18);
             weightPosition = sharedPreferences.getInt("weightPositionMetric", 68);
             heightPosition = sharedPreferences.getInt("heightPositionMetric", 182);
-
-            Log.i("testTdee", "retrieving metric height at position " + heightPosition);
         } else {
             genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
             agePosition = sharedPreferences.getInt("agePositionImperial", 18);
             weightPosition = sharedPreferences.getInt("weightPositionImperial", 150);
             heightPosition = sharedPreferences.getInt("heightPositionImperial", 72);
-
-            Log.i("testTdee", "retrieving imperial height at position " + heightPosition);
         }
 
-//        gender_spinner.setSelection(genderPosition);
-//        age_spinner.setSelection(agePosition);
-        //Todo: Setting but not showing in UI.
+        gender_spinner.setSelection(genderPosition);
+        age_spinner.setSelection(agePosition);
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
-
-        Log.i("testTdee", "setting imperial height at position " + heightPosition);
 
         int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 0);
         activity_level_spinner.setSelection(activityLevelPosition);
@@ -256,21 +264,6 @@ public class tdeeSettingsFragment extends Fragment {
         populateHeightSpinnerStringList();
     }
 
-    private void clearAndRepopulateWeightAndHeightSpinnerAdapters() {
-        weightAdapter.addAll(weightList);
-        heightAdapter.addAll(heightList);
-    }
-
-    private void refreshWeightAndHeightSpinnerAdapters() {
-        weightAdapter.notifyDataSetChanged();
-        heightAdapter.notifyDataSetChanged();
-    }
-
-    private void populateGenderSpinnerStringList() {
-        genderList.add(getString(R.string.male));
-        genderList.add(getString(R.string.female));
-    }
-
     private void populateAgeSpinnerStringList() {
         for (int i = 18; i < 101; i++) {
             ageList.add(i + " " + "years");
@@ -291,12 +284,10 @@ public class tdeeSettingsFragment extends Fragment {
 
     private void populateHeightSpinnerStringList() {
         if (metricMode) {
-            Log.i("testTdee", "populating metric height");
             for (int i = 120; i < 251; i++) {
                 heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
             }
         } else {
-            Log.i("testTdee", "populating imperial height");
             for (int i = 48; i < 100; i++) {
                 heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
             }

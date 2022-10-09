@@ -632,8 +632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Imperial saving but not retrieving correctly on app restart BUT in stats frag it does reflect correctly.
-      //Todo: Likely spinner not set on adapter correctly.
+  //Todo: Gender/Age also need to be saved in sharedPref.
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
   //Todo: Disclaimer section should be centered.
 
