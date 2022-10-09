@@ -632,7 +632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Gender/Age also need to be saved in sharedPref.
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
   //Todo: Disclaimer section should be centered.
 

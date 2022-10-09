@@ -76,6 +76,9 @@ public class tdeeSettingsFragment extends Fragment {
 
         imperialSettingButton = root.findViewById(R.id.imperial_setting);
         metricSettingButton = root.findViewById(R.id.metric_setting);
+        imperialSettingButton.setAlpha(1.0f);
+        metricSettingButton.setAlpha(0.5f);
+
         Button saveTdeeSettingsButton = root.findViewById(R.id.save_tdee_settings_button);
 
         imperialSettingButton.setText(R.string.imperial);
@@ -115,8 +118,6 @@ public class tdeeSettingsFragment extends Fragment {
         retrieveAndSetSpinnerValues(false);
 
         bmrTextView.setText(calculatedBMRString());
-        imperialSettingButton.setAlpha(1.0f);
-        metricSettingButton.setAlpha(0.5f);
 
         imperialSettingButton.setOnClickListener(v -> {
             toggleMetricAndImperial(false);
@@ -160,7 +161,6 @@ public class tdeeSettingsFragment extends Fragment {
         }
     }
 
-
     private void clearAndRepopulateWeightAndHeightSpinnerAdapters() {
         weightAdapter.addAll(weightList);
         heightAdapter.addAll(heightList);
@@ -183,18 +183,12 @@ public class tdeeSettingsFragment extends Fragment {
             prefEdit.putInt("weightPositionMetric", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionMetric", height_spinner.getSelectedItemPosition());
             prefEdit.putInt("activityLevelPositionMetric", activity_level_spinner.getSelectedItemPosition());
-
-            Log.i("testTdee", "saving metric height at position " + height_spinner.getSelectedItemPosition());
-
         } else {
             prefEdit.putInt("genderPositionImperial", gender_spinner.getSelectedItemPosition());
             prefEdit.putInt("agePositionImperial", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionImperial", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionImperial", height_spinner.getSelectedItemPosition());
             prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
-
-            Log.i("testTdee", "saving imperial height at position " + height_spinner.getSelectedItemPosition());
-
         }
 
         prefEdit.putBoolean("metricMode", metricMode);
@@ -225,14 +219,14 @@ public class tdeeSettingsFragment extends Fragment {
 
         if (selectingMetric) {
             genderPosition = sharedPreferences.getInt("genderPositionMetric", 0);
-            agePosition = sharedPreferences.getInt("agePositionMetric", 18);
-            weightPosition = sharedPreferences.getInt("weightPositionMetric", 68);
-            heightPosition = sharedPreferences.getInt("heightPositionMetric", 182);
+            agePosition = sharedPreferences.getInt("agePositionMetric", 0);
+            weightPosition = sharedPreferences.getInt("weightPositionMetric", 0);
+            heightPosition = sharedPreferences.getInt("heightPositionMetric", 0);
         } else {
             genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
-            agePosition = sharedPreferences.getInt("agePositionImperial", 18);
-            weightPosition = sharedPreferences.getInt("weightPositionImperial", 150);
-            heightPosition = sharedPreferences.getInt("heightPositionImperial", 72);
+            agePosition = sharedPreferences.getInt("agePositionImperial", 0);
+            weightPosition = sharedPreferences.getInt("weightPositionImperial", 0);
+            heightPosition = sharedPreferences.getInt("heightPositionImperial", 0);
         }
 
         gender_spinner.setSelection(genderPosition);
