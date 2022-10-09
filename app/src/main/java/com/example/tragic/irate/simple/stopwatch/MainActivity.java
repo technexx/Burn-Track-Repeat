@@ -634,7 +634,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Tdee settings reset on launch w/ our index fix.
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
-  //Todo: Adjust adjustDotRecyclerLayoutMargins() for <1920 height.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
@@ -647,6 +646,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Sub cat row in activity addition  + timer textView may not appear on first app launch (on moto g5).
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
+  //Todo: First time pref fragment popUp is accessed, nothing is selected (e.g. silent is active, but not selected).
 
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens agian.

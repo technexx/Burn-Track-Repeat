@@ -89,8 +89,8 @@ public class tdeeSettingsFragment extends Fragment {
         activityLevelList = new ArrayList<>();
 
         //Need to have correct mode before we retrieve or populate spinner values, otherwise can have an index crash since they populate w/ different values.
-        metricMode = sharedPreferences.getBoolean("metricMode", false);
-        retrieveAndSetSpinnerValues(metricMode);
+//        metricMode = sharedPreferences.getBoolean("metricMode", false);
+        retrieveAndSetSpinnerValues(false);
 
         populateAllSpinnerStringLists();
 
@@ -166,12 +166,18 @@ public class tdeeSettingsFragment extends Fragment {
             prefEdit.putInt("weightPositionMetric", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionMetric", height_spinner.getSelectedItemPosition());
             prefEdit.putInt("activityLevelPositionMetric", activity_level_spinner.getSelectedItemPosition());
+
+            Log.i("testTdee", "saving metric height at position " + height_spinner.getSelectedItemPosition());
+
         } else {
             prefEdit.putInt("genderPositionImperial", gender_spinner.getSelectedItemPosition());
             prefEdit.putInt("agePositionImperial", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionImperial", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionImperial", height_spinner.getSelectedItemPosition());
             prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
+
+            Log.i("testTdee", "saving imperial height at position " + height_spinner.getSelectedItemPosition());
+
         }
 
         prefEdit.putBoolean("metricMode", metricMode);
@@ -205,11 +211,15 @@ public class tdeeSettingsFragment extends Fragment {
             agePosition = sharedPreferences.getInt("agePositionMetric", 18);
             weightPosition = sharedPreferences.getInt("weightPositionMetric", 68);
             heightPosition = sharedPreferences.getInt("heightPositionMetric", 182);
+
+            Log.i("testTdee", "retrieving metric height at position " + heightPosition);
         } else {
             genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
             agePosition = sharedPreferences.getInt("agePositionImperial", 18);
             weightPosition = sharedPreferences.getInt("weightPositionImperial", 150);
             heightPosition = sharedPreferences.getInt("heightPositionImperial", 72);
+
+            Log.i("testTdee", "retrieving imperial height at position " + heightPosition);
         }
 
 //        gender_spinner.setSelection(genderPosition);
@@ -219,33 +229,7 @@ public class tdeeSettingsFragment extends Fragment {
 
         int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 0);
         activity_level_spinner.setSelection(activityLevelPosition);
-    }
 
-    private String getActivityLevelString(int position) {
-        String stringToReturn = "";
-
-        switch (position) {
-            case 0:
-                stringToReturn = getString(R.string.act_0);
-                break;
-            case 1:
-                stringToReturn = getString(R.string.act_1);
-                break;
-            case 2:
-                stringToReturn = getString(R.string.act_2);
-                break;
-            case 3:
-                stringToReturn = getString(R.string.act_3);
-                break;
-            case 4:
-                stringToReturn = getString(R.string.act_4);
-                break;
-            case 5:
-                stringToReturn = getString(R.string.act_5);
-                break;
-        }
-
-        return stringToReturn;
     }
 
     private int getIntegerValueFromFullSpinnerString(Spinner spinner) {
@@ -275,6 +259,62 @@ public class tdeeSettingsFragment extends Fragment {
     private void refreshWeightAndHeightSpinnerAdapters() {
         weightAdapter.notifyDataSetChanged();
         heightAdapter.notifyDataSetChanged();
+    }
+
+    private void populateAllSpinnerStringLists() {
+        populateGenderSpinnerStringList();
+        populateAgeSpinnerStringList();
+        populateWeightSpinnerStringList();
+        populateHeightSpinnerStringList();
+        populateActivityLevelStringList();
+
+        setActivityLevelSpinnerListener();
+    }
+
+    private void populateGenderSpinnerStringList() {
+        genderList.add(getString(R.string.male));
+        genderList.add(getString(R.string.female));
+    }
+
+    private void populateAgeSpinnerStringList() {
+        for (int i = 18; i < 101; i++) {
+            ageList.add(i + " " + "years");
+        }
+    }
+
+    private void populateWeightSpinnerStringList() {
+        if (metricMode) {
+            for (int i = 45; i < 151; i++) {
+                weightList.add((getAppendingStringForSpinnerList(i, WEIGHT)));
+            }
+        } else {
+            for (int i = 100; i < 301; i++) {
+                weightList.add((getAppendingStringForSpinnerList( i, WEIGHT)));
+            }
+        }
+    }
+
+    private void populateHeightSpinnerStringList() {
+        if (metricMode) {
+            Log.i("testTdee", "populating metric height");
+            for (int i = 120; i < 251; i++) {
+                heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
+            }
+        } else {
+            Log.i("testTdee", "populating imperial height");
+            for (int i = 48; i < 100; i++) {
+                heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
+            }
+        }
+    }
+
+    private void populateActivityLevelStringList() {
+        activityLevelList.add(getString(R.string.act_0));
+        activityLevelList.add(getString(R.string.act_1));
+        activityLevelList.add(getString(R.string.act_2));
+        activityLevelList.add(getString(R.string.act_3));
+        activityLevelList.add(getString(R.string.act_4));
+        activityLevelList.add(getString(R.string.act_5));
     }
 
     private String calculatedBMRString() {
@@ -327,6 +367,33 @@ public class tdeeSettingsFragment extends Fragment {
         return caloriesBurned;
     }
 
+    private String getActivityLevelString(int position) {
+        String stringToReturn = "";
+
+        switch (position) {
+            case 0:
+                stringToReturn = getString(R.string.act_0);
+                break;
+            case 1:
+                stringToReturn = getString(R.string.act_1);
+                break;
+            case 2:
+                stringToReturn = getString(R.string.act_2);
+                break;
+            case 3:
+                stringToReturn = getString(R.string.act_3);
+                break;
+            case 4:
+                stringToReturn = getString(R.string.act_4);
+                break;
+            case 5:
+                stringToReturn = getString(R.string.act_5);
+                break;
+        }
+
+        return stringToReturn;
+    }
+
     private String getAppendingStringForSpinnerList(int spinnerValue, int typeOfStat) {
         String append = "";
 
@@ -347,50 +414,6 @@ public class tdeeSettingsFragment extends Fragment {
         }
 
         return getString(R.string.spinner_value, String.valueOf(spinnerValue), append);
-    }
-
-    private void populateGenderSpinnerStringList() {
-        genderList.add(getString(R.string.male));
-        genderList.add(getString(R.string.female));
-    }
-
-    private void populateAgeSpinnerStringList() {
-        for (int i = 18; i < 101; i++) {
-            ageList.add(i + " " + "years");
-        }
-    }
-
-    private void populateWeightSpinnerStringList() {
-        if (metricMode) {
-            for (int i = 45; i < 151; i++) {
-                weightList.add((getAppendingStringForSpinnerList(i, WEIGHT)));
-            }
-        } else {
-            for (int i = 100; i < 301; i++) {
-                weightList.add((getAppendingStringForSpinnerList( i, WEIGHT)));
-            }
-        }
-    }
-
-    private void populateHeightSpinnerStringList() {
-        if (metricMode) {
-            for (int i = 120; i < 251; i++) {
-                heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
-            }
-        } else {
-            for (int i = 48; i < 100; i++) {
-                heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
-            }
-        }
-    }
-
-    private void populateActivityLevelStringList() {
-        activityLevelList.add(getString(R.string.act_0));
-        activityLevelList.add(getString(R.string.act_1));
-        activityLevelList.add(getString(R.string.act_2));
-        activityLevelList.add(getString(R.string.act_3));
-        activityLevelList.add(getString(R.string.act_4));
-        activityLevelList.add(getString(R.string.act_5));
     }
 
     private void setActivityLevelSpinnerListener() {
@@ -433,15 +456,6 @@ public class tdeeSettingsFragment extends Fragment {
         }
 
         return multiplierToReturn;
-    }
-
-    private void populateAllSpinnerStringLists() {
-        populateGenderSpinnerStringList();
-        populateAgeSpinnerStringList();
-        populateWeightSpinnerStringList();
-        populateHeightSpinnerStringList();
-        populateActivityLevelStringList();
-        setActivityLevelSpinnerListener();
     }
 
     private void showToastIfNoneActive (String message){
