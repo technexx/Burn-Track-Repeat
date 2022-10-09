@@ -211,7 +211,7 @@
     <string name="calories_burned">Calories Burned: %1$s</string>
     <string name="calories_burned_per_minute">Calories Burned Per Minute: %1$s</string>
     <string name="calories_burned_per_hour">Calories Burned Per Hour: %1$s</string>
-    <string name="two_line_concat">%1$s \n %2$s</string>
+    <string name="two_line_concat">%1$s\n%2$s</string>
     <string name="calories_burned_per_cycle">%1$s \n Calories Burned: %2$s</string>
     <string name="okay">Okay</string>
 

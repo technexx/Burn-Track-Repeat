@@ -632,6 +632,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  //Todo: <1920 stats frag ui
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
 
   //Todo: Test minimized vibrations on <26 api
