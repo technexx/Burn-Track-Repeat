@@ -630,12 +630,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void setMultipleDayWarningTextViewForFoodConsumption(int addingOrEditing) {
+    private void toggleMultipleDayWarningTextViewForFoodConsumption(int addingOrEditing) {
         if (addingOrEditing == ADDING_FOOD) {
             multipleDayEditWarningForFoodConsumedTextView.setText(R.string.multiple_food_addition_warning);
         }
         if (addingOrEditing == EDITING_FOOD) {
             multipleDayEditWarningForFoodConsumedTextView.setText(R.string.multiple_food_edit_warning);
+        }
+    }
+
+    private void toggleStringOnConfirmButtonForAddingOrEditingFood(int addingOrEditing) {
+        if (addingOrEditing == ADDING_FOOD) {
+            confirmCaloriesConsumedAdditionWithinPopUpButton.setText(R.string.save);
+        }
+        if (addingOrEditing == EDITING_FOOD) {
+            confirmCaloriesConsumedAdditionWithinPopUpButton.setText(R.string.update);
         }
     }
 
@@ -1217,9 +1226,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                 //New instance to be capped for each iteration of loop.
                 finalNewActivityTime = newActivityTime;
-//                Log.i("testFetch", "day " + uniqueIdToCheck + " assigned time for activity is " + assignedTime/1000/60);
-//                Log.i("testFetch", "day " + uniqueIdToCheck + " unassigned time for activity is " + unassignedTime/1000/60);
-
                 finalNewActivityTime = cappedTimeForStatEdits(finalNewActivityTime, assignedTime, unassignedTime);
 
                 if (!isCustomActivity) {
@@ -1630,7 +1636,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.cancel);
         toggleFoodConsumedEditingForMultipleDaysTextViews();
         clearFoodConsumedEditTexts();
-        setMultipleDayWarningTextViewForFoodConsumption(ADDING_FOOD);
+
+        toggleMultipleDayWarningTextViewForFoodConsumption(ADDING_FOOD);
+        toggleStringOnConfirmButtonForAddingOrEditingFood(ADDING_FOOD);
 
         caloriesConsumedAddAndEditPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
@@ -1713,7 +1721,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         confirmCaloriesConsumedDeletionWithinPopUpButton.setText(R.string.delete);
         toggleFoodConsumedEditingForMultipleDaysTextViews();
         launchFoodEditPopUpWithEditTextValuesSet(position);
-        setMultipleDayWarningTextViewForFoodConsumption(EDITING_FOOD);
+
+        toggleMultipleDayWarningTextViewForFoodConsumption(EDITING_FOOD);
+        toggleStringOnConfirmButtonForAddingOrEditingFood(EDITING_FOOD);
     }
 
     private void launchFoodEditPopUpWithEditTextValuesSet(int position) {
