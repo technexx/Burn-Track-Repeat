@@ -24,19 +24,15 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     Context mContext;
 
-    HeaderViewHolder mHeaderViewHolder;
     MainViewHolder mMainViewHolder;
 
     List<String> mFoodEaten;
     List<Double> mCaloriesConsumed;
     int mItemCount;
 
-    int HEADER_VIEW = 0;
     int MAIN_VIEW = 1;
     int FOOTER_VIEW = 2;
 
-    int REGULAR_TEXT = 0;
-    int BOLD_TEXT = 1;
 
     boolean mEditModeIsActive;
     boolean mRowIsSelectedForEditing;
@@ -86,14 +82,7 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
         LayoutInflater inflater = LayoutInflater.from(mContext);
         View view;
 
-        if (viewType==HEADER_VIEW) {
-            if (mScreenHeight <= 1920) {
-                view = inflater.inflate(R.layout.calories_consumed_recycler_header_layout_h1920, parent, false);
-            } else {
-                view = inflater.inflate(R.layout.calories_consumed_recycler_header_layout, parent, false);
-            }
-            return new HeaderViewHolder(view);
-        } else if (viewType==FOOTER_VIEW) {
+        if (viewType==FOOTER_VIEW) {
             view = inflater.inflate(R.layout.calories_consumed_footer_layout, parent, false);
             return new FootViewHolder(view);
         }
@@ -109,27 +98,23 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        if (holder instanceof CaloriesConsumedAdapter.HeaderViewHolder) {
-            mHeaderViewHolder = (HeaderViewHolder) holder;
 
-            populateHeaderRowViews();
-            setHolderViewTextStyles(BOLD_TEXT);
-
-        } else if (holder instanceof CaloriesConsumedAdapter.MainViewHolder) {
+        if (holder instanceof CaloriesConsumedAdapter.MainViewHolder) {
             mMainViewHolder = (MainViewHolder) holder;
 
             populateMainRowViews(position);
             setDefaultMainHolderViewsAndBackgrounds();
-            setMainHolderEditModeViews();
-            setHolderViewTextStyles(REGULAR_TEXT);
+            setMainHolderEditModeViews(position);
 
             mMainViewHolder.fullView.setOnClickListener(v-> {
                 mMainViewHolder = (MainViewHolder) holder;
 
-                if (mEditModeIsActive) {
-                    setAddingOrEditingFoodVariable(EDITING_FOOD);
-                    mCaloriesConsumedEdit.editCaloriesConsumedRowSelected(position-1);
-                    toggleRowSelectionForEditing();
+                if (position > 0) {
+                    if (mEditModeIsActive) {
+                        setAddingOrEditingFoodVariable(EDITING_FOOD);
+                        mCaloriesConsumedEdit.editCaloriesConsumedRowSelected(position-1);
+                        toggleRowSelectionForEditing();
+                    }
                 }
             });
 
@@ -161,9 +146,11 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
         mMainViewHolder.fullView.setBackground(null);
     }
 
-    private void setMainHolderEditModeViews() {
+    private void setMainHolderEditModeViews(int position) {
         if (mEditModeIsActive) {
-            mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
+            if (position > 0) {
+                mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
+            }
         }
     }
 
@@ -178,10 +165,7 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemViewType(int position) {
-        if (position==0) {
-            return HEADER_VIEW;
-            //<= because header takes up first position and doesn't pull from list.
-        } else if (position <= mFoodEaten.size() || !mEditModeIsActive){
+        if (position <= mFoodEaten.size() || !mEditModeIsActive){
             return MAIN_VIEW;
         } else {
             return FOOTER_VIEW;
@@ -199,28 +183,21 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
         notifyDataSetChanged();
     }
 
-    private void populateHeaderRowViews() {
-        mHeaderViewHolder.foodEatenTextView.setText(R.string.food_name_header);
-        mHeaderViewHolder.caloriesConsumedTextView.setText(R.string.calories_burned_text_header);
-    }
-
     private void populateMainRowViews(int position) {
         //Returns on last row in edit mode so we don't try to pull textViews from footer.
         if (position==mItemCount-1 && mEditModeIsActive) {
             return;
         }
-        mMainViewHolder.foodEatenTextView.setText(mFoodEaten.get(position-1));
-        mMainViewHolder.caloriesConsumedTextView.setText(formatCalorieString(mCaloriesConsumed.get(position-1)));
-    }
 
-    private void setHolderViewTextStyles(int textStyle) {
-        if (textStyle==BOLD_TEXT) {
-            mHeaderViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT_BOLD);
-            mHeaderViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT_BOLD);
+        if (position == 0) {
+            mMainViewHolder.foodEatenTextView.setText(R.string.food_name_header);
+            mMainViewHolder.caloriesConsumedTextView.setText(R.string.calories_burned_text_header);
 
-        } else if (textStyle==REGULAR_TEXT){
-            mMainViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT);
-            mMainViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT);
+            mMainViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT_BOLD);
+            mMainViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT_BOLD);
+        } else {
+            mMainViewHolder.foodEatenTextView.setText(mFoodEaten.get(position-1));
+            mMainViewHolder.caloriesConsumedTextView.setText(formatCalorieString(mCaloriesConsumed.get(position-1)));
         }
     }
 
@@ -232,17 +209,6 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
         slideOutFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_left);
         slideOutFromLeft.setDuration(200);
         slideOutFromLeft.setFillAfter(true);
-    }
-
-    public class HeaderViewHolder extends RecyclerView.ViewHolder {
-        TextView foodEatenTextView;
-        TextView caloriesConsumedTextView;
-
-        public HeaderViewHolder(@NonNull View itemView) {
-            super(itemView);
-            foodEatenTextView =  itemView.findViewById(R.id.food_eaten_header);
-            caloriesConsumedTextView =  itemView.findViewById(R.id.calories_consumed_by_food_header);
-        }
     }
 
     public class MainViewHolder extends RecyclerView.ViewHolder {
