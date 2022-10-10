@@ -5,11 +5,44 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/StatRecyclerHeaderTheme">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/stats_recycler_guideline_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".4">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/stats_recycler_guideline_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".45">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/stats_recycler_guideline_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".7">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/stats_recycler_guideline_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".75">
+    </androidx.constraintlayout.widget.Guideline>
+
     <TextView
         android:id="@+id/activity_in_daily_stats_header"
-        android:layout_width="150dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/stats_recycler_guideline_1"
         app:layout_constraintTop_toTopOf="parent"
         android:layout_marginStart="2dp"
         android:paddingStart="6dp"
@@ -19,26 +52,20 @@
 
     <TextView
         android:id="@+id/set_time_in_daily_stats_header"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats_header"
         app:layout_constraintTop_toTopOf="parent"
-        android:gravity="center"
-        android:minWidth="100dp"
-        android:maxWidth="150dp"
+        app:layout_constraintStart_toStartOf="@id/stats_recycler_guideline_2"
+        app:layout_constraintEnd_toStartOf="@id/stats_recycler_guideline_3"
         android:textSize="18sp">
     </TextView>
 
     <TextView
         android:id="@+id/calories_burned_in_daily_stats_header"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginEnd="8dp"
-        android:minWidth="100dp"
-        android:maxWidth="150dp"
-        android:gravity="center"
+        app:layout_constraintStart_toStartOf="@id/stats_recycler_guideline_4"
         android:textSize="18sp">
     </TextView>
 

@@ -7,12 +7,45 @@
     android:layout_gravity="center"
     android:theme="@style/StatRecyclerViewsTheme">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/stats_stats_recycler_guideline_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".4">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/stats_recycler_guideline_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".45">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/stats_recycler_guideline_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".7">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/stats_recycler_guideline_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".75">
+    </androidx.constraintlayout.widget.Guideline>
+
     <!--Stat views (except activity) constrained from END because width of activity String is variable-->
     <TextView
         android:id="@+id/activity_in_daily_stats_textView"
-        android:layout_width="175dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="@id/stats_stats_recycler_guideline_1"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/divider_view_for_activities"
         android:layout_marginStart="8dp"
@@ -21,29 +54,27 @@
 
     <TextView
         android:id="@+id/set_time_in_daily_stats_textView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/divider_view_for_activities"
-        app:layout_constraintEnd_toStartOf="@id/calories_burned_in_daily_stats_textView"
+        app:layout_constraintStart_toStartOf="@id/stats_recycler_guideline_2"
+        app:layout_constraintEnd_toStartOf="@id/stats_recycler_guideline_3"
         android:gravity="center"
-        android:textSize="17sp"
-        android:minWidth="100dp"
-        android:maxWidth="150dp">
+        android:textSize="17sp">
     </TextView>
 
     <TextView
         android:id="@+id/calories_burned_in_daily_stats_textView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/divider_view_for_activities"
+        app:layout_constraintStart_toStartOf="@id/stats_recycler_guideline_4"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
         android:layout_marginEnd="8dp"
-        android:textSize="17sp"
-        android:minWidth="100dp"
-        android:maxWidth="150dp">
+        android:textSize="17sp">
     </TextView>
 
     <View
