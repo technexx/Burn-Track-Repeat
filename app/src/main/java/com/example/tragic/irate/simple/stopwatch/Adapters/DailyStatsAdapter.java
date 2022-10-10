@@ -212,13 +212,21 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
-            mMainViewHolder.activityTextView.setTextSize(18);
-            mMainViewHolder.setTimeTextView.setTextSize(18);
-            mMainViewHolder.caloriesBurnedTextView.setTextSize(18);
+            mMainViewHolder.activityTextView.setTextSize(20);
+            mMainViewHolder.setTimeTextView.setTextSize(20);
+            mMainViewHolder.caloriesBurnedTextView.setTextSize(20);
         } else {
             mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
             mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
             mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+
+            mMainViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
+            mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
+            mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
+
+            mMainViewHolder.activityTextView.setTextSize(17);
+            mMainViewHolder.setTimeTextView.setTextSize(17);
+            mMainViewHolder.caloriesBurnedTextView.setTextSize(17);
         }
     }
 

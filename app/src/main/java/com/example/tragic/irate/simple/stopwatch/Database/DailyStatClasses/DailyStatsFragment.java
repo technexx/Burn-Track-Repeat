@@ -602,12 +602,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
-    private void setMultipleDayWarningTextViewForActivities(int addingOrEditing) {
+    private void toggleMultipleDayWarningTextViewForActivities(int addingOrEditing) {
         if (addingOrEditing == ADDING_ACTIVITY) {
             multipleDayWarningForActivitiesTextView.setText(R.string.multiple_day_activity_addition_warning);
         }
         if (addingOrEditing == EDITING_ACTIVITY) {
             multipleDayWarningForActivitiesTextView.setText(R.string.multiple_day_activity_edit_warning);
+        }
+    }
+
+    private void toggleStringOnConfirmButtonForAddingOrEditingActivity(int addingOrEditing) {
+        if (addingOrEditing == ADDING_ACTIVITY) {
+            confirmActivityEditWithinPopUpButton.setText(R.string.save);
+        }
+        if (addingOrEditing == EDITING_ACTIVITY) {
+            confirmActivityEditWithinPopUpButton.setText(R.string.update);
         }
     }
 
@@ -1146,7 +1155,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         activityInEditPopUpTextView.setText(activityToAdd);
         zeroOutActivityEditPopUpEditTexts();
-        setMultipleDayWarningTextViewForActivities(ADDING_ACTIVITY);
+        toggleMultipleDayWarningTextViewForActivities(ADDING_ACTIVITY);
+        toggleStringOnConfirmButtonForAddingOrEditingActivity(ADDING_ACTIVITY);
     }
 
     private void replaceActivityAddPopUpWithEmptyEditPopUp() {
@@ -1167,7 +1177,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setDefaultCustomActivityAdditionViews();
 
         toggleActivityEditingForMultipleDaysTextViews();
-        setMultipleDayWarningTextViewForActivities(EDITING_ACTIVITY);
+        toggleMultipleDayWarningTextViewForActivities(EDITING_ACTIVITY);
+        toggleStringOnConfirmButtonForAddingOrEditingActivity(EDITING_ACTIVITY);
     }
 
     private void editActivityStatsInDatabase() {
