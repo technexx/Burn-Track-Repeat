@@ -208,8 +208,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 
-        Log.i("testActive", "position set with colors is " + mPositionOfActiveCycle);
-
         workoutHolder.resetCycle.setOnClickListener(v-> {
           mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
         });
@@ -217,7 +215,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       } else {
         workoutHolder.fullView.setBackgroundColor(Color.BLACK);
       }
-      Log.i("testActive", "position of active cycle in bindView is " + mPositionOfActiveCycle);
     } else {
       workoutHolder.fullView.setBackgroundColor(Color.BLACK);
     }
@@ -317,7 +314,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (mActiveCycle) {
         if (position==mPositionOfActiveCycle) {
           if (j<=mNumberOfRoundsCompleted-1) {
-            span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.test_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.darker_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
         }
       }
