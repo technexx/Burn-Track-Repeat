@@ -116,16 +116,18 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             populateMainRowViews(position);
             setDefaultMainHolderViewsAndBackgrounds();
-            setMainHolderEditModeViews();
+            setMainHolderEditModeViews(position);
 
             //mMainViewHolder instance set on onClick is set on first adapter population. It does NOT get refreshed with views in adapter, which is why we need new instances if we're going to use it as a global.
             mMainViewHolder.fullView.setOnClickListener(v-> {
                 mMainViewHolder = (MainViewHolder) holder;
 
-                if (mEditModeIsActive) {
-                    setAddingOrEditingActivityVariable(EDITING_ACTIVITY);
-                    mTdeeEditedItemIsSelected.activityEditItemSelected(position-1);
-                    toggleRowSelectionForEditing();
+                if (position > 0) {
+                    if (mEditModeIsActive) {
+                        setAddingOrEditingActivityVariable(EDITING_ACTIVITY);
+                        mTdeeEditedItemIsSelected.activityEditItemSelected(position-1);
+                        toggleRowSelectionForEditing();
+                    }
                 }
             });
 
@@ -157,9 +159,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mMainViewHolder.fullView.setBackground(null);
     }
 
-    private void setMainHolderEditModeViews() {
+    private void setMainHolderEditModeViews(int position) {
         if (mEditModeIsActive) {
-            mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
+            if (position > 0) {
+                mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
+            }
         }
     }
 

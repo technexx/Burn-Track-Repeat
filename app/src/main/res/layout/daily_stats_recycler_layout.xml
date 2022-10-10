@@ -39,7 +39,6 @@
         app:layout_constraintGuide_percent=".75">
     </androidx.constraintlayout.widget.Guideline>
 
-    <!--Stat views (except activity) constrained from END because width of activity String is variable-->
     <TextView
         android:id="@+id/activity_in_daily_stats_textView"
         android:layout_width="0dp"
