@@ -195,6 +195,9 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
             mMainViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT_BOLD);
+
+            mMainViewHolder.foodEatenTextView.setTextSize(18);
+            mMainViewHolder.caloriesConsumedTextView.setTextSize(18);
         } else {
             mMainViewHolder.foodEatenTextView.setText(mFoodEaten.get(position-1));
             mMainViewHolder.caloriesConsumedTextView.setText(formatCalorieString(mCaloriesConsumed.get(position-1)));
