@@ -140,10 +140,10 @@
     <string name="per_hour">Per hour</string>
     <string name="per_minute">Per minute</string>
 
-    <string name="multiple_day_activity_addition_warning">This will <b>add</b> or <b>update</b> activity for all days in current date range!</string>
-    <string name="multiple_day_activity_edit_warning">This will <b>update</b> or <b>delete</b> activity for all days in current date range!</string>
-    <string name="multiple_food_addition_warning">This will <b>add</b> or <b>update</b> food for all days in current date range!</string>
-    <string name="multiple_food_edit_warning">This will <b>update</b> or <b>delete</b> food for all days in current date range!</string>
+    <string name="multiple_day_activity_addition_warning">This will <b>add</b> or <b>update</b> activity for all days in current date range.</string>
+    <string name="multiple_day_activity_edit_warning">This will <b>update</b> or <b>delete</b> activity for all days in current date range.</string>
+    <string name="multiple_food_addition_warning">This will <b>add</b> or <b>update</b> food for all days in current date range.</string>
+    <string name="multiple_food_edit_warning">This will <b>update</b> or <b>delete</b> food for all days in current date range.</string>
 
     <string name="current_day">Selected day</string>
     <string name="date_range">Date range</string>

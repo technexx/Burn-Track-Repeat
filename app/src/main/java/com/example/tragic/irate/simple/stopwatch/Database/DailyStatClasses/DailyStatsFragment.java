@@ -173,6 +173,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     TextView activityInEditPopUpTextView;
     ConstraintLayout.LayoutParams activityInEditPopUpTextViewLayoutParams;
+
+    ConstraintLayout editTextLayoutForActivityEdit;
+    ConstraintLayout.LayoutParams editTextLayoutParamsForActivityEdit;
     EditText tdeeEditTextHours;
     EditText tdeeEditTextMinutes;
     EditText tdeeEditTextSeconds;
@@ -592,13 +595,29 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void toggleActivityEditingForMultipleDaysTextViews() {
         if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
-            setEditActivityPopUpButtonsLayoutParams(true);
-            unassignedTimeInEditPopUpTextView.setVisibility(View.GONE);
+            unassignedTimeInEditPopUpTextView.setVisibility(View.INVISIBLE);
             multipleDayWarningForActivitiesTextView.setVisibility(View.VISIBLE);
         } else {
-            setEditActivityPopUpButtonsLayoutParams(false);
             unassignedTimeInEditPopUpTextView.setVisibility(View.VISIBLE);
-            multipleDayWarningForActivitiesTextView.setVisibility(View.GONE);
+            multipleDayWarningForActivitiesTextView.setVisibility(View.INVISIBLE);
+        }
+    }
+
+    private void toggleLayoutParamsForMultipleDays() {
+        if (dailyStatsAccess.getNumberOfDaysSelected() > 1) {
+            editTextLayoutParamsForActivityEdit.topToBottom = R.id.activity_string_in_edit_popUp;
+            editTextLayoutParamsForActivityEdit.bottomToTop = R.id.multiple_day_warning_for_activities_textView;
+            editTextLayoutParamsForActivityEdit.topMargin = dpToPxConv(0);
+            editTextLayoutParamsForActivityEdit.bottomMargin = dpToPxConv(0);
+
+            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(20);
+        } else {
+            editTextLayoutParamsForActivityEdit.topToBottom = R.id.activity_string_in_edit_popUp;
+            editTextLayoutParamsForActivityEdit.topMargin = dpToPxConv(20);
+            editTextLayoutParamsForActivityEdit.bottomMargin = dpToPxConv(0);
+
+            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
+
         }
     }
 
@@ -860,7 +879,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setStatDurationViews(int mode) {
-        setEditActivityPopUpButtonsLayoutParams(false);
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
 
         if (mode==DAILY_STATS) {
@@ -1010,6 +1028,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         setDefaultCustomActivityAdditionViews();
         toggleActivityEditingForMultipleDaysTextViews();
+        toggleLayoutParamsForMultipleDays();
 
         addTdeePopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0), Gravity.TOP);
     }
@@ -1186,6 +1205,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setDefaultCustomActivityAdditionViews();
 
         toggleActivityEditingForMultipleDaysTextViews();
+        toggleLayoutParamsForMultipleDays();
         toggleMultipleDayWarningTextViewForActivities(EDITING_ACTIVITY);
         toggleStringOnConfirmButtonForAddingOrEditingActivity(EDITING_ACTIVITY);
     }
@@ -1289,14 +1309,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             }
         }
         return valueToReturn;
-    }
-
-    private void setEditActivityPopUpButtonsLayoutParams(boolean constrainedToTop) {
-        if (!constrainedToTop) {
-            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(50);
-        } else {
-            activityInEditPopUpTextViewLayoutParams.topMargin = dpToPxConv(10);
-        }
     }
 
     private void deleteActivityFromStats(int position) {
@@ -2043,6 +2055,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         activityInEditPopUpTextView = tdeeEditView.findViewById(R.id.activity_string_in_edit_popUp);
         activityInEditPopUpTextViewLayoutParams = (ConstraintLayout.LayoutParams) activityInEditPopUpTextView.getLayoutParams();
+
+        editTextLayoutForActivityEdit = tdeeEditView.findViewById(R.id.edit_text_layout_for_activities);
+        editTextLayoutParamsForActivityEdit = (ConstraintLayout.LayoutParams) editTextLayoutForActivityEdit.getLayoutParams();
         tdeeEditTextHours = tdeeEditView.findViewById(R.id.tdee_editText_hours);
         tdeeEditTextMinutes = tdeeEditView.findViewById(R.id.tdee_editText_minutes);
         tdeeEditTextSeconds = tdeeEditView.findViewById(R.id.tdee_editText_seconds);

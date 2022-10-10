@@ -21,13 +21,12 @@
     </TextView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/edit_text_layout"
+        android:id="@+id/edit_text_layout_for_activities"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activity_string_in_edit_popUp"
-        android:layout_marginTop="16dp">
+        app:layout_constraintTop_toBottomOf="@id/activity_string_in_edit_popUp">
 
         <EditText
             android:id="@+id/tdee_editText_hours"
@@ -121,8 +120,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/edit_text_layout"
-        android:layout_marginTop="19dp"
+        app:layout_constraintTop_toBottomOf="@id/edit_text_layout_for_activities"
+        android:layout_marginTop="20dp"
         android:textSize="18sp">
     </TextView>
 
@@ -130,7 +129,7 @@
         android:id="@+id/multiple_day_warning_for_activities_textView"
         android:layout_width="275dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/unassigned_time_textView"
+        app:layout_constraintTop_toBottomOf="@id/edit_text_layout_for_activities"
         app:layout_constraintBottom_toTopOf="@id/confirm_activity_edit_button"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"

@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedSingleActivityString;
 
   //Todo: <1920 stats frag ui
-  //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
   //Todo: Check total stats in frag for +/- 1.
 
   //Todo: Test minimized vibrations on <26 api
@@ -649,8 +648,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: First time pref fragment popUp is accessed, nothing is selected (e.g. silent is active, but not selected).
 
   //Todo: Had a bug of iterating calories but not time.
-      //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens agian.
-  //Todo: For non-zero stats on new day: May have been a manual addition we did. If not, likely related to our resume settings textView string -> int value.
+      //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
+  //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
 
   //Todo: Add Day/Night modes.
 
