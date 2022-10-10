@@ -8,7 +8,7 @@
     android:theme="@style/StatRecyclerViewsTheme">
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/stats_recycler_guideline_1"
+        android:id="@+id/activity_stats_recycler_guideline_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -16,7 +16,7 @@
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/stats_recycler_guideline_2"
+        android:id="@+id/activity_stats_recycler_guideline_2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -24,7 +24,7 @@
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/stats_recycler_guideline_3"
+        android:id="@+id/activity_stats_recycler_guideline_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -32,7 +32,7 @@
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/stats_recycler_guideline_4"
+        android:id="@+id/activity_stats_recycler_guideline_4"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -45,7 +45,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="@id/stats_recycler_guideline_1"
+        app:layout_constraintEnd_toEndOf="@id/activity_stats_recycler_guideline_1"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/divider_view_for_activities"
         android:layout_marginStart="8dp"
@@ -58,8 +58,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/divider_view_for_activities"
-        app:layout_constraintStart_toStartOf="@id/stats_recycler_guideline_2"
-        app:layout_constraintEnd_toStartOf="@id/stats_recycler_guideline_3"
+        app:layout_constraintStart_toStartOf="@id/activity_stats_recycler_guideline_2"
+        app:layout_constraintEnd_toStartOf="@id/activity_stats_recycler_guideline_3"
         android:gravity="center"
         android:textSize="15sp">
     </TextView>
@@ -70,7 +70,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/divider_view_for_activities"
-        app:layout_constraintStart_toStartOf="@id/stats_recycler_guideline_4"
+        app:layout_constraintStart_toStartOf="@id/activity_stats_recycler_guideline_4"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
         android:layout_marginEnd="8dp"

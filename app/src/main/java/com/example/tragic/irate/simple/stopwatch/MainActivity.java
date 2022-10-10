@@ -632,7 +632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Set guideline constraints for food recycler.
   //Todo: <1920 stats frag ui
   //Todo: PopUps in stats frag for adding/editing could use a bit of adjusting.
   //Todo: Check total stats in frag for +/- 1.

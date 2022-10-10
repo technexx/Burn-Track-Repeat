@@ -7,32 +7,44 @@
     android:layout_gravity="center"
     android:theme="@style/StatRecyclerViewsTheme">
 
-    <!--Stat views (except activity) constrained from END because width of activity String is variable-->
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/food_stats_recycler_guideline_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".6">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/food_stats_recycler_guideline_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".65">
+    </androidx.constraintlayout.widget.Guideline>
+
     <TextView
         android:id="@+id/food_eaten_textView"
-        android:layout_width="150dp"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/food_stats_recycler_guideline_1"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/divider_view_for_food_consumed"
         android:layout_marginStart="8dp"
-        android:paddingStart="6dp"
-        android:paddingEnd="6dp"
-        android:textSize="20sp">
+        android:textSize="16sp">
     </TextView>
 
     <TextView
         android:id="@+id/calories_consumed_textView"
-        android:layout_width="wrap_content"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="@id/food_stats_recycler_guideline_2"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@+id/divider_view_for_food_consumed"
         android:gravity="center"
-        android:layout_marginEnd="32dp"
-        android:textSize="16sp"
-        android:minWidth="100dp"
-        android:maxWidth="150dp">
+        android:textSize="16sp">
     </TextView>
 
     <View
