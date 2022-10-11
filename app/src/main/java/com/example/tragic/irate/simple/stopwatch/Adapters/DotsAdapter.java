@@ -51,9 +51,6 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
     Typeface narrowFont;
     Typeface narrowFontBold;
-    Typeface bigShouldersFont;
-    Typeface ignotum;
-    Typeface sixCaps;
 
     int mThemeMode;
     int DAY_MODE = 0;
@@ -336,10 +333,5 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
         narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
         narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
-        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
-        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
-        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
-
-//        testFont = ResourcesCompat.getFont(mContext, R.font.sixcaps);
     }
 }

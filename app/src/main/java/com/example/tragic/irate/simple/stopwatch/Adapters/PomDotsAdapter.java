@@ -44,9 +44,6 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
 
     Typeface narrowFont;
     Typeface narrowFontBold;
-    Typeface bigShouldersFont;
-    Typeface ignotum;
-    Typeface sixCaps;
 
     public PomDotsAdapter(Context context, List<String> pomCycleRoundsAsStringList) {
         this.mContext = context; this.mPomCycleRoundsAsStringsList = pomCycleRoundsAsStringList;
@@ -210,9 +207,6 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
 
         narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
         narrowFontBold = ResourcesCompat.getFont(mContext, R.font.archivo_narrow_bold);
-        bigShouldersFont = ResourcesCompat.getFont(mContext, R.font.big_shoulders_text_bold);
-        ignotum = ResourcesCompat.getFont(mContext, R.font.ignotum);
-        sixCaps = ResourcesCompat.getFont(mContext, R.font.sixcaps);
     }
 
     public interface sendPomDotAlpha {

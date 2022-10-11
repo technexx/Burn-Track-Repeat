@@ -288,8 +288,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void instantiateFonts() {
-        openSans = ResourcesCompat.getFont(mContext, R.font.open_sans);
-        roboto = ResourcesCompat.getFont(mContext, R.font.roboto);
+//        openSans = ResourcesCompat.getFont(mContext, R.font.open_sans);
+//        roboto = ResourcesCompat.getFont(mContext, R.font.roboto);
+
+        openSans = Typeface.createFromAsset(mContext.getAssets(),"fonts/open_sans.ttf");
+        roboto = Typeface.createFromAsset(mContext.getAssets(),"fonts/roboto.ttf");
     }
 
     //This doesn't round because input isn't a decimal (e.g. "0" is "0" until it is "1").
