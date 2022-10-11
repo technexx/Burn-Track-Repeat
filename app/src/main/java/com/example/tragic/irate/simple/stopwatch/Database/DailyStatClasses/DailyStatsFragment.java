@@ -93,6 +93,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     View recyclerAndTotalStatsDivider;
 
     TabLayout caloriesComparisonTabLayout;
+    TabLayout.Tab tabOne;
+    TabLayout.Tab tabTwo;
+    TabLayout.Tab tabThree;
 
     TextView totalStatsHeaderTextView;
     ImageButton activityStatsDurationSwitcherButtonLeft;
@@ -289,7 +292,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                         togggleTotalStatTextViewsWhenSwitchingTabs(0);
 
-//                        toggleSimplifiedStatViewsWithinActivityTab(areActivityStatsSimplified);
                         break;
                     case 1:
                         caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
@@ -300,9 +302,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         setTabSelected(1);
 
                         mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(STATS_MENU);
+                        mChangeSortMenu.onChangeSortMenu(SORTING_FOOD_CONSUMED);
 
                         togggleTotalStatTextViewsWhenSwitchingTabs(1);
-                        mChangeSortMenu.onChangeSortMenu(SORTING_FOOD_CONSUMED);
                         break;
                     case 2:
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
@@ -312,13 +314,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         setTabSelected(2);
 
                         mChangeSortMenu.onChangeSortMenu(DISABLE_SORTING);
-
-//                        toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
                         break;
                 }
-
                 toggleCalendarMinimizationLayouts();
-//                toggleSimplifiedViewsWithinComparisonTab(areActivityStatsSimplified);
             }
 
             @Override
@@ -342,6 +340,15 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             }
         });
     }
+
+    private void setTabSelected(int selectedTab) {
+        this.mSelectedTab = selectedTab;
+    }
+
+    public int getSelectedTab() {
+        return mSelectedTab;
+    }
+
 
     @Override
     public void onDestroy() {
@@ -383,6 +390,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         instantiateCalendarObjects();
         instantiateTextViewsAndMiscClasses();
+        instantiateTabLayout();
         instantiateActivityRecyclerViewAndItsAdapter();
         instantiateCalorieConsumptionRecyclerAndItsAdapter();
         instantiateCalendarAnimations();
@@ -402,8 +410,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setTextWatchersOnActivityEditTexts();
 
         setCalendarAnimationListeners();
-
-
 
         areActivityStatsSimplified = sharedPref.getBoolean("areActivityStatsSimplified", false);
         toggleSimplifiedStatsButtonView(false);
@@ -2109,18 +2115,50 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         aboutStatsPopUpWindow.showAtLocation(topOfRecyclerViewAnchor, Gravity.TOP, 0, 0);
     }
 
-    private void setTabSelected(int selectedTab) {
-        this.mSelectedTab = selectedTab;
-    }
-
-    public int getSelectedTab() {
-        return mSelectedTab;
-    }
-
     private void setDefaultCalorieTabViewsForFirstTab() {
         caloriesConsumedRecyclerView.setVisibility(View.GONE);
         totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
         caloriesComparedLayout.setVisibility(View.GONE);
+    }
+
+    private void instantiateTabLayout() {
+        caloriesComparisonTabLayout = mRoot.findViewById(R.id.calorie_comparison_tab_layout);
+
+        if (phoneHeight <= 1920) {
+            tabOne = caloriesComparisonTabLayout.newTab().setText("Burned");
+            tabTwo = caloriesComparisonTabLayout.newTab().setText("Consumed");
+            tabThree = caloriesComparisonTabLayout.newTab().setText("Compared");
+        } else {
+            tabOne = caloriesComparisonTabLayout.newTab().setText("Calories Burned");
+            tabTwo = caloriesComparisonTabLayout.newTab().setText("Calories Consumed");
+            tabThree = caloriesComparisonTabLayout.newTab().setText("Calories Compared");
+        }
+
+        caloriesComparisonTabLayout.addTab(tabOne);
+        caloriesComparisonTabLayout.addTab(tabTwo);
+        caloriesComparisonTabLayout.addTab(tabThree);
+
+        for (int i=0; i<caloriesComparisonTabLayout.getTabCount(); i++) {
+            setCustomTextViewOnTab(caloriesComparisonTabLayout.getTabAt(i));
+        }
+    }
+
+    private void setCustomTextViewOnTab(TabLayout.Tab tabToChange) {
+        TextView tabTextView = new TextView(getContext());
+        tabToChange.setCustomView(tabTextView);
+
+        tabTextView.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+        tabTextView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+        tabTextView.setText(tabToChange.getText());
+        tabTextView.setTextSize(16);
+        tabTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+
+        if (phoneHeight <= 1920) {
+            tabTextView.setMinLines(1);
+        } else {
+            tabTextView.setMinLines(2);
+        }
     }
 
     private void instantiateTextViewsAndMiscClasses() {
@@ -2130,34 +2168,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tdeeChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getActivity());
         longToStringConverters = new LongToStringConverters();
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-        caloriesComparisonTabLayout = mRoot.findViewById(R.id.calorie_comparison_tab_layout);
-
-        if (phoneHeight <= 1920) {
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Burned"));
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Consumed"));
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Compared"));
-
-            //Overwrites tab selection color.
-//            for (int i=0; i<caloriesComparisonTabLayout.getTabCount(); i++) {
-//                TabLayout.Tab tabToChange = caloriesComparisonTabLayout.getTabAt(i);
-//
-//                TextView tabTextView = new TextView(getContext());
-//                tabToChange.setCustomView(tabTextView);
-//
-//                tabTextView.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
-//                tabTextView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
-//
-//                tabTextView.setText(tabToChange.getText());
-//                tabTextView.setTextSize(14);
-//
-//            }
-
-        } else {
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Burned"));
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
-            caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));
-        }
 
 
 
