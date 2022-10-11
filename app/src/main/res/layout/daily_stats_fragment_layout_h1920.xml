@@ -14,7 +14,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         android:background="@color/darkest_gray"
-        app:tabTextColor="@color/white"
+        app:tabTextColor="@color/lighter_grey"
         app:tabIndicatorColor="@color/off_white"
         app:tabSelectedTextColor="@color/blue_2"
         app:tabTextAppearance="@style/TabLayoutTextStyle_h1920"
@@ -25,10 +25,11 @@
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_duration_header_layout"
         android:layout_width="match_parent"
-        android:layout_height="45dp"
+        android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="0dp"
+        android:layout_marginBottom="6dp"
         android:background="@drawable/daily_total_stats_border"
         android:backgroundTint="@color/darkest_gray">
 
@@ -41,7 +42,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            android:layout_marginTop="0dp"
+            android:layout_marginTop="8dp"
             android:textSize="16sp">
         </TextView>
 
@@ -49,10 +50,10 @@
             android:id="@+id/stat_duration_switcher_button_left"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/activity_stats_duration_header_textView"
             app:layout_constraintEnd_toStartOf="@id/activity_stats_duration_header_textView"
+            android:layout_marginBottom="4dp"
             android:layout_marginEnd="20dp"
-            android:layout_marginTop="4dp"
             android:background="@color/darkest_gray"
             android:src="@drawable/double_arrow_left_small">
         </ImageButton>
@@ -61,10 +62,10 @@
             android:id="@+id/stat_duration_switcher_button_right"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/activity_stats_duration_header_textView"
             app:layout_constraintStart_toEndOf="@id/activity_stats_duration_header_textView"
             android:layout_marginStart="20dp"
-            android:layout_marginTop="4dp"
+            android:layout_marginBottom="4dp"
             android:background="@color/darkest_gray"
             android:src="@drawable/double_arrow_right_small">
         </ImageButton>
@@ -116,6 +117,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:src="@drawable/edit_icon_small"
         android:layout_marginEnd="10dp"
+        android:layout_marginBottom="2dp"
         android:background="@color/darkest_gray">
     </ImageButton>
 

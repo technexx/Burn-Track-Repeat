@@ -632,8 +632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: <1920 stats frag ui
-
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well
   //Todo: Test w/ fresh install for all default values.
@@ -5102,17 +5100,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (millis >= 60000) {
-      if (phoneHeight < 1920) {
+      if (phoneHeight <= 1920) {
         timeLeft.setTextSize(70f);
       } else {
-        Log.i("testChange", "changing to smaller size!");
         timeLeft.setTextSize(90f);
       }
     } else {
-      if (phoneHeight < 1920) {
+      if (phoneHeight <= 1920) {
         timeLeft.setTextSize(90f);
       } else {
-        Log.i("testChange", "changing to larger size!");
         timeLeft.setTextSize(120f);
       }
     }
@@ -5123,7 +5119,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       valueAnimatorDown.cancel();
     }
 
-    if (phoneHeight < 1920) {
+    if (phoneHeight <= 1920) {
       stopWatchTimeTextView.setTextSize(90f);
     } else {
       stopWatchTimeTextView.setTextSize(120f);
@@ -5142,7 +5138,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void changeValueAnimatorNumbers() {
-    if (phoneHeight < 1920) {
+    if (phoneHeight <= 1920) {
       valueAnimatorDown.setFloatValues(90f, 70f);
       valueAnimatorUp.setFloatValues(70f, 90f);
     } else {
@@ -5152,7 +5148,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void changeTextSizeWithoutAnimator(long millis) {
-    if (phoneHeight < 1920) {
+    if (phoneHeight <= 1920) {
 
       if (millis < 60000) {
         timeLeft.setTextSize(90f);

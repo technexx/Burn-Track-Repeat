@@ -134,7 +134,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else if (holder instanceof FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) holder;
 
-            if (mPhoneHeight < 1920) {
+            if (mPhoneHeight <= 1920) {
                 footViewHolder.addActivity.setBackground(ContextCompat.getDrawable(mContext, R.drawable.add_32));
             } else {
                 footViewHolder.addActivity.setBackground(ContextCompat.getDrawable(mContext, R.drawable.add_40));            }
@@ -217,7 +217,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
-            if (mPhoneHeight < 1920) {
+            if (mPhoneHeight <= 1920) {
                 mMainViewHolder.activityTextView.setTextSize(17);
                 mMainViewHolder.setTimeTextView.setTextSize(17);
                 mMainViewHolder.caloriesBurnedTextView.setTextSize(17);
@@ -235,7 +235,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
 
-            if (mPhoneHeight < 1920 ) {
+            if (mPhoneHeight <= 1920 ) {
                 mMainViewHolder.activityTextView.setTextSize(15);
                 mMainViewHolder.setTimeTextView.setTextSize(15);
                 mMainViewHolder.caloriesBurnedTextView.setTextSize(15);

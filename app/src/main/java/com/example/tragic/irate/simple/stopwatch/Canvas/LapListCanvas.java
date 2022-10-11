@@ -31,7 +31,7 @@ public class LapListCanvas extends View {
     }
 
     public void setGradientWidth() {
-        if (mScreenHeight < 1920) {
+        if (mScreenHeight <= 1920) {
             gradientWidthAndHeight = 240;
             gradientShadeMovement = 12;
             gradientYAxisMovement = 5;

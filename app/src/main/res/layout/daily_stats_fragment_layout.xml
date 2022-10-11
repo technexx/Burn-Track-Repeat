@@ -81,6 +81,42 @@
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
+    <ImageButton
+        android:id="@+id/daily_stats_expanded_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
+        app:layout_constraintBottom_toTopOf="@id/daily_stats_recyclerView"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="10dp"
+        android:src="@drawable/collapse_1"
+        android:backgroundTint="@color/darkest_gray">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/minimize_calendarView_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
+        app:layout_constraintBottom_toTopOf="@id/daily_stats_recyclerView"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="14dp"
+        android:src="@drawable/arrow_down"
+        android:background="#08000000">
+    </ImageButton>
+
+    <ImageButton
+        android:id="@+id/edit_tdee_stats_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
+        app:layout_constraintBottom_toTopOf="@id/daily_stats_recyclerView"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:src="@drawable/edit_icon"
+        android:layout_marginEnd="10dp"
+        android:background="@color/darkest_gray">
+    </ImageButton>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/simplified_stats_layout"
         android:layout_width="match_parent"
@@ -140,42 +176,6 @@
         </TextView>
 
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <ImageButton
-        android:id="@+id/daily_stats_expanded_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
-        app:layout_constraintBottom_toTopOf="@id/daily_stats_recyclerView"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="10dp"
-        android:src="@drawable/collapse_1"
-        android:backgroundTint="@color/darkest_gray">
-    </ImageButton>
-
-    <ImageButton
-        android:id="@+id/minimize_calendarView_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
-        app:layout_constraintBottom_toTopOf="@id/daily_stats_recyclerView"
-        app:layout_constraintStart_toStartOf="parent"
-        android:layout_marginStart="14dp"
-        android:src="@drawable/arrow_down"
-        android:background="#08000000">
-    </ImageButton>
-
-    <ImageButton
-        android:id="@+id/edit_tdee_stats_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/calorie_comparison_tab_layout"
-        app:layout_constraintBottom_toTopOf="@id/daily_stats_recyclerView"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:src="@drawable/edit_icon"
-        android:layout_marginEnd="10dp"
-        android:background="@color/darkest_gray">
-    </ImageButton>
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/daily_stats_recyclerView"
