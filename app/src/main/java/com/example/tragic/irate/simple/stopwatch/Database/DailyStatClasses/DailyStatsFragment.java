@@ -2137,11 +2137,31 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Burned"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Consumed"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Compared"));
+
+//            TabLayout.Tab tabOne = caloriesComparisonTabLayout.getTabAt(0);
+//            TabLayout.Tab tabTwo = caloriesComparisonTabLayout.getTabAt(0);
+//            TabLayout.Tab tabThree = caloriesComparisonTabLayout.getTabAt(0);
+
+            for (int i=0; i<caloriesComparisonTabLayout.getTabCount(); i++) {
+                TabLayout.Tab tabToChange = caloriesComparisonTabLayout.getTabAt(i);
+
+                TextView tabTextView = new TextView(getContext());
+                tabToChange.setCustomView(tabTextView);
+
+                tabTextView.getLayoutParams().width = ViewGroup.LayoutParams.WRAP_CONTENT;
+                tabTextView.getLayoutParams().height = ViewGroup.LayoutParams.WRAP_CONTENT;
+
+                tabTextView.setText(tabToChange.getText());
+                tabTextView.setTextSize(14);
+            }
+
         } else {
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Burned"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Consumed"));
             caloriesComparisonTabLayout.addTab(caloriesComparisonTabLayout.newTab().setText("Calories Compared"));
         }
+
+
 
         activityStatsDurationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);
         activityStatsDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);

@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedSingleActivityString;
 
   //Todo: <1920 stats frag ui
-  //Todo: Check total stats in frag for +/- 1.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test extra-large screens as well

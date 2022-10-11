@@ -134,6 +134,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else if (holder instanceof FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) holder;
 
+            if (mPhoneHeight < 1920) {
+                footViewHolder.addActivity.setBackground(ContextCompat.getDrawable(mContext, R.drawable.add_32));
+            } else {
+                footViewHolder.addActivity.setBackground(ContextCompat.getDrawable(mContext, R.drawable.add_40));            }
+
             footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
             footViewHolder.addActivity.setOnClickListener(v-> {
@@ -212,9 +217,15 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
-            mMainViewHolder.activityTextView.setTextSize(20);
-            mMainViewHolder.setTimeTextView.setTextSize(20);
-            mMainViewHolder.caloriesBurnedTextView.setTextSize(20);
+            if (mPhoneHeight < 1920) {
+                mMainViewHolder.activityTextView.setTextSize(17);
+                mMainViewHolder.setTimeTextView.setTextSize(17);
+                mMainViewHolder.caloriesBurnedTextView.setTextSize(17);
+            } else {
+                mMainViewHolder.activityTextView.setTextSize(20);
+                mMainViewHolder.setTimeTextView.setTextSize(20);
+                mMainViewHolder.caloriesBurnedTextView.setTextSize(20);
+            }
         } else {
             mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
             mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
@@ -224,9 +235,15 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
 
-            mMainViewHolder.activityTextView.setTextSize(17);
-            mMainViewHolder.setTimeTextView.setTextSize(17);
-            mMainViewHolder.caloriesBurnedTextView.setTextSize(17);
+            if (mPhoneHeight < 1920 ) {
+                mMainViewHolder.activityTextView.setTextSize(15);
+                mMainViewHolder.setTimeTextView.setTextSize(15);
+                mMainViewHolder.caloriesBurnedTextView.setTextSize(15);
+            } else {
+                mMainViewHolder.activityTextView.setTextSize(17);
+                mMainViewHolder.setTimeTextView.setTextSize(17);
+                mMainViewHolder.caloriesBurnedTextView.setTextSize(17);
+            }
         }
     }
 
