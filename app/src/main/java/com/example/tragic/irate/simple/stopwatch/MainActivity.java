@@ -633,7 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedSingleActivityString;
 
   //Todo: Test minimized vibrations on <26 api
-  //Todo: Test extra-large screens as well
+  //Todo: Test tablet screens.
   //Todo: Test w/ fresh install for all default values.
   //Todo: Test everything 10x. Incl. round selection/replacement.
   //Todo: Run code inspector for redundancies, etc.

@@ -104,7 +104,7 @@
     <string name="compared_calories_header">Calories Compared</string>
 
     <string name="consumed_calories">Calories Consumed:</string>
-    <string name="expended_calories">Calories Expended:</string>
+    <string name="expended_calories">Calories Burned:</string>
     <string name="expended_calories_bmr">Base Metabolic Rate:</string>
     <string name="expended_calories_activities">Activities:</string>
     <string name="difference_calories">Caloric Difference:</string>

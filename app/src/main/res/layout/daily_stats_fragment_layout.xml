@@ -405,7 +405,8 @@
             android:paddingStart="6dp"
             android:paddingEnd="6dp"
             android:textStyle="bold"
-            android:textColor="@color/red">
+            android:textColor="@color/red"
+            android:textSize="19sp">
         </TextView>
 
         <TextView
