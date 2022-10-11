@@ -2101,8 +2101,19 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         tab.setCustomView(tabTextView);
     }
 
+    private void resetCustomTabTextViewColors() {
+        for (int i = 0; i<caloriesComparisonTabLayout.getTabCount(); i++) {
+            TabLayout.Tab tab = caloriesComparisonTabLayout.getTabAt(i);
+            TextView tabTextView = (TextView) tab.getCustomView();
+            tabTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.lighter_grey));
+
+            tab.setCustomView(tabTextView);
+        }
+    }
+
     private void instantiateCalorieTabLayoutListenerAndViews() {
         setDefaultCalorieTabViewsForFirstTab();
+        toggleCustomTabTextViewHighlighting(0);
 
         caloriesComparisonTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
@@ -2119,7 +2130,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         mChangeSortMenu.onChangeSortMenu(SORTING_ACTIVITIES);
 
                         togggleTotalStatTextViewsWhenSwitchingTabs(0);
-
                         toggleCustomTabTextViewHighlighting(0);
 
                         break;
@@ -2135,6 +2145,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         mChangeSortMenu.onChangeSortMenu(SORTING_FOOD_CONSUMED);
 
                         togggleTotalStatTextViewsWhenSwitchingTabs(1);
+                        toggleCustomTabTextViewHighlighting(1);
                         break;
                     case 2:
                         caloriesComparedLayout.setVisibility(View.VISIBLE);
@@ -2144,6 +2155,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                         setTabSelected(2);
 
                         mChangeSortMenu.onChangeSortMenu(DISABLE_SORTING);
+
+                        toggleCustomTabTextViewHighlighting(2);
                         break;
                 }
                 toggleCalendarMinimizationLayouts();
@@ -2162,6 +2175,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 dailyStatsAdapter.notifyDataSetChanged();
                 caloriesConsumedAdapter.turnOffEditMode();
                 caloriesConsumedAdapter.notifyDataSetChanged();
+
+                resetCustomTabTextViewColors();
             }
 
             @Override
