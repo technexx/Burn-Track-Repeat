@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -96,6 +97,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     TabLayout.Tab tabOne;
     TabLayout.Tab tabTwo;
     TabLayout.Tab tabThree;
+    TextView tabOneTextView;
+    TextView tabTwoTextView;
+    TextView tabThreeTextView;
 
     TextView totalStatsHeaderTextView;
     ImageButton activityStatsDurationSwitcherButtonLeft;
@@ -272,83 +276,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void setSortMenu(changeSortMenu xChangeSortMenu) {
         this.mChangeSortMenu = xChangeSortMenu;
     }
-
-    private void instantiateCalorieTabLayoutListenerAndViews() {
-        setDefaultCalorieTabViewsForFirstTab();
-
-        caloriesComparisonTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
-            @Override
-            public void onTabSelected(TabLayout.Tab tab) {
-                switch (caloriesComparisonTabLayout.getSelectedTabPosition()) {
-                    case 0:
-                        dailyStatsRecyclerView.setVisibility(View.VISIBLE);
-                        totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-
-                        toggleEditButtonView(false);
-                        setTabSelected(0);
-
-                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(STATS_MENU);
-                        mChangeSortMenu.onChangeSortMenu(SORTING_ACTIVITIES);
-
-                        togggleTotalStatTextViewsWhenSwitchingTabs(0);
-
-                        break;
-                    case 1:
-                        caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
-                        totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
-                        simplifiedStatsLayout.setVisibility(View.INVISIBLE);
-
-                        toggleEditButtonView(false);
-                        setTabSelected(1);
-
-                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(STATS_MENU);
-                        mChangeSortMenu.onChangeSortMenu(SORTING_FOOD_CONSUMED);
-
-                        togggleTotalStatTextViewsWhenSwitchingTabs(1);
-                        break;
-                    case 2:
-                        caloriesComparedLayout.setVisibility(View.VISIBLE);
-                        simplifiedStatsLayout.setVisibility(View.INVISIBLE);
-
-                        toggleEditButtonView(true);
-                        setTabSelected(2);
-
-                        mChangeSortMenu.onChangeSortMenu(DISABLE_SORTING);
-                        break;
-                }
-                toggleCalendarMinimizationLayouts();
-            }
-
-            @Override
-            public void onTabUnselected(TabLayout.Tab tab) {
-                dailyStatsRecyclerView.setVisibility(View.INVISIBLE);
-                caloriesConsumedRecyclerView.setVisibility(View.INVISIBLE);
-                totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
-                totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
-                caloriesComparedLayout.setVisibility(View.GONE);
-                simplifiedStatsLayout.setVisibility(View.INVISIBLE);
-
-                dailyStatsAdapter.turnOffEditMode();
-                dailyStatsAdapter.notifyDataSetChanged();
-                caloriesConsumedAdapter.turnOffEditMode();
-                caloriesConsumedAdapter.notifyDataSetChanged();
-            }
-
-            @Override
-            public void onTabReselected(TabLayout.Tab tab) {
-
-            }
-        });
-    }
-
-    private void setTabSelected(int selectedTab) {
-        this.mSelectedTab = selectedTab;
-    }
-
-    public int getSelectedTab() {
-        return mSelectedTab;
-    }
-
 
     @Override
     public void onDestroy() {
@@ -2159,6 +2086,97 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         } else {
             tabTextView.setMinLines(2);
         }
+    }
+
+    private void toggleCustomTabTextViewHighlighting(int tabPosition) {
+        TabLayout.Tab tab = new TabLayout.Tab();
+
+        if (tabPosition == 0) tab = caloriesComparisonTabLayout.getTabAt(0);
+        if (tabPosition == 1) tab = caloriesComparisonTabLayout.getTabAt(1);
+        if (tabPosition == 2) tab = caloriesComparisonTabLayout.getTabAt(2);
+
+        TextView tabTextView = (TextView) tab.getCustomView();
+        tabTextView.setTextColor(ContextCompat.getColor(getContext(), R.color.blue_2));
+
+        tab.setCustomView(tabTextView);
+    }
+
+    private void instantiateCalorieTabLayoutListenerAndViews() {
+        setDefaultCalorieTabViewsForFirstTab();
+
+        caloriesComparisonTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                switch (caloriesComparisonTabLayout.getSelectedTabPosition()) {
+                    case 0:
+                        dailyStatsRecyclerView.setVisibility(View.VISIBLE);
+                        totalActivityStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+
+                        toggleEditButtonView(false);
+                        setTabSelected(0);
+
+                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(STATS_MENU);
+                        mChangeSortMenu.onChangeSortMenu(SORTING_ACTIVITIES);
+
+                        togggleTotalStatTextViewsWhenSwitchingTabs(0);
+
+                        toggleCustomTabTextViewHighlighting(0);
+
+                        break;
+                    case 1:
+                        caloriesConsumedRecyclerView.setVisibility(View.VISIBLE);
+                        totalFoodStatsValuesTextViewLayout.setVisibility(View.VISIBLE);
+                        simplifiedStatsLayout.setVisibility(View.INVISIBLE);
+
+                        toggleEditButtonView(false);
+                        setTabSelected(1);
+
+                        mChangeOnOptionsItemSelectedMenu.onChangeOnOptionsMenu(STATS_MENU);
+                        mChangeSortMenu.onChangeSortMenu(SORTING_FOOD_CONSUMED);
+
+                        togggleTotalStatTextViewsWhenSwitchingTabs(1);
+                        break;
+                    case 2:
+                        caloriesComparedLayout.setVisibility(View.VISIBLE);
+                        simplifiedStatsLayout.setVisibility(View.INVISIBLE);
+
+                        toggleEditButtonView(true);
+                        setTabSelected(2);
+
+                        mChangeSortMenu.onChangeSortMenu(DISABLE_SORTING);
+                        break;
+                }
+                toggleCalendarMinimizationLayouts();
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+                dailyStatsRecyclerView.setVisibility(View.INVISIBLE);
+                caloriesConsumedRecyclerView.setVisibility(View.INVISIBLE);
+                totalActivityStatsValuesTextViewLayout.setVisibility(View.GONE);
+                totalFoodStatsValuesTextViewLayout.setVisibility(View.GONE);
+                caloriesComparedLayout.setVisibility(View.GONE);
+                simplifiedStatsLayout.setVisibility(View.INVISIBLE);
+
+                dailyStatsAdapter.turnOffEditMode();
+                dailyStatsAdapter.notifyDataSetChanged();
+                caloriesConsumedAdapter.turnOffEditMode();
+                caloriesConsumedAdapter.notifyDataSetChanged();
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
+    }
+
+    private void setTabSelected(int selectedTab) {
+        this.mSelectedTab = selectedTab;
+    }
+
+    public int getSelectedTab() {
+        return mSelectedTab;
     }
 
     private void instantiateTextViewsAndMiscClasses() {
