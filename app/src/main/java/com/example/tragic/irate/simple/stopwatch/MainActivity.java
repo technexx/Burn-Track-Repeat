@@ -630,6 +630,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalRestTime;
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
+  
+  //Todo: Notifications don't show for stopwatch. Also don't show if timer paused. Also showing in top of screen.
+  //Todo: With new round width, dot selector is outside of borders.
+  //Todo: On editing a cycle, we didn't get a highlight on active cycle after starting it.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test on low res nexus emulator.
@@ -960,12 +964,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
-        changeTextSizeWithoutAnimator(workoutTimeIntegerArray.get(0));
 
         if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
           timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
+          changeTextSizeWithoutAnimator(setMillis);
         } else {
           timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
+          changeTextSizeWithoutAnimator(breakMillis);
         }
 
         AsyncTask.execute(()-> {
