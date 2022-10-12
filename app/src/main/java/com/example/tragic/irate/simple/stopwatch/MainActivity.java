@@ -633,6 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedSingleActivityString;
 
   //Todo: Test minimized vibrations on <26 api
+  //Todo: Test on low res nexus emulator.
   //Todo: Test tablet screens.
   //Todo: Test w/ fresh install for all default values.
   //Todo: Test everything 10x. Incl. round selection/replacement.
@@ -3215,7 +3216,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode == 1) {
         firstRoundTypeHeaderInEditPopUp.setTextColor(setColor);
 
-        Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_green);
+        Drawable newDraw;
+
+        if (phoneHeight <= 1920) {
+          newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_green);
+        } else {
+          newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_large_green);
+        }
+
         newDraw.setColorFilter(setColor, PorterDuff.Mode.SRC_IN);
         toggleInfinityRounds.setImageDrawable(newDraw);
 
@@ -3240,8 +3248,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode == 1) {
         secondRoundTypeHeaderInEditPopUp.setTextColor(breakColor);
 
-        Drawable newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_green);
+        Drawable newDraw;
+
+        if (phoneHeight <= 1920) {
+          newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_red);
+        } else {
+          newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_large_red);
+        }
+
         newDraw.setColorFilter(breakColor, PorterDuff.Mode.SRC_IN);
+
         toggleInfinityRounds.setImageDrawable(newDraw);
         toggleInfinityModeAndSetRoundType();
 

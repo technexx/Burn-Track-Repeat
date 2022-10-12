@@ -128,6 +128,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     Animation slideOutCalendarToBottom;
     Animation slideInCalendarFromBottom;
 
+    Animation slideOutTotalStatValuesLayoutToBottom;
+    Animation slideInTotalStatValuesLayoutFromBottom;
+
     int currentStatDurationMode;
     int ITERATING_ACTIVITY_STATS_UP = 0;
     int ITERATING_ACTIVITY_STATS_DOWN = 1;
@@ -2294,6 +2297,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         slideOutCalendarToBottom.setDuration(250);
         slideInCalendarFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom);
         slideInCalendarFromBottom.setDuration(250);
+
+        slideOutTotalStatValuesLayoutToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom_no_alpha_change);
+        slideOutTotalStatValuesLayoutToBottom.setDuration(2000);
+        slideInTotalStatValuesLayoutFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom_untouched_alpha);
+        slideInTotalStatValuesLayoutFromBottom.setDuration(250);
     }
 
     private void setCalendarAnimationListeners() {
@@ -2303,7 +2311,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             }
             @Override
             public void onAnimationEnd(Animation animation) {
-                calendarView.setVisibility(View.INVISIBLE);
+                calendarView.setVisibility(View.GONE);
             }
             @Override
             public void onAnimationRepeat(Animation animation) {

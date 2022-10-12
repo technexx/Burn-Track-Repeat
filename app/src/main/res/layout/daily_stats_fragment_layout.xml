@@ -173,7 +173,6 @@
             android:textColor="@color/green"
             android:textSize="22sp">
         </TextView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.recyclerview.widget.RecyclerView

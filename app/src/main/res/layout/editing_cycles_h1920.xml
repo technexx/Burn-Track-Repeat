@@ -133,8 +133,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@+id/timerValueInEditPopUpTextView"
         app:layout_constraintBottom_toBottomOf="@+id/timerValueInEditPopUpTextView"
-        app:layout_constraintEnd_toEndOf="parent"
-        android:backgroundTint="@color/test_black">
+        app:layout_constraintStart_toStartOf="@id/addRoundToCycleButton"
+        app:layout_constraintEnd_toEndOf="@id/addRoundToCycleButton"
+        android:background="@color/test_black">
     </ImageButton>
 
     <ImageButton
