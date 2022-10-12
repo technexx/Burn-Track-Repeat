@@ -632,7 +632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedSingleActivityString;
 
   //Todo: Notifications don't show for stopwatch. Also don't show if timer paused. Also showing in top of screen.
-  //Todo: On editing a cycle, we didn't get a highlight on active cycle after starting it.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test on low res nexus emulator.
@@ -3682,8 +3681,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void activateResumeOrResetOptionForCycle() {
     if (mode == 1) {
-      Log.i("testActive", "activeCycle boolean in Main is " + savedCycleAdapter.isCycleActive());
-
       if (savedCycleAdapter.isCycleActive()) {
         if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size() - 1;
         savedCycleAdapter.setCycleAsActive();

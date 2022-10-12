@@ -143,6 +143,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             } else {
                 pomHolder.fullView.setBackgroundColor(Color.BLACK);
             }
+        } else {
+            pomHolder.fullView.setBackgroundColor(Color.BLACK);
         }
 
         if (mHighlightDeleted) {
@@ -151,7 +153,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
             mHighlightMode = false;
 
-            pomHolder.fullView.setBackgroundColor(Color.BLACK);
+//            pomHolder.fullView.setBackgroundColor(Color.BLACK);
         }
 
         pomHolder.pomName.setText(mPomTitle.get(position));

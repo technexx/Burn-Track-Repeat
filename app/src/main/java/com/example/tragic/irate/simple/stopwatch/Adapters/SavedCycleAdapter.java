@@ -203,8 +203,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
+//    Log.i("testActive", "boolean in adapter is " + mActiveCycle);
+
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
+
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 
@@ -222,10 +225,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (mHighlightDeleted) {
       //Clears highlight list.
       mHighlightPositionList.clear();
+
       //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
       mHighlightMode = false;
 
-      workoutHolder.fullView.setBackgroundColor(Color.BLACK);
+//      mHighlightDeleted = false;
+//      workoutHolder.fullView.setBackgroundColor(Color.BLACK);
     }
 
     if (mThemeMode == DAY_MODE) {
