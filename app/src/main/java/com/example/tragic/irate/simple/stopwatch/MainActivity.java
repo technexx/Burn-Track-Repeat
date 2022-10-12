@@ -630,9 +630,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalRestTime;
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
-  
+
+  //Todo: Selecting a new round to replace in Edit de-selects in second adapter.
   //Todo: Notifications don't show for stopwatch. Also don't show if timer paused. Also showing in top of screen.
-  //Todo: With new round width, dot selector is outside of borders.
   //Todo: On editing a cycle, we didn't get a highlight on active cycle after starting it.
 
   //Todo: Test minimized vibrations on <26 api
@@ -989,7 +989,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode == 3) {
         setStoredSetAndBreakTimeOnPomCycleResume();
 
-        changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+        changeTextSizeWithoutAnimator(pomMillis);
         toggleViewsForTotalDailyAndCycleTimes(false);
         timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
       }
@@ -4083,11 +4083,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundListDivider.setVisibility(View.VISIBLE);
 
     if (phoneHeight <= 1920) {
-      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
+      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(300);
       roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(20);
       roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(140);
     } else {
-      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
+      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(290);
       roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(150);
       roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(10);
     }
