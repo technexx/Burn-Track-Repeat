@@ -260,10 +260,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton toggleInfinityRounds;
   ImageButton buttonToLaunchTimerFromEditPopUp;
 
-  ArrayList<Integer> workoutTime;
-  ArrayList<String> convertedWorkoutTime;
+  ArrayList<Integer> workoutTimeIntegerArray;
+  ArrayList<String> convertedWorkoutTimeStringArray;
   ArrayList<String> workoutCyclesArray;
-  ArrayList<String> workoutTitle;
   ArrayList<String> workoutTitleArray;
   ArrayList<Boolean> tdeeIsBeingTrackedInCycleList;
   ArrayList<Boolean> tdeeActivityExistsInCycleList;
@@ -963,7 +962,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
-        changeTextSizeWithoutAnimator(workoutTime.get(0));
+        changeTextSizeWithoutAnimator(workoutTimeIntegerArray.get(0));
 
         if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
           timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
@@ -1191,17 +1190,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     removeRound();
     if (consolidateRoundAdapterLists) {
       //Adapters only need adjusting if second one is populated.
-      if (workoutTime.size() >= 8) {
+      if (workoutTimeIntegerArray.size() >= 8) {
         workoutStringListOfRoundValuesForFirstAdapter.clear();
         workoutIntegerListOfRoundTypeForFirstAdapter.clear();
         workoutStringListOfRoundValuesForSecondAdapter.clear();
         workoutIntegerListOfRoundTypeForSecondAdapter.clear();
-        for (int i = 0; i < workoutTime.size(); i++) {
+        for (int i = 0; i < workoutTimeIntegerArray.size(); i++) {
           if (i <= 7) {
-            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTime.get(i));
+            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTimeStringArray.get(i));
             workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
           } else {
-            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTime.get(i));
+            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTimeStringArray.get(i));
             workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(i));
           }
         }
@@ -1380,7 +1379,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       populateCycleRoundAndRoundTypeArrayLists();
       populateRoundAdapterArraysForHighlightedCycle();
 
-      setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
+      setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
       assignOldCycleValuesToCheckForChanges();
     });
 
@@ -1743,7 +1742,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateLayoutManagers();
     instantiateRoundAdaptersAndTheirCallbacks();
     setRoundRecyclersOnAdaptersAndLayoutManagers();
-    setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
+    setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
     setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight();
     instantiateLapAdapterAndSetRecyclerOnIt();
 
@@ -2161,7 +2160,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundListForDots.add(String.valueOf(i + 1));
     }
 
-    ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+    ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
 
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
@@ -2349,9 +2348,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateArrayLists() {
-    workoutTime = new ArrayList<>();
-    convertedWorkoutTime = new ArrayList<>();
-    workoutTitle = new ArrayList<>();
+    workoutTimeIntegerArray = new ArrayList<>();
+    convertedWorkoutTimeStringArray = new ArrayList<>();
     workoutCyclesArray = new ArrayList<>();
     typeOfRound = new ArrayList<>();
     typeOfRoundArray = new ArrayList<>();
@@ -2897,18 +2895,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void populateRoundAdapterArraysForHighlightedCycle() {
     switch (mode) {
       case 1:
-        for (int i = 0; i < workoutTime.size(); i++) {
-          convertedWorkoutTime.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTime.get(i) / 1000));
+        for (int i = 0; i < workoutTimeIntegerArray.size(); i++) {
+          convertedWorkoutTimeStringArray.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTimeIntegerArray.get(i) / 1000));
           if (i <= 7) {
-            workoutStringListOfRoundValuesForFirstAdapter.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTime.get(i) / 1000));
+            workoutStringListOfRoundValuesForFirstAdapter.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTimeIntegerArray.get(i) / 1000));
             workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
           }
           if (i >= 8) {
-            workoutStringListOfRoundValuesForSecondAdapter.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTime.get(i) / 1000));
+            workoutStringListOfRoundValuesForSecondAdapter.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTimeIntegerArray.get(i) / 1000));
             workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(i));
           }
         }
-        roundSelectedPosition = workoutTime.size() - 1;
+        roundSelectedPosition = workoutTimeIntegerArray.size() - 1;
         break;
       case 3:
         cycleRoundsAdapter.disablePomFade();
@@ -3812,13 +3810,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void clearRoundAndCycleAdapterArrayLists() {
     if (mode == 1) {
-      convertedWorkoutTime.clear();
+      convertedWorkoutTimeStringArray.clear();
       workoutStringListOfRoundValuesForFirstAdapter.clear();
       workoutStringListOfRoundValuesForSecondAdapter.clear();
       workoutIntegerListOfRoundTypeForFirstAdapter.clear();
       workoutIntegerListOfRoundTypeForSecondAdapter.clear();
 
-      workoutTime.clear();
+      workoutTimeIntegerArray.clear();
       typeOfRound.clear();
     }
 
@@ -3933,7 +3931,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (subtractedRoundIsFading) {
           removeRound();
         }
-        if (workoutTime.size() > 0) {
+        if (workoutTimeIntegerArray.size() > 0) {
           if (roundSelectedPosition <= 7) {
             cycleRoundsAdapter.setFadeOutPosition(roundSelectedPosition);
             cycleRoundsAdapter.notifyDataSetChanged();
@@ -3960,19 +3958,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void addOrReplaceRounds(int integerValue, boolean replacingValue) {
     if (mode == 1) {
       if (!replacingValue) {
-        if (workoutTime.size() < 16) {
-          workoutTime.add(integerValue * 1000);
-          convertedWorkoutTime.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue));
+        if (workoutTimeIntegerArray.size() < 16) {
+          workoutTimeIntegerArray.add(integerValue * 1000);
+          convertedWorkoutTimeStringArray.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue));
           typeOfRound.add(roundType);
-          roundSelectedPosition = workoutTime.size() - 1;
+          roundSelectedPosition = workoutTimeIntegerArray.size() - 1;
 
-          if (workoutTime.size() <= 8) {
-            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTime.get(convertedWorkoutTime.size() - 1));
+          if (workoutTimeIntegerArray.size() <= 8) {
+            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTimeStringArray.get(convertedWorkoutTimeStringArray.size() - 1));
             workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(typeOfRound.size() - 1));
             cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
             cycleRoundsAdapter.notifyDataSetChanged();
           } else {
-            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTime.get(convertedWorkoutTime.size() - 1));
+            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTimeStringArray.get(convertedWorkoutTimeStringArray.size() - 1));
             workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(typeOfRound.size() - 1));
             cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition - 8);
             cycleRoundsAdapterTwo.notifyDataSetChanged();
@@ -3980,20 +3978,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else {
           showToastIfNoneActive("Full!");
         }
-        setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
+        setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
       } else {
-        workoutTime.set(roundSelectedPosition, integerValue * 1000);
-        convertedWorkoutTime.set(roundSelectedPosition, longToStringConverters.convertSecondsToMinutesBasedString(integerValue));
+        workoutTimeIntegerArray.set(roundSelectedPosition, integerValue * 1000);
+        convertedWorkoutTimeStringArray.set(roundSelectedPosition, longToStringConverters.convertSecondsToMinutesBasedString(integerValue));
         typeOfRound.set(roundSelectedPosition, roundType);
         if (roundSelectedPosition <= 7) {
-          workoutStringListOfRoundValuesForFirstAdapter.set(roundSelectedPosition, convertedWorkoutTime.get(roundSelectedPosition));
+          workoutStringListOfRoundValuesForFirstAdapter.set(roundSelectedPosition, convertedWorkoutTimeStringArray.get(roundSelectedPosition));
           workoutIntegerListOfRoundTypeForFirstAdapter.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
 
           cycleRoundsAdapter.isRoundCurrentlySelected(false);
           cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
           cycleRoundsAdapter.notifyDataSetChanged();
         } else {
-          workoutStringListOfRoundValuesForSecondAdapter.set(roundSelectedPosition - 8, convertedWorkoutTime.get(roundSelectedPosition));
+          workoutStringListOfRoundValuesForSecondAdapter.set(roundSelectedPosition - 8, convertedWorkoutTimeStringArray.get(roundSelectedPosition));
           workoutIntegerListOfRoundTypeForSecondAdapter.set(roundSelectedPosition - 8, typeOfRound.get(roundSelectedPosition));
 
           cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
@@ -4007,9 +4005,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void removeRound() {
     if (mode == 1) {
-      if (workoutTime.size() > 0) {
-        if (workoutTime.size() - 1 >= roundSelectedPosition) {
-          if (workoutTime.size() <= 8 || (roundIsSelected && roundSelectedPosition <= 7)) {
+      if (workoutTimeIntegerArray.size() > 0) {
+        if (workoutTimeIntegerArray.size() - 1 >= roundSelectedPosition) {
+          if (workoutTimeIntegerArray.size() <= 8 || (roundIsSelected && roundSelectedPosition <= 7)) {
             if (workoutStringListOfRoundValuesForFirstAdapter.size() - 1 >= roundSelectedPosition) {
               workoutStringListOfRoundValuesForFirstAdapter.remove(roundSelectedPosition);
               workoutIntegerListOfRoundTypeForFirstAdapter.remove(roundSelectedPosition);
@@ -4026,10 +4024,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
 
           typeOfRound.remove(roundSelectedPosition);
-          workoutTime.remove(roundSelectedPosition);
-          convertedWorkoutTime.remove(roundSelectedPosition);
+          workoutTimeIntegerArray.remove(roundSelectedPosition);
+          convertedWorkoutTimeStringArray.remove(roundSelectedPosition);
 
-          setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
+          setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
 
           subtractedRoundIsFading = false;
         }
@@ -4044,7 +4042,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           consolidateRoundAdapterLists = true;
           roundIsSelected = false;
         }
-        roundSelectedPosition = workoutTime.size() - 1;
+        roundSelectedPosition = workoutTimeIntegerArray.size() - 1;
       } else {
         showToastIfNoneActive("Empty!");
       }
@@ -4125,20 +4123,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void populateCycleRoundAndRoundTypeArrayLists() {
     switch (mode) {
       case 1:
-        workoutTime.clear();
+        workoutTimeIntegerArray.clear();
         typeOfRound.clear();
         if (workoutCyclesArray.size() - 1 >= positionOfSelectedCycle) {
           String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
           String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
 
           for (int i = 0; i < fetchedRounds.length; i++) {
-            workoutTime.add(Integer.parseInt(fetchedRounds[i]));
+            workoutTimeIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
           }
           for (int j = 0; j < fetchedRoundType.length; j++) {
             typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
           }
 
-          ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+          ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
 
           adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
           dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
@@ -4217,7 +4215,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchTimerCycle(int typeOfLaunch) {
-    if (workoutTime.size() == 0) {
+    if (workoutTimeIntegerArray.size() == 0) {
       showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
@@ -4306,7 +4304,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView.setText(cycleTitle);
 
     if (mode == 1) {
-      changeTextSizeWithoutAnimator(workoutTime.get(0));
+      changeTextSizeWithoutAnimator(workoutTimeIntegerArray.get(0));
     }
     if (mode == 3) {
       changeTextSizeWithoutAnimator(pomValuesTime.get(0));
@@ -4399,7 +4397,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleID = cyclesList.get(positionOfSelectedCycle).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
-      workoutString = gson.toJson(workoutTime);
+      workoutString = gson.toJson(workoutTimeIntegerArray);
       workoutString = friendlyString(workoutString);
       roundTypeString = gson.toJson(typeOfRound);
       roundTypeString = friendlyString(roundTypeString);
@@ -4428,7 +4426,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setWorkoutRounds(workoutString);
         cycles.setRoundType(roundTypeString);
         cycles.setTimeAccessed(System.currentTimeMillis());
-        cycles.setItemCount(workoutTime.size());
+        cycles.setItemCount(workoutTimeIntegerArray.size());
         cycles.setTitle(cycleTitle);
 
         if (isNewCycle) {
@@ -4898,11 +4896,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(setMillis/1000));
 
-        if (workoutTime.size() >= numberOfRoundsLeft) {
-          workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) setMillis);
+        if (workoutTimeIntegerArray.size() >= numberOfRoundsLeft) {
+          workoutTimeIntegerArray.set(workoutTimeIntegerArray.size() - numberOfRoundsLeft, (int) setMillis);
         }
 
-        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
 
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.notifyDataSetChanged();
@@ -4942,11 +4940,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(breakMillis/1000));
 
-        if (workoutTime.size() >= numberOfRoundsLeft) {
-          workoutTime.set(workoutTime.size() - numberOfRoundsLeft, (int) breakMillis);
+        if (workoutTimeIntegerArray.size() >= numberOfRoundsLeft) {
+          workoutTimeIntegerArray.set(workoutTimeIntegerArray.size() - numberOfRoundsLeft, (int) breakMillis);
         }
 
-        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
 
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.notifyDataSetChanged();
@@ -5329,7 +5327,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (numberOfRoundsLeft > 0) {
           switch (typeOfRound.get(currentRound)) {
             case 1:
-              setMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
+              setMillis = workoutTimeIntegerArray.get(workoutTimeIntegerArray.size() - numberOfRoundsLeft);
               timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
 
               if (!objectAnimator.isStarted()) {
@@ -5344,7 +5342,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               mHandler.post(infinityTimerForSetsRunnable);
               break;
             case 3:
-              breakMillis = workoutTime.get(workoutTime.size() - numberOfRoundsLeft);
+              breakMillis = workoutTimeIntegerArray.get(workoutTimeIntegerArray.size() - numberOfRoundsLeft);
               timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
 
               if (!objectAnimator.isStarted()) {
@@ -5705,8 +5703,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
     setDefaultTimerValuesAndTheirEditTextViews();
 
-    //Causes blank timeLeft on launching from edit popUp dismiss.
-//    timeLeft.setText(timeLeftValueHolder);
     setEditPopUpTimerHeaders(1);
 
     switch (mode) {
@@ -5766,7 +5762,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomTimerValueInEditPopUpTextViewTwo.setVisibility(View.VISIBLE);
         pomTimerValueInEditPopUpTextViewThree.setVisibility(View.VISIBLE);
 
-        setRoundRecyclerViewsWhenChangingAdapterCount(workoutTime);
+        setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
 
         sortHigh.setVisibility(View.GONE);
         sortLow.setVisibility(View.GONE);
@@ -5841,10 +5837,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
     if (mode == 1) {
-      if (workoutTime.size() > 0) {
+      if (workoutTimeIntegerArray.size() > 0) {
         switch (typeOfRound.get(0)) {
           case 1:
-            setMillis = workoutTime.get(0);
+            setMillis = workoutTimeIntegerArray.get(0);
             timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString((dividedMillisForTimerDisplay(setMillis))));
             setInitialTextSizeForTimers(setMillis);
             break;
@@ -5854,7 +5850,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setInitialTextSizeForTimers(0);
             break;
           case 3:
-            breakMillis = workoutTime.get(0);
+            breakMillis = workoutTimeIntegerArray.get(0);
             timeLeft.setText(longToStringConverters.convertSecondsToMinutesBasedString(((dividedMillisForTimerDisplay(breakMillis)))));
             setInitialTextSizeForTimers(breakMillis);
             break;
@@ -5865,17 +5861,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             break;
         };
 
-        for (int i = 0; i < workoutTime.size(); i++) {
+        for (int i = 0; i < workoutTimeIntegerArray.size(); i++) {
           if (typeOfRound.get(i) == 2 || typeOfRound.get(i) == 4) {
-            workoutTime.set(i, 0);
+            workoutTimeIntegerArray.set(i, 0);
           }
         }
 
         currentRound = 0;
-        startRounds = workoutTime.size();
+        startRounds = workoutTimeIntegerArray.size();
         numberOfRoundsLeft = startRounds;
 
-        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTime);
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
 
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.setTypeOfRoundList(typeOfRound);

@@ -1910,6 +1910,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
             recyclerParams.bottomToTop = ConstraintLayout.LayoutParams.UNSET;
             recyclerParams.bottomToBottom = R.id.daily_stats_fragment_parent_layout;
+
         }
     }
 
