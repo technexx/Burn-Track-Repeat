@@ -150,7 +150,9 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
         view = LayoutInflater.from(context).inflate(R.layout.mode_three_rounds, parent, false);
       }
       return new ModeThreeRounds(view);
-    } else return null;
+    } else {
+      return null;
+    }
   }
 
   @Override

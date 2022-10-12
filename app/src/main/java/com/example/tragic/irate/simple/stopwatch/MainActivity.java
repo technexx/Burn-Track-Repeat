@@ -631,7 +631,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Selecting a new round to replace in Edit de-selects in second adapter.
   //Todo: Notifications don't show for stopwatch. Also don't show if timer paused. Also showing in top of screen.
   //Todo: On editing a cycle, we didn't get a highlight on active cycle after starting it.
 

@@ -133,7 +133,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
 
         modeOneRounds.fullView.setOnClickListener(v -> {
             //Toggles bullet appearance next to each round, and de-selects a round if another is selected.
-            if (!mRoundSelected) {
+            if (!mRoundSelected || position!=mPositionOfSelectedRound) {
                 modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
                 //This var is used to make visible the correct bullet position when we re-draw this adapter's list.
                 mPositionOfSelectedRound = position;
