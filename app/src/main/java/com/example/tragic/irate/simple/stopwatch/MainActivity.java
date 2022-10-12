@@ -631,8 +631,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Expanded round recyclerView doesn't reset if +8 rounds then existing edit popUp.
-
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test on low res nexus emulator.
   //Todo: Test tablet screens.
@@ -3194,6 +3192,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
     cycleRoundsAdapterTwo.notifyDataSetChanged();
     roundListDivider.setVisibility(View.GONE);
+
+    setSingleColumnRoundRecyclerView();
   }
 
   private void assignOldCycleValuesToCheckForChanges() {
@@ -4052,31 +4052,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setRoundRecyclerViewsWhenChangingAdapterCount(ArrayList<Integer> adapterList) {
     if (mode == 1) {
       if (adapterList.size() <= 8) {
-        roundRecyclerTwo.setVisibility(View.GONE);
-        roundListDivider.setVisibility(View.GONE);
-
-        if (phoneHeight <= 1920) {
-          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
-          roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(15);
-        } else {
-          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
-          roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(20);
-        }
-        roundRecyclerOneLayoutParams.rightMargin = 0;
+        setSingleColumnRoundRecyclerView();
       } else {
-        roundRecyclerTwo.setVisibility(View.VISIBLE);
-        roundListDivider.setVisibility(View.VISIBLE);
-
-        if (phoneHeight <= 1920) {
-          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
-          roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(20);
-          roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(140);
-        } else {
-          roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
-          roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(150);
-          roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(10);
-        }
+        setDoubleColumnRoundRecyclerView();
       }
+    }
+  }
+
+  private void setSingleColumnRoundRecyclerView() {
+    roundRecyclerTwo.setVisibility(View.GONE);
+    roundListDivider.setVisibility(View.GONE);
+
+    if (phoneHeight <= 1920) {
+      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
+      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(15);
+    } else {
+      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
+      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(20);
+    }
+    roundRecyclerOneLayoutParams.rightMargin = 0;
+  }
+
+  private void setDoubleColumnRoundRecyclerView() {
+    roundRecyclerTwo.setVisibility(View.VISIBLE);
+    roundListDivider.setVisibility(View.VISIBLE);
+
+    if (phoneHeight <= 1920) {
+      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
+      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(20);
+      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(140);
+    } else {
+      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
+      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(150);
+      roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(10);
     }
   }
 
