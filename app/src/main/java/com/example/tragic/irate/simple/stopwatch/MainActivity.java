@@ -632,6 +632,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  //Todo: Expanded round recyclerView doesn't reset if +8 rounds then existing edit popUp.
+
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test on low res nexus emulator.
   //Todo: Test tablet screens.
@@ -4071,7 +4073,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
           roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(20);
           roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(140);
-
         } else {
           roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(260);
           roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(150);

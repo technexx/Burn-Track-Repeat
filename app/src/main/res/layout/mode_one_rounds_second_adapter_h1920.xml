@@ -22,11 +22,11 @@
 
     <TextView
         android:id="@+id/workout_rounds"
-        android:layout_width="wrap_content"
+        android:layout_width="70dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/round_count"
         app:layout_constraintTop_toTopOf="parent"
-        android:layout_marginStart="3dp"
+        android:layout_marginStart="6dp"
         android:textSize="21sp">
     </TextView>
 
