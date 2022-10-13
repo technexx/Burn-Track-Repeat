@@ -31,8 +31,12 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
     ListPreference workPreference;
     ListPreference miniBreakPreference;
 
+    String defaultSoundSettingForSets;
+    String defaultSoundSettingForBreaks;
+    String defaultSoundSettingForWork;
+    String defaultSoundSettingForMiniBreaks;
+
     SharedPreferences prefShared;
-    boolean appHasBeenLaunchedBefore;
 
     public interface onChangedSoundSetting {
         void changeSoundSetting(int typeOfRound, int settingNumber);
@@ -50,39 +54,24 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         return view;
     }
 
-    //Todo: Optimize this on onCreate.
-    private void setDefaultSoundSettings() {
+    private void setDefaultSoundSettingsIfNoneSelected() {
         String[] soundStringArray = getResources().getStringArray(R.array.sound_setting_options);
-        setPreference = findPreference("soundSettingForSets");
-        breakPreference = findPreference("soundSettingForBreaks");
 
-        workPreference = findPreference("soundSettingForWork");
-        miniBreakPreference = findPreference("soundSettingForMiniBreaks");
-
-        String currentSetString = prefShared.getString("soundSettingForSets", "");
-        String currentBreakString = prefShared.getString("soundSettingForBreaks", "");
-        String currentWorkString = prefShared.getString("soundSettingForWork", "");
-        String currentMiniBreakString = prefShared.getString("soundSettingForMiniBreaks", "");
-
-        if (currentSetString.equals("")) {
+        if (defaultSoundSettingForSets.equals("")) {
             setPreference.setSummary(soundStringArray[1]);
         }
 
-        if (currentBreakString.equals("")) {
+        if (defaultSoundSettingForBreaks.equals("")) {
             breakPreference.setSummary(soundStringArray[2]);
         }
 
-        if (currentWorkString.equals("")) {
+        if (defaultSoundSettingForWork.equals("")) {
             workPreference.setSummary(soundStringArray[1]);
         }
 
-        if (currentMiniBreakString.equals("")) {
+        if (defaultSoundSettingForMiniBreaks.equals("")) {
             miniBreakPreference.setSummary(soundStringArray[2]);
         }
-    }
-
-    private boolean isPreferenceKeyEmpty(String prefKey) {
-        return prefKey.equals("");
     }
 
     @Override
@@ -100,11 +89,11 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         miniBreakPreference = findPreference("soundSettingForMiniBreaks");
         SwitchPreference fullBreakPreference = findPreference("soundSettingForFullBreak");
 
-        String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
-        String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_once");
+        defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
+        defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_once");
 
-        String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
-        String defaultSoundSettingForMiniBreaks = prefShared.getString("soundSettingForMiniBreaks", "vibrate_once");
+        defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
+        defaultSoundSettingForMiniBreaks = prefShared.getString("soundSettingForMiniBreaks", "vibrate_once");
 
         CharSequence[] soundEntryListForSets = setPreference.getEntries();
         CharSequence[] soundEntryListForBreaks = breakPreference.getEntries();
@@ -126,7 +115,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         workPreference.setSummary(defaultWorkString);
         miniBreakPreference.setSummary(defaultMiniBreaksString);
 
-        setDefaultSoundSettings();
+        setDefaultSoundSettingsIfNoneSelected();
 
         setPreference.setOnPreferenceChangeListener((preference, newValue) -> {
             int setValue = convertSoundSettingObjectToInteger(newValue);

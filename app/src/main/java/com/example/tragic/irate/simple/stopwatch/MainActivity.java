@@ -635,6 +635,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: New install: Defaults to vibrations (as intended), but display as Silent in Settings.
       //Todo: Visting settings WILL set this to silent.
 
+  //Todo: Unwanted ripple effects when clicking on settings values.
+
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test on low res nexus emulator.
   //Todo: Test tablet screens.
