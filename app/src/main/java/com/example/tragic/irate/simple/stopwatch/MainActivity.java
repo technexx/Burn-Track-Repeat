@@ -631,7 +631,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Forcing nextRound in infinity rounds doubled our dots fading speed.
+
+  //Todo: Instances of forcing nextRound in infinity rounds doubled our dots fading speed.
   //Todo: New install: Defaults to vibrations (as intended), but display as Silent in Settings.
       //Todo: Visting settings WILL set this to silent.
   //Todo: Notifications don't show for stopwatch. Also don't show if timer paused. Also showing in top of screen.
@@ -5260,7 +5261,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextPomRound(boolean endingEarly) {
-    Log.i("testPom", "dot counter is " + pomDotCounter);
     if (pomDotCounter == 8) {
       mHandler.removeCallbacks(endFadeForModeThree);
       resetTimer();
@@ -5385,13 +5385,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cyclesCompleted++;
           setCyclesCompletedTextView();
         }
+
+        Log.i("testSkip", "post-round runnable executing!");
         timerDisabled = false;
         next_round.setEnabled(true);
       }
     };
   }
-
-  ;
 
   private Runnable postRoundRunnableForThirdMode() {
     return new Runnable() {
@@ -5428,6 +5428,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumeTimer(int pausing) {
+    Log.i("testSkip", "timer ended boolean is " + timerDisabled);
     if (!timerDisabled) {
       if (!timerEnded) {
         if (pausing == PAUSING_TIMER) {
@@ -5489,7 +5490,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       } else {
-        deleteTotalCycleTimes();
+        resetTimer();
+//        deleteTotalCycleTimes();
       }
     }
   }
@@ -5550,6 +5552,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       } else {
         resetTimer();
+//        deleteTotalCycleTimes();
       }
     }
   }
