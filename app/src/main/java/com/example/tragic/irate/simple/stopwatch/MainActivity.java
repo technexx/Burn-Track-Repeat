@@ -632,7 +632,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedSingleActivityString;
 
 
-  //Todo: Instances of forcing nextRound in infinity rounds doubled our dots fading speed.
   //Todo: New install: Defaults to vibrations (as intended), but display as Silent in Settings.
       //Todo: Visting settings WILL set this to silent.
   //Todo: Notifications don't show for stopwatch. Also don't show if timer paused. Also showing in top of screen.
@@ -1522,14 +1521,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     endFadeForModeOne = new Runnable() {
       @Override
       public void run() {
-        dotsAdapter.notifyDataSetChanged();
-
         if (receivedDotAlpha <= 0.3f) {
           dotsAdapter.setDotAlpha(0.3f);
           dotsAdapter.notifyDataSetChanged();
 
           mHandler.removeCallbacks(this);
         } else {
+          dotsAdapter.notifyDataSetChanged();
           mHandler.postDelayed(this, 50);
         }
       }
@@ -1538,14 +1536,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     endFadeForModeThree = new Runnable() {
       @Override
       public void run() {
-        pomDotsAdapter.notifyDataSetChanged();
-
         if (receivedPomDotAlpha <= 0.3f) {
           pomDotsAdapter.setPomDotAlpha(0.3f);
           pomDotsAdapter.notifyDataSetChanged();
 
           mHandler.removeCallbacks(this);
         } else {
+          pomDotsAdapter.notifyDataSetChanged();
           mHandler.postDelayed(this, 50);
         }
       }
@@ -4525,7 +4522,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setTotalDailyActivityTimeToTextView();
       setTotalSingleActivityTimeToTextView();
     }
-    
+
     setTotalDailyCaloriesToTextView();
     setTotalSingleActivityCaloriesToTextView();
   }
@@ -5339,6 +5336,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.resetModeOneAlpha();
         dotsAdapter.setModeOneAlpha();
 
+        if (mHandler.hasCallbacks(endFadeForModeOne)) {
+          mHandler.removeCallbacks(endFadeForModeOne);
+        }
+
         setMillis = 0;
         breakMillis = 0;
         timerIsPaused = false;
@@ -5386,7 +5387,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setCyclesCompletedTextView();
         }
 
-        Log.i("testSkip", "post-round runnable executing!");
         timerDisabled = false;
         next_round.setEnabled(true);
       }
@@ -5401,7 +5401,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomDotsAdapter.updatePomDotCounter(pomDotCounter);
         pomDotsAdapter.resetModeThreeAlpha();
         pomDotsAdapter.setModeThreeAlpha();
-        dotsAdapter.notifyDataSetChanged();
+
+        if (mHandler.hasCallbacks(endFadeForModeThree)) {
+          mHandler.removeCallbacks(endFadeForModeThree);
+        }
 
         if (pomDotCounter <= 7) {
           pomMillis = pomValuesTime.get(pomDotCounter);
@@ -5428,7 +5431,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumeTimer(int pausing) {
-    Log.i("testSkip", "timer ended boolean is " + timerDisabled);
     if (!timerDisabled) {
       if (!timerEnded) {
         if (pausing == PAUSING_TIMER) {
