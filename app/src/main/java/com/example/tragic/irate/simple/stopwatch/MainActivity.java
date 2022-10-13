@@ -631,6 +631,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  //Todo: Forcing nextRound in infinity rounds doubled our dots fading speed.
+  //Todo: New install: Defaults to vibrations (as intended), but display as Silent in Settings.
+      //Todo: Visting settings WILL set this to silent.
   //Todo: Notifications don't show for stopwatch. Also don't show if timer paused. Also showing in top of screen.
 
   //Todo: Test minimized vibrations on <26 api
@@ -4505,59 +4508,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return df.format(calories);
   }
 
-  private void roundCycleSetTimeDown() {
-    totalCycleSetTimeInMillis = roundDownMillisValues(totalCycleSetTimeInMillis);
-  }
-
-  private void roundCycleBreakTimeDown() {
-    totalCycleBreakTimeInMillis = roundDownMillisValues(totalCycleBreakTimeInMillis);
-  }
-
-  private void roundDailyStatTimesDown() {
-    totalSetTimeForCurrentDayInMillis = roundDownMillisValues(totalSetTimeForCurrentDayInMillis);
-    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValues(totalSetTimeForSpecificActivityForCurrentDayInMillis);
-  }
-
-  private void roundDownPomCycleWorkTime() {
-    totalCycleWorkTimeInMillis = roundDownMillisValues(totalCycleWorkTimeInMillis);
-  }
-
-  private void roundDownPomCycleRestTime() {
-    totalCycleRestTimeInMillis = roundDownMillisValues(totalCycleRestTimeInMillis);
-  }
-
-  private long roundDownMillisValues(long millisToRound) {
-    return millisToRound -= (millisToRound % 1000);
-  }
-
-  private long roundUpMillisValues(long millisToRound) {
-    long remainder = millisToRound % 1000;
-    return millisToRound += (1000 - remainder);
-  }
-
-  private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
-    caloriesToRound += 1;
-    DecimalFormat df = new DecimalFormat("#");
-    String truncatedCalorieString = df.format(caloriesToRound);
-
-    return Double.parseDouble(truncatedCalorieString);
-  }
-
   private long dividedMillisForTimerDisplay(long millis) {
     return (millis + 999) / 1000;
   }
 
   private long dividedMillisForTotalTimesDisplay(long millis) {
     return (millis) / 1000;
-  }
-
-  private long roundToNearestFullThousandth(long valueToRound) {
-    long remainder = valueToRound % 1000;
-    if (remainder <= 500) {
-      return valueToRound -= remainder;
-    } else {
-      return valueToRound += (1000 - remainder);
-    }
   }
 
   private void updateDailyStatTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
@@ -4631,6 +4587,54 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void roundPomCycleTimeValuesForEndOfRoundDisplay() {
     totalCycleWorkTimeInMillis = roundToNearestFullThousandth(totalCycleWorkTimeInMillis);
     totalCycleRestTimeInMillis = roundToNearestFullThousandth(totalCycleRestTimeInMillis);
+  }
+
+
+  private void roundCycleSetTimeDown() {
+    totalCycleSetTimeInMillis = roundDownMillisValues(totalCycleSetTimeInMillis);
+  }
+
+  private void roundCycleBreakTimeDown() {
+    totalCycleBreakTimeInMillis = roundDownMillisValues(totalCycleBreakTimeInMillis);
+  }
+
+  private void roundDailyStatTimesDown() {
+    totalSetTimeForCurrentDayInMillis = roundDownMillisValues(totalSetTimeForCurrentDayInMillis);
+    totalSetTimeForSpecificActivityForCurrentDayInMillis = roundDownMillisValues(totalSetTimeForSpecificActivityForCurrentDayInMillis);
+  }
+
+  private void roundDownPomCycleWorkTime() {
+    totalCycleWorkTimeInMillis = roundDownMillisValues(totalCycleWorkTimeInMillis);
+  }
+
+  private void roundDownPomCycleRestTime() {
+    totalCycleRestTimeInMillis = roundDownMillisValues(totalCycleRestTimeInMillis);
+  }
+
+  private long roundDownMillisValues(long millisToRound) {
+    return millisToRound -= (millisToRound % 1000);
+  }
+
+  private long roundUpMillisValues(long millisToRound) {
+    long remainder = millisToRound % 1000;
+    return millisToRound += (1000 - remainder);
+  }
+
+  private double roundDownDoubleValuesToSyncCalories(double caloriesToRound) {
+    caloriesToRound += 1;
+    DecimalFormat df = new DecimalFormat("#");
+    String truncatedCalorieString = df.format(caloriesToRound);
+
+    return Double.parseDouble(truncatedCalorieString);
+  }
+
+  private long roundToNearestFullThousandth(long valueToRound) {
+    long remainder = valueToRound % 1000;
+    if (remainder <= 500) {
+      return valueToRound -= remainder;
+    } else {
+      return valueToRound += (1000 - remainder);
+    }
   }
 
   private void setCycleTimeToIterate() {
@@ -5215,7 +5219,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (trackActivityWithinCycle) {
       setAllActivityTimesAndCaloriesToTextViews();
     } else {
-      roundCycleTimeValuesForEndOfRoundDisplay();
+//      roundCycleTimeValuesForEndOfRoundDisplay();
+      roundCycleSetTimeDown();
+      roundCycleBreakTimeDown();
+
       setTotalCycleTimeValuesToTextView();
     }
 
@@ -5267,8 +5274,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     globalNextRoundLogic();
 
-    roundPomCycleTimeValuesForEndOfRoundDisplay();
+//    roundPomCycleTimeValuesForEndOfRoundDisplay();
+    roundDownPomCycleWorkTime();
+    roundDownPomCycleRestTime();
     setTotalCycleTimeValuesToTextView();
+
     mHandler.post(endFadeForModeThree);
 
     removePomCycleTimeRunnable();
