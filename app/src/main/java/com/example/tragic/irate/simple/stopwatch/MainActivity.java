@@ -634,7 +634,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: New install: Defaults to vibrations (as intended), but display as Silent in Settings.
       //Todo: Visting settings WILL set this to silent.
-  //Todo: Notifications don't show for stopwatch. Also don't show if timer paused. Also showing in top of screen.
 
   //Todo: Test minimized vibrations on <26 api
   //Todo: Test on low res nexus emulator.
@@ -677,9 +676,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onStop() {
     super.onStop();
     setVisible(false);
+
     if (timerPopUpWindow.isShowing() || stopWatchPopUpWindow.isShowing()) {
       dismissNotification = false;
 
+      //Shows even if paused and timer does not change.
+      setNotificationValues();
+      //Runnable to display in sync w/ timer change.
       globalNotficationsRunnable = notifcationsRunnable();
       mHandler.post(globalNotficationsRunnable);
     }
@@ -3550,7 +3553,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (Build.VERSION.SDK_INT >= 26) {
       CharSequence name = "Timers";
       String description = "Timer Countdown";
-      int importance = NotificationManager.IMPORTANCE_HIGH;
+      int importance = NotificationManager.IMPORTANCE_DEFAULT;
       NotificationChannel channel = new NotificationChannel("1", name, importance);
       channel.setDescription(description);
 
@@ -3565,7 +3568,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     notificationManagerBuilder.setSmallIcon(R.drawable.start_cycle);
     notificationManagerBuilder.setAutoCancel(false);
-    notificationManagerBuilder.setPriority(Notification.PRIORITY_HIGH);
+    //Higher priority will cause it to show at top of screen.
+    notificationManagerBuilder.setPriority(Notification.PRIORITY_DEFAULT);
     notificationManagerBuilder.setDeleteIntent(dismissNotificationIntent(this, 1));
 
     PackageManager pm = getApplicationContext().getPackageManager();
@@ -3664,6 +3668,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
+  }
+
+  private Runnable notifcationsRunnable() {
+    TextViewDisplaySync textViewDisplaySyncForNotifications = new TextViewDisplaySync();
+    textViewDisplaySyncForNotifications.setFirstTextView((String) timeLeft.getText());
+    textViewDisplaySyncForNotifications.setSecondTextView((String) timeLeft.getText());
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySyncForNotifications);
+
+        mHandler.postDelayed(this, 10);
+      }
+    };
   }
 
   private String getUpOrDownArrowForNotifications() {
@@ -4748,22 +4767,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setNotificationValues();
     }
   }
-
-  private Runnable notifcationsRunnable() {
-    TextViewDisplaySync textViewDisplaySyncForNotifications = new TextViewDisplaySync();
-    textViewDisplaySyncForNotifications.setFirstTextView((String) timeLeft.getText());
-    textViewDisplaySyncForNotifications.setSecondTextView((String) timeLeft.getText());
-
-    return new Runnable() {
-      @Override
-      public void run() {
-        updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySyncForNotifications);
-
-        mHandler.postDelayed(this, 10);
-      }
-    };
-  }
-
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
