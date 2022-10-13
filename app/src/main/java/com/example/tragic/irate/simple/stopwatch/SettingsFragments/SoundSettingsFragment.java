@@ -54,26 +54,6 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         return view;
     }
 
-    private void setDefaultSoundSettingsIfNoneSelected() {
-        String[] soundStringArray = getResources().getStringArray(R.array.sound_setting_options);
-
-        if (defaultSoundSettingForSets.equals("")) {
-            setPreference.setSummary(soundStringArray[1]);
-        }
-
-        if (defaultSoundSettingForBreaks.equals("")) {
-            breakPreference.setSummary(soundStringArray[2]);
-        }
-
-        if (defaultSoundSettingForWork.equals("")) {
-            workPreference.setSummary(soundStringArray[1]);
-        }
-
-        if (defaultSoundSettingForMiniBreaks.equals("")) {
-            miniBreakPreference.setSummary(soundStringArray[2]);
-        }
-    }
-
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.sounds_settings_fragment_layout, rootKey);
@@ -169,6 +149,26 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
             mOnChangedSoundSetting.changeSoundSetting(FULL_BREAK_SETTING, infinityInteger);
             return true;
         });
+    }
+
+    private void setDefaultSoundSettingsIfNoneSelected() {
+        String[] soundStringArray = getResources().getStringArray(R.array.sound_setting_options);
+
+        if (defaultSoundSettingForSets.equals("")) {
+            setPreference.setSummary(soundStringArray[1]);
+        }
+
+        if (defaultSoundSettingForBreaks.equals("")) {
+            breakPreference.setSummary(soundStringArray[2]);
+        }
+
+        if (defaultSoundSettingForWork.equals("")) {
+            workPreference.setSummary(soundStringArray[1]);
+        }
+
+        if (defaultSoundSettingForMiniBreaks.equals("")) {
+            miniBreakPreference.setSummary(soundStringArray[2]);
+        }
     }
 
     private int convertSoundSettingObjectToInteger(Object newVar) {

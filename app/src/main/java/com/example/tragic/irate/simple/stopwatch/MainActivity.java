@@ -631,13 +631,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  //Todo: Change up a few settings colors (e.g. blue doesn't look great).
+  //Todo: Rename "Tracking Stats" onOptions item.
 
-  //Todo: New install: Defaults to vibrations (as intended), but display as Silent in Settings.
-      //Todo: Visting settings WILL set this to silent.
-
-  //Todo: Unwanted ripple effects when clicking on settings values.
-
-  //Todo: Test minimized vibrations on <26 api
+  //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test on low res nexus emulator.
   //Todo: Test tablet screens.
   //Todo: Test w/ fresh install for all default values.
