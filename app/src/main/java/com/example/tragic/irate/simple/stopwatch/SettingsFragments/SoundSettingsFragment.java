@@ -26,6 +26,14 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
     ChangeSettingsValues changeSettingsValues;
     onChangedSoundSetting mOnChangedSoundSetting;
 
+    ListPreference setPreference;
+    ListPreference breakPreference;
+    ListPreference workPreference;
+    ListPreference miniBreakPreference;
+
+    SharedPreferences prefShared;
+    boolean appHasBeenLaunchedBefore;
+
     public interface onChangedSoundSetting {
         void changeSoundSetting(int typeOfRound, int settingNumber);
     }
@@ -42,20 +50,55 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         return view;
     }
 
+    //Todo: Optimize this on onCreate.
+    private void setDefaultSoundSettings() {
+        String[] soundStringArray = getResources().getStringArray(R.array.sound_setting_options);
+        setPreference = findPreference("soundSettingForSets");
+        breakPreference = findPreference("soundSettingForBreaks");
+
+        workPreference = findPreference("soundSettingForWork");
+        miniBreakPreference = findPreference("soundSettingForMiniBreaks");
+
+        String currentSetString = prefShared.getString("soundSettingForSets", "");
+        String currentBreakString = prefShared.getString("soundSettingForBreaks", "");
+        String currentWorkString = prefShared.getString("soundSettingForWork", "");
+        String currentMiniBreakString = prefShared.getString("soundSettingForMiniBreaks", "");
+
+        if (currentSetString.equals("")) {
+            setPreference.setSummary(soundStringArray[1]);
+        }
+
+        if (currentBreakString.equals("")) {
+            breakPreference.setSummary(soundStringArray[2]);
+        }
+
+        if (currentWorkString.equals("")) {
+            workPreference.setSummary(soundStringArray[1]);
+        }
+
+        if (currentMiniBreakString.equals("")) {
+            miniBreakPreference.setSummary(soundStringArray[2]);
+        }
+    }
+
+    private boolean isPreferenceKeyEmpty(String prefKey) {
+        return prefKey.equals("");
+    }
+
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.sounds_settings_fragment_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues();
 
-        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
+        prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
 
-        ListPreference setPreference = (ListPreference) findPreference("soundSettingForSets");
-        ListPreference breakPreference = (ListPreference) findPreference("soundSettingForBreaks");
-        SwitchPreference lastRoundPreference = (SwitchPreference) findPreference("soundSettingForLastRound");
+        setPreference = findPreference("soundSettingForSets");
+        breakPreference = findPreference("soundSettingForBreaks");
+        SwitchPreference lastRoundPreference = findPreference("soundSettingForLastRound");
 
-        ListPreference workPreference = (ListPreference) findPreference("soundSettingForWork");
-        ListPreference miniBreakPreference = (ListPreference) findPreference("soundSettingForMiniBreaks");
-        SwitchPreference fullBreakPreference = (SwitchPreference) findPreference("soundSettingForFullBreak");
+        workPreference = findPreference("soundSettingForWork");
+        miniBreakPreference = findPreference("soundSettingForMiniBreaks");
+        SwitchPreference fullBreakPreference = findPreference("soundSettingForFullBreak");
 
         String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
         String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_once");
@@ -83,6 +126,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         workPreference.setSummary(defaultWorkString);
         miniBreakPreference.setSummary(defaultMiniBreaksString);
 
+        setDefaultSoundSettings();
 
         setPreference.setOnPreferenceChangeListener((preference, newValue) -> {
             int setValue = convertSoundSettingObjectToInteger(newValue);

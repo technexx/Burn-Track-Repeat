@@ -3052,6 +3052,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int workColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForWork);
     int miniBreakColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForMiniBreak);
     int fullBreakColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForFullBreak);
+
     setColor = changeSettingsValues.assignColor(setColorNumericValue);
     breakColor = changeSettingsValues.assignColor(breakColorNumericValue);
     workColor = changeSettingsValues.assignColor(workColorNumericValue);

@@ -200,7 +200,6 @@
         <item>cyan_setting</item>
     </string-array>
 
-
     <string name="spinner_value">%1$s %2$s</string>
     <string name="bmr_value">%1$s Calories</string>
     <string name="activity_duration">Duration:</string>
