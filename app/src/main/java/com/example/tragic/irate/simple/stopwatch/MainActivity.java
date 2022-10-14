@@ -634,8 +634,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Change up a few settings colors (e.g. blue doesn't look great).
   //Todo: Rename "Tracking Stats" onOptions item.
 
+  //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
-  //Todo: Test on low res nexus emulator.
+  //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
   //Todo: Test tablet screens.
   //Todo: Test w/ fresh install for all default values.
   //Todo: Test everything 10x. Incl. round selection/replacement.

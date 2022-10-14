@@ -111,7 +111,7 @@
 
     <Spinner
         android:id="@+id/gender_spinner"
-        android:layout_width="195dp"
+        android:layout_width="225dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imperial_setting"
@@ -122,7 +122,7 @@
 
     <Spinner
         android:id="@+id/age_spinner"
-        android:layout_width="195dp"
+        android:layout_width="225dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/gender_text"
@@ -133,7 +133,7 @@
 
     <Spinner
         android:id="@+id/weight_spinner"
-        android:layout_width="195dp"
+        android:layout_width="225dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/age_text"
@@ -144,7 +144,7 @@
 
     <Spinner
         android:id="@+id/height_spinner"
-        android:layout_width="195dp"
+        android:layout_width="225dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/weight_text"
@@ -155,7 +155,7 @@
 
     <Spinner
         android:id="@+id/activity_level_spinner"
-        android:layout_width="195dp"
+        android:layout_width="225dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/height_text"
@@ -165,27 +165,29 @@
     </Spinner>
 
     <TextView
-        android:id="@+id/bmr_text"
-        android:text="@string/bmr"
-        android:layout_width="wrap_content"
+        android:id="@+id/user_settings_calories_burned_header"
+        android:text="@string/total_daily_calories_burned"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toStartOf="@id/user_settings_calories_burned_textView"
         app:layout_constraintTop_toBottomOf="@id/activity_level_spinner"
         android:layout_marginTop="32dp"
         android:layout_marginStart="4dp"
         android:textStyle="bold"
-        android:textSize="24sp">
+        android:textSize="20sp"
+        android:minLines="2">
     </TextView>
 
     <TextView
-        android:id="@+id/bmr"
+        android:id="@+id/user_settings_calories_burned_textView"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activity_level_spinner"
         android:layout_marginTop="32dp"
         android:layout_marginStart="175dp"
-        android:textSize="24sp">
+        android:textSize="22sp">
     </TextView>
 
     <com.google.android.material.button.MaterialButton
@@ -194,7 +196,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/bmr"
+        app:layout_constraintTop_toBottomOf="@id/user_settings_calories_burned_header"
         android:paddingStart="16dp"
         android:paddingEnd="16dp"
         android:paddingTop="4dp"

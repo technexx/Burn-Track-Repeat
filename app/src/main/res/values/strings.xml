@@ -201,7 +201,7 @@
     </string-array>
 
     <string name="spinner_value">%1$s %2$s</string>
-    <string name="bmr_value">%1$s Calories</string>
+    <string name="bmr_value">%1$s / day</string>
     <string name="activity_duration">Duration:</string>
 
     <string name="add_activity">Add an activity!</string>
@@ -225,7 +225,7 @@
     <string name="tdee">Daily TDEE:</string>
     <string name="calories">Calories</string>
     <string name="average">Avg. Hourly:</string>
-    <string name="bmr">Daily BMR:</string>
+    <string name="total_daily_calories_burned">Calories Burned:</string>
     <string name="calculate">Calculate!</string>
     <string name="two_part">%1$s  %2$s</string>
     <string name="add">Add to Custom Calculator</string>

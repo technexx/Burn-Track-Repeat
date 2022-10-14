@@ -72,7 +72,7 @@ public class tdeeSettingsFragment extends Fragment {
         weight_spinner = root.findViewById(R.id.weight_spinner);
         height_spinner = root.findViewById(R.id.height_spinner);
         activity_level_spinner = root.findViewById(R.id.activity_level_spinner);
-        bmrTextView = root.findViewById(R.id.bmr);
+        bmrTextView = root.findViewById(R.id.user_settings_calories_burned_textView);
 
         imperialSettingButton = root.findViewById(R.id.imperial_setting);
         metricSettingButton = root.findViewById(R.id.metric_setting);
