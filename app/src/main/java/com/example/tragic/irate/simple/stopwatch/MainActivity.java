@@ -631,9 +631,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Change up a few settings colors (e.g. blue doesn't look great).
-  //Todo: Smooth out stats frag on initial load.
   //Todo: Settings fragments should have different action bar ("Settings" up top - no sort feature, ***which needs to be removed anyway***).
+  //Todo: Smooth out stats frag on initial load.
+  //Todo: Play w/ priority level in notifications so it begins unminimized.
 
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -714,11 +714,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           toggleSortButtonBasedOnIfCycleIsActive();
         }
 
+        if (rootSettingsFragment.isVisible()) {
+          if (phoneHeight <= 1920) {
+            getSupportActionBar().setCustomView(R.layout.custom_bar_h1920);
+          } else {
+            getSupportActionBar().setCustomView(R.layout.custom_bar);
+          }
+
+          //Necessary. Otherwise we lose reference to them for some reason.
+          edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
+          cancelHighlight = findViewById(R.id.cancel_highlight);
+          delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
+
+          setCustomActionBarDefaultViews();
+        }
+
         setTypeOfOnOptionsSelectedMenu(DEFAULT_MENU);
         toggleSortMenuViewBetweenCyclesAndActivities(SORTING_CYCLES);
       }
 
-//      sortButton.setVisibility(View.VISIBLE);
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || disclaimerFragment.isVisible()) {
@@ -801,6 +815,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       sortButton.setVisibility(View.INVISIBLE);
 
       setTypeOfOnOptionsSelectedMenu(SETTINGS_MENU);
+
+      if (phoneHeight <= 1920) {
+        getSupportActionBar().setCustomView(R.layout.custom_action_bar_for_settings_h1920);
+      } else {
+        getSupportActionBar().setCustomView(R.layout.custom_action_bar_for_settings);
+      }
     }
   }
 
@@ -3828,6 +3848,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setVisibility(View.GONE);
       delete_highlighted_cycle.setVisibility(View.GONE);
       cancelHighlight.setVisibility(View.GONE);
+      Log.i("testBar", "visibilities toggling off!");
     }
   }
 

@@ -277,6 +277,7 @@
     <string name="winter">Winter Activities</string>
     <string name="custom_activity">CUSTOM</string>
 
+    <string name="settings">Settings</string>
     <string name="about_settings">Version 1.0.1\n\nAuthor: Brian S.</string>
 
     <string name="about_stats">\"Metabolic Rate\" are the amount of calories that you burn simply going about your day to day life. This calculation is based on your user settings.\n\n\"Activities\" are the calories you burn for specific activities. They take the place of your Metabolic Rate.\n\nFor example, if you burn 2400 calories per day as a Metabolic Rate, and then play basketball for 2 hours, your total calories burned for that day will be:\n\n(100 * 22 hours) + (464 * 2 hours) = 3218.
