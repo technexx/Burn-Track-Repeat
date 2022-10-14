@@ -2,7 +2,7 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item android:id="@+id/daily_stats"
-        android:title="Tracking Stats">
+        android:title="Tracking Statistics">
     </item>
     <item android:id="@+id/global_settings"
         android:title="Settings">

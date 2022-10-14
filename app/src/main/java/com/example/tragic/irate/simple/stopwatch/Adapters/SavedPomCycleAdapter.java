@@ -46,7 +46,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
 
-    ChangeSettingsValues changeSettingsValues = new ChangeSettingsValues();
+    ChangeSettingsValues changeSettingsValues;
     int WORK_COLOR;
     int BREAK_COLOR;
     int REST_COLOR;
@@ -94,6 +94,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         if (mSizeToggle.size()==0) for (int i=0; i<8; i++) mSizeToggle.add(0);
         //Must be instantiated here so it does not loop and reset in onBindView.
         mHighlightPositionList = new ArrayList<>();
+
+        changeSettingsValues = new ChangeSettingsValues(mContext);
     }
 
     public void exitHighlightMode() {

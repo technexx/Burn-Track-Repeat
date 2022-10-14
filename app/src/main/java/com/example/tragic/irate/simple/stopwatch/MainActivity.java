@@ -632,7 +632,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedSingleActivityString;
 
   //Todo: Change up a few settings colors (e.g. blue doesn't look great).
-  //Todo: Rename "Tracking Stats" onOptions item.
+  //Todo: Smooth out stats frag on initial load.
+  //Todo: Settings fragments should have different action bar ("Settings" up top - no sort feature, ***which needs to be removed anyway***).
 
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -1778,7 +1779,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void instantiateGlobalClasses() {
     fragmentManager = getSupportFragmentManager();
-    changeSettingsValues = new ChangeSettingsValues();
+    changeSettingsValues = new ChangeSettingsValues(getApplicationContext());
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
     dailyStatsAccess = new DailyStatsAccess(getApplicationContext());
     longToStringConverters = new LongToStringConverters();

@@ -328,7 +328,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
     }
 
     private void instantiateMiscObjects() {
-        changeSettingsValues = new ChangeSettingsValues();
+        changeSettingsValues = new ChangeSettingsValues(mContext);
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
         narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);

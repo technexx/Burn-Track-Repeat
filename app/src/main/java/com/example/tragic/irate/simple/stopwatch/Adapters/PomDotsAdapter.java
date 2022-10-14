@@ -202,7 +202,7 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
     }
 
     private void instantiateMiscObjects() {
-        changeSettingsValues = new ChangeSettingsValues();
+        changeSettingsValues = new ChangeSettingsValues(mContext);
         dotsBorder =  (GradientDrawable) ContextCompat.getDrawable(mContext, R.drawable.dots_border);
 
         narrowFont = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);

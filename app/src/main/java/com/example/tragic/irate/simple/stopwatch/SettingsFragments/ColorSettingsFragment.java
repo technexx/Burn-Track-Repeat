@@ -55,7 +55,7 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.color_settings_fragment_layout, rootKey);
-        changeSettingsValues = new ChangeSettingsValues();
+        changeSettingsValues = new ChangeSettingsValues(getContext());
 
         SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
 

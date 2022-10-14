@@ -57,7 +57,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public void onCreatePreferences(Bundle savedInstanceState, String rootKey) {
         setPreferencesFromResource(R.xml.sounds_settings_fragment_layout, rootKey);
-        changeSettingsValues = new ChangeSettingsValues();
+        changeSettingsValues = new ChangeSettingsValues(getContext());
 
         prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
 

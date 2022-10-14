@@ -61,7 +61,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int mPositionOfActiveCycle;
   int mNumberOfRoundsCompleted;
 
-  ChangeSettingsValues changeSettingsValues = new ChangeSettingsValues();
+  ChangeSettingsValues changeSettingsValues;
   int SET_COLOR;
   int BREAK_COLOR;
 
@@ -137,6 +137,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     mHighlightDeleted = false;
 
     moonFace = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
+
+    changeSettingsValues = new ChangeSettingsValues(mContext);
   }
 
   public void exitHighlightMode() {

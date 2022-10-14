@@ -1,10 +1,12 @@
 package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
 import android.util.Log;
 
+import androidx.core.content.ContextCompat;
 import androidx.preference.ListPreference;
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
@@ -13,8 +15,10 @@ import com.example.tragic.irate.simple.stopwatch.R;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.SoundSettingsFragment;
 
 public class ChangeSettingsValues {
+    Context mContext;
 
-    public ChangeSettingsValues() {
+    public ChangeSettingsValues(Context context) {
+        this.mContext = context;
     }
 
     public int assignSoundSettingNumericValue(String setting) {
@@ -84,7 +88,7 @@ public class ChangeSettingsValues {
 
         if (setting==0) color = Color.GREEN;
         if (setting==1) color = Color.RED;
-        if (setting==2) color = Color.BLUE;
+        if (setting==2) color = ContextCompat.getColor(mContext, R.color.blue_2);
         if (setting==3) color = Color.YELLOW;
         if (setting==4) color = Color.MAGENTA;
         if (setting==5) color = Color.CYAN;

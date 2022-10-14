@@ -40,7 +40,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   boolean mRoundSelected;
   int mPositionOfSelectedRound;
 
-  ChangeSettingsValues changeSettingsValues = new ChangeSettingsValues();
+  ChangeSettingsValues changeSettingsValues;
   int SET_COLOR;
   int BREAK_COLOR;
   int WORK_COLOR;
@@ -95,6 +95,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       public void onAnimationRepeat(Animation animation) {
       }
     });
+
+    changeSettingsValues  = new ChangeSettingsValues(mContext);
   }
 
   public void setScreenHeight(int height) {
