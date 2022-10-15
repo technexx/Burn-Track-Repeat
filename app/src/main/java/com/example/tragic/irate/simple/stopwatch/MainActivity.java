@@ -633,8 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Don't fade back arrow in highlight mode. Decrease fade duration on trash/edit buttons.
-
   //Todo: Test all both timers + stopwatch simultaneously, and with notifications.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -2255,19 +2253,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void instantiateAnimationAndColorMethods() {
     fadeInForCustomActionBar = new AlphaAnimation(0.0f, 1.0f);
-    fadeInForCustomActionBar.setDuration(750);
+    fadeInForCustomActionBar.setDuration(300);
     fadeInForCustomActionBar.setFillAfter(true);
 
     fadeOutForCustomActionBar = new AlphaAnimation(1.0f, 0.0f);
-    fadeOutForCustomActionBar.setDuration(750);
+    fadeOutForCustomActionBar.setDuration(300);
     fadeOutForCustomActionBar.setFillAfter(true);
 
     fadeInForEditCycleButton = new AlphaAnimation(0.0f, 1.0f);
-    fadeInForEditCycleButton.setDuration(750);
+    fadeInForEditCycleButton.setDuration(300);
     fadeInForEditCycleButton.setFillAfter(true);
 
     fadeOutForEditCycleButton = new AlphaAnimation(1.0f, 0.0f);
-    fadeOutForEditCycleButton.setDuration(750);
+    fadeOutForEditCycleButton.setDuration(300);
     fadeOutForEditCycleButton.setFillAfter(true);
 
     slideLeft = AnimationUtils.loadAnimation(getApplicationContext(), android.R.anim.slide_in_left);
