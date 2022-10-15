@@ -131,7 +131,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TabLayout.Tab savedCyclesTab;
   View timerView;
   View mainView;
-  View actionBarView;
   Calendar calendar;
   LongToStringConverters longToStringConverters;
 
@@ -631,6 +630,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
+  ActionBar mainActionBar;
+  ActionBar settingsActionBar;
+
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
@@ -643,7 +645,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
-  //Todo: First time pref fragment popUp is accessed, nothing is selected (e.g. silent is active, but not selected).
 
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
@@ -711,18 +712,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         if (rootSettingsFragment.isVisible()) {
-          if (phoneHeight <= 1920) {
-            getSupportActionBar().setCustomView(R.layout.custom_bar_h1920);
-          } else {
-            getSupportActionBar().setCustomView(R.layout.custom_bar);
-          }
-
-          //Necessary. Otherwise we lose reference to them for some reason.
-          edit_highlighted_cycle = findViewById(R.id.edit_highlighted_cycle);
-          cancelHighlight = findViewById(R.id.cancel_highlight);
-          delete_highlighted_cycle = findViewById(R.id.delete_highlighted_cycles);
-
-          setCustomActionBarDefaultViews();
+          sortButton.setVisibility(View.VISIBLE);
         }
 
         setTypeOfOnOptionsSelectedMenu(DEFAULT_MENU);
@@ -812,11 +802,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setTypeOfOnOptionsSelectedMenu(SETTINGS_MENU);
 
-      if (phoneHeight <= 1920) {
-        getSupportActionBar().setCustomView(R.layout.custom_action_bar_for_settings_h1920);
-      } else {
-        getSupportActionBar().setCustomView(R.layout.custom_action_bar_for_settings);
-      }
+      sortButton.setVisibility(View.GONE);
     }
   }
 
@@ -1678,7 +1664,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     stopWatchPopUpWindow.setOnDismissListener(() -> {
-      getSupportActionBar().show();
+//      getSupportActionBar().show();
       removeCycleHighlights();
 
       if (mode == 1) {
@@ -1902,15 +1888,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignMainLayoutClassesToIds() {
     mainView = findViewById(R.id.main_layout);
-    actionBarView = findViewById(R.id.custom_action_bar);
 
-    getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
-    getSupportActionBar().setDisplayShowCustomEnabled(true);
+    mainActionBar = getSupportActionBar();
+
+    mainActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
+    mainActionBar.setDisplayShowCustomEnabled(true);
 
     if (phoneHeight <= 1920) {
-      getSupportActionBar().setCustomView(R.layout.custom_bar_h1920);
+      mainActionBar.setCustomView(R.layout.custom_bar_h1920);
     } else {
-      getSupportActionBar().setCustomView(R.layout.custom_bar);
+      mainActionBar.setCustomView(R.layout.custom_bar);
     }
 
     fab = findViewById(R.id.fab);
