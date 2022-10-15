@@ -60,6 +60,18 @@ public class tdeeSettingsFragment extends Fragment {
 
     TextView bmrTextView;
 
+    @Override
+    public void onPause() {
+        super.onPause();
+    }
+
+    @Override
+    public void onStop() {
+//        saveSpinnerStatsToSharedPreferences(metricMode);
+//        saveUpdatedBmrSettings();
+        super.onStop();
+    }
+
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tdee_settings_fragment_layout, container, false);
         root.setBackgroundColor(getResources().getColor(R.color.darker_grey));
@@ -73,6 +85,12 @@ public class tdeeSettingsFragment extends Fragment {
         height_spinner = root.findViewById(R.id.height_spinner);
         activity_level_spinner = root.findViewById(R.id.activity_level_spinner);
         bmrTextView = root.findViewById(R.id.user_settings_calories_burned_textView);
+
+        gender_spinner.setOnItemSelectedListener(spinnerClickListener());
+        age_spinner.setOnItemSelectedListener(spinnerClickListener());
+        weight_spinner.setOnItemSelectedListener(spinnerClickListener());
+        height_spinner.setOnItemSelectedListener(spinnerClickListener());
+        activity_level_spinner.setOnItemSelectedListener(spinnerClickListener());
 
         imperialSettingButton = root.findViewById(R.id.imperial_setting);
         metricSettingButton = root.findViewById(R.id.metric_setting);
@@ -136,6 +154,22 @@ public class tdeeSettingsFragment extends Fragment {
         });
 
         return root;
+    }
+
+    private AdapterView.OnItemSelectedListener spinnerClickListener() {
+        return new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                saveUpdatedBmrSettings();
+                saveSpinnerStatsToSharedPreferences(metricMode);
+                bmrTextView.setText(calculatedBMRString());
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        };
     }
 
     private void toggleMetricAndImperial(boolean selectingMetric) {
