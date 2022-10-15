@@ -1,13 +1,16 @@
 package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.preference.Preference;
 import androidx.preference.PreferenceFragmentCompat;
+import androidx.preference.PreferenceScreen;
 
 import com.example.tragic.irate.simple.stopwatch.R;
 

@@ -631,10 +631,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   String savedTotalDailyTimeString;
   String savedSingleActivityString;
 
-  //Todo: Settings fragments should have different action bar ("Settings" up top - no sort feature, ***which needs to be removed anyway***).
-  //Todo: Smooth out stats frag on initial load.
-  //Todo: Play w/ priority level in notifications so it begins unminimized.
-
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
@@ -761,7 +757,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case R.id.delete_all_cycles:
         if (mode == 1 && workoutCyclesArray.size() == 0 || mode == 3 && pomArray.size() == 0) {
-          showToastIfNoneActive("No cycles to delete!");
+          showToastIfNoneActive("Nothing to delete!");
         } else {
           delete_all_text.setText(R.string.delete_all_cycles);
           deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER, 0, 0);
