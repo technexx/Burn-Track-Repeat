@@ -948,8 +948,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         getActivity().runOnUiThread(()->{
-            calendarDayWithActivityDecorator.setCalendarDayList(calendarDayList);
-            calendarView.addDecorator(calendarDayWithActivityDecorator);
+//            calendarDayWithActivityDecorator.setCalendarDayList(calendarDayList);
+//            calendarView.addDecorator(calendarDayWithActivityDecorator);
         });
     }
 

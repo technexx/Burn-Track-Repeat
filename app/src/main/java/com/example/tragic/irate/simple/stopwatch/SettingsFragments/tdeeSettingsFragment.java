@@ -176,7 +176,7 @@ public class tdeeSettingsFragment extends Fragment {
         genderList.add(getString(R.string.female));
     }
 
-    private void saveSpinnerStatsToSharedPreferences(boolean savingMetric) {
+    public void saveSpinnerStatsToSharedPreferences(boolean savingMetric) {
         if (savingMetric) {
             prefEdit.putInt("genderPositionMetric", gender_spinner.getSelectedItemPosition());
             prefEdit.putInt("agePositionMetric", age_spinner.getSelectedItemPosition());
@@ -206,7 +206,7 @@ public class tdeeSettingsFragment extends Fragment {
         prefEdit.apply();
     }
 
-    private void saveUpdatedBmrSettings() {
+    public void saveUpdatedBmrSettings() {
         prefEdit.putInt("savedBmr", calculateBMR());
         prefEdit.apply();
     }

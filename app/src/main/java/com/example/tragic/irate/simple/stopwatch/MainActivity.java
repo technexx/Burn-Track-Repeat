@@ -635,7 +635,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Tdee setting are visually retained in spinners even when not updated - can be confusing.
       //Todo: Test imperial/metric back and forth + saving.
-  //Todo: Active cycle highlight color same as tabLayout background.
 
   //Todo: Test all both timers + stopwatch simultaneously, and with notifications.
   //Todo: Test Moto G5 + low res nexus emulator.
@@ -649,15 +648,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Backup cloud option.
   //Todo: Have a fun icon made!
 
-  //Todo: Option for ringtones?
-  //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
-
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
 
+  //Todo: Option for ringtones?
+  //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Add Day/Night modes.
+  //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle it.
+
 
   //Todo: We can also commit just specific files, remember!
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
@@ -729,6 +729,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || disclaimerFragment.isVisible()) {
+
+      if (tdeeSettingsFragment.isVisible()) {
+//        tdeeSettingsFragment.saveSpinnerStatsToSharedPreferences(false);
+//        tdeeSettingsFragment.saveUpdatedBmrSettings();
+      }
+
       getSupportFragmentManager().beginTransaction()
               .setCustomAnimations(
                       0,  // enter
