@@ -633,6 +633,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Don't fade back arrow in highlight mode. Decrease fade duration on trash/edit buttons.
+
+  //Todo: Test all both timers + stopwatch simultaneously, and with notifications.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
@@ -642,7 +645,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
+  //Todo: Have a fun icon made!
 
+  //Todo: Option for ringtones?
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
 
@@ -3029,11 +3034,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
 
     String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
-    String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_once");
+    String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_twice");
     boolean defaultSoundSettingForLastRound = prefShared.getBoolean("soundSettingForLastRound", true);
 
     String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
-    String defaultSoundSettingForMiniBreak = prefShared.getString("soundSettingForMiniBreaks", "vibrate_once");
+    String defaultSoundSettingForMiniBreak = prefShared.getString("soundSettingForMiniBreaks", "vibrate_twice");
     boolean defaultSoundSettingForFullBreak = prefShared.getBoolean("soundSettingForFullBreak", true);
 
     String defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "green_setting");
@@ -3041,7 +3046,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     String defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "green_setting");
     String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
-    String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "magenta_setting");
+    String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "cyan_setting");
 
     vibrationSettingForSets = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
@@ -3120,8 +3125,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setEndOfRoundSounds(int vibrationSetting, boolean repeat) {
     long[] vibrationEffect = changeSettingsValues.getVibrationSetting(vibrationSetting);
-
-    Log.i("testVib", "array size is " + vibrationEffect.length);
 
     if (vibrationSetting == 1 || vibrationSetting == 2 || vibrationSetting == 3) {
       if (vibrator.hasVibrator()) {
