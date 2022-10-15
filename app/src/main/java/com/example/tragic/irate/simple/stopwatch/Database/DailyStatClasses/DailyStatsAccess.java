@@ -809,7 +809,7 @@ public class DailyStatsAccess {
     }
 
     public int bmrCaloriesBurned() {
-        int savedBmr = sharedPreferences.getInt("savedBmr", 1819);
+        int savedBmr = sharedPreferences.getInt("savedBmr", 2772);
         return savedBmr * numberOfDaysSelected;
     }
 

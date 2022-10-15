@@ -282,7 +282,7 @@
     <string name="settings">Settings</string>
     <string name="about_settings">Version 1.0.1\n\nAuthor: Brian S.</string>
 
-    <string name="about_stats">\"Metabolic Rate\" are the amount of calories that you burn simply going about your day to day life. This calculation is based on your user settings.\n\n\"Activities\" are the calories you burn for specific activities. They take the place of your Metabolic Rate.\n\nFor example, if you burn 2400 calories per day as a Metabolic Rate, and then play basketball for 2 hours, your total calories burned for that day will be:\n\n(100 * 22 hours) + (464 * 2 hours) = 3218.
+    <string name="about_stats">\"Metabolic Rate\" are the amount of calories that you burn simply going about your day to day life. This calculation is based on your user settings.\n\n\"Activities\" are the calories you burn for specific activities. They take the place of your Metabolic Rate.\n\nFor example, if you burn 100 calories per hour as a Metabolic Rate, and then play basketball for 2 hours, your total calories burned for that day will be:\n\n(100 * 22 hours) + (464 * 2 hours) = 3218.
     </string>
 
     <string name="about_tdee">\"TDEE\" stands for \"Total Daily Energy Expenditure,\" which is a fancy way of counting how many calories you burn each day.\n\n\"BMR\" stands for \"Basal Metabolic Rate,\" and represents how many calories you burn while doing absolutely nothing (e.g. sitting motionless, sleeping).\n\nThis calculator will show your BMR based upon your physical composition, and approximate your TDEE based on your level of daily activity.</string>

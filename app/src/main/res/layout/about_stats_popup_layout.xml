@@ -4,7 +4,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:background="@drawable/rounded_corners"
-    android:backgroundTint="@color/mid_grey"
+    android:backgroundTint="@color/dark_grey"
     android:paddingStart="10dp"
     android:paddingEnd="10dp"
     android:paddingTop="5dp"

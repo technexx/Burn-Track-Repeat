@@ -220,13 +220,13 @@ public class tdeeSettingsFragment extends Fragment {
         if (selectingMetric) {
             genderPosition = sharedPreferences.getInt("genderPositionMetric", 0);
             agePosition = sharedPreferences.getInt("agePositionMetric", 0);
-            weightPosition = sharedPreferences.getInt("weightPositionMetric", 0);
-            heightPosition = sharedPreferences.getInt("heightPositionMetric", 0);
+            weightPosition = sharedPreferences.getInt("weightPositionMetric", 25);
+            heightPosition = sharedPreferences.getInt("heightPositionMetric", 60);
         } else {
             genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
             agePosition = sharedPreferences.getInt("agePositionImperial", 0);
-            weightPosition = sharedPreferences.getInt("weightPositionImperial", 0);
-            heightPosition = sharedPreferences.getInt("heightPositionImperial", 0);
+            weightPosition = sharedPreferences.getInt("weightPositionImperial", 50);
+            heightPosition = sharedPreferences.getInt("heightPositionImperial", 24);
         }
 
         gender_spinner.setSelection(genderPosition);
@@ -234,9 +234,8 @@ public class tdeeSettingsFragment extends Fragment {
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
 
-        int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 0);
+        int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 3);
         activity_level_spinner.setSelection(activityLevelPosition);
-
     }
 
     private int getIntegerValueFromFullSpinnerString(Spinner spinner) {

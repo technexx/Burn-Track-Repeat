@@ -633,6 +633,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Tdee setting are visually retained in spinners even when not updated - can be confusing.
+      //Todo: Test imperial/metric back and forth + saving.
+  //Todo: Active cycle highlight color same as tabLayout background.
+
   //Todo: Test all both timers + stopwatch simultaneously, and with notifications.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -3094,7 +3098,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     userGender = sp.getString("tdeeGender", "male");
     userAge = sp.getInt("tdeeAge,", 18);
     userWeight = sp.getInt("tdeeWeight,", 150);
-    userHeight = sp.getInt("tdeeHeight,", 66);
+    userHeight = sp.getInt("tdeeHeight,", 72);
   }
 
   public void setTypeOfOnOptionsSelectedMenu(int menuType) {
