@@ -48,7 +48,7 @@
 
                 <ListPreference
                     android:key="soundSettingForMiniBreaks"
-                    android:title="Break"
+                    android:title="Breaks"
                     android:entries="@array/sound_setting_options"
                     android:entryValues="@array/sound_setting_option_values"
                     android:defaultValue="">

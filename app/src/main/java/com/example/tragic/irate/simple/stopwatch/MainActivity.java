@@ -633,9 +633,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Selecting breaks during cycles addition adds sets. Edit/Main/Timer all out of sync w/ types of round.
+  //Todo: Timer near end of a second iteration can show as 1 less second in notifications.
 
-  //Todo: Test all both timers + stopwatch simultaneously, and with notifications.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
@@ -3062,6 +3061,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     vibrationSettingForMiniBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreak);
     isFullBreakSoundContinuous = changeSettingsValues.assignFinalRoundSwitchValue(defaultSoundSettingForFullBreak);
 
+
     int setColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
     int breakColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
     int workColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForWork);
@@ -5235,7 +5235,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (trackActivityWithinCycle) {
       setAllActivityTimesAndCaloriesToTextViews();
     } else {
-//      roundCycleTimeValuesForEndOfRoundDisplay();
       roundCycleSetTimeDown();
       roundCycleBreakTimeDown();
 
@@ -5298,10 +5297,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     removePomCycleTimeRunnable();
 
-    if (pomDotCounter < 8) {
-      pomDotCounter++;
-    }
-
     if (endingEarly) {
       if (timer != null) timer.cancel();
       if (objectAnimatorPom != null) objectAnimatorPom.cancel();
@@ -5315,16 +5310,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 4:
       case 6:
         setEndOfRoundSounds(vibrationSettingForWork, false);
+        Log.i("testSettings", "sound for work going!");
         break;
       case 1:
       case 3:
       case 5:
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
+        Log.i("testSettings", "sound for mini break going!");
         break;
       case 7:
         boolean isAlertRepeating = false;
         if (isFullBreakSoundContinuous) isAlertRepeating = true;
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, isAlertRepeating);
+    }
+
+    if (pomDotCounter < 8) {
+      pomDotCounter++;
     }
 
     mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
