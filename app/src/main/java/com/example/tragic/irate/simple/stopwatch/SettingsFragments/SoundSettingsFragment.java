@@ -97,8 +97,6 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
         setDefaultSoundSettingsIfNoneSelected();
 
-        Log.i("testSet", "set sound default from fragment is " + defaultSoundSettingForSets);
-
         setPreference.setOnPreferenceChangeListener((preference, newValue) -> {
             int setValue = convertSoundSettingObjectToInteger(newValue);
             mOnChangedSoundSetting.changeSoundSetting(SET_SETTING, setValue);

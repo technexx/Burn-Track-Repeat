@@ -633,8 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Timer near end of a second iteration can show as 1 less second in notifications.
-
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
@@ -3049,10 +3047,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
     String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "cyan_setting");
 
-    Log.i("testSet", "set sound default from MAIN is " + defaultSoundSettingForSets);
-    Log.i("testSet", "break sound default from MAIN is " + defaultSoundSettingForBreaks);
-    Log.i("testSet", "break color default from MAIN is " + defaultColorSettingForMiniBreak);
-
     vibrationSettingForSets = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
     isLastRoundSoundContinuous = changeSettingsValues.assignFinalRoundSwitchValue(defaultSoundSettingForLastRound);
@@ -3677,8 +3671,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (timeLeft < 100) {
       timeRemaining = "00:00";
     } else {
-      long roundedTimeLeft = roundToNearestFullThousandth(timeLeft);
-      timeRemaining = longToStringConverters.convertTimerValuesToStringForNotifications(roundedTimeLeft / 1000);
+//      long roundedTimeLeft = roundToNearestFullThousandth(timeLeft);
+      timeRemaining = longToStringConverters.convertTimerValuesToStringForNotifications(dividedMillisForTimerDisplay(timeLeft));
     }
 
     return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
@@ -5310,13 +5304,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 4:
       case 6:
         setEndOfRoundSounds(vibrationSettingForWork, false);
-        Log.i("testSettings", "sound for work going!");
         break;
       case 1:
       case 3:
       case 5:
         setEndOfRoundSounds(vibrationSettingForMiniBreaks, false);
-        Log.i("testSettings", "sound for mini break going!");
         break;
       case 7:
         boolean isAlertRepeating = false;
