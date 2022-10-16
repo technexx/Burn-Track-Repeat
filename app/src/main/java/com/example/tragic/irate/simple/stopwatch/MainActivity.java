@@ -633,9 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Tdee setting are visually retained in spinners even when not updated - can be confusing.
-      //Todo: Test imperial/metric back and forth + saving.
-
   //Todo: Test all both timers + stopwatch simultaneously, and with notifications.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -3034,7 +3031,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setDefaultUserSettings() {
     retrieveUserStats();
 
-    SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(this);
+    SharedPreferences prefShared = getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
     String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
     String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_twice");
@@ -3050,6 +3047,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "green_setting");
     String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
     String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "cyan_setting");
+
+    Log.i("testSet", "set sound default from MAIN is " + defaultSoundSettingForSets);
+    Log.i("testSet", "break sound default from MAIN is " + defaultSoundSettingForBreaks);
+    Log.i("testSet", "break color default from MAIN is " + defaultColorSettingForMiniBreak);
 
     vibrationSettingForSets = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);

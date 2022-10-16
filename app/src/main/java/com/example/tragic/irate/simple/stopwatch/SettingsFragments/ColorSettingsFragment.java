@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch.SettingsFragments;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -57,7 +58,7 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.color_settings_fragment_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues(getContext());
 
-        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences prefShared = getActivity().getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
         setPreference = findPreference("colorSettingForSets");
         breakPreference = findPreference("colorSettingForBreaks");
@@ -69,7 +70,7 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
         defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "red_setting");
         defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "green_setting");
         defaultColorSettingForMiniBreaks = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
-        defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "magenta_setting");
+        defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "cyan_setting");
 
         CharSequence[] colorEntryListForSets = setPreference.getEntries();
         CharSequence[] colorEntryListForBreaks = breakPreference.getEntries();

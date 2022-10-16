@@ -38,8 +38,6 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
     String defaultSoundSettingForWork;
     String defaultSoundSettingForMiniBreaks;
 
-    SharedPreferences prefShared;
-
     public interface onChangedSoundSetting {
         void changeSoundSetting(int typeOfRound, int settingNumber);
     }
@@ -61,7 +59,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.sounds_settings_fragment_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues(getContext());
 
-        prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences prefShared = getActivity().getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
         setPreference = findPreference("soundSettingForSets");
         breakPreference = findPreference("soundSettingForBreaks");
@@ -72,10 +70,10 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         SwitchPreference fullBreakPreference = findPreference("soundSettingForFullBreak");
 
         defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
-        defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_once");
+        defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_twice");
 
         defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
-        defaultSoundSettingForMiniBreaks = prefShared.getString("soundSettingForMiniBreaks", "vibrate_once");
+        defaultSoundSettingForMiniBreaks = prefShared.getString("soundSettingForMiniBreaks", "vibrate_twice");
 
         CharSequence[] soundEntryListForSets = setPreference.getEntries();
         CharSequence[] soundEntryListForBreaks = breakPreference.getEntries();
@@ -98,6 +96,8 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         miniBreakPreference.setSummary(defaultMiniBreaksString);
 
         setDefaultSoundSettingsIfNoneSelected();
+
+        Log.i("testSet", "set sound default from fragment is " + defaultSoundSettingForSets);
 
         setPreference.setOnPreferenceChangeListener((preference, newValue) -> {
             int setValue = convertSoundSettingObjectToInteger(newValue);
