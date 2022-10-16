@@ -2887,22 +2887,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     positionOfSelectedCycle = (receivedHighlightPositions.get(0));
 
-    cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
+    if (mode==1) {
+      cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
+      toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
 
-    toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
+      if (cycleHasActivityAssigned) {
+        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+        retrieveCycleActivityPositionAndMetScoreFromCycleList();
+      }
 
-    if (cycleHasActivityAssigned) {
-      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
-      retrieveCycleActivityPositionAndMetScoreFromCycleList();
+      String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
+      setTdeeSpinnersToDefaultValues();
+      addTDEEfirstMainTextView.setText(tdeeString);
     }
-
-    String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
-    setTdeeSpinnersToDefaultValues();
-    addTDEEfirstMainTextView.setText(tdeeString);
 
     if (mode == 1) cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
     if (mode == 3) cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
-
     cycleNameEdit.setText(cycleTitle);
   }
 
@@ -3870,7 +3870,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editHeaderSelected == 2) breakValue = timerValueBoundsFormula(5, 3600, value);
         break;
       case 3:
-        pomValue1 = timerValueBoundsFormula(600, 3600, value);
+        pomValue1 = timerValueBoundsFormula(600, 5400, value);
         pomValue2 = timerValueBoundsFormula(180, 600, value);
         pomValue3 = timerValueBoundsFormula(900, 3600, value);
         break;
