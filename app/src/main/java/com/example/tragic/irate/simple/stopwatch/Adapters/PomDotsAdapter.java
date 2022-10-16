@@ -1,6 +1,7 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
+import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.GradientDrawable;
 import android.util.Log;
@@ -45,6 +46,10 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
     Typeface narrowFont;
     Typeface narrowFontBold;
 
+    int mThemeMode;
+    int DAY_MODE = 0;
+    int NIGHT_MODE = 1;
+
     public PomDotsAdapter(Context context, List<String> pomCycleRoundsAsStringList) {
         this.mContext = context; this.mPomCycleRoundsAsStringsList = pomCycleRoundsAsStringList;
         instantiateLists();
@@ -61,6 +66,10 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
 
     public void setScreenHeight(int height) {
         this.mScreenHeight = height;
+    }
+
+    public void setDayOrNightMode(int themeMode) {
+        this.mThemeMode = themeMode;
     }
 
     @NonNull
@@ -97,6 +106,8 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
             holder.roundText.setTypeface(Typeface.DEFAULT);
         }
 
+        holder.fullView.setBackground(dotsBorder);
+
         switch (position) {
             case 0: case 2: case 4: case 6:
                 dotsBorder.setColor(WORK_COLOR);
@@ -109,7 +120,7 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
                 break;
         }
 
-        holder.fullView.setBackground(dotsBorder);
+        dotsBorder.setStroke(3, pomDotsStrokeColor(mThemeMode));
 
         if (mPomDotCounter == position) {
             fadeAlpha();
@@ -119,6 +130,19 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         } else {
             holder.fullView.setAlpha(1.0f);
         }
+    }
+
+    private int pomDotsStrokeColor(int theme) {
+        int colorToReturn = 0;
+
+        if (theme == DAY_MODE) {
+            colorToReturn = Color.BLACK;
+        }
+        if (theme == NIGHT_MODE) {
+            colorToReturn = Color.WHITE;
+        }
+
+        return colorToReturn;
     }
 
     private float textSizeForEachRound(int numberOfRoundChars) {

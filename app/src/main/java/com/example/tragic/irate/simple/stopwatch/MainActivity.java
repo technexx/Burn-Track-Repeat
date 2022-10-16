@@ -6255,6 +6255,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     next_round.setImageDrawable(nextRoundDrawableWrapped);
 
     dotsAdapter.setDayOrNightMode(themeMode);
+    pomDotsAdapter.setDayOrNightMode(themeMode);
   }
 
   private void toggleDayAndNightModeForStatsFragment() {
