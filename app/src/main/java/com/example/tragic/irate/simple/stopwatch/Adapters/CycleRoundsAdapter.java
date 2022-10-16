@@ -65,14 +65,16 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     this.mOnRoundSelected = xOnRoundSelected;
   }
 
-  public void changeColorSetting(int typeOFRound, int settingNumber) {
+  public void setColorSettingsFromMainActivity(int roundCategory, int settingNumber) {
     int color = changeSettingsValues.assignColor(settingNumber);
 
-    if (typeOFRound==1) SET_COLOR = color;
-    if (typeOFRound==2) BREAK_COLOR = color;
-    if (typeOFRound==3) WORK_COLOR = color;
-    if (typeOFRound==4) MINI_BREAK_COLOR = color;
-    if (typeOFRound==5) FULL_BREAK_COLOR = color;
+    if (roundCategory==1) SET_COLOR = color;
+    if (roundCategory==2) BREAK_COLOR = color;
+    if (roundCategory==3) WORK_COLOR = color;
+    if (roundCategory==4) MINI_BREAK_COLOR = color;
+    if (roundCategory==5) FULL_BREAK_COLOR = color;
+
+//    Log.i("testColor", "round category is " + roundCategory + " and " + "set color integer in adapter one is " + settingNumber);
   }
 
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {

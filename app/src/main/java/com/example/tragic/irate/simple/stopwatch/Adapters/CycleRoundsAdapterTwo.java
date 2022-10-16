@@ -62,13 +62,15 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
         this.mOnRoundSelectedSecondAdapter = xOnRoundSelectedSecondAdapter;
     }
 
-    public void changeColorSetting(int typeOFRound, int settingNumber) {
+    public void setColorSettingsFromMainActivity(int roundCategory, int settingNumber) {
         int color = changeSettingsValues.assignColor(settingNumber);
 
-        if (typeOFRound==1) SET_COLOR = color;
-        if (typeOFRound==2) BREAK_COLOR = color;
-    }
+        if (roundCategory==1) SET_COLOR = color;
+        if (roundCategory==2) BREAK_COLOR = color;
 
+        Log.i("testColor", "round category is " + roundCategory + " and " + "set color integer in adapter two is " + settingNumber);
+
+    }
 
     public CycleRoundsAdapterTwo(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound) {
         this.mContext = context; this.mWorkOutList = workoutList; mTypeOfRound = typeOfRound;
@@ -174,8 +176,7 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 break;
         }
 
-        Log.i("testAdd", "set color is " + SET_COLOR);
-        Log.i("testAdd", "break color is " + BREAK_COLOR);
+        Log.i("testColor", "type of round list is " + mTypeOfRound);
 
         //Only runs fade animation if adding/subtracting rounds.
         if (mRunRoundAnimation) {

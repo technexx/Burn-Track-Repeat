@@ -633,6 +633,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Selecting breaks during cycles addition adds sets. Edit/Main/Timer all out of sync w/ types of round.
+
   //Todo: Test all both timers + stopwatch simultaneously, and with notifications.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -653,7 +655,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Option for ringtones?
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Add Day/Night modes.
-  //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle it.
+  //Todo: Possibly do green/red for day decorator depending on loss/gain of calries. Or have option to toggle it.
 
 
   //Todo: We can also commit just specific files, remember!
@@ -921,8 +923,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   @Override
   public void changeColorSetting(int receivedMode, int typeOFRound, int settingNumber) {
-    cycleRoundsAdapter.changeColorSetting(typeOFRound, settingNumber);
-    cycleRoundsAdapterTwo.changeColorSetting(typeOFRound, settingNumber);
+    cycleRoundsAdapter.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
+    cycleRoundsAdapterTwo.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
 
     if (receivedMode == 1) {
       savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
@@ -3078,13 +3080,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomDotsAdapter.changeColorSetting(4, miniBreakColorNumericValue);
     pomDotsAdapter.changeColorSetting(5, fullBreakColorNumericValue);
 
-    cycleRoundsAdapter.changeColorSetting(1, setColorNumericValue);
-    cycleRoundsAdapter.changeColorSetting(2, breakColorNumericValue);
-    cycleRoundsAdapter.changeColorSetting(3, workColorNumericValue);
-    cycleRoundsAdapter.changeColorSetting(4, miniBreakColorNumericValue);
-    cycleRoundsAdapter.changeColorSetting(5, fullBreakColorNumericValue);
-    cycleRoundsAdapterTwo.changeColorSetting(1, setColorNumericValue);
-    cycleRoundsAdapterTwo.changeColorSetting(2, setColorNumericValue);
+    cycleRoundsAdapter.setColorSettingsFromMainActivity(1, setColorNumericValue);
+    cycleRoundsAdapter.setColorSettingsFromMainActivity(2, breakColorNumericValue);
+    cycleRoundsAdapter.setColorSettingsFromMainActivity(3, workColorNumericValue);
+    cycleRoundsAdapter.setColorSettingsFromMainActivity(4, miniBreakColorNumericValue);
+    cycleRoundsAdapter.setColorSettingsFromMainActivity(5, fullBreakColorNumericValue);
+    cycleRoundsAdapterTwo.setColorSettingsFromMainActivity(1, setColorNumericValue);
+    cycleRoundsAdapterTwo.setColorSettingsFromMainActivity(2, breakColorNumericValue);
 
     savedCycleAdapter.changeColorSetting(1, setColorNumericValue);
     savedCycleAdapter.changeColorSetting(2, breakColorNumericValue);
