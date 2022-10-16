@@ -67,9 +67,6 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
 
         if (roundCategory==1) SET_COLOR = color;
         if (roundCategory==2) BREAK_COLOR = color;
-
-        Log.i("testColor", "round category is " + roundCategory + " and " + "set color integer in adapter two is " + settingNumber);
-
     }
 
     public CycleRoundsAdapterTwo(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound) {

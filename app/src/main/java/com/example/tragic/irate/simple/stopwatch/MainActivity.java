@@ -927,17 +927,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
 
     if (receivedMode == 1) {
-      savedCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
+      savedCycleAdapter.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
       savedCycleAdapter.notifyDataSetChanged();
 
-      dotsAdapter.changeColorSetting(typeOFRound, settingNumber);
+      dotsAdapter.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
     }
 
     if (receivedMode == 3) {
-      savedPomCycleAdapter.changeColorSetting(typeOFRound, settingNumber);
+      savedPomCycleAdapter.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
       savedPomCycleAdapter.notifyDataSetChanged();
 
-      pomDotsAdapter.changeColorSetting(typeOFRound, settingNumber);
+      pomDotsAdapter.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
     }
 
     assignColorSettingValues(typeOFRound, settingNumber);
@@ -3074,11 +3074,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     miniBreakColor = changeSettingsValues.assignColor(miniBreakColorNumericValue);
     fullBreakColor = changeSettingsValues.assignColor(fullBreakColorNumericValue);
 
-    dotsAdapter.changeColorSetting(1, setColorNumericValue);
-    dotsAdapter.changeColorSetting(2, breakColorNumericValue);
-    pomDotsAdapter.changeColorSetting(3, workColorNumericValue);
-    pomDotsAdapter.changeColorSetting(4, miniBreakColorNumericValue);
-    pomDotsAdapter.changeColorSetting(5, fullBreakColorNumericValue);
+    dotsAdapter.setColorSettingsFromMainActivity(1, setColorNumericValue);
+    dotsAdapter.setColorSettingsFromMainActivity(2, breakColorNumericValue);
+    pomDotsAdapter.setColorSettingsFromMainActivity(3, workColorNumericValue);
+    pomDotsAdapter.setColorSettingsFromMainActivity(4, miniBreakColorNumericValue);
+    pomDotsAdapter.setColorSettingsFromMainActivity(5, fullBreakColorNumericValue);
 
     cycleRoundsAdapter.setColorSettingsFromMainActivity(1, setColorNumericValue);
     cycleRoundsAdapter.setColorSettingsFromMainActivity(2, breakColorNumericValue);
@@ -3088,12 +3088,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapterTwo.setColorSettingsFromMainActivity(1, setColorNumericValue);
     cycleRoundsAdapterTwo.setColorSettingsFromMainActivity(2, breakColorNumericValue);
 
-    savedCycleAdapter.changeColorSetting(1, setColorNumericValue);
-    savedCycleAdapter.changeColorSetting(2, breakColorNumericValue);
+    savedCycleAdapter.setColorSettingsFromMainActivity(1, setColorNumericValue);
+    savedCycleAdapter.setColorSettingsFromMainActivity(2, breakColorNumericValue);
 
-    savedPomCycleAdapter.changeColorSetting(3, workColorNumericValue);
-    savedPomCycleAdapter.changeColorSetting(4, miniBreakColorNumericValue);
-    savedPomCycleAdapter.changeColorSetting(5, fullBreakColorNumericValue);
+    savedPomCycleAdapter.setColorSettingsFromMainActivity(3, workColorNumericValue);
+    savedPomCycleAdapter.setColorSettingsFromMainActivity(4, miniBreakColorNumericValue);
+    savedPomCycleAdapter.setColorSettingsFromMainActivity(5, fullBreakColorNumericValue);
   }
 
   private void retrieveUserStats() {

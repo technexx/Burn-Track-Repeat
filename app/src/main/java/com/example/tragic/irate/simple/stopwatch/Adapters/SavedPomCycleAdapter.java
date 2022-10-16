@@ -51,7 +51,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int BREAK_COLOR;
     int REST_COLOR;
 
-    public void changeColorSetting(int typeOFRound, int settingNumber) {
+    public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
         if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==4) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==5) REST_COLOR = changeSettingsValues.assignColor(settingNumber);

@@ -75,7 +75,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int DAY_MODE = 0;
   int NIGHT_MODE = 1;
 
-  public void changeColorSetting(int typeOFRound, int settingNumber) {
+  public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
     if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
   }

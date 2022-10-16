@@ -191,7 +191,7 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
         }
     }
 
-    public void changeColorSetting(int typeOFRound, int settingNumber) {
+    public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
         if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==4) MINI_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==5) FULL_BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);

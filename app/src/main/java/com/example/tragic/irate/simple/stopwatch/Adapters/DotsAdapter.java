@@ -147,7 +147,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
         if (mRoundTypeList.get(position) == 2) {
             dotsBorder.setColor(0);
-            dotsBorder.setStroke(3, dotColorStrokeForInfinityRounds(mThemeMode));
+            dotsBorder.setStroke(3, dotColorStrokeForSetInfinityRounds(mThemeMode));
         }
 
         if (mRoundTypeList.get(position) == 3) {
@@ -157,7 +157,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
 
         if (mRoundTypeList.get(position) == 4) {
             dotsBorder.setColor(0);
-            dotsBorder.setStroke(3, dotColorStrokeForInfinityRounds(mThemeMode));
+            dotsBorder.setStroke(3, dotColorStrokeForBreakInfinityRounds(mThemeMode));
         }
 
         if (mCyclesRoundCount - mCycleRoundsLeft == position) {
@@ -196,7 +196,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         return colorToReturn;
     }
 
-    private int dotColorStrokeForInfinityRounds(int theme) {
+    private int dotColorStrokeForSetInfinityRounds(int theme) {
         int colorToReturn = 0;
 
         if (theme == DAY_MODE) {
@@ -204,6 +204,19 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
         if (theme == NIGHT_MODE) {
             colorToReturn = SET_COLOR;
+        }
+
+        return colorToReturn;
+    }
+
+    private int dotColorStrokeForBreakInfinityRounds(int theme) {
+        int colorToReturn = 0;
+
+        if (theme == DAY_MODE) {
+            colorToReturn = BREAK_COLOR;
+        }
+        if (theme == NIGHT_MODE) {
+            colorToReturn = BREAK_COLOR;
         }
 
         return colorToReturn;
@@ -282,7 +295,7 @@ public class DotsAdapter extends RecyclerView.Adapter<DotsAdapter.DotsViewHolder
         }
     }
 
-    public void changeColorSetting(int typeOFRound, int settingNumber) {
+    public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
         if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
     }
