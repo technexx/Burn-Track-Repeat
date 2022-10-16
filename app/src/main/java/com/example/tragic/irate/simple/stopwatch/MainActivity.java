@@ -730,11 +730,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (soundSettingsFragment.isVisible() || colorSettingsFragment.isVisible() || tdeeSettingsFragment.isVisible() || disclaimerFragment.isVisible()) {
 
-      if (tdeeSettingsFragment.isVisible()) {
-//        tdeeSettingsFragment.saveSpinnerStatsToSharedPreferences(false);
-//        tdeeSettingsFragment.saveUpdatedBmrSettings();
-      }
-
       getSupportFragmentManager().beginTransaction()
               .setCustomAnimations(
                       0,  // enter

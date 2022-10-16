@@ -167,16 +167,14 @@
     <TextView
         android:id="@+id/user_settings_calories_burned_header"
         android:text="@string/total_daily_calories_burned"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/user_settings_calories_burned_textView"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/activity_level_spinner"
         android:layout_marginTop="32dp"
-        android:layout_marginStart="4dp"
         android:textStyle="bold"
-        android:textSize="20sp"
-        android:minLines="2">
+        android:textSize="24sp">
     </TextView>
 
     <TextView
@@ -184,10 +182,11 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/activity_level_spinner"
-        android:layout_marginTop="32dp"
-        android:layout_marginStart="175dp"
-        android:textSize="22sp">
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/user_settings_calories_burned_header"
+        android:layout_marginTop="12dp"
+        android:textSize="26sp"
+        android:textStyle="bold">
     </TextView>
 
     <com.google.android.material.button.MaterialButton

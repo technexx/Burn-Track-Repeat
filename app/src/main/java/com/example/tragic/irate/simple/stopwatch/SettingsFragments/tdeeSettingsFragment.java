@@ -98,6 +98,8 @@ public class tdeeSettingsFragment extends Fragment {
         metricSettingButton.setAlpha(0.5f);
 
         Button saveTdeeSettingsButton = root.findViewById(R.id.save_tdee_settings_button);
+        //Removed for moment
+        saveTdeeSettingsButton.setVisibility(View.GONE);
 
         imperialSettingButton.setText(R.string.imperial);
         metricSettingButton.setText(R.string.metric);
@@ -212,17 +214,17 @@ public class tdeeSettingsFragment extends Fragment {
 
     public void saveSpinnerStatsToSharedPreferences(boolean savingMetric) {
         if (savingMetric) {
-            prefEdit.putInt("genderPositionMetric", gender_spinner.getSelectedItemPosition());
-            prefEdit.putInt("agePositionMetric", age_spinner.getSelectedItemPosition());
+//            prefEdit.putInt("genderPositionMetric", gender_spinner.getSelectedItemPosition());
+//            prefEdit.putInt("agePositionMetric", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionMetric", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionMetric", height_spinner.getSelectedItemPosition());
-            prefEdit.putInt("activityLevelPositionMetric", activity_level_spinner.getSelectedItemPosition());
+//            prefEdit.putInt("activityLevelPositionMetric", activity_level_spinner.getSelectedItemPosition());
         } else {
-            prefEdit.putInt("genderPositionImperial", gender_spinner.getSelectedItemPosition());
-            prefEdit.putInt("agePositionImperial", age_spinner.getSelectedItemPosition());
+//            prefEdit.putInt("genderPositionImperial", gender_spinner.getSelectedItemPosition());
+//            prefEdit.putInt("agePositionImperial", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionImperial", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionImperial", height_spinner.getSelectedItemPosition());
-            prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
+//            prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
         }
 
         prefEdit.putBoolean("metricMode", metricMode);
@@ -252,24 +254,24 @@ public class tdeeSettingsFragment extends Fragment {
         int heightPosition;
 
         if (selectingMetric) {
-            genderPosition = sharedPreferences.getInt("genderPositionMetric", 0);
-            agePosition = sharedPreferences.getInt("agePositionMetric", 0);
+//            genderPosition = sharedPreferences.getInt("genderPositionMetric", 0);
+//            agePosition = sharedPreferences.getInt("agePositionMetric", 0);
             weightPosition = sharedPreferences.getInt("weightPositionMetric", 25);
             heightPosition = sharedPreferences.getInt("heightPositionMetric", 60);
         } else {
-            genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
-            agePosition = sharedPreferences.getInt("agePositionImperial", 0);
+//            genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
+//            agePosition = sharedPreferences.getInt("agePositionImperial", 0);
             weightPosition = sharedPreferences.getInt("weightPositionImperial", 50);
             heightPosition = sharedPreferences.getInt("heightPositionImperial", 24);
         }
 
-        gender_spinner.setSelection(genderPosition);
-        age_spinner.setSelection(agePosition);
+//        gender_spinner.setSelection(genderPosition);
+//        age_spinner.setSelection(agePosition);
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
 
-        int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 3);
-        activity_level_spinner.setSelection(activityLevelPosition);
+//        int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 3);
+//        activity_level_spinner.setSelection(activityLevelPosition);
     }
 
     private int getIntegerValueFromFullSpinnerString(Spinner spinner) {
