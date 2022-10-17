@@ -352,6 +352,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header"            app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_2"
             app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_3"
+            android:layout_marginStart="8dp"
             android:gravity="center"
             android:textColor="@color/green"
             android:textStyle="bold"
@@ -419,16 +420,32 @@
         app:layout_constraintBottom_toTopOf="@id/stats_calendar"
         app:layout_constraintStart_toStartOf="parent">
 
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/food_stats_totals_guideline_1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent=".6">
+        </androidx.constraintlayout.widget.Guideline>
+
+        <androidx.constraintlayout.widget.Guideline
+            android:id="@+id/food_stats_totals_guideline_2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            app:layout_constraintGuide_percent=".65">
+        </androidx.constraintlayout.widget.Guideline>
+
         <TextView
             android:id="@+id/total_food_stats_textView_header"
             android:text="@string/total_assigned_stats"
-            android:layout_width="150dp"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toStartOf="@id/food_stats_totals_guideline_1"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:paddingStart="6dp"
-            android:paddingEnd="6dp"
+            android:layout_marginStart="8dp"
             android:textStyle="bold"
             android:textColor="@color/red"
             android:textSize="19sp">
@@ -438,13 +455,10 @@
             android:id="@+id/total_food_stats_calories_consumed"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="@id/food_stats_totals_guideline_2"
+            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:gravity="center"
-            android:layout_marginEnd="32dp"
-            android:minWidth="100dp"
-            android:maxWidth="150dp"
             android:textColor="@color/green"
             android:textStyle="bold">
         </TextView>
