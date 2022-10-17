@@ -1929,11 +1929,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         mCalendar = Calendar.getInstance(Locale.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
 
-        CalendarDay calendarDay = CalendarDay.from(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH) + 1, mCalendar.get(Calendar.DAY_OF_MONTH));
+        CalendarDay currentCalendarDay = CalendarDay.from(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH) + 1, mCalendar.get(Calendar.DAY_OF_MONTH));
+
+        int currentYear = mCalendar.get(Calendar.YEAR);
 
         calendarView.state().edit()
                 .setMinimumDate(CalendarDay.from(2022, 1, 1))
-//                .setMaximumDate(calendarDay)
+//                .setMaximumDate(CalendarDay.from((currentYear), 12, 31))
                 .commit();
     }
 

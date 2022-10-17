@@ -633,9 +633,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Repeat food total row from calories burned.
+  //Todo: Custom extending into multiple years shows current year for whole range + total text bleeds over.
   //Todo: Test length of totals w/ 365 days fully populated.
-  //Todo: New cycle launch slides out, but resume fades in. Both should slide out.
   //Todo: Daily stats alignment within timer should be optimized.
 
   //Todo: Test Moto G5 + low res nexus emulator.
@@ -967,7 +966,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
       timerIsPaused = true;
       progressBar.setProgress(currentProgressBarValue);
-
       setTotalCycleTimeValuesToTextView();
 
       if (mode == 1) {
@@ -3838,7 +3836,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       edit_highlighted_cycle.setVisibility(View.GONE);
       delete_highlighted_cycle.setVisibility(View.GONE);
       cancelHighlight.setVisibility(View.GONE);
-      Log.i("testBar", "visibilities toggling off!");
     }
   }
 
@@ -4309,7 +4306,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (!trackActivityWithinCycle) {
         setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
-//        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
       runOnUiThread(new Runnable() {

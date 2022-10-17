@@ -318,6 +318,7 @@ public class DailyStatsAccess {
         lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
         int firstAggregatedDayOfYearToUse = dayOfYear + valueAddedForFutureYears;
 
+        //Todo: This uses numeric days of year, and convertDayOfYearToFormattedString() uses the current date, so we always use the same year for our duration display.
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
         clearAllActivityAndFoodIntegerDayLists();
@@ -335,7 +336,36 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
 
         numberOfDaysSelected = calendarDayList.size();
+    }
 
+    public int getDayOfYearFromCalendarDayList(CalendarDay calendarDay){
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.set(calendarDay.getYear(), calendarDay.getMonth()-1, calendarDay.getDay());
+        return calendar.get(Calendar.DAY_OF_YEAR);
+    }
+
+    public void convertToStringAndSetSingleDay(int day) {
+        String dayToSet = convertDayOfYearToFormattedString(day);
+        setSingleDayAsString(dayToSet);
+    }
+
+    private void convertToStringAndSetFirstAndLastDurationDays(int firstDay,  int lastDay) {
+        String firstDayString = convertDayOfYearToFormattedString(firstDay);
+        String lastDayString = convertDayOfYearToFormattedString(lastDay);
+
+        setFirstDayInDurationAsString(firstDayString);
+        setLastDayInDurationAsString(lastDayString);
+    }
+
+    //Todo: Grabs current date which is why year remains the same.
+    private String convertDayOfYearToFormattedString(int day) {
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
+        Calendar calendar = Calendar.getInstance(Locale.getDefault());
+        calendar.set(Calendar.DAY_OF_YEAR, day);
+        Date date = calendar.getTime();
+
+        Log.i("testDate", "calendar year is " + calendar.get(Calendar.YEAR));
+        return simpleDateFormat.format(date);
     }
 
     public int getNumberOfDaysSelected() {
@@ -350,7 +380,6 @@ public class DailyStatsAccess {
         for (int i=0; i<sizeOfList; i++) {
             mListOfActivityDaysSelected.add(firstDay + i);
         }
-        Log.i("testInsert", "list of days selected is " + mListOfActivityDaysSelected);
     }
 
     private void setFullListOfFoodDaysFromDateSelection(int firstDay, int sizeOfList) {
@@ -400,19 +429,6 @@ public class DailyStatsAccess {
         clearPopulatedAndUnpopulatedFoodLists();
     }
 
-    public void convertToStringAndSetSingleDay(int day) {
-        String dayToSet = convertDayOfYearToFormattedString(day);
-        setSingleDayAsString(dayToSet);
-    }
-
-    private void convertToStringAndSetFirstAndLastDurationDays(int firstDay,  int lastDay) {
-        String firstDayString = convertDayOfYearToFormattedString(firstDay);
-        String lastDayString = convertDayOfYearToFormattedString(lastDay);
-
-        setFirstDayInDurationAsString(firstDayString);
-        setLastDayInDurationAsString(lastDayString);
-    }
-
     private void setSingleDayAsString(String day) {
         this.mSingleDayAsString = day;
     }
@@ -435,20 +451,6 @@ public class DailyStatsAccess {
 
     public String getLastDayInDurationAsString() {
         return mLastDayInDurationAsString;
-    }
-
-    private String convertDayOfYearToFormattedString(int day) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        calendar.set(Calendar.DAY_OF_YEAR, day);
-        Date date = calendar.getTime();
-        return simpleDateFormat.format(date);
-    }
-
-    public int getDayOfYearFromCalendarDayList(CalendarDay calendarDay){
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        calendar.set(calendarDay.getYear(), calendarDay.getMonth()-1, calendarDay.getDay());
-        return calendar.get(Calendar.DAY_OF_YEAR);
     }
 
     public void setValueAddedToSelectedDaysForFutureYears(int valueToAdd) {
@@ -522,8 +524,6 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
-
-        Log.i("testInsert", "day id inserted is " + daySelected);
     }
 
     //Used by Main.
