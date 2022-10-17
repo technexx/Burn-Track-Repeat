@@ -351,6 +351,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             int valueToAddForFutureYears = valueToAddForFutureYears();
             daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
             dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
+            dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
             daySelectedAsACalendarDayObject = CalendarDay.from(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH) + 1, mCalendar.get(Calendar.DAY_OF_MONTH));
             customCalendarDayList = Collections.singletonList(daySelectedAsACalendarDayObject);
@@ -371,6 +372,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 AsyncTask.execute(()->{
                     mCalendar = Calendar.getInstance(Locale.getDefault());
                     mCalendar.set(date.getYear(), date.getMonth()-1, date.getDay());
+                    Log.i("testDate", "year passed in from fragment is " + mCalendar.get(Calendar.YEAR));
 
                     int selectedDay = mCalendar.get(Calendar.DAY_OF_YEAR);
                     int valueToAddForFutureYears = valueToAddForFutureYears();
@@ -378,6 +380,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
                     dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
+                    dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
                     daySelectedAsACalendarDayObject = date;
 
@@ -410,6 +413,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
                     dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
+                    dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
                     dailyStatsAccess.setValueAddedToSelectedDaysForFutureYears(valueToAddForFutureYears());
 
@@ -771,6 +775,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
+        dailyStatsAccess.setYearSelectedForDurationStartDate(mCalendar.get(Calendar.YEAR));
 
         setListOfStatsForEachActivity();
         setListOfFoods();
