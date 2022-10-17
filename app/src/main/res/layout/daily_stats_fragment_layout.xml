@@ -419,7 +419,8 @@
             android:layout_marginEnd="32dp"
             android:minWidth="100dp"
             android:maxWidth="150dp"
-            android:textColor="@color/green">
+            android:textColor="@color/green"
+            android:textStyle="bold">
         </TextView>
 
         <View

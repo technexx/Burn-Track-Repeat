@@ -633,6 +633,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Food consumed recycler header / xml total alignment.
+  //Todo: New cycle launch slides out, but resume fades in. Both should slide out.
+
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
@@ -653,7 +656,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Add Day/Night modes.
   //Todo: Possibly do green/red for day decorator depending on loss/gain of calries. Or have option to toggle it.
-
 
   //Todo: We can also commit just specific files, remember!
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
