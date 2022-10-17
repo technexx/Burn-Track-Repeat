@@ -350,7 +350,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             int selectedDay = mCalendar.get(Calendar.DAY_OF_YEAR);
             int valueToAddForFutureYears = valueToAddForFutureYears();
             daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
-            dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
             dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
             daySelectedAsACalendarDayObject = CalendarDay.from(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH) + 1, mCalendar.get(Calendar.DAY_OF_MONTH));
@@ -379,7 +378,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAccess.setValueAddedToSelectedDaysForFutureYears(valueToAddForFutureYears);
 
                     daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
-                    dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
                     dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
                     daySelectedAsACalendarDayObject = date;
@@ -412,7 +410,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAccess.setValueAddedToSelectedDaysForFutureYears(valueToAddForFutureYears);
 
                     daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
-                    dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
                     dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
                     dailyStatsAccess.setValueAddedToSelectedDaysForFutureYears(valueToAddForFutureYears());
@@ -750,6 +747,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
+        dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
+//        dailyStatsAccess.setYearSelectedForDurationStartDate(mCalendar.get(Calendar.YEAR));
+//        dailyStatsAccess.setYearSelectedForDurationEndDate(mCalendar.get(Calendar.YEAR));
+
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForSingleDay(daySelectedFromCalendar);
         }
@@ -773,9 +774,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             colorDaysWithAtLeastOneActivity();
             numberOfDaysWithActivitiesHasChanged = false;
         }
-
-        dailyStatsAccess.setDaySelectedFromCalendar(daySelectedFromCalendar);
-        dailyStatsAccess.setYearSelectedForDurationStartDate(mCalendar.get(Calendar.YEAR));
 
         setListOfStatsForEachActivity();
         setListOfFoods();

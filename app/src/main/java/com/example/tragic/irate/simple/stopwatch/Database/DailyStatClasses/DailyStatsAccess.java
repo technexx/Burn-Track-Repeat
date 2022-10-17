@@ -43,7 +43,6 @@ public class DailyStatsAccess {
     long totalAggregateTimeForSelectedDuration;
     double totalAggregateCaloriesForSelectedDuration;
 
-    int mDaySelectedFromCalendar;
     int numberOfDaysSelected;
     int firstDayOfDuration;
     int lastDayOfDuration;
@@ -246,6 +245,8 @@ public class DailyStatsAccess {
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueAddedForFutureYears;
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
+        Log.i("testCal", "calendar object in access is " + mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
+
         setYearSelectedForDurationStartDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
         setYearSelectedForDurationEndDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
 
@@ -297,6 +298,33 @@ public class DailyStatsAccess {
         numberOfDaysSelected = numberOfDaysInMonth;
     }
 
+    public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
+        firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
+        lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
+        int firstAggregatedDayOfYearToUse = dayOfYear + valueAddedForFutureYears;
+
+        setYearSelectedForDurationStartDate(calendarDayList.get(0).getYear());
+        setYearSelectedForDurationEndDate(calendarDayList.get(calendarDayList.size()-1).getYear());
+
+        convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
+
+        clearAllActivityAndFoodIntegerDayLists();
+
+        setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
+        setFullListOfFoodDaysFromDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
+
+        for (int i=0; i<calendarDayList.size(); i++) {
+            int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
+            setPopulatedAndEmptyListsOfActivityDays(dayFromList);
+            setPopulatedAndEmptyListsOfFoodDays(dayFromList);
+        }
+
+        setActivityListsForDatabaseObjectsForStatsFragment(mListOfActivityDaysWithPopulatedRows);
+        setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
+
+        numberOfDaysSelected = calendarDayList.size();
+    }
+
     public void setAllDayAndStatListsForYearFromDatabase(int daysInYear, boolean yearToDate) {
         firstDayOfDuration = 1;
 
@@ -328,34 +356,6 @@ public class DailyStatsAccess {
         setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
     }
 
-    public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
-        firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
-        lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
-        int firstAggregatedDayOfYearToUse = dayOfYear + valueAddedForFutureYears;
-
-        setYearSelectedForDurationStartDate(calendarDayList.get(0).getYear());
-        setYearSelectedForDurationEndDate(calendarDayList.get(calendarDayList.size()-1).getYear());
-
-        //Todo: This uses numeric days of year, and convertDayOfYearToFormattedString() uses the current date, so we always use the same year for our duration display. Applies to all duration types.
-        convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
-
-        clearAllActivityAndFoodIntegerDayLists();
-
-        setFullListOfActivityDaysFromDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
-        setFullListOfFoodDaysFromDateSelection(firstAggregatedDayOfYearToUse, calendarDayList.size());
-
-        for (int i=0; i<calendarDayList.size(); i++) {
-            int dayFromList = getDayOfYearFromCalendarDayList(calendarDayList.get(i));
-            setPopulatedAndEmptyListsOfActivityDays(dayFromList);
-            setPopulatedAndEmptyListsOfFoodDays(dayFromList);
-        }
-
-        setActivityListsForDatabaseObjectsForStatsFragment(mListOfActivityDaysWithPopulatedRows);
-        setFoodListsForDatabaseObjects(mListOfFoodDaysWithPopulatedRows);
-
-        numberOfDaysSelected = calendarDayList.size();
-    }
-
     public int getDayOfYearFromCalendarDayList(CalendarDay calendarDay){
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         calendar.set(calendarDay.getYear(), calendarDay.getMonth()-1, calendarDay.getDay());
@@ -363,7 +363,7 @@ public class DailyStatsAccess {
     }
 
     public void convertToStringAndSetSingleDay(int day) {
-        String dayToSet = convertDayOfYearToFormattedString(day);
+        String dayToSet = singleDayDurationDateString(day);
         setSingleDayAsString(dayToSet);
     }
 
@@ -375,13 +375,10 @@ public class DailyStatsAccess {
         setLastDayInDurationAsString(lastDayString);
     }
 
-    private String convertDayOfYearToFormattedString(int day) {
+    private String singleDayDurationDateString(int day) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-        //Todo: This is changing year in single day duration. Date displayed is fine with it gone, but longer durations are b0rked.
 
         mCalendarObjectSelectedFromFragment.set(Calendar.DAY_OF_YEAR, day);
-        mCalendarObjectSelectedFromFragment.set(Calendar.YEAR, mYearSelectedForDurationStartDate);
-
         Date date = mCalendarObjectSelectedFromFragment.getTime();
 
         return simpleDateFormat.format(date);
@@ -390,6 +387,7 @@ public class DailyStatsAccess {
     private String firstDayInDurationDateString(int day) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
         mCalendarObjectSelectedFromFragment.set(Calendar.DAY_OF_YEAR, day);
+        //Todo: Works for Custom, but b0rking other durations, because mCalendar is GLOBAL and it's being accessed, year set and changed as it is below, in our setAllDay...() methods.
         mCalendarObjectSelectedFromFragment.set(Calendar.YEAR, mYearSelectedForDurationStartDate);
 
         Date date = mCalendarObjectSelectedFromFragment.getTime();
@@ -409,6 +407,7 @@ public class DailyStatsAccess {
 
     public void setCalendarObjectSelectedFromFragment(Calendar calendarObject) {
         this.mCalendarObjectSelectedFromFragment = calendarObject;
+        Log.i("testCal", "calendar object year received is " + mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
     }
 
     private void setSingleDayAsString(String day) {
@@ -457,10 +456,6 @@ public class DailyStatsAccess {
 
     public int getNumberOfDaysSelected() {
         return numberOfDaysSelected;
-    }
-
-    public void setDaySelectedFromCalendar(int daySelected) {
-        this.mDaySelectedFromCalendar = daySelected;
     }
 
     private void setFullListOfActivityDaysFromDateSelection(int firstDay, int sizeOfList) {
