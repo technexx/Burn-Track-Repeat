@@ -634,7 +634,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar settingsActionBar;
 
   //Todo: Food consumed recycler header / xml total alignment.
+      //Todo: Test length of totals w/ 365 days fully populated.
   //Todo: New cycle launch slides out, but resume fades in. Both should slide out.
+  //Todo: Daily stats alignment within timer should be optimized.
 
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
