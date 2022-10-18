@@ -847,8 +847,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setSingleDateStringOnTextView() {
-        dailyStatsAccess.convertToStringAndSetSingleDay(daySelectedFromCalendar);
-        String dayToSet = dailyStatsAccess.getSingleDayAsString();
+        String dayToSet = dailyStatsAccess.getFirstDayInDurationAsString();
         activityStatsDurationRangeTextView.setText(dayToSet);
     }
 

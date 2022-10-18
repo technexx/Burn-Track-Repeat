@@ -228,6 +228,10 @@ public class DailyStatsAccess {
         setYearSelectedForDurationStartDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
         setYearSelectedForDurationEndDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
 
+        firstDayOfDuration = daySelected;
+        lastDayOfDuration = daySelected;
+        convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
+
         setPopulatedAndEmptyListsOfActivityDays(daySelected);
         setPopulatedAndEmptyListsOfFoodDays(daySelected);
 
@@ -363,26 +367,12 @@ public class DailyStatsAccess {
         return calendar.get(Calendar.DAY_OF_YEAR);
     }
 
-    public void convertToStringAndSetSingleDay(int day) {
-        String dayToSet = singleDayDurationDateString(day);
-        setSingleDayAsString(dayToSet);
-    }
-
     private void convertToStringAndSetFirstAndLastDurationDays(int firstDay, int lastDay) {
         String firstDayString = firstDayInDurationDateString(firstDay);
         String lastDayString = lastDayInDurationDateString(lastDay);
 
         setFirstDayInDurationAsString(firstDayString);
         setLastDayInDurationAsString(lastDayString);
-    }
-
-    private String singleDayDurationDateString(int day) {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-
-        mCalendarObjectSelectedFromFragment.set(Calendar.DAY_OF_YEAR, day);
-        Date date = mCalendarObjectSelectedFromFragment.getTime();
-
-        return simpleDateFormat.format(date);
     }
 
     private String firstDayInDurationDateString(int day) {
@@ -394,8 +384,6 @@ public class DailyStatsAccess {
 
         Date date = calendar.getTime();
 
-        Log.i("testDate", "mYear var in first day duration string is " + mYearSelectedForDurationStartDate);
-
         return simpleDateFormat.format(date);
     }
 
@@ -406,8 +394,6 @@ public class DailyStatsAccess {
         calendar.set(Calendar.DAY_OF_YEAR, day);
         calendar.set(Calendar.YEAR, mYearSelectedForDurationEndDate);
 
-        Log.i("testDate", "mYear var in first day duration string is " + mYearSelectedForDurationEndDate);
-
         Date date = calendar.getTime();
 
         return simpleDateFormat.format(date);
@@ -415,15 +401,6 @@ public class DailyStatsAccess {
 
     public void setCalendarObjectSelectedFromFragment(Calendar calendarObject) {
         this.mCalendarObjectSelectedFromFragment = calendarObject;
-        Log.i("testCal", "calendar object year received is " + mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
-    }
-
-    private void setSingleDayAsString(String day) {
-        this.mSingleDayAsString = day;
-    }
-
-    public String getSingleDayAsString() {
-        return mSingleDayAsString;
     }
 
     private void setFirstDayInDurationAsString(String day) {
