@@ -8,6 +8,46 @@
     android:id="@+id/main_timer_layout"
     android:theme="@style/TimerTheme">
 
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/timer_guideline_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".3">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/timer_guideline_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".35">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/timer_guideline_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".5">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/timer_guideline_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".55">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/timer_guideline_5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".95">
+    </androidx.constraintlayout.widget.Guideline>
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/non_tracking_timer_stat_headers_layout"
         android:layout_width="match_parent"
@@ -15,8 +55,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/dots_recycler_layout"
-        app:layout_constraintVertical_weight="4">
+        app:layout_constraintBottom_toTopOf="@id/timer_guideline_1">
 
         <TextView
             android:id="@+id/cycle_title_textView"
@@ -110,9 +149,8 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/dots_recycler_layout"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintVertical_weight="4">
+        app:layout_constraintBottom_toTopOf="@id/timer_guideline_1"
+        app:layout_constraintStart_toStartOf="parent">
 
         <TextView
             android:id="@+id/tracking_daily_stats_header_textView"
@@ -237,16 +275,14 @@
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dots_recycler_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
-        app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
-        android:layout_marginBottom="12dp">
+        app:layout_constraintTop_toBottomOf="@id/timer_guideline_2"
+        app:layout_constraintBottom_toTopOf="@id/timer_guideline_3">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/dots_recyclerView"
@@ -259,8 +295,7 @@
             android:orientation="horizontal"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
-            android:background="@drawable/recycler_border"
-            app:layout_constraintVertical_weight="3">
+            android:background="@drawable/recycler_border">
         </androidx.recyclerview.widget.RecyclerView>
 
         <androidx.recyclerview.widget.RecyclerView
@@ -274,8 +309,7 @@
             android:orientation="horizontal"
             android:paddingStart="4dp"
             android:paddingEnd="4dp"
-            android:background="@drawable/recycler_border"
-            app:layout_constraintVertical_weight="3">
+            android:background="@drawable/recycler_border">
         </androidx.recyclerview.widget.RecyclerView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
@@ -285,10 +319,9 @@
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="@id/vertical_guideline_left"
         app:layout_constraintEnd_toEndOf="@id/vertical_guideline_right"
-        app:layout_constraintTop_toBottomOf="@id/dots_recycler_layout"
+        app:layout_constraintTop_toBottomOf="@id/timer_guideline_4"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintVertical_weight="5"
-        android:layout_marginBottom="0dp">
+        android:layout_marginBottom="20dp">
 
         <TextView
             android:id="@+id/timeLeft"
@@ -327,21 +360,20 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
         </View>
-
-        <TextView
-            android:id="@+id/reset"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintBottom_toBottomOf="parent"
-            android:layout_marginBottom="0dp"
-            android:text="Reset"
-            android:textColor="@color/white"
-            android:textSize="23sp">
-        </TextView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/reset"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/next_round"
+        app:layout_constraintBottom_toBottomOf="@id/next_round"
+        android:text="Reset"
+        android:textColor="@color/white"
+        android:textSize="23sp">
+    </TextView>
 
     <ImageButton
         android:id="@+id/next_round"
@@ -374,3 +406,4 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+

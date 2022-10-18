@@ -5,7 +5,6 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:background="@color/black"
     android:id="@+id/main_timer_layout"
     android:theme="@style/TimerTheme">
 
@@ -64,7 +63,7 @@
             android:layout_height="wrap_content"
             android:fontFamily="@font/open_sans"
             android:textColor="@color/teal_200"
-            android:textSize="22sp"
+            android:textSize="23sp"
             android:maxLines="1"
             android:maxLength="50"
             app:layout_constraintStart_toStartOf="parent"
@@ -76,9 +75,9 @@
             android:id="@+id/cycles_completed_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="24dp"
             android:textColor="@color/white"
-            android:textSize="21sp"
+            android:textSize="26sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cycle_title_textView">
@@ -88,8 +87,9 @@
             android:id="@+id/total_set_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:textSize="21sp"
+            android:layout_marginTop="20dp"
+            android:textSize="26sp"
+            android:layout_marginEnd="20dp"
             app:layout_constraintEnd_toStartOf="@id/reset_total_cycle_times"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView">
@@ -99,8 +99,9 @@
             android:id="@+id/total_break_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
-            android:textSize="21sp"
+            android:layout_marginTop="20dp"
+            android:textSize="26sp"
+            android:layout_marginStart="20dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/reset_total_cycle_times"
             app:layout_constraintTop_toBottomOf="@id/cycles_completed_textView">
@@ -111,7 +112,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textSize="22sp"
+            android:textSize="26sp"
             app:layout_constraintEnd_toEndOf="@id/total_set_header"
             app:layout_constraintStart_toStartOf="@id/total_set_header"
             app:layout_constraintTop_toBottomOf="@id/total_set_header">
@@ -122,7 +123,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
-            android:textSize="22sp"
+            android:textSize="26sp"
             app:layout_constraintEnd_toEndOf="@id/total_break_header"
             app:layout_constraintStart_toStartOf="@id/total_break_header"
             app:layout_constraintTop_toBottomOf="@id/total_break_header">
@@ -132,9 +133,8 @@
             android:id="@+id/reset_total_cycle_times"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="18dp"
+            android:layout_marginTop="24dp"
             android:background="@color/black"
-            android:src="@drawable/reset_24"
             app:layout_constraintBottom_toBottomOf="@id/total_set_time"
             app:layout_constraintEnd_toStartOf="@id/total_break_header"
             app:layout_constraintStart_toEndOf="@id/total_set_header"
@@ -162,7 +162,7 @@
             android:layout_marginStart="0dp"
             android:gravity="center_horizontal"
             android:textColor="@color/teal_200"
-            android:textSize="19sp"
+            android:textSize="21sp"
             android:textStyle="bold">
         </TextView>
 
@@ -173,8 +173,9 @@
             android:layout_marginStart="100dp"
             app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="6dp"
             android:textColor="@color/white"
-            android:textSize="18sp">
+            android:textSize="21sp">
         </TextView>
 
         <TextView
@@ -184,8 +185,9 @@
             app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toEndOf="@id/daily_total_time_textView_header"
             android:layout_marginStart="8dp"
+            android:layout_marginTop="6dp"
             android:textColor="@color/green"
-            android:textSize="18sp">
+            android:textSize="21sp">
         </TextView>
 
         <TextView
@@ -196,7 +198,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
             android:layout_marginTop="4dp"
-            android:textSize="18sp">
+            android:textSize="21sp">
         </TextView>
 
         <TextView
@@ -207,21 +209,21 @@
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
             app:layout_constraintStart_toEndOf="@id/daily_total_calories_textView_header"
             android:layout_marginTop="4dp"
-            android:textSize="18sp"
+            android:textSize="21sp"
             android:textColor="@color/purple_200">
         </TextView>
 
         <TextView
             android:id="@+id/daily_single_activity_string_header"
-            android:layout_width="300dp"
+            android:layout_width="360dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_calories_textView_header"
             android:gravity="center_horizontal"
-            android:layout_marginTop="8dp"
+            android:layout_marginTop="20dp"
             android:textColor="@color/light_blue"
-            android:textSize="18sp"
+            android:textSize="21sp"
             android:layout_marginStart="30dp"
             android:maxLines="2">
         </TextView>
@@ -230,7 +232,7 @@
             android:id="@+id/daily_total_time_for_single_activity_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textSize="18sp"
+            android:textSize="21sp"
             android:layout_marginStart="100dp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header">
@@ -243,7 +245,7 @@
             android:layout_marginStart="8dp"
             android:gravity="center"
             android:textColor="@color/green"
-            android:textSize="18sp"
+            android:textSize="21sp"
             app:layout_constraintStart_toEndOf="@id/daily_total_time_for_single_activity_textView_header"
             app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header">
         </TextView>
@@ -254,7 +256,7 @@
             android:layout_height="wrap_content"
             android:layout_marginTop="4dp"
             android:layout_marginStart="100dp"
-            android:textSize="18sp"
+            android:textSize="21sp"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header">
         </TextView>
@@ -267,43 +269,11 @@
             android:layout_marginTop="4dp"
             android:gravity="center"
             android:textColor="@color/purple_200"
-            android:textSize="18sp"
+            android:textSize="21sp"
             app:layout_constraintStart_toEndOf="@id/daily_total_calories_for_single_activity_textView_header"
             app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView_header">
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dots_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:paddingEnd="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
-        app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
-        android:orientation="horizontal"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="0dp"
-        android:paddingStart="4dp"
-        android:background="@drawable/recycler_border"
-        app:layout_constraintVertical_weight="3">
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pom_dots_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:paddingEnd="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
-        app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
-        android:orientation="horizontal"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:paddingStart="4dp"
-        android:background="@drawable/recycler_border"
-        app:layout_constraintVertical_weight="3">
-    </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dots_recycler_layout"
@@ -313,6 +283,34 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/timer_guideline_2"
         app:layout_constraintBottom_toTopOf="@id/timer_guideline_3">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dots_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="95dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:background="@drawable/recycler_border">
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pom_dots_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="95dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:background="@drawable/recycler_border">
+        </androidx.recyclerview.widget.RecyclerView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -340,9 +338,9 @@
         <ProgressBar
             android:id="@+id/progressBar"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="240dp"
-            android:layout_height="240dp"
-            android:layout_marginBottom="4dp"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="12dp"
             android:background="@drawable/circle_shape"
             android:max="10000"
             android:progressDrawable="@drawable/circle_progress"
@@ -354,14 +352,15 @@
 
         <View
             android:id="@+id/pauseResumeButton"
-            android:layout_width="240dp"
-            android:layout_height="240dp"
+            android:layout_width="260dp"
+            android:layout_height="0dp"
             android:layout_marginBottom="4dp"
             app:cornerRadius="90dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
         </View>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
@@ -372,21 +371,23 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/next_round"
         app:layout_constraintBottom_toBottomOf="@id/next_round"
+        android:layout_marginTop="0dp"
         android:text="Reset"
         android:textColor="@color/white"
-        android:textSize="20sp">
+        android:textSize="23sp">
     </TextView>
 
     <ImageButton
         android:id="@+id/next_round"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="6dp"
-        android:layout_marginBottom="12dp"
+        android:layout_marginBottom="16dp"
         android:background="@color/black"
-        android:src="@drawable/double_arrow_large">
+        android:src="@drawable/double_arrow_large"
+        app:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
     </ImageButton>
 
     <androidx.constraintlayout.widget.Guideline
@@ -394,7 +395,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent=".15">
+        app:layout_constraintGuide_percent=".12">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -402,8 +403,9 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="vertical"
-        app:layout_constraintGuide_percent=".85">
+        app:layout_constraintGuide_percent=".88">
     </androidx.constraintlayout.widget.Guideline>
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
