@@ -633,7 +633,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Text can bleed over for tons of days selected.
   //Todo: Daily stats alignment within timer should be optimized.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
 

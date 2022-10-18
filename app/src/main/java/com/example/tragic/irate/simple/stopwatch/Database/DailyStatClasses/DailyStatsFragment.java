@@ -1926,6 +1926,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    //Custom CalendarDay class uses months w/ 1-12 vars, while Calendar uses 0-11, hence the adjustments.
     private void instantiateCalendarObjects() {
         mCalendar = Calendar.getInstance(Locale.getDefault());
         calendarView = mRoot.findViewById(R.id.stats_calendar);
@@ -1933,10 +1934,20 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         CalendarDay currentCalendarDay = CalendarDay.from(mCalendar.get(Calendar.YEAR), mCalendar.get(Calendar.MONTH) + 1, mCalendar.get(Calendar.DAY_OF_MONTH));
 
         int currentYear = mCalendar.get(Calendar.YEAR);
+        int currentMonth = mCalendar.get(Calendar.MONTH);
+        int currentDay = mCalendar.get(Calendar.DAY_OF_MONTH);
+
+        int maxYear = currentYear + 1;
+        int maxMonth = currentMonth + 1;
+        int maxDay = currentDay;
+
+        if (currentMonth == Calendar.FEBRUARY) {
+            maxDay = 28;
+        }
 
         calendarView.state().edit()
                 .setMinimumDate(CalendarDay.from(2022, 1, 1))
-//                .setMaximumDate(CalendarDay.from((currentYear), 12, 31))
+                .setMaximumDate(CalendarDay.from(maxYear, maxMonth, maxDay))
                 .commit();
     }
 
