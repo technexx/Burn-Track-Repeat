@@ -242,13 +242,13 @@ public class DailyStatsAccess {
         firstDayOfDuration = dayOfYear - (dayOfWeek - 1);
         lastDayOfDuration = firstDayOfDuration + 6;
 
+        setYearSelectedForDurationStartDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
+        setYearSelectedForDurationEndDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
+
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueAddedForFutureYears;
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
-        Log.i("testCal", "calendar object in access is " + mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
-
-        setYearSelectedForDurationStartDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
-        setYearSelectedForDurationEndDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
+        Log.i("testDate", "mYear var in duration retrieval method is is " + mYearSelectedForDurationStartDate);
 
         clearAllActivityAndFoodIntegerDayLists();
 
@@ -273,11 +273,11 @@ public class DailyStatsAccess {
         firstDayOfDuration = dayOfYear - (dayOfMonth-1);
         lastDayOfDuration = firstDayOfDuration + (numberOfDaysInMonth-1);
 
-        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueAddedForFutureYears;
-        convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
-
         setYearSelectedForDurationStartDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
         setYearSelectedForDurationEndDate(mCalendarObjectSelectedFromFragment.get(Calendar.YEAR));
+
+        int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueAddedForFutureYears;
+        convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
 
         clearAllActivityAndFoodIntegerDayLists();
 
@@ -301,6 +301,7 @@ public class DailyStatsAccess {
     public void setAllDayAndStatListsForCustomDatesFromDatabase(List<CalendarDay> calendarDayList, int dayOfYear) {
         firstDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(0));
         lastDayOfDuration = getDayOfYearFromCalendarDayList(calendarDayList.get(calendarDayList.size()-1));
+
         int firstAggregatedDayOfYearToUse = dayOfYear + valueAddedForFutureYears;
 
         setYearSelectedForDurationStartDate(calendarDayList.get(0).getYear());
@@ -386,21 +387,28 @@ public class DailyStatsAccess {
 
     private String firstDayInDurationDateString(int day) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-        mCalendarObjectSelectedFromFragment.set(Calendar.DAY_OF_YEAR, day);
-        //Todo: Works for Custom, but b0rking other durations, because mCalendar is GLOBAL and it's being accessed, year set and changed as it is below, in our setAllDay...() methods.
-        mCalendarObjectSelectedFromFragment.set(Calendar.YEAR, mYearSelectedForDurationStartDate);
 
-        Date date = mCalendarObjectSelectedFromFragment.getTime();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_YEAR, day);
+        calendar.set(Calendar.YEAR, mYearSelectedForDurationStartDate);
+
+        Date date = calendar.getTime();
+
+        Log.i("testDate", "mYear var in first day duration string is " + mYearSelectedForDurationStartDate);
 
         return simpleDateFormat.format(date);
     }
 
     private String lastDayInDurationDateString(int day) {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("MM/dd/yyyy", Locale.getDefault());
-        mCalendarObjectSelectedFromFragment.set(Calendar.DAY_OF_YEAR, day);
-        mCalendarObjectSelectedFromFragment.set(Calendar.YEAR, mYearSelectedForDurationEndDate);
 
-        Date date = mCalendarObjectSelectedFromFragment.getTime();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_YEAR, day);
+        calendar.set(Calendar.YEAR, mYearSelectedForDurationEndDate);
+
+        Log.i("testDate", "mYear var in first day duration string is " + mYearSelectedForDurationEndDate);
+
+        Date date = calendar.getTime();
 
         return simpleDateFormat.format(date);
     }

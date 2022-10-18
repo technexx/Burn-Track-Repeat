@@ -371,6 +371,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 AsyncTask.execute(()->{
                     mCalendar = Calendar.getInstance(Locale.getDefault());
                     mCalendar.set(date.getYear(), date.getMonth()-1, date.getDay());
+
+                    dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
                     Log.i("testDate", "year passed in from fragment is " + mCalendar.get(Calendar.YEAR));
 
                     int selectedDay = mCalendar.get(Calendar.DAY_OF_YEAR);
@@ -378,7 +380,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     dailyStatsAccess.setValueAddedToSelectedDaysForFutureYears(valueToAddForFutureYears);
 
                     daySelectedFromCalendar = selectedDay + valueToAddForFutureYears;
-                    dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
                     daySelectedAsACalendarDayObject = date;
 
@@ -733,6 +734,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setAggregateCaloriesForSelectedDuration();
         dailyStatsAccess.setUnassignedDailyTotalTime();
 
+        dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
+
         getActivity().runOnUiThread(()-> {
             dailyStatsAdapter.notifyDataSetChanged();
             caloriesConsumedAdapter.notifyDataSetChanged();
@@ -747,10 +750,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
-        dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
-//        dailyStatsAccess.setYearSelectedForDurationStartDate(mCalendar.get(Calendar.YEAR));
-//        dailyStatsAccess.setYearSelectedForDurationEndDate(mCalendar.get(Calendar.YEAR));
-
+        //Todo: Duration switching does not get new instance of mCalendar, which is why dates are b0rked. Only listener does this.
+                //Todo: Custom - > Other duration is where this b0rks.
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForSingleDay(daySelectedFromCalendar);
         }
@@ -779,43 +780,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         setListOfFoods();
     }
 
-    public void setNumberOfDaysWithActivitiesHasChangedBoolean(boolean numberOfDaysHaveChanged) {
-        this.numberOfDaysWithActivitiesHasChanged = numberOfDaysHaveChanged;
-    }
-
-    public void setActivitySortMode(int sortMode) {
-        this.mActivitySortMode = sortMode;
-    }
-
-    public void setFoodConsumedSortMode(int sortMode) {
-        this.mFoodConsumedSortMode = sortMode;
-    }
-
-    public void sortActivityStatsAsACallFromMainActivity() {
-        dailyStatsAccess.setActivitySortMode(mActivitySortMode);
-        populateListsAndTextViewsFromEntityListsInDatabase();
-    }
-
-    public void sortFoodConsumedStatsAsACallFromMainActivity() {
-        dailyStatsAccess.setFoodConsumedSortMode(mFoodConsumedSortMode);
-        populateListsAndTextViewsFromEntityListsInDatabase();;
-    }
-
-    private void setListOfStatsForEachActivity() {
-        statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityList();
-    }
-
-    public List<StatsForEachActivity> getStatsForEachActivityList() {
-        return statsForEachActivityList;
-    }
-
-    public void setListOfFoods() {
-        caloriesForEachFoodList = dailyStatsAccess.getCaloriesForEachFoodList();
-    }
-
-    public List<CaloriesForEachFood> getCaloriesForEachFoodList() {
-        return caloriesForEachFoodList;
-    }
 
     private void setStatDurationViews(int mode) {
         calendarView.setSelectionMode(MaterialCalendarView.SELECTION_MODE_SINGLE);
@@ -892,6 +856,44 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String firstDay = dailyStatsAccess.getFirstDayInDurationAsString();
         String lastDay = String.valueOf(dailyStatsAccess.getLastDayInDurationAsString());
         activityStatsDurationRangeTextView.setText(getString(R.string.date_duration_textView, firstDay, lastDay));
+    }
+
+    public void setNumberOfDaysWithActivitiesHasChangedBoolean(boolean numberOfDaysHaveChanged) {
+        this.numberOfDaysWithActivitiesHasChanged = numberOfDaysHaveChanged;
+    }
+
+    public void setActivitySortMode(int sortMode) {
+        this.mActivitySortMode = sortMode;
+    }
+
+    public void setFoodConsumedSortMode(int sortMode) {
+        this.mFoodConsumedSortMode = sortMode;
+    }
+
+    public void sortActivityStatsAsACallFromMainActivity() {
+        dailyStatsAccess.setActivitySortMode(mActivitySortMode);
+        populateListsAndTextViewsFromEntityListsInDatabase();
+    }
+
+    public void sortFoodConsumedStatsAsACallFromMainActivity() {
+        dailyStatsAccess.setFoodConsumedSortMode(mFoodConsumedSortMode);
+        populateListsAndTextViewsFromEntityListsInDatabase();;
+    }
+
+    private void setListOfStatsForEachActivity() {
+        statsForEachActivityList = dailyStatsAccess.getStatsForEachActivityList();
+    }
+
+    public List<StatsForEachActivity> getStatsForEachActivityList() {
+        return statsForEachActivityList;
+    }
+
+    public void setListOfFoods() {
+        caloriesForEachFoodList = dailyStatsAccess.getCaloriesForEachFoodList();
+    }
+
+    public List<CaloriesForEachFood> getCaloriesForEachFoodList() {
+        return caloriesForEachFoodList;
     }
 
     private void setTotalActivityStatsFooterTextViews() {
