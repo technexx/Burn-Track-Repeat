@@ -288,7 +288,7 @@
         app:layout_constraintTop_toBottomOf="@id/dots_recycler_layout"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintVertical_weight="5"
-        android:layout_marginBottom="32dp">
+        android:layout_marginBottom="0dp">
 
         <TextView
             android:id="@+id/timeLeft"
@@ -328,21 +328,20 @@
             app:layout_constraintStart_toStartOf="parent">
         </View>
 
-    </androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/reset"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginBottom="0dp"
+            android:text="Reset"
+            android:textColor="@color/white"
+            android:textSize="23sp">
+        </TextView>
 
-    <TextView
-        android:id="@+id/reset"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@id/next_round"
-        app:layout_constraintBottom_toBottomOf="@id/next_round"
-        android:layout_marginBottom="0dp"
-        android:text="Reset"
-        android:textColor="@color/white"
-        android:textSize="23sp">
-    </TextView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
     <ImageButton
         android:id="@+id/next_round"
