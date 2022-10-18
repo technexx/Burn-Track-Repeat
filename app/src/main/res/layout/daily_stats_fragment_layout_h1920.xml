@@ -357,7 +357,6 @@
             android:layout_height="wrap_content"
             app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header"            app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_2"
             app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_3"
-            android:layout_marginStart="8dp"
             android:gravity="center"
             android:textColor="@color/green"
             android:textStyle="bold"
