@@ -633,8 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Custom extending into multiple years shows current year for whole range + total text bleeds over.
-  //Todo: Test length of totals w/ 365 days fully populated.
+  //Todo: Text can bleed over for tons of days selected.
   //Todo: Daily stats alignment within timer should be optimized.
 
   //Todo: Test Moto G5 + low res nexus emulator.

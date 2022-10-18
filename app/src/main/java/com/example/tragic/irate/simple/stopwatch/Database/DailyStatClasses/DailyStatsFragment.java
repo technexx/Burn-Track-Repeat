@@ -373,7 +373,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                     mCalendar.set(date.getYear(), date.getMonth()-1, date.getDay());
 
                     dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
-                    Log.i("testDate", "year passed in from fragment is " + mCalendar.get(Calendar.YEAR));
 
                     int selectedDay = mCalendar.get(Calendar.DAY_OF_YEAR);
                     int valueToAddForFutureYears = valueToAddForFutureYears();
@@ -750,10 +749,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
-        //Todo: Duration switching does not get new instance of mCalendar, which is why dates are b0rked. Only listener does this.
-                //Todo: Custom - > Other duration is where this b0rks.
         if (mode==DAILY_STATS) {
-            dailyStatsAccess.setAllDayAndStatListsForSingleDay(daySelectedFromCalendar);
+            dailyStatsAccess.setAllDayAndStatListsForSingleDay(mCalendar.get(Calendar.DAY_OF_YEAR));
         }
         if (mode==WEEKLY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForWeek(mCalendar.get(Calendar.DAY_OF_WEEK), mCalendar.get(Calendar.DAY_OF_YEAR));
