@@ -635,6 +635,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Text can bleed over for tons of days selected.
   //Todo: Daily stats alignment within timer should be optimized.
+  //Todo: Test db saves/deletions/etc. on different years.
 
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.

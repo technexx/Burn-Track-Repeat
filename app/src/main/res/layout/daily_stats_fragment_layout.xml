@@ -265,7 +265,6 @@
             app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
             app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_2"
             app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_3"
-            android:layout_marginStart="8dp"
             android:gravity="center"
             android:textColor="@color/green"
             android:textStyle="bold"
