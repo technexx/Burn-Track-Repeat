@@ -146,18 +146,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean isNewCycle;
 
   RecyclerView roundRecycler;
-  RecyclerView roundRecyclerTwo;
   RecyclerView savedCycleRecycler;
   RecyclerView savedPomCycleRecycler;
   CycleRoundsAdapter cycleRoundsAdapter;
   CycleRoundsAdapterTwo cycleRoundsAdapterTwo;
-  View roundListDivider;
   SavedCycleAdapter savedCycleAdapter;
   SavedPomCycleAdapter savedPomCycleAdapter;
 
   LinearLayoutManager workoutCyclesRecyclerLayoutManager;
   LinearLayoutManager roundRecyclerOneLayoutManager;
-  LinearLayoutManager roundRecyclerTwoLayoutManager;
   LinearLayoutManager pomCyclesRecyclerLayoutManager;
 
   View deleteCyclePopupView;
@@ -316,9 +313,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams progressBarLayoutParams;
   ConstraintLayout.LayoutParams timerTextViewLayoutParams;
 
-  ConstraintLayout.LayoutParams roundRecyclerParentLayoutParams;
   ConstraintLayout.LayoutParams roundRecyclerOneLayoutParams;
-  ConstraintLayout.LayoutParams roundRecyclerTwoLayoutParams;
 
   ConstraintLayout.LayoutParams firstRoundHeaderParams;
   ConstraintLayout.LayoutParams secondRoundHeaderParams;
@@ -1988,8 +1983,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     buttonToLaunchTimerFromEditPopUp = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimerFromEditPopUp);
 
     roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
-    roundRecyclerTwo = editCyclesPopupView.findViewById(R.id.round_list_recycler_two);
-    roundListDivider = editCyclesPopupView.findViewById(R.id.round_list_divider);
     roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
 
     addTDEEfirstMainTextView = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
@@ -2128,7 +2121,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void instantiateLayoutManagers() {
     workoutCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
     roundRecyclerOneLayoutManager = new LinearLayoutManager(getApplicationContext());
-    roundRecyclerTwoLayoutManager = new LinearLayoutManager(getApplicationContext());
     pomCyclesRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
 
     lapRecyclerLayoutManager = new LinearLayoutManager(getApplicationContext());
@@ -2151,10 +2143,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setRoundRecyclersOnAdaptersAndLayoutManagers() {
-    roundRecycler.setLayoutManager(roundRecyclerOneLayoutManager);
+    GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
+    gridLayoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
+
+    roundRecycler.setLayoutManager(gridLayoutManager);
     roundRecycler.setAdapter(cycleRoundsAdapter);
-    roundRecyclerTwo.setAdapter(cycleRoundsAdapterTwo);
-    roundRecyclerTwo.setLayoutManager(roundRecyclerTwoLayoutManager);
   }
 
   private void setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight() {
@@ -2165,8 +2158,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       verticalSpaceItemDecoration = new VerticalSpaceItemDecoration(
               -10);
     }
-    roundRecycler.addItemDecoration(verticalSpaceItemDecoration);
-    roundRecyclerTwo.addItemDecoration(verticalSpaceItemDecoration);
   }
 
   private void instantiateLapAdapterAndSetRecyclerOnIt() {
@@ -2414,9 +2405,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     progressBarLayoutParams = (ConstraintLayout.LayoutParams) progressBarLayout.getLayoutParams();
     timerTextViewLayoutParams = (ConstraintLayout.LayoutParams) timeLeft.getLayoutParams();
 
-    roundRecyclerParentLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerLayout.getLayoutParams();
     roundRecyclerOneLayoutParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
-    roundRecyclerTwoLayoutParams = (ConstraintLayout.LayoutParams) roundRecyclerTwo.getLayoutParams();
 
     firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
     secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
@@ -2438,7 +2427,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     reset.setVisibility(View.INVISIBLE);
     new_lap.setAlpha(0.3f);
-//    roundListDivider.setVisibility(View.GONE);
 
     savedPomCycleRecycler.setVisibility(View.GONE);
     pomDotsRecycler.setVisibility(View.GONE);
@@ -3215,7 +3203,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab.setEnabled(true);
     cycleRoundsAdapter.notifyDataSetChanged();
     cycleRoundsAdapterTwo.notifyDataSetChanged();
-//    roundListDivider.setVisibility(View.GONE);
 
     setSingleColumnRoundRecyclerView();
   }
@@ -3970,13 +3957,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           removeRound();
         }
         if (workoutTimeIntegerArray.size() > 0) {
-          if (roundSelectedPosition <= 7) {
-            cycleRoundsAdapter.setFadeOutPosition(roundSelectedPosition);
-            cycleRoundsAdapter.notifyDataSetChanged();
-          } else {
-            cycleRoundsAdapterTwo.setFadeOutPosition(roundSelectedPosition - 8);
-            cycleRoundsAdapterTwo.notifyDataSetChanged();
-          }
+          cycleRoundsAdapter.setFadeOutPosition(roundSelectedPosition);
+          cycleRoundsAdapter.notifyDataSetChanged();
+
           subtractedRoundIsFading = true;
         } else {
           showToastIfNoneActive("No rounds to clear!");
@@ -4002,17 +3985,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           typeOfRound.add(roundType);
           roundSelectedPosition = workoutTimeIntegerArray.size() - 1;
 
-          if (workoutTimeIntegerArray.size() <= 8) {
-            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTimeStringArray.get(convertedWorkoutTimeStringArray.size() - 1));
-            workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(typeOfRound.size() - 1));
-            cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
-            cycleRoundsAdapter.notifyDataSetChanged();
-          } else {
-            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTimeStringArray.get(convertedWorkoutTimeStringArray.size() - 1));
-            workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(typeOfRound.size() - 1));
-            cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition - 8);
-            cycleRoundsAdapterTwo.notifyDataSetChanged();
-          }
+          workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTimeStringArray.get(convertedWorkoutTimeStringArray.size() - 1));
+          workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(typeOfRound.size() - 1));
+          cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
+          cycleRoundsAdapter.notifyDataSetChanged();
         } else {
           showToastIfNoneActive("Full!");
         }
@@ -4021,21 +3997,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTimeIntegerArray.set(roundSelectedPosition, integerValue * 1000);
         convertedWorkoutTimeStringArray.set(roundSelectedPosition, longToStringConverters.convertSecondsToMinutesBasedString(integerValue));
         typeOfRound.set(roundSelectedPosition, roundType);
-        if (roundSelectedPosition <= 7) {
-          workoutStringListOfRoundValuesForFirstAdapter.set(roundSelectedPosition, convertedWorkoutTimeStringArray.get(roundSelectedPosition));
-          workoutIntegerListOfRoundTypeForFirstAdapter.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
 
-          cycleRoundsAdapter.isRoundCurrentlySelected(false);
-          cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
-          cycleRoundsAdapter.notifyDataSetChanged();
-        } else {
-          workoutStringListOfRoundValuesForSecondAdapter.set(roundSelectedPosition - 8, convertedWorkoutTimeStringArray.get(roundSelectedPosition));
-          workoutIntegerListOfRoundTypeForSecondAdapter.set(roundSelectedPosition - 8, typeOfRound.get(roundSelectedPosition));
+        workoutStringListOfRoundValuesForFirstAdapter.set(roundSelectedPosition, convertedWorkoutTimeStringArray.get(roundSelectedPosition));
+        workoutIntegerListOfRoundTypeForFirstAdapter.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
 
-          cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
-          cycleRoundsAdapterTwo.setFadeInPosition(roundSelectedPosition - 8);
-          cycleRoundsAdapterTwo.notifyDataSetChanged();
-        }
+        cycleRoundsAdapter.isRoundCurrentlySelected(false);
+        cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
+        cycleRoundsAdapter.notifyDataSetChanged();
+
         roundIsSelected = false;
       }
     }
@@ -4046,30 +4015,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Integer array covers both adapters.
       if (workoutTimeIntegerArray.size() > 0) {
         if (workoutTimeIntegerArray.size() - 1 >= roundSelectedPosition) {
-          if (workoutTimeIntegerArray.size() <= 8 || (roundIsSelected && roundSelectedPosition <= 7)) {
-            if (workoutStringListOfRoundValuesForFirstAdapter.size() - 1 >= roundSelectedPosition) {
-              workoutStringListOfRoundValuesForFirstAdapter.remove(roundSelectedPosition);
-              workoutIntegerListOfRoundTypeForFirstAdapter.remove(roundSelectedPosition);
-              cycleRoundsAdapter.setFadeOutPosition(-1);
-              cycleRoundsAdapter.notifyDataSetChanged();
-            }
-          } else {
-            Log.i("testRemove", "adapter list size before conditional is " + workoutStringListOfRoundValuesForSecondAdapter.size());
-
-            Log.i("testRemove", "roundSelectPosition before conditional is " + roundSelectedPosition);
-
-            //Todo: Can be true if (roundselected -8) is negative, thus trying to access a negative value on removal.
-            if (workoutStringListOfRoundValuesForSecondAdapter.size() - 1 >= roundSelectedPosition - 8) {
-
-              Log.i("testRemove", "adapter list size after conditional is " + workoutStringListOfRoundValuesForSecondAdapter.size());
-
-              Log.i("testRemove", "roundSelectPosition after conditional is " + roundSelectedPosition);
-
-              workoutStringListOfRoundValuesForSecondAdapter.remove(roundSelectedPosition - 8);
-              workoutIntegerListOfRoundTypeForSecondAdapter.remove(roundSelectedPosition - 8);
-              cycleRoundsAdapterTwo.setFadeInPosition(-1);
-              cycleRoundsAdapterTwo.notifyDataSetChanged();
-            }
+          if (workoutStringListOfRoundValuesForFirstAdapter.size() - 1 >= roundSelectedPosition) {
+            workoutStringListOfRoundValuesForFirstAdapter.remove(roundSelectedPosition);
+            workoutIntegerListOfRoundTypeForFirstAdapter.remove(roundSelectedPosition);
+            cycleRoundsAdapter.setFadeOutPosition(-1);
+            cycleRoundsAdapter.notifyDataSetChanged();
           }
 
           typeOfRound.remove(roundSelectedPosition);
@@ -4081,13 +4031,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           subtractedRoundIsFading = false;
         }
         if (roundIsSelected) {
-          if (roundSelectedPosition <= 7) {
-            cycleRoundsAdapter.isRoundCurrentlySelected(false);
-            cycleRoundsAdapter.notifyDataSetChanged();
-          } else {
-            cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
-            cycleRoundsAdapterTwo.notifyDataSetChanged();
-          }
+          cycleRoundsAdapter.isRoundCurrentlySelected(false);
+          cycleRoundsAdapter.notifyDataSetChanged();
+
           consolidateRoundAdapterLists = true;
           roundIsSelected = false;
         }
@@ -4123,9 +4069,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setDoubleColumnRoundRecyclerView() {
-    roundRecyclerTwo.setVisibility(View.VISIBLE);
-    roundListDivider.setVisibility(View.VISIBLE);
-
 //    if (phoneHeight <= 1920) {
 //      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
 //      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(165);
@@ -5821,8 +5764,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortLow.setVisibility(View.GONE);
         sortActivityTitleAtoZ.setVisibility(View.GONE);
         sortActivityTitleZToA.setVisibility(View.GONE);
-        roundRecyclerTwo.setVisibility(View.GONE);
-//        roundListDivider.setVisibility(View.GONE);
 
         addTDEEfirstMainTextView.setVisibility(View.INVISIBLE);
         total_set_header.setText(R.string.total_work);
