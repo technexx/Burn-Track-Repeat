@@ -4095,7 +4095,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (phoneHeight <= 1920) {
       roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
-      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(15);
+      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
     } else {
       roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
       roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(20);
@@ -4108,9 +4108,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundListDivider.setVisibility(View.VISIBLE);
 
     if (phoneHeight <= 1920) {
-      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(300);
-      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(20);
-      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(140);
+      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
+      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(160);
+      roundRecyclerTwoLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
     } else {
       roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(290);
       roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(150);
