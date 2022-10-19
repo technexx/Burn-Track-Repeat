@@ -634,6 +634,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar settingsActionBar;
 
   //Todo: Bug on fast add/remove w/ selecting rounds. Round left over + crash when trying to add more.
+      //Todo: Crash occurs when replacing and then clicking subtract in quick succession w/ 2 adapters present.
+      //Todo: Other bug occurs when replacing + subtracting quickly w/ only first adapter present.
       //Todo; Dot should also clear when exiting edit popUp.
   //Todo: Consider guidelines for Stats Frag too.
   //Todo: mode 3 editPopUp changes at both heights.
@@ -4041,6 +4043,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void removeRound() {
     if (mode == 1) {
+      //Integer array covers both adapters.
       if (workoutTimeIntegerArray.size() > 0) {
         if (workoutTimeIntegerArray.size() - 1 >= roundSelectedPosition) {
           if (workoutTimeIntegerArray.size() <= 8 || (roundIsSelected && roundSelectedPosition <= 7)) {
@@ -4051,7 +4054,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               cycleRoundsAdapter.notifyDataSetChanged();
             }
           } else {
+            Log.i("testRemove", "adapter list size before conditional is " + workoutStringListOfRoundValuesForSecondAdapter.size());
+
+            Log.i("testRemove", "roundSelectPosition before conditional is " + roundSelectedPosition);
+
+            //Todo: Can be true if (roundselected -8) is negative, thus trying to access a negative value on removal.
             if (workoutStringListOfRoundValuesForSecondAdapter.size() - 1 >= roundSelectedPosition - 8) {
+
+              Log.i("testRemove", "adapter list size after conditional is " + workoutStringListOfRoundValuesForSecondAdapter.size());
+
+              Log.i("testRemove", "roundSelectPosition after conditional is " + roundSelectedPosition);
+
               workoutStringListOfRoundValuesForSecondAdapter.remove(roundSelectedPosition - 8);
               workoutIntegerListOfRoundTypeForSecondAdapter.remove(roundSelectedPosition - 8);
               cycleRoundsAdapterTwo.setFadeInPosition(-1);

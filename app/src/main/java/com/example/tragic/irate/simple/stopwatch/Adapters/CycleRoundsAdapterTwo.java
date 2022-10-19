@@ -173,8 +173,6 @@ public class CycleRoundsAdapterTwo extends RecyclerView.Adapter<RecyclerView.Vie
                 break;
         }
 
-        Log.i("testColor", "type of round list is " + mTypeOfRound);
-
         //Only runs fade animation if adding/subtracting rounds.
         if (mRunRoundAnimation) {
             if (mPosAddHolder>=0 || mPosSubHolder >=0) {
