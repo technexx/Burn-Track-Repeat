@@ -633,6 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Timer Ui changes at <1920 height.
   //Todo: Pomodoro intro popUp
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
