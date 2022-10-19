@@ -140,7 +140,7 @@
 
     <ImageButton
         android:id="@+id/addRoundToCycleButton"
-        android:src="@drawable/white_plus_circle"
+        android:src="@drawable/white_plus_circle_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintEnd_toEndOf="parent"
@@ -149,19 +149,19 @@
         android:layout_marginEnd="4dp"
         android:textSize="15sp"
         android:gravity="center"
-        android:backgroundTint="@color/test_black"
         app:cornerRadius="50dp"
         app:rippleColor="#37474F"
         app:strokeColor="@color/black"
         app:strokeWidth="1dp"
         android:background="@drawable/ripple_effect_4"
+        android:backgroundTint="@color/test_black"
         android:clickable="true"
         android:focusable="true">
     </ImageButton>
 
     <ImageButton
         android:id="@+id/subtractRoundFromCycleButton"
-        android:src="@drawable/white_sub_circle"
+        android:src="@drawable/white_sub_circle_small"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="6dp"
@@ -170,12 +170,12 @@
         android:layout_marginEnd="4dp"
         android:textSize="15sp"
         android:gravity="center"
-        android:backgroundTint="@color/test_black"
         app:cornerRadius="50dp"
         app:rippleColor="#37474F"
         app:strokeColor="@color/black"
         app:strokeWidth="1dp"
         android:background="@drawable/ripple_effect_4"
+        android:backgroundTint="@color/test_black"
         android:clickable="true"
         android:focusable="true">
     </ImageButton>
@@ -357,12 +357,14 @@
         app:layout_constraintStart_toStartOf="@id/round_recycler_layout"
         app:layout_constraintEnd_toEndOf="@id/round_recycler_layout"
         app:layout_constraintTop_toBottomOf="@id/number_pad_layout"
-        android:layout_marginTop="2dp"
+        app:layout_constraintBottom_toTopOf="@id/round_recycler_layout"
+        android:layout_marginTop="0dp"
+        android:layout_marginBottom="10dp"
         android:textColor="@color/white"
-        app:layout_constraintWidth_max="320dp"
+        android:maxWidth="280dp"
         android:gravity="center_horizontal"
         android:textStyle="bold"
-        android:textSize="18sp">
+        android:textSize="17sp">
     </TextView>
 
     <ImageView
