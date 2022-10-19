@@ -633,7 +633,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Timer Ui changes at <1920 height.
+  //Todo: Try wrap content for width of roundReyclerLayoutParams, and then padding both sides to create space (instead of these margins).
+  //Todo: Replace round bullet dot fixed for 4 digit time on second round adapter.
+  //Todo: mode 3 editPopUp changes at both heights.
   //Todo: Pomodoro intro popUp
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -4099,7 +4101,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
     } else {
       roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
-      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(20);
+      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
     }
     roundRecyclerOneLayoutParams.rightMargin = 0;
   }
@@ -4110,12 +4112,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (phoneHeight <= 1920) {
       roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
-      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(160);
+      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(165);
       roundRecyclerTwoLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
     } else {
       roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(290);
-      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(150);
-      roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(10);
+      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
+      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(0);
+      roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(15);
     }
   }
 
