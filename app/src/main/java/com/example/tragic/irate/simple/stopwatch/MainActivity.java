@@ -633,8 +633,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Edit PopUp itself should use guidelines, if nothing else than for the recyclerView layout so we don't have to change heights.
-  //Todo: Try wrap content for width of roundReyclerLayoutParams, and then padding both sides to create space (instead of these margins).
+  //Todo: Bug on fast add/remove w/ selecting rounds. Round left over + crash when trying to add more.
+      //Todo; Dot should also clear when exiting edit popUp.
   //Todo: Consider guidelines for Stats Frag too.
   //Todo: mode 3 editPopUp changes at both heights.
   //Todo: Pomodoro intro popUp
@@ -2436,7 +2436,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     reset.setVisibility(View.INVISIBLE);
     new_lap.setAlpha(0.3f);
-    roundListDivider.setVisibility(View.GONE);
+//    roundListDivider.setVisibility(View.GONE);
 
     savedPomCycleRecycler.setVisibility(View.GONE);
     pomDotsRecycler.setVisibility(View.GONE);
@@ -3213,7 +3213,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab.setEnabled(true);
     cycleRoundsAdapter.notifyDataSetChanged();
     cycleRoundsAdapterTwo.notifyDataSetChanged();
-    roundListDivider.setVisibility(View.GONE);
+//    roundListDivider.setVisibility(View.GONE);
 
     setSingleColumnRoundRecyclerView();
   }
@@ -4096,33 +4096,33 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setSingleColumnRoundRecyclerView() {
-    roundRecyclerTwo.setVisibility(View.GONE);
-    roundListDivider.setVisibility(View.GONE);
+//    roundRecyclerTwo.setVisibility(View.GONE);
+//    roundListDivider.setVisibility(View.GONE);
 
-    if (phoneHeight <= 1920) {
-      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
-      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
-    } else {
-      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
-      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
-    }
-    roundRecyclerOneLayoutParams.rightMargin = 0;
+//    if (phoneHeight <= 1920) {
+//      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
+//      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
+//    } else {
+//      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
+//      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
+//    }
+//    roundRecyclerOneLayoutParams.rightMargin = 0;
   }
 
   private void setDoubleColumnRoundRecyclerView() {
     roundRecyclerTwo.setVisibility(View.VISIBLE);
     roundListDivider.setVisibility(View.VISIBLE);
 
-    if (phoneHeight <= 1920) {
-      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
-      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(165);
-      roundRecyclerTwoLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
-    } else {
-      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(290);
-      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
-      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(0);
-      roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(15);
-    }
+//    if (phoneHeight <= 1920) {
+//      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
+//      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(165);
+//      roundRecyclerTwoLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
+//    } else {
+//      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(290);
+//      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
+//      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(0);
+//      roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(15);
+//    }
   }
 
   public String friendlyString(String altString) {
@@ -5809,10 +5809,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortActivityTitleAtoZ.setVisibility(View.GONE);
         sortActivityTitleZToA.setVisibility(View.GONE);
         roundRecyclerTwo.setVisibility(View.GONE);
-        roundListDivider.setVisibility(View.GONE);
+//        roundListDivider.setVisibility(View.GONE);
 
         addTDEEfirstMainTextView.setVisibility(View.INVISIBLE);
-        ;
         total_set_header.setText(R.string.total_work);
 
 //        savedCycleRecycler.setVisibility(View.GONE);

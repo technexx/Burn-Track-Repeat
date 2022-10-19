@@ -381,8 +381,8 @@
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="@id/edit_guideline_1"
         app:layout_constraintBottom_toBottomOf="@id/edit_guideline_3"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/round_recycler_layout"
+        app:layout_constraintEnd_toEndOf="@id/round_recycler_layout"
         android:layout_marginTop="0dp"
         android:textColor="@color/white"
         android:maxWidth="350dp"
@@ -394,7 +394,7 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/round_recycler_layout"
-        android:layout_width="match_parent"
+        android:layout_width="280dp"
         android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -406,11 +406,11 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/round_list_recycler"
-            android:layout_width="240dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            android:layout_marginStart="4dp">
+            android:layout_marginStart="8dp">
         </androidx.recyclerview.widget.RecyclerView>
 
         <View
@@ -425,10 +425,9 @@
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/round_list_recycler_two"
-            android:layout_width="240dp"
+            android:layout_width="wrap_content"
             android:layout_height="match_parent"
             app:layout_constraintStart_toEndOf="@id/round_list_divider"
-            app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             android:layout_marginStart="0dp">
         </androidx.recyclerview.widget.RecyclerView>
