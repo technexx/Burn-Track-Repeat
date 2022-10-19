@@ -559,7 +559,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   TDEEChosenActivitySpinnerValues tDEEChosenActivitySpinnerValues;
   TextView addTDEEfirstMainTextView;
-  ImageView removeTdeeActivityImageView;
   PopupWindow addTdeePopUpWindow;
   View addTDEEPopUpView;
 
@@ -573,7 +572,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   TextView caloriesBurnedInTdeeAdditionTextView;
   TextView metScoreTextView;
-  Button confirmActivityAdditionValues;
+  Button addActivityConfirmButton;
+  Button cancelActivityConfirmButton;
 
   boolean metricMode;
   String userGender;
@@ -633,8 +633,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Edit PopUp itself should use guidelines, if nothing else than for the recyclerView layout so we don't have to change heights.
   //Todo: Try wrap content for width of roundReyclerLayoutParams, and then padding both sides to create space (instead of these margins).
-  //Todo: Replace round bullet dot fixed for 4 digit time on second round adapter.
+  //Todo: Consider guidelines for Stats Frag too.
   //Todo: mode 3 editPopUp changes at both heights.
   //Todo: Pomodoro intro popUp
 
@@ -1348,12 +1349,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       addTdeePopUpWindow.showAsDropDown(testView);
     });
 
-    confirmActivityAdditionValues.setOnClickListener(v -> {
+    addActivityConfirmButton.setOnClickListener(v -> {
       addTdeePopUpWindow.dismiss();
       toggleEditPopUpViewsForAddingActivity(true);
     });
 
-    removeTdeeActivityImageView.setOnClickListener(v -> {
+    cancelActivityConfirmButton.setOnClickListener(v -> {
+      addTdeePopUpWindow.dismiss();
       toggleEditPopUpViewsForAddingActivity(false);
     });
 
@@ -1949,7 +1951,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void assignTdeePopUpLayoutClassesToTheirIds() {
     tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
     tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
-    confirmActivityAdditionValues = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+    addActivityConfirmButton = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+    cancelActivityConfirmButton = addTDEEPopUpView.findViewById(R.id.add_activity_cancel_button);
     metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
     metScoreTextView.setVisibility(View.GONE);
     caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
@@ -1988,7 +1991,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
 
     addTDEEfirstMainTextView = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
-    removeTdeeActivityImageView = editCyclesPopupView.findViewById(R.id.cancel_activity_for_cycle);
   }
 
   private void assignTimerPopUpLayoutClassesToTheirIds() {
@@ -2441,7 +2443,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setDefaultLayoutTexts() {
-    confirmActivityAdditionValues.setText(R.string.okay);
+    addActivityConfirmButton.setText(R.string.okay);
+    cancelActivityConfirmButton.setText(R.string.cancel);
     timerValueInEditPopUpTextView.setText("00:00");
     setTrackingDailyStatsHeaderTextView();
 
@@ -5738,7 +5741,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setDefaultEditRoundViews() {
     toggleInfinityRounds.setAlpha(0.4f);
-    removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
     setDefaultTimerValuesAndTheirEditTextViews();
 
     setEditPopUpTimerHeaders(1);
@@ -6008,11 +6010,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (activityExists) {
         String activity = (String) tdee_sub_category_spinner.getSelectedItem();
         addTDEEfirstMainTextView.setText(activity);
-        removeTdeeActivityImageView.setVisibility(View.VISIBLE);
         cycleHasActivityAssigned = true;
       } else {
         addTDEEfirstMainTextView.setText(R.string.add_activity);
-        removeTdeeActivityImageView.setVisibility(View.INVISIBLE);
         cycleHasActivityAssigned = false;
       }
     }

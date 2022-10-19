@@ -163,7 +163,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     TextView caloriesBurnedInTdeeAdditionTextView;
     TextView metScoreTextView;
-    Button confirmActivityAdditionValues;
+    Button addActivityConfirmButton;
 
     View tdeeEditView;
     View popUpAnchorBottom;
@@ -431,7 +431,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             statDurationSwitchModeLogic(ITERATING_ACTIVITY_STATS_UP);
         });
 
-        confirmActivityAdditionValues.setOnClickListener(v-> {
+        addActivityConfirmButton.setOnClickListener(v-> {
             setNewActivityVariablesAndCheckIfActivityExists(false);
         });
 
@@ -1969,13 +1969,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tdee_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_category_spinner);
         tdee_sub_category_spinner = addTDEEPopUpView.findViewById(R.id.activity_sub_category_spinner);
-        confirmActivityAdditionValues = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
+        addActivityConfirmButton = addTDEEPopUpView.findViewById(R.id.add_activity_confirm_button);
 
         metScoreTextView = addTDEEPopUpView.findViewById(R.id.met_score_textView);
         metScoreTextView.setVisibility(View.GONE);
         caloriesBurnedInTdeeAdditionTextView = addTDEEPopUpView.findViewById(R.id.calories_burned_in_tdee_addition_popUp_textView);
 
-        confirmActivityAdditionValues.setText(R.string.save);
+        addActivityConfirmButton.setText(R.string.save);
         metScoreTextView.setTextSize(22);
 
         addTdeePopUpWindow.setOnDismissListener(()-> {
