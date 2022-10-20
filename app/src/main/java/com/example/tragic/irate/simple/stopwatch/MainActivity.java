@@ -454,7 +454,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean stopWatchTimerEnded;
 
   LinearLayoutManager lapRecyclerLayoutManager;
-  ConstraintLayout roundRecyclerLayout;
 
   ValueAnimator sizeAnimator;
   ValueAnimator valueAnimatorDown;
@@ -1980,7 +1979,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.toggle_infinity_rounds);
     buttonToLaunchTimerFromEditPopUp = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimerFromEditPopUp);
 
-    roundRecyclerLayout = editCyclesPopupView.findViewById(R.id.round_recycler_layout);
     roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
 
     addTDEEfirstMainTextView = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
