@@ -125,13 +125,11 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
   public void setPomFade(boolean fadingIn) {
     this.mPomFadingIn = fadingIn;
-    //Determines whether we want an active animation. Since animateOut's listener clears our adapter lists at fade'a end, we don't want it triggered unless we are actively adding/removing a list.
+    //Determines whether we want an active animation. Since animateOut's listener clears our adapter lists at fade's end, we don't want it triggered unless we are actively adding/removing a list.
     mFadePom = true;
   }
 
   public void setIsRoundCurrentlySelectedBoolean(boolean selected) {
-    Log.i("testBullet", "boolean set to " + mRoundSelected);
-
     mRoundSelected = selected;
   }
 

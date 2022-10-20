@@ -622,8 +622,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: "01, 02" etc. could make first column look fuller and also correct 9/10 alignment. Maybe slightly smaller round number font.
-  //Todo; Dot should also clear when exiting edit popUp and as soon as we press add/replace within popUp.
   //Todo: mode 3 editPopUp changes.
   //Todo: Pomodoro intro popUp
 
@@ -3889,6 +3887,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         removeRound();
       }
       if (workoutTimeIntegerArray.size() > 0) {
+        cycleRoundsAdapter.setIsRoundCurrentlySelectedBoolean(false);
         cycleRoundsAdapter.setFadeOutPosition(roundSelectedPosition);
         cycleRoundsAdapter.notifyDataSetChanged();
 
