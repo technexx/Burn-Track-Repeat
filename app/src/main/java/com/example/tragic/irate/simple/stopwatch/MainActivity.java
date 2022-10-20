@@ -50,7 +50,6 @@ import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.GridView;
 import android.widget.ImageButton;
-import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
@@ -69,14 +68,11 @@ import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.loader.content.AsyncTaskLoader;
-import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapter;
-import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapterTwo;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DotsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.LapAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.PomDotsAdapter;
@@ -114,7 +110,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapterTwo.onFadeFinished, CycleRoundsAdapter.onRoundSelected, CycleRoundsAdapterTwo.onRoundSelectedSecondAdapter, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DailyStatsFragment.changeSortMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapter.onRoundSelected, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DailyStatsFragment.changeSortMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
 
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
@@ -150,7 +146,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   RecyclerView savedCycleRecycler;
   RecyclerView savedPomCycleRecycler;
   CycleRoundsAdapter cycleRoundsAdapter;
-  CycleRoundsAdapterTwo cycleRoundsAdapterTwo;
   SavedCycleAdapter savedCycleAdapter;
   SavedPomCycleAdapter savedPomCycleAdapter;
 
@@ -922,7 +917,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void changeColorSetting(int receivedMode, int typeOFRound, int settingNumber) {
     cycleRoundsAdapter.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
-    cycleRoundsAdapterTwo.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
 
     if (receivedMode == 1) {
       savedCycleAdapter.setColorSettingsFromMainActivity(typeOFRound, settingNumber);
@@ -1214,7 +1208,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
       }
       cycleRoundsAdapter.notifyDataSetChanged();
-      cycleRoundsAdapterTwo.notifyDataSetChanged();
     }
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
     if (mode == 3) {
@@ -1230,7 +1223,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void roundSelected(boolean selected, int position) {
     if (selected) {
       cycleRoundsAdapter.isRoundCurrentlySelected(true);
-      cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
       roundIsSelected = true;
       roundSelectedPosition = position;
     } else {
@@ -1239,24 +1231,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     cycleRoundsAdapter.notifyDataSetChanged();
-    cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
-  @Override
-  public void roundSelectedSecondAdapter(boolean selected, int position) {
-    if (selected) {
-      cycleRoundsAdapter.isRoundCurrentlySelected(false);
-      cycleRoundsAdapterTwo.isRoundCurrentlySelected(true);
-      roundIsSelected = true;
-      roundSelectedPosition = position;
-    } else {
-      cycleRoundsAdapterTwo.isRoundCurrentlySelected(false);
-      roundIsSelected = false;
-    }
-
-    cycleRoundsAdapter.notifyDataSetChanged();
-    cycleRoundsAdapterTwo.notifyDataSetChanged();
-  }
 
   @Override
   public boolean onCreateOptionsMenu(final Menu menu) {
@@ -2126,14 +2102,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter = new CycleRoundsAdapter(getApplicationContext(), workoutStringListOfRoundValuesForFirstAdapter, workoutIntegerListOfRoundTypeForFirstAdapter, pomStringListOfRoundValues);
     cycleRoundsAdapter.fadeFinished(MainActivity.this);
     cycleRoundsAdapter.selectedRound(MainActivity.this);
-    cycleRoundsAdapter.setMode(mode);
-
-    cycleRoundsAdapterTwo = new CycleRoundsAdapterTwo(getApplicationContext(), workoutStringListOfRoundValuesForSecondAdapter, workoutIntegerListOfRoundTypeForSecondAdapter);
-    cycleRoundsAdapterTwo.fadeFinished(MainActivity.this);
-    cycleRoundsAdapterTwo.selectedRoundSecondAdapter(MainActivity.this);
 
     cycleRoundsAdapter.setScreenHeight(phoneHeight);
-    cycleRoundsAdapterTwo.setScreenHeight(phoneHeight);
   }
 
   private void setRoundRecyclersOnAdaptersAndLayoutManagers() {
@@ -3068,8 +3038,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.setColorSettingsFromMainActivity(3, workColorNumericValue);
     cycleRoundsAdapter.setColorSettingsFromMainActivity(4, miniBreakColorNumericValue);
     cycleRoundsAdapter.setColorSettingsFromMainActivity(5, fullBreakColorNumericValue);
-    cycleRoundsAdapterTwo.setColorSettingsFromMainActivity(1, setColorNumericValue);
-    cycleRoundsAdapterTwo.setColorSettingsFromMainActivity(2, breakColorNumericValue);
 
     savedCycleAdapter.setColorSettingsFromMainActivity(1, setColorNumericValue);
     savedCycleAdapter.setColorSettingsFromMainActivity(2, breakColorNumericValue);
@@ -3194,7 +3162,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     fab.setEnabled(true);
     cycleRoundsAdapter.notifyDataSetChanged();
-    cycleRoundsAdapterTwo.notifyDataSetChanged();
 
     setSingleColumnRoundRecyclerView();
   }
@@ -3843,7 +3810,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     cycleRoundsAdapter.notifyDataSetChanged();
-    cycleRoundsAdapterTwo.notifyDataSetChanged();
   }
 
   private void setAndCapTimerValues(int value) {
