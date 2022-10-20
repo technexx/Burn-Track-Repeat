@@ -288,7 +288,7 @@
         android:layout_marginTop="6dp"
         android:layout_marginBottom="0dp"
         android:paddingStart="4dp"
-        android:background="@drawable/recycler_border_with_divider"
+        android:background="@drawable/recycler_border_without_divider"
         app:layout_constraintVertical_weight="3">
     </androidx.recyclerview.widget.RecyclerView>
 
@@ -304,7 +304,7 @@
         android:layout_marginTop="0dp"
         android:layout_marginBottom="0dp"
         android:paddingStart="4dp"
-        android:background="@drawable/recycler_border_with_divider"
+        android:background="@drawable/recycler_border_without_divider"
         app:layout_constraintVertical_weight="3">
     </androidx.recyclerview.widget.RecyclerView>
 

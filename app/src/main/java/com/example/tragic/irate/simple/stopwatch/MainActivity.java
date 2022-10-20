@@ -1453,13 +1453,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addRoundToCycleButton.setOnClickListener(v -> {
       mHandler.postDelayed(()-> {
         adjustCustom(true);
-      }, 50);
+      }, 25);
     });
 
     subtractRoundFromCycleButton.setOnClickListener(v -> {
       mHandler.postDelayed(()-> {
         adjustCustom(false);
-      }, 50);
+      }, 25);
     });
 
     toggleInfinityRounds.setOnClickListener(v -> {
