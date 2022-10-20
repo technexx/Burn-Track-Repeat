@@ -1204,26 +1204,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void subtractionFadeHasFinished() {
     //When adapter fade on round has finished, execute method to remove the round from adapter list/holders and refresh the adapter display. If we click to remove another round before fade is done, fade gets cancelled, restarted on next position, and this method is also called to remove previous round.
     removeRound();
-    if (consolidateRoundAdapterLists) {
-      //Adapters only need adjusting if second one is populated.
-      if (workoutTimeIntegerArray.size() >= 8) {
-        workoutStringListOfRoundValuesForFirstAdapter.clear();
-        workoutIntegerListOfRoundTypeForFirstAdapter.clear();
-        workoutStringListOfRoundValuesForSecondAdapter.clear();
-        workoutIntegerListOfRoundTypeForSecondAdapter.clear();
-        for (int i = 0; i < workoutTimeIntegerArray.size(); i++) {
-          if (i <= 7) {
-            workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTimeStringArray.get(i));
-            workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
-          } else {
-            workoutStringListOfRoundValuesForSecondAdapter.add(convertedWorkoutTimeStringArray.get(i));
-            workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(i));
-          }
-        }
-        cycleRoundsAdapter.notifyDataSetChanged();
-        cycleRoundsAdapterTwo.notifyDataSetChanged();
+
+    if (workoutTimeIntegerArray.size() >= 8) {
+      workoutStringListOfRoundValuesForFirstAdapter.clear();
+      workoutIntegerListOfRoundTypeForFirstAdapter.clear();
+      workoutStringListOfRoundValuesForSecondAdapter.clear();
+      workoutIntegerListOfRoundTypeForSecondAdapter.clear();
+
+      for (int i = 0; i < workoutTimeIntegerArray.size(); i++) {
+        workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTimeStringArray.get(i));
+        workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
       }
-      consolidateRoundAdapterLists = false;
+      cycleRoundsAdapter.notifyDataSetChanged();
+      cycleRoundsAdapterTwo.notifyDataSetChanged();
     }
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
     if (mode == 3) {
@@ -1484,11 +1477,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
     addRoundToCycleButton.setOnClickListener(v -> {
-      adjustCustom(true);
+      mHandler.postDelayed(()-> {
+        adjustCustom(true);
+      }, 50);
     });
 
     subtractRoundFromCycleButton.setOnClickListener(v -> {
-      adjustCustom(false);
+      mHandler.postDelayed(()-> {
+        adjustCustom(false);
+      }, 50);
     });
 
     toggleInfinityRounds.setOnClickListener(v -> {
@@ -2906,15 +2903,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         for (int i = 0; i < workoutTimeIntegerArray.size(); i++) {
+
           convertedWorkoutTimeStringArray.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTimeIntegerArray.get(i) / 1000));
-          if (i <= 7) {
-            workoutStringListOfRoundValuesForFirstAdapter.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTimeIntegerArray.get(i) / 1000));
-            workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
-          }
-          if (i >= 8) {
-            workoutStringListOfRoundValuesForSecondAdapter.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTimeIntegerArray.get(i) / 1000));
-            workoutIntegerListOfRoundTypeForSecondAdapter.add(typeOfRound.get(i));
-          }
+          workoutStringListOfRoundValuesForFirstAdapter.add(longToStringConverters.convertSecondsToMinutesBasedString(workoutTimeIntegerArray.get(i) / 1000));
+          workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
         }
         roundSelectedPosition = workoutTimeIntegerArray.size() - 1;
         break;
