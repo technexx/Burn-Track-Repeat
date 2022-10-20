@@ -27,7 +27,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".65">
+        app:layout_constraintGuide_percent=".64">
     </androidx.constraintlayout.widget.Guideline>
 
     <EditText
@@ -416,7 +416,7 @@
         app:layout_constraintEnd_toEndOf="@id/edit_horizontal_guideline_2"
         app:layout_constraintTop_toBottomOf="@id/edit_guideline_3"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="2dp"
+        android:layout_marginBottom="0dp"
         android:layout_marginEnd="0dp"
         android:background="@drawable/recycler_border_with_divider">
     </androidx.recyclerview.widget.RecyclerView>

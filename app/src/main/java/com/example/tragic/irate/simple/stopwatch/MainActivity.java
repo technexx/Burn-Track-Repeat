@@ -628,10 +628,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Bug on fast add/remove w/ selecting rounds. Round left over + crash when trying to add more.
-      //Todo: Crash occurs when replacing and then clicking subtract in quick succession w/ 2 adapters present.
-      //Todo: Other bug occurs when replacing + subtracting quickly w/ only first adapter present.
-      //Todo; Dot should also clear when exiting edit popUp.
+  //Todo; Dot should also clear when exiting edit popUp and as soon as we press add/replace within popUp.
   //Todo: Consider guidelines for Stats Frag too.
   //Todo: mode 3 editPopUp changes at both heights.
   //Todo: Pomodoro intro popUp
