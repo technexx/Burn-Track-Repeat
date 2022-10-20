@@ -164,14 +164,11 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     if (holder instanceof ModeOneRounds) {
       //Casts our custom recyclerView to generic recyclerView class.
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
-      //No bullets visible unless a round is selected.
       modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
 
-      //If a round has been selected (and boolean set to true), set only that position's bullet to visible.
       if (mRoundSelected) if (position==mPositionOfSelectedRound) modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
 
       modeOneRounds.fullView.setOnClickListener(v -> {
-        //Toggles bullet appearance next to each round, and de-selects a round if another is selected.
         if (!mRoundSelected || position!=mPositionOfSelectedRound) {
           modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
           //This var is used to make visible the correct bullet position when we re-draw this adapter's list.
@@ -224,7 +221,12 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
           }
         }
       }
-      modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
+
+      if (position<=8) {
+        modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, "0" + (position + 1)));
+      } else {
+        modeOneRounds.round_count.setText(holder.itemView.getContext().getString(R.string.round_numbers, String.valueOf(position + 1)));
+      }
       modeOneRounds.workout_rounds.setText(appendSeconds(mWorkOutList.get(position)));
       //Last adapter position has been iterated through, and we set our fade animation boolean back to false.
       if (position==mWorkOutList.size()-1) mRunRoundAnimation = false;

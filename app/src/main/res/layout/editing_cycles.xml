@@ -418,7 +418,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginBottom="2dp"
         android:layout_marginEnd="0dp"
-        android:background="@drawable/recycler_border_with_divider">
+        android:background="@drawable/recycler_border_without_divider">
     </androidx.recyclerview.widget.RecyclerView>
 
     <ImageButton

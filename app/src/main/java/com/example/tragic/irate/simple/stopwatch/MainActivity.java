@@ -628,6 +628,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: "01, 02" etc. could make first column look fuller and also correct 9/10 alignment. Maybe slightly smaller round number font.
   //Todo; Dot should also clear when exiting edit popUp and as soon as we press add/replace within popUp.
   //Todo: Consider guidelines for Stats Frag too.
   //Todo: mode 3 editPopUp changes at both heights.
@@ -2143,7 +2144,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     roundRecycler.setLayoutManager(gridLayoutManager);
     roundRecycler.setAdapter(cycleRoundsAdapter);
-    roundRecycler.addItemDecoration(horizontalSpaceItemDecoration);
+//    roundRecycler.addItemDecoration(horizontalSpaceItemDecoration);
   }
 
   private void setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight() {
