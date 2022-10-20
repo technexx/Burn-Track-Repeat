@@ -126,8 +126,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   FragmentManager fragmentManager;
   TabLayout savedCyclesTabLayout;
   TabLayout.Tab savedCyclesTab;
+
   View timerView;
   View mainView;
+  View topOfMainActivityView;
+  View bottomEditTitleDividerView;
+
   Calendar calendar;
   LongToStringConverters longToStringConverters;
 
@@ -624,8 +628,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Pomodoro intro popUp
-
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -648,6 +650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add Day/Night modes.
   //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle it.
 
+  //Todo: Drawable height may sync w/ textView height for alignment.
   //Todo: We can also commit just specific files, remember!
   //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
 
@@ -1296,6 +1299,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setPhoneDimensions();
     groupAllAppStartInstantiations();
 
+    mainView = findViewById(R.id.main_layout);
+    topOfMainActivityView = findViewById(R.id.top_of_main_activity_view);
+    bottomEditTitleDividerView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
+
     toggleDayAndNightModesForMain(colorThemeMode);
     toggleDayAndNightModesForTimer(colorThemeMode);
 
@@ -1306,8 +1313,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEfirstMainTextView.setOnClickListener(v -> {
       inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
 
-      View testView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
-      addTdeePopUpWindow.showAsDropDown(testView);
+      addTdeePopUpWindow.showAsDropDown(topOfMainActivityView);
+
     });
 
     addActivityConfirmButton.setOnClickListener(v -> {
@@ -1868,8 +1875,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void assignMainLayoutClassesToIds() {
-    mainView = findViewById(R.id.main_layout);
-
     mainActionBar = getSupportActionBar();
 
     mainActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
@@ -2113,13 +2118,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setRoundRecyclersOnAdaptersAndLayoutManagers() {
+//    GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
+//    gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
+
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
 
     GridLayoutManager gridLayoutManager2 = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager2.setOrientation(GridLayoutManager.HORIZONTAL);
 
-    HorizontalSpaceItemDecoration horizontalSpaceItemDecoration = new HorizontalSpaceItemDecoration(dpConv(33));
+    HorizontalSpaceItemDecoration horizontalSpaceItemDecoration = new HorizontalSpaceItemDecoration(dpConv(10));
 
     roundRecycler.setLayoutManager(gridLayoutManager);
     roundRecycler.setAdapter(cycleRoundsAdapter);
@@ -4198,8 +4206,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle);
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
 
-        if (mode == 1) savedCycleRecycler.startAnimation(slideOutFromLeftLong);
-        if (mode == 3) savedPomCycleRecycler.startAnimation(slideOutFromLeftLong);
+        runOnUiThread(() -> {
+          if (mode == 1) savedCycleRecycler.startAnimation(slideOutFromLeftLong);
+          if (mode == 3) savedPomCycleRecycler.startAnimation(slideOutFromLeftLong);
+        });
       }
 
       if (cycleHasActivityAssigned) {

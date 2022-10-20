@@ -5,9 +5,7 @@
     android:id="@+id/workout_recycler_layout"
     android:layout_width="wrap_content"
     android:layout_height="wrap_content"
-    android:layout_marginTop="3dp"
-    android:layout_marginBottom="3dp"
-    android:layout_marginStart="4dp"
+    android:layout_marginStart="16dp"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent">
 
@@ -17,7 +15,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="23sp"
+        android:textSize="21sp"
         android:layout_marginStart="6dp"
         android:textColor="@color/white">
     </TextView>
@@ -27,9 +25,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/round_count"
-        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toTopOf="@id/round_count"
+        app:layout_constraintBottom_toBottomOf="@id/round_count"
         android:layout_marginStart="3dp"
-        android:textSize="25sp">
+        android:textSize="23sp">
     </TextView>
 
     <ImageView
@@ -51,7 +50,7 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="2dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="0dp"
         android:src="@drawable/target_dot">
     </ImageView>
 

@@ -140,7 +140,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     View view;
 
     if (viewType == MODE_ONE) {
-
       if (mScreenHeight <= 1920) {
         view = LayoutInflater.from(context).inflate(R.layout.mode_one_rounds_h1920, parent, false);
       } else {
