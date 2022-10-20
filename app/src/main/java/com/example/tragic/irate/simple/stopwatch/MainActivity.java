@@ -91,6 +91,7 @@ import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.Daily
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalorieIteration;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.HorizontalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TextViewDisplaySync;
@@ -2143,8 +2144,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
 
+    HorizontalSpaceItemDecoration horizontalSpaceItemDecoration = new HorizontalSpaceItemDecoration(dpConv(33));
+
     roundRecycler.setLayoutManager(gridLayoutManager);
     roundRecycler.setAdapter(cycleRoundsAdapter);
+    roundRecycler.addItemDecoration(horizontalSpaceItemDecoration);
   }
 
   private void setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight() {
@@ -4047,29 +4051,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setSingleColumnRoundRecyclerView() {
-//    roundRecyclerTwo.setVisibility(View.GONE);
-//    roundListDivider.setVisibility(View.GONE);
-
 //    if (phoneHeight <= 1920) {
-//      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(180);
+//      roundRecyclerOneLayoutParams.width = convertDensityPixelsToScalable(180);
 //      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
 //    } else {
-//      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(200);
-//      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
+//      roundRecyclerOneLayoutParams.width = convertDensityPixelsToScalable(200);
+//      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
 //    }
 //    roundRecyclerOneLayoutParams.rightMargin = 0;
   }
 
   private void setDoubleColumnRoundRecyclerView() {
 //    if (phoneHeight <= 1920) {
-//      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(240);
+//      roundRecyclerOneLayoutParams.width = convertDensityPixelsToScalable(240);
 //      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(165);
-//      roundRecyclerTwoLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
 //    } else {
-//      roundRecyclerParentLayoutParams.width = convertDensityPixelsToScalable(290);
+//      roundRecyclerOneLayoutParams.width = convertDensityPixelsToScalable(290);
 //      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
 //      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(0);
-//      roundRecyclerTwoLayoutParams.rightMargin = convertDensityPixelsToScalable(15);
 //    }
   }
 
