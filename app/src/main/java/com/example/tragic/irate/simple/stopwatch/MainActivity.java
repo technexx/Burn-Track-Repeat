@@ -2341,7 +2341,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
     stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
-    addTdeePopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    addTdeePopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     aboutSettingsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
   }
 
