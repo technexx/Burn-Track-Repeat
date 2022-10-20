@@ -143,9 +143,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean isNewCycle;
 
   RecyclerView roundRecycler;
+  RecyclerView pomRoundRecycler;
   RecyclerView savedCycleRecycler;
   RecyclerView savedPomCycleRecycler;
   CycleRoundsAdapter cycleRoundsAdapter;
+
   SavedCycleAdapter savedCycleAdapter;
   SavedPomCycleAdapter savedPomCycleAdapter;
 
@@ -622,7 +624,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: mode 3 editPopUp changes.
   //Todo: Pomodoro intro popUp
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -1800,8 +1801,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleRoundsAdapter.setMode(1);
             dotsAdapter.setModeOneAlpha();
 
+            roundRecycler.setVisibility(View.VISIBLE);
             savedCycleRecycler.setVisibility(View.VISIBLE);
             dotsRecycler.setVisibility(View.VISIBLE);
+            pomRoundRecycler.setVisibility(View.GONE);
             savedPomCycleRecycler.setVisibility(View.GONE);
             pomDotsRecycler.setVisibility(View.GONE);
             break;
@@ -1810,10 +1813,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleRoundsAdapter.setMode(3);
             pomDotsAdapter.setModeThreeAlpha();
 
+            roundRecycler.setVisibility(View.GONE);
             savedCycleRecycler.setVisibility(View.GONE);
             dotsRecycler.setVisibility(View.GONE);
             savedPomCycleRecycler.setVisibility(View.VISIBLE);
             pomDotsRecycler.setVisibility(View.VISIBLE);
+            pomRoundRecycler.setVisibility(View.VISIBLE);
 
             break;
         }
@@ -1951,7 +1956,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleInfinityRounds = editCyclesPopupView.findViewById(R.id.toggle_infinity_rounds);
     buttonToLaunchTimerFromEditPopUp = editCyclesPopupView.findViewById(R.id.buttonToLaunchTimerFromEditPopUp);
 
-    roundRecycler = editCyclesPopupView.findViewById(R.id.round_list_recycler);
+    roundRecycler = editCyclesPopupView.findViewById(R.id.round_recycler);
+    pomRoundRecycler = editCyclesPopupView.findViewById(R.id.pom_round_recycler);
 
     addTDEEfirstMainTextView = editCyclesPopupView.findViewById(R.id.tdee_add_textView);
   }
@@ -2069,6 +2075,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCycleAdapter = new SavedCycleAdapter(getApplicationContext(), workoutCyclesArray, typeOfRoundArray, workoutTitleArray, tdeeActivityExistsInCycleList, tdeeIsBeingTrackedInCycleList, workoutActivityStringArray);
     savedCycleRecycler.setAdapter(savedCycleAdapter);
     savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
+
     savedCycleAdapter.setTdeeToggle(MainActivity.this);
     savedCycleAdapter.setItemClick(MainActivity.this);
     savedCycleAdapter.setHighlight(MainActivity.this);
@@ -2080,6 +2087,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
     savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
     savedPomCycleRecycler.setLayoutManager(pomCyclesRecyclerLayoutManager);
+
     savedPomCycleAdapter.setItemClick(MainActivity.this);
     savedPomCycleAdapter.setHighlight(MainActivity.this);
     savedPomCycleAdapter.setResumeOrResetCycle(MainActivity.this);
@@ -2108,11 +2116,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
 
+    LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
+
     HorizontalSpaceItemDecoration horizontalSpaceItemDecoration = new HorizontalSpaceItemDecoration(dpConv(33));
 
     roundRecycler.setLayoutManager(gridLayoutManager);
     roundRecycler.setAdapter(cycleRoundsAdapter);
-//    roundRecycler.addItemDecoration(horizontalSpaceItemDecoration);
+
+    pomRoundRecycler.setLayoutManager(lm);
+    pomRoundRecycler.setAdapter(cycleRoundsAdapter);
   }
 
   private void setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight() {
@@ -2393,6 +2405,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     reset.setVisibility(View.INVISIBLE);
     new_lap.setAlpha(0.3f);
 
+    pomRoundRecycler.setVisibility(View.GONE);
     savedPomCycleRecycler.setVisibility(View.GONE);
     pomDotsRecycler.setVisibility(View.GONE);
   }
