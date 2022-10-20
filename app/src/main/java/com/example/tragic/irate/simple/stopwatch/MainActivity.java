@@ -2116,14 +2116,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
 
-    LinearLayoutManager lm = new LinearLayoutManager(getApplicationContext());
+    GridLayoutManager gridLayoutManager2 = new GridLayoutManager(getApplicationContext(), 8);
+    gridLayoutManager2.setOrientation(GridLayoutManager.HORIZONTAL);
 
     HorizontalSpaceItemDecoration horizontalSpaceItemDecoration = new HorizontalSpaceItemDecoration(dpConv(33));
 
     roundRecycler.setLayoutManager(gridLayoutManager);
     roundRecycler.setAdapter(cycleRoundsAdapter);
 
-    pomRoundRecycler.setLayoutManager(lm);
+    pomRoundRecycler.setLayoutManager(gridLayoutManager2);
     pomRoundRecycler.setAdapter(cycleRoundsAdapter);
   }
 
