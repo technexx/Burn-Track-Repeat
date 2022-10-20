@@ -129,7 +129,9 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     mFadePom = true;
   }
 
-  public void isRoundCurrentlySelected(boolean selected) {
+  public void setIsRoundCurrentlySelectedBoolean(boolean selected) {
+    Log.i("testBullet", "boolean set to " + mRoundSelected);
+
     mRoundSelected = selected;
   }
 
@@ -166,7 +168,14 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
       modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
 
-      if (mRoundSelected) if (position==mPositionOfSelectedRound) modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
+      Log.i("testBullet", "invisible for position " + position);
+
+      if (mRoundSelected){
+        if (position==mPositionOfSelectedRound) {
+          modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
+          Log.i("testBullet", "visible for position " + position);
+        }
+      }
 
       modeOneRounds.fullView.setOnClickListener(v -> {
         if (!mRoundSelected || position!=mPositionOfSelectedRound) {

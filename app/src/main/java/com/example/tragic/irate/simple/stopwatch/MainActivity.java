@@ -324,7 +324,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean subtractedRoundIsFading;
   boolean roundIsSelected;
-  boolean consolidateRoundAdapterLists;
   int roundSelectedPosition;
 
   int CYCLE_LAUNCHED_FROM_RECYCLER_VIEW = 0;
@@ -625,8 +624,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: "01, 02" etc. could make first column look fuller and also correct 9/10 alignment. Maybe slightly smaller round number font.
   //Todo; Dot should also clear when exiting edit popUp and as soon as we press add/replace within popUp.
-  //Todo: Consider guidelines for Stats Frag too.
-  //Todo: mode 3 editPopUp changes at both heights.
+  //Todo: mode 3 editPopUp changes.
   //Todo: Pomodoro intro popUp
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -1222,11 +1220,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void roundSelected(boolean selected, int position) {
     if (selected) {
-      cycleRoundsAdapter.isRoundCurrentlySelected(true);
+      cycleRoundsAdapter.setIsRoundCurrentlySelectedBoolean(true);
       roundIsSelected = true;
       roundSelectedPosition = position;
     } else {
-      cycleRoundsAdapter.isRoundCurrentlySelected(false);
+      cycleRoundsAdapter.setIsRoundCurrentlySelectedBoolean(false);
       roundIsSelected = false;
     }
 
@@ -1452,14 +1450,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
     addRoundToCycleButton.setOnClickListener(v -> {
       mHandler.postDelayed(()-> {
-        adjustCustom(true);
+        if (mode==1) adjustRoundCountForModeOne(true);
+        if (mode==3) adjustRoundCountForModeThree(true);
       }, 25);
     });
 
     subtractRoundFromCycleButton.setOnClickListener(v -> {
       mHandler.postDelayed(()-> {
-        adjustCustom(false);
-      }, 25);
+        if (mode==1) adjustRoundCountForModeOne(false);
+        if (mode==3) adjustRoundCountForModeThree(false);
+        }, 25);
     });
 
     toggleInfinityRounds.setOnClickListener(v -> {
@@ -3858,78 +3858,76 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopWatchTimeTextView.startAnimation(endAnimationForStopwatch);
   }
 
-  private void adjustCustom(boolean adding) {
+  private void adjustRoundCountForModeOne(boolean adding) {
     inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+
     if (adding) {
-      if (mode == 1) {
-        toggleInfinityModeAndSetRoundType();
+      toggleInfinityModeAndSetRoundType();
 
-        switch (roundType) {
-          case 1:
-            addOrReplaceRounds(setValue, roundIsSelected);
-            editPopUpTimerArray = convertIntegerToStringArray(setValue);
-            setEditPopUpTimerStringValues();
-            break;
-          case 2:
-            addOrReplaceRounds(0, roundIsSelected);
-            break;
-          case 3:
-            addOrReplaceRounds(breakValue, roundIsSelected);
-            editPopUpTimerArray = convertIntegerToStringArray(breakValue);
-            setEditPopUpTimerStringValues();
-            break;
-          case 4:
-            addOrReplaceRounds(0, roundIsSelected);
-            break;
-          default:
-            return;
-        }
-      }
-      if (mode == 3) {
-        savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomValue1);
-        savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
-        savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
-
-        setEditPopUpTimerStringValues();
-
-        if (pomValuesTime.size() == 0) {
-          for (int i = 0; i < 3; i++) {
-            pomValuesTime.add(pomValue1 * 1000);
-            pomValuesTime.add(pomValue2 * 1000);
-          }
-          pomValuesTime.add(pomValue1 * 1000);
-          pomValuesTime.add(pomValue3 * 1000);
-          for (int j = 0; j < pomValuesTime.size(); j++) {
-            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(pomValuesTime.get(j) / 1000));
-          }
-
-          cycleRoundsAdapter.setPomFade(true);
-          cycleRoundsAdapter.notifyDataSetChanged();
-        } else {
-//          showToastIfNoneActive("Pomodoro cycle already loaded!");
-        }
+      switch (roundType) {
+        case 1:
+          addOrReplaceRounds(setValue, roundIsSelected);
+          editPopUpTimerArray = convertIntegerToStringArray(setValue);
+          setEditPopUpTimerStringValues();
+          break;
+        case 2:
+          addOrReplaceRounds(0, roundIsSelected);
+          break;
+        case 3:
+          addOrReplaceRounds(breakValue, roundIsSelected);
+          editPopUpTimerArray = convertIntegerToStringArray(breakValue);
+          setEditPopUpTimerStringValues();
+          break;
+        case 4:
+          addOrReplaceRounds(0, roundIsSelected);
+          break;
+        default:
+          return;
       }
     } else {
-      if (mode == 1) {
-        if (subtractedRoundIsFading) {
-          removeRound();
-        }
-        if (workoutTimeIntegerArray.size() > 0) {
-          cycleRoundsAdapter.setFadeOutPosition(roundSelectedPosition);
-          cycleRoundsAdapter.notifyDataSetChanged();
+      if (subtractedRoundIsFading) {
+        removeRound();
+      }
+      if (workoutTimeIntegerArray.size() > 0) {
+        cycleRoundsAdapter.setFadeOutPosition(roundSelectedPosition);
+        cycleRoundsAdapter.notifyDataSetChanged();
 
-          subtractedRoundIsFading = true;
-        } else {
-          showToastIfNoneActive("No rounds to clear!");
+        subtractedRoundIsFading = true;
+      } else {
+        showToastIfNoneActive("No rounds to clear!");
+      }
+    }
+  }
+
+  private void adjustRoundCountForModeThree(boolean adding) {
+    if (adding) {
+      savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomValue1);
+      savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
+      savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
+
+      setEditPopUpTimerStringValues();
+
+      if (pomValuesTime.size() == 0) {
+        for (int i = 0; i < 3; i++) {
+          pomValuesTime.add(pomValue1 * 1000);
+          pomValuesTime.add(pomValue2 * 1000);
         }
-      } else if (mode == 3) {
-        if (pomValuesTime.size() != 0) {
-          cycleRoundsAdapter.setPomFade(false);
-          cycleRoundsAdapter.notifyDataSetChanged();
-          subtractRoundFromCycleButton.setClickable(false);
-        } else {
-          showToastIfNoneActive("No Pomodoro cycle to clear!");
+        pomValuesTime.add(pomValue1 * 1000);
+        pomValuesTime.add(pomValue3 * 1000);
+        for (int j = 0; j < pomValuesTime.size(); j++) {
+          pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(pomValuesTime.get(j) / 1000));
         }
+
+        cycleRoundsAdapter.setPomFade(true);
+        cycleRoundsAdapter.notifyDataSetChanged();
+      }
+    }  else {
+      if (pomValuesTime.size() != 0) {
+        cycleRoundsAdapter.setPomFade(false);
+        cycleRoundsAdapter.notifyDataSetChanged();
+        subtractRoundFromCycleButton.setClickable(false);
+      } else {
+        showToastIfNoneActive("No Pomodoro cycle to clear!");
       }
     }
   }
@@ -3959,7 +3957,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutStringListOfRoundValuesForFirstAdapter.set(roundSelectedPosition, convertedWorkoutTimeStringArray.get(roundSelectedPosition));
         workoutIntegerListOfRoundTypeForFirstAdapter.set(roundSelectedPosition, typeOfRound.get(roundSelectedPosition));
 
-        cycleRoundsAdapter.isRoundCurrentlySelected(false);
+        cycleRoundsAdapter.setIsRoundCurrentlySelectedBoolean(false);
         cycleRoundsAdapter.setFadeInPosition(roundSelectedPosition);
         cycleRoundsAdapter.notifyDataSetChanged();
 
@@ -3968,6 +3966,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Execute at end of fade animation or if another round is manipulated during a fade animation.
   private void removeRound() {
     if (mode == 1) {
       //Integer array covers both adapters.
@@ -3977,7 +3976,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             workoutStringListOfRoundValuesForFirstAdapter.remove(roundSelectedPosition);
             workoutIntegerListOfRoundTypeForFirstAdapter.remove(roundSelectedPosition);
             cycleRoundsAdapter.setFadeOutPosition(-1);
-            cycleRoundsAdapter.notifyDataSetChanged();
           }
 
           typeOfRound.remove(roundSelectedPosition);
@@ -3989,13 +3987,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           subtractedRoundIsFading = false;
         }
         if (roundIsSelected) {
-          cycleRoundsAdapter.isRoundCurrentlySelected(false);
-          cycleRoundsAdapter.notifyDataSetChanged();
-
-          consolidateRoundAdapterLists = true;
+          cycleRoundsAdapter.setIsRoundCurrentlySelectedBoolean(false);
           roundIsSelected = false;
         }
         roundSelectedPosition = workoutTimeIntegerArray.size() - 1;
+        cycleRoundsAdapter.notifyDataSetChanged();
       } else {
         showToastIfNoneActive("Empty!");
       }
@@ -4013,25 +4009,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setSingleColumnRoundRecyclerView() {
-//    if (phoneHeight <= 1920) {
-//      roundRecyclerOneLayoutParams.width = convertDensityPixelsToScalable(180);
-//      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(50);
-//    } else {
-//      roundRecyclerOneLayoutParams.width = convertDensityPixelsToScalable(200);
-//      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
-//    }
-//    roundRecyclerOneLayoutParams.rightMargin = 0;
+
   }
 
   private void setDoubleColumnRoundRecyclerView() {
-//    if (phoneHeight <= 1920) {
-//      roundRecyclerOneLayoutParams.width = convertDensityPixelsToScalable(240);
-//      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(165);
-//    } else {
-//      roundRecyclerOneLayoutParams.width = convertDensityPixelsToScalable(290);
-//      roundRecyclerOneLayoutParams.leftMargin = convertDensityPixelsToScalable(0);
-//      roundRecyclerOneLayoutParams.rightMargin = convertDensityPixelsToScalable(0);
-//    }
+
   }
 
   public String friendlyString(String altString) {
