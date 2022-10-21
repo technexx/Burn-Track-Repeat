@@ -628,11 +628,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Had an instance of stats skipping (e.g. 2->4) when ending a round early. Also occurred after a second had iterate in new round.
-      //Todo: What happens: Ends early at 3950 so "3" is displayed, but it goes past 5000+ before timeLeft textView changes to allow its textView to change.
-      //Todo: Not iterating on <1 second (as base timer done) presents an issue w/ calorie tracking as that iterates in milliseconds.
-  //Todo: Ideally when entering edit popUp to edit cycle, action bar should not change (should change when popUp dismisses. looks better).
-
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test tablet screens.
@@ -645,6 +640,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Backup cloud option.
   //Todo: Have a fun icon made!
 
+  //Todo: Had an instance of stats skipping (e.g. 2->4) when ending a round early. Also occurred after a second had iterate in new round.
+      //Todo: What happens: Ends early at 3950 so "3" is displayed, but it goes past 5000+ before timeLeft textView changes to allow its textView to change.
+      //Todo: Not iterating on <1 second (as base timer done) presents an issue w/ calorie tracking as that iterates in milliseconds.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
@@ -1361,7 +1359,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     edit_highlighted_cycle.setOnClickListener(v -> {
-      fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
+      mHandler.postDelayed(() -> {
+        fadeEditCycleButtonsInAndOut(FADE_IN_EDIT_CYCLE);
+      },250);
+
       removeCycleHighlights();
       editHighlightedCycleLogic();
 
@@ -3180,7 +3181,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void editCyclesPopUpDismissalLogic() {
     if (currentlyEditingACycle) {
-      fadeEditCycleButtonsInAndOut(FADE_OUT_EDIT_CYCLE);
+//      fadeEditCycleButtonsInAndOut(FADE_OUT_EDIT_CYCLE);
       currentlyEditingACycle = false;
 
       removeCycleHighlights();
@@ -3769,8 +3770,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cancelHighlight.setEnabled(true);
     }
     if (typeOfFade == FADE_OUT_EDIT_CYCLE) {
-      delete_highlighted_cycle.setEnabled(false);
       sortButton.setEnabled(true);
+      delete_highlighted_cycle.setEnabled(false);
       edit_highlighted_cycle.setEnabled(false);
       cancelHighlight.setEnabled(false);
     }
