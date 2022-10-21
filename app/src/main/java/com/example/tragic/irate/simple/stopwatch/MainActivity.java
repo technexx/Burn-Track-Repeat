@@ -628,14 +628,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Stats iterating on breaks.
+  //Todo: Had an instance of stats skipping (e.g. 2->4) when ending a round early. Also occurred after a second had iterate in new round.
+      //Todo: What happens: Ends early at 3950 so "3" is displayed, but it goes past 5000+ before timeLeft textView changes to allow its textView to change.
   //Todo: Ideally when entering edit popUp to edit cycle, action bar should not change (should change when popUp dismisses. looks better).
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
+  //Todo: Test tablet screens.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
-  //Todo: Test tablet screens.
   //Todo: Test w/ fresh install for all default values.
   //Todo: Test everything 10x. Incl. round selection/replacement.
   //Todo: Run code inspector for redundancies, etc.
@@ -4731,6 +4732,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalSetTimeForCurrentDayInMillis = timerIteration.getNewDailyTotal();
         totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewActivityTotal();
 
+//        Log.i("testTime", "daily time is " + totalSetTimeForCurrentDayInMillis);
+        Log.i("testTime", "activity time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
+
         calorieIteration.setNewTotalCalories(calorieIteration.getPreviousTotalCalories() + caloriesToIterate);
         calorieIteration.setNewActivityCalories(calorieIteration.getPreviousActivityCalories() + caloriesToIterate);
         totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
@@ -5139,6 +5143,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       setNotificationValues();
     }
+
+    Log.i("testTime", "ended early at " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
 
     globalNextRoundLogic();
     mHandler.post(endFadeForModeOne);
