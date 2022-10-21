@@ -27,6 +27,12 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Vibrator;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.Spanned;
+import android.text.TextUtils;
+import android.text.style.AbsoluteSizeSpan;
+import android.text.style.ForegroundColorSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -628,6 +634,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: If we keep the ms for stats, we should not round them down on reset (so they stay where they were left off).
+
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test tablet screens.
@@ -640,9 +648,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Backup cloud option.
   //Todo: Have a fun icon made!
 
-  //Todo: Had an instance of stats skipping (e.g. 2->4) when ending a round early. Also occurred after a second had iterate in new round.
+  //Todo: Had an instance of stats skipping (e.g. 2->4) when ending a round early. Also occurred after a second had iterated in new round.
       //Todo: What happens: Ends early at 3950 so "3" is displayed, but it goes past 5000+ before timeLeft textView changes to allow its textView to change.
-      //Todo: Not iterating on <1 second (as base timer done) presents an issue w/ calorie tracking as that iterates in milliseconds.
+      //Todo: Not iterating on <1 second (as base timer does) presents an issue w/ calorie tracking as that iterates in milliseconds.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
@@ -4518,6 +4526,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setTotalCycleTimeValuesToTextView();
     }
+  }
+
+  private CharSequence changeDisplayOfStatsMilliseconds(String fullTimeString) {
+    String[] splitString = fullTimeString.split("\\.");
+    String mainTime = splitString[0] + ".";
+    String msTime = splitString[1];
+
+    Spannable spannable = new SpannableString(msTime);
+    spannable.setSpan(new AbsoluteSizeSpan(16, true), 0, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+    return  TextUtils.concat(mainTime, spannable);
   }
 
   private void setCyclesCompletedTextView() {
