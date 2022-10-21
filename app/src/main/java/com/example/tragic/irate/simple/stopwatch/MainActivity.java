@@ -630,6 +630,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Had an instance of stats skipping (e.g. 2->4) when ending a round early. Also occurred after a second had iterate in new round.
       //Todo: What happens: Ends early at 3950 so "3" is displayed, but it goes past 5000+ before timeLeft textView changes to allow its textView to change.
+      //Todo: Not iterating on <1 second (as base timer done) presents an issue w/ calorie tracking as that iterates in milliseconds.
   //Todo: Ideally when entering edit popUp to edit cycle, action bar should not change (should change when popUp dismisses. looks better).
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -4489,7 +4490,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyActivityTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
+    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimesWithMilliseconds(totalSetTimeForCurrentDayInMillis));
+
+//    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
   }
 
   private void setTotalDailyCaloriesToTextView() {
@@ -4497,7 +4500,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalSingleActivityTimeToTextView() {
-    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimesWithMilliseconds(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+
+//    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
   }
 
   private void setTotalSingleActivityCaloriesToTextView() {
@@ -4740,7 +4745,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
-        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
+
+        setAllActivityTimesAndCaloriesToTextViews();
+//        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         mHandler.postDelayed(this, 10);
       }
