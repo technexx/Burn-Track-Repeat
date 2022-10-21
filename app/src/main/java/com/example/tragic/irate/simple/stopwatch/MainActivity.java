@@ -628,6 +628,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Stats iterating on breaks.
+  //Todo: Ideally when entering edit popUp to edit cycle, action bar should not change (should change when popUp dismisses. looks better).
+
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -1314,6 +1317,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
 
       addTdeePopUpWindow.showAsDropDown(topOfMainActivityView);
+//      addTdeePopUpWindow.showAsDropDown(bottomEditTitleDividerView);
 
     });
 
@@ -5285,12 +5289,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startSetTimer();
               }
+
+              if (trackActivityWithinCycle) {
+                postActivityTimeRunnable();
+              }
               break;
             case 2:
               timeLeft.setText("0");
               //Do not want to consolidate infinityTimer runnable methods, since we only want its global re-instantiated here, not in our pause/resume option.
               infinityTimerForSetsRunnable = infinityRunnableForSets();
               mHandler.post(infinityTimerForSetsRunnable);
+
+              if (trackActivityWithinCycle) {
+                postActivityTimeRunnable();
+              }
               break;
             case 3:
               breakMillis = workoutTimeIntegerArray.get(workoutTimeIntegerArray.size() - numberOfRoundsLeft);
@@ -5307,9 +5319,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               mHandler.post(infinityTimerForBreaksRunnable);
               break;
           }
-
-          postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
-
         } else {
           animateTimerEnding();
           currentRound = 0;
@@ -5395,27 +5404,50 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startSetTimer();
               }
+
+              if (trackActivityWithinCycle) {
+                postActivityTimeRunnable();
+              } else {
+                postCycleTimeRunnable();
+              }
               break;
             case 2:
               infinityTimerForSetsRunnable = infinityRunnableForSets();
               if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
                 mHandler.post(infinityTimerForSetsRunnable);
               }
+
+              if (trackActivityWithinCycle) {
+                postActivityTimeRunnable();
+              } else {
+                postCycleTimeRunnable();
+              }
               break;
             case 3:
               if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
                 startObjectAnimatorAndTotalCycleTimeCounters();
                 startBreakTimer();
+
+                if (trackActivityWithinCycle) {
+                  //Doing nothing.
+                } else {
+                  postCycleTimeRunnable();
+                }
               }
               break;
             case 4:
               infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
               if (!mHandler.hasCallbacks(infinityTimerForBreaksRunnable)) {
                 mHandler.post(infinityTimerForBreaksRunnable);
+
+                if (trackActivityWithinCycle) {
+                  //Doing nothing.
+                } else {
+                  postCycleTimeRunnable();
+                }
               }
               break;
           }
-          postActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
           savedCycleAdapter.setCycleAsActive();
           timerIsPaused = false;
@@ -5429,21 +5461,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void postActivityOrCycleTimeRunnables(boolean trackingActivity) {
-    if (trackingActivity) {
-      if (!isDailyActivityTimeMaxed()) {
-        infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
+  private void postActivityTimeRunnable() {
+    if (!isDailyActivityTimeMaxed()) {
+      infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
 
-        if (!mHandler.hasCallbacks(infinityRunnableForDailyActivityTimer)) {
-          mHandler.post(infinityRunnableForDailyActivityTimer);
-        }
+      if (!mHandler.hasCallbacks(infinityRunnableForDailyActivityTimer)) {
+        mHandler.post(infinityRunnableForDailyActivityTimer);
       }
-    } else {
-      infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
+    }
+  }
 
-      if (!mHandler.hasCallbacks(infinityRunnableForCyclesTimer)) {
-        mHandler.post(infinityRunnableForCyclesTimer);
-      }
+  private void postCycleTimeRunnable() {
+    infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
+
+    if (!mHandler.hasCallbacks(infinityRunnableForCyclesTimer)) {
+      mHandler.post(infinityRunnableForCyclesTimer);
     }
   }
 
