@@ -634,7 +634,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: "Reset" appears on new stopwatch launch.
+  //Todo: Tablayout bg is same color as "reset/resume" mode highlight.
   //Todo: Add disclaimer at beginning of app w/ confirmation to dismiss it permanently.
       //Todo: Can also transition to User Settings from here.
   //Todo: Any colors changed need to be done in /1920 xml too.
@@ -1045,7 +1045,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //        storeDailyTimesForCycleResuming();
 
         AsyncTask.execute(()-> {
-          setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString();
+          setAndUpdateActivityTimeAndCaloriesInDatabase();
+
+          //This is used if we're converting our Strings in timer popUp to millis. Needed if we go back to rounding instead of using milliseconds when dismissing timer.
+//          setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString();
         });
       }  else {
         storeSetAndBreakTimeForCycleResuming();
@@ -1667,7 +1670,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     stopWatchPopUpWindow.setOnDismissListener(() -> {
-//      getSupportActionBar().show();
       removeCycleHighlights();
 
       if (mode == 1) {
@@ -2431,6 +2433,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cancelHighlight.setVisibility(View.INVISIBLE);
     delete_highlighted_cycle.setVisibility(View.INVISIBLE);
     reset.setVisibility(View.INVISIBLE);
+    stopwatchReset.setVisibility(View.INVISIBLE);
     new_lap.setAlpha(0.3f);
 
     pomRoundRecycler.setVisibility(View.GONE);
@@ -2565,62 +2568,62 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
 
-  private void setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString() {
-    dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(getDailyActivityTimeFromTextView(), totalCaloriesBurnedForSpecificActivityForCurrentDay);
-  }
+//  private void setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString() {
+//    dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(getDailyActivityTimeFromTextView(), totalCaloriesBurnedForSpecificActivityForCurrentDay);
+//  }
 
-  private long getDailyActivityTimeFromTextView() {
-    String textView = (String) dailyTotalTimeForSingleActivityTextView.getText().toString();
-    return convertStringToSecondsForTimerPopUp(textView) * 1000;
-  }
+//  private long getDailyActivityTimeFromTextView() {
+//    String textView = (String) dailyTotalTimeForSingleActivityTextView.getText().toString();
+//    return convertStringToSecondsForTimerPopUp(textView) * 1000;
+//  }
 
-  private int convertStringToSecondsForTimerPopUp(String timerString) {
-    int hours = 0;
-    int minutes = 0;
-    int seconds = 0;
-    timerString = timerString.replace(":", "");
-
-    //Range is exclusive of last position.
-    if (timerString.length() == 3) {
-      minutes = Integer.parseInt(timerString.substring(0, 1));
-      seconds = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
-    }
-
-    if (timerString.length() == 4) {
-      minutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
-      seconds = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
-    }
-
-    if (timerString.length() == 5) {
-      hours = Integer.parseInt(timerString.substring(0, 1));
-      minutes = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
-      seconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
-    }
-
-    if (timerString.length() == 6) {
-      hours = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
-      minutes = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
-      seconds = Integer.parseInt(timerString.substring(4, 5) + timerString.substring(5, 6));
-    }
-
-    if (seconds > 60) {
-      seconds = seconds % 60;
-      minutes += 1;
-    }
-
-    if (minutes>=60) {
-      hours = minutes/60;
-      minutes = minutes % 60;
-    }
-
-    int totalTime = (minutes * 60) + seconds;
-
-    if (hours > 0) {
-      totalTime += (hours * 60 * 60);
-    }
-
-    return totalTime;
-  }
+//  private int convertStringToSecondsForTimerPopUp(String timerString) {
+//    int hours = 0;
+//    int minutes = 0;
+//    int seconds = 0;
+//    timerString = timerString.replace(":", "");
+//
+//    //Range is exclusive of last position.
+//    if (timerString.length() == 3) {
+//      minutes = Integer.parseInt(timerString.substring(0, 1));
+//      seconds = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
+//    }
+//
+//    if (timerString.length() == 4) {
+//      minutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+//      seconds = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
+//    }
+//
+//    if (timerString.length() == 5) {
+//      hours = Integer.parseInt(timerString.substring(0, 1));
+//      minutes = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
+//      seconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
+//    }
+//
+//    if (timerString.length() == 6) {
+//      hours = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+//      minutes = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
+//      seconds = Integer.parseInt(timerString.substring(4, 5) + timerString.substring(5, 6));
+//    }
+//
+//    if (seconds > 60) {
+//      seconds = seconds % 60;
+//      minutes += 1;
+//    }
+//
+//    if (minutes>=60) {
+//      hours = minutes/60;
+//      minutes = minutes % 60;
+//    }
+//
+//    int totalTime = (minutes * 60) + seconds;
+//
+//    if (hours > 0) {
+//      totalTime += (hours * 60 * 60);
+//    }
+//
+//    return totalTime;
+//  }
 
   private void fabLogic() {
     cycleNameEdit.getText().clear();
