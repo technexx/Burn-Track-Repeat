@@ -659,7 +659,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Option for ringtones?
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Add Day/Night modes.
-  //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle it.
+  //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle
+  //Todo: storeDailyTimesForCycleResuming() and setStoredDailyTimesForCycleResuming() commented out when using ms for daily stats.
 
   //Todo: Drawable height may sync w/ textView height for alignment.
   //Todo: We can also commit just specific files, remember!
@@ -974,7 +975,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode == 1) {
         if (trackActivityWithinCycle) {
           setAllActivityTimesAndCaloriesToTextViews();
-          setStoredDailyTimesOnCycleResume();
+//          setStoredDailyTimesOnCycleResume();
         } else {
           setStoredSetAndBreakTimeOnCycleResume();
         }
@@ -1038,7 +1039,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       savedCycleAdapter.notifyDataSetChanged();
 
       if (trackActivityWithinCycle) {
-        storeDailyTimesForCycleResuming();
+//        storeDailyTimesForCycleResuming();
 
         AsyncTask.execute(()-> {
           setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString();
@@ -1086,15 +1087,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testSort", "button is " + sortButton.isEnabled());
   }
 
-  private void storeDailyTimesForCycleResuming() {
-    savedTotalDailyTimeString = (String) dailyTotalTimeTextView.getText();
-    savedSingleActivityString = (String) dailyTotalTimeForSingleActivityTextView.getText();
-  }
-
-  private void setStoredDailyTimesOnCycleResume() {
-    dailyTotalTimeTextView.setText(savedTotalDailyTimeString);
-    dailyTotalTimeForSingleActivityTextView.setText(savedSingleActivityString);
-  }
+//  private void storeDailyTimesForCycleResuming() {
+//    savedTotalDailyTimeString = (String) dailyTotalTimeTextView.getText();
+//    savedSingleActivityString = (String) dailyTotalTimeForSingleActivityTextView.getText();
+//  }
+//
+//  private void setStoredDailyTimesOnCycleResume() {
+//    dailyTotalTimeTextView.setText(savedTotalDailyTimeString);
+//    dailyTotalTimeForSingleActivityTextView.setText(savedSingleActivityString);
+//  }
 
   private void storeSetAndBreakTimeForCycleResuming() {
     if (mode==1) {
@@ -4499,9 +4500,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalDailyActivityTimeToTextView() {
-    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimesWithMilliseconds(totalSetTimeForCurrentDayInMillis));
+    String timeInStringFormat = longToStringConverters.convertMillisToHourBasedStringForCycleTimesWithMilliseconds(totalSetTimeForCurrentDayInMillis);
 
-//    dailyTotalTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForCurrentDayInMillis));
+    dailyTotalTimeTextView.setText(changeDisplayOfStatsMilliseconds(timeInStringFormat, 17));
+
+//    dailyTotalTimeTextView.setText(timeInStringFormat);
   }
 
   private void setTotalDailyCaloriesToTextView() {
@@ -4509,9 +4512,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTotalSingleActivityTimeToTextView() {
-    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimesWithMilliseconds(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+    String timeInStringFormat = longToStringConverters.convertMillisToHourBasedStringForCycleTimesWithMilliseconds(totalSetTimeForSpecificActivityForCurrentDayInMillis);
 
-//    dailyTotalTimeForSingleActivityTextView.setText(longToStringConverters.convertMillisToHourBasedString(totalSetTimeForSpecificActivityForCurrentDayInMillis));
+    dailyTotalTimeForSingleActivityTextView.setText(changeDisplayOfStatsMilliseconds(timeInStringFormat, 17));
+
+//    dailyTotalTimeForSingleActivityTextView.setText(timeInStringFormat);
   }
 
   private void setTotalSingleActivityCaloriesToTextView() {
@@ -4528,15 +4533,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private CharSequence changeDisplayOfStatsMilliseconds(String fullTimeString) {
+  private CharSequence changeDisplayOfStatsMilliseconds(String fullTimeString, int size) {
     String[] splitString = fullTimeString.split("\\.");
     String mainTime = splitString[0] + ".";
     String msTime = splitString[1];
 
     Spannable spannable = new SpannableString(msTime);
-    spannable.setSpan(new AbsoluteSizeSpan(16, true), 0, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+    spannable.setSpan(new AbsoluteSizeSpan(17, true), 0, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
 
-    return  TextUtils.concat(mainTime, spannable);
+    return TextUtils.concat(mainTime, spannable);
   }
 
   private void setCyclesCompletedTextView() {
@@ -5901,7 +5906,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         roundCycleSetTimeDown();
         roundCycleBreakTimeDown();
-        roundDailyStatTimesDown();
+//        roundDailyStatTimesDown();
 
         if (objectAnimator != null) {
           objectAnimator.cancel();

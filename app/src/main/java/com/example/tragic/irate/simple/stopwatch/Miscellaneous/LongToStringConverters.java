@@ -109,7 +109,7 @@ public class LongToStringConverters {
         }
 
         if (hours==0) {
-            return dfOneZero.format(minutes) + ":" + dfTwoZeros.format(seconds) + ":" + dfTwoZeros.format((ms));
+            return dfOneZero.format(minutes) + ":" + dfTwoZeros.format(seconds) + "." + dfTwoZeros.format((ms));
         } else {
             return dfOneZero.format(hours) + ":" + dfTwoZeros.format(minutes) + ":" + dfTwoZeros.format(seconds) + "." + dfTwoZeros.format(ms);
         }
