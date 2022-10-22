@@ -57,6 +57,13 @@
     <color name="test_bg"> #212f3c </color>
     <color name="darkest_gray"> #201d1d </color>
 
+    <color name="onyx">#353935</color>
+    <color name="matte_black">#28282B</color>
+    <color name="ebony">#282C35</color>
+    <color name="black_denim">#191C27</color>
+    <color name="cool_black">#151922</color>
+    <color name="iron_black">#343432</color>
+
     <color name="android_green">#ff00ff00</color>
     <color name="android_red">#ffff0000</color>
     <color name="android_blue">#ff0000ff</color>
