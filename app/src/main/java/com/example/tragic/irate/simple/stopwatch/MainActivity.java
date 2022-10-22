@@ -634,7 +634,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: If we keep the ms for stats, we should not round them down on reset (so they stay where they were left off).
+  //Todo: Add disclaimer at beginning of app w/ confirmation to dismiss it permanently.
+      //Todo: Can also transition to User Settings from here.
+  //Todo: Notifications showing after app is killed. Likely a priority level issue.
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
@@ -688,7 +690,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (timerPopUpWindow.isShowing() || stopWatchPopUpWindow.isShowing()) {
       dismissNotification = false;
-
       //Shows even if paused and timer does not change.
       setNotificationValues();
       //Runnable to display in sync w/ timer change.
@@ -700,6 +701,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onDestroy() {
     super.onDestroy();
+    mHandler.removeCallbacks(globalNotficationsRunnable);
   }
 
   //Remember, this does not execute if we are dismissing a popUp.
@@ -4474,22 +4476,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return (millis + 999) / 1000;
   }
 
-  private long dividedMillisForTotalTimesDisplay(long millis) {
-    return (millis) / 1000;
-  }
-
-  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
-    textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
-
-    if (textViewDisplaySync.areTextViewsDifferent()) {
-      textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
-      setTotalDailyActivityTimeToTextView();
-      setTotalSingleActivityTimeToTextView();
-    }
-
-    setTotalDailyCaloriesToTextView();
-    setTotalSingleActivityCaloriesToTextView();
-  }
+//  private void updateDailyStatTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
+//    textViewDisplaySync.setFirstTextView((String) timeLeft.getText());
+//
+//    if (textViewDisplaySync.areTextViewsDifferent()) {
+//      textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
+//      setTotalDailyActivityTimeToTextView();
+//      setTotalSingleActivityTimeToTextView();
+//    }
+//
+//    setTotalDailyCaloriesToTextView();
+//    setTotalSingleActivityCaloriesToTextView();
+//  }
 
   private void setAllActivityTimesAndCaloriesToTextViews() {
     setTotalDailyActivityTimeToTextView();
@@ -4502,25 +4500,55 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTotalDailyActivityTimeToTextView() {
     String timeInStringFormat = longToStringConverters.convertMillisToHourBasedStringForCycleTimesWithMilliseconds(totalSetTimeForCurrentDayInMillis);
 
-    dailyTotalTimeTextView.setText(changeDisplayOfStatsMilliseconds(timeInStringFormat, 17));
+    if (phoneHeight <= 1920) {
+      dailyTotalTimeTextView.setText(changeDisplayOfStatsMillisValues(timeInStringFormat, 14));
 
-//    dailyTotalTimeTextView.setText(timeInStringFormat);
+    } else {
+      dailyTotalTimeTextView.setText(changeDisplayOfStatsMillisValues(timeInStringFormat, 17));
+    }
   }
 
   private void setTotalDailyCaloriesToTextView() {
-    dailyTotalCaloriesTextView.setText(formatCalorieString(totalCaloriesBurnedForCurrentDay));
+    String calorieString = formatCalorieString(totalCaloriesBurnedForCurrentDay);
+
+    if (phoneHeight <= 1920) {
+      dailyTotalCaloriesTextView.setText(changeDisplayOfStatsMillisValues(calorieString, 14));
+
+    } else {
+      dailyTotalCaloriesTextView.setText(changeDisplayOfStatsMillisValues(calorieString, 17));
+    }
   }
 
   private void setTotalSingleActivityTimeToTextView() {
     String timeInStringFormat = longToStringConverters.convertMillisToHourBasedStringForCycleTimesWithMilliseconds(totalSetTimeForSpecificActivityForCurrentDayInMillis);
 
-    dailyTotalTimeForSingleActivityTextView.setText(changeDisplayOfStatsMilliseconds(timeInStringFormat, 17));
+    if (phoneHeight <= 1920) {
+      dailyTotalTimeForSingleActivityTextView.setText(changeDisplayOfStatsMillisValues(timeInStringFormat, 14));
 
-//    dailyTotalTimeForSingleActivityTextView.setText(timeInStringFormat);
+    } else {
+      dailyTotalTimeForSingleActivityTextView.setText(changeDisplayOfStatsMillisValues(timeInStringFormat, 17));
+    }
   }
 
   private void setTotalSingleActivityCaloriesToTextView() {
-    dailyTotalCaloriesForSingleActivityTextView.setText(formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay));
+    String calorieString = formatCalorieString(totalCaloriesBurnedForSpecificActivityForCurrentDay);
+
+    if (phoneHeight <= 1920) {
+      dailyTotalCaloriesForSingleActivityTextView.setText(changeDisplayOfStatsMillisValues(calorieString, 14));
+    } else {
+      dailyTotalCaloriesForSingleActivityTextView.setText(changeDisplayOfStatsMillisValues(calorieString, 17));
+    }
+  }
+
+  private CharSequence changeDisplayOfStatsMillisValues(String fullTimeString, int size) {
+    String[] splitString = fullTimeString.split("\\.");
+    String mainTime = splitString[0] + ".";
+    String msTime = splitString[1];
+
+    Spannable spannable = new SpannableString(msTime);
+    spannable.setSpan(new AbsoluteSizeSpan(17, true), 0, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+    return TextUtils.concat(mainTime, spannable);
   }
 
   private void updateCycleTimesTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
@@ -4531,17 +4559,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       setTotalCycleTimeValuesToTextView();
     }
-  }
-
-  private CharSequence changeDisplayOfStatsMilliseconds(String fullTimeString, int size) {
-    String[] splitString = fullTimeString.split("\\.");
-    String mainTime = splitString[0] + ".";
-    String msTime = splitString[1];
-
-    Spannable spannable = new SpannableString(msTime);
-    spannable.setSpan(new AbsoluteSizeSpan(17, true), 0, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-
-    return TextUtils.concat(mainTime, spannable);
   }
 
   private void setCyclesCompletedTextView() {
