@@ -69,11 +69,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   int mScreenHeight;
 
-  Typeface moonFace;
-
   int mThemeMode;
   int DAY_MODE = 0;
   int NIGHT_MODE = 1;
+
+  int fullViewBackgroundColor;
 
   public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -136,9 +136,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //Resets our cancel so bindView does not continuously call black backgrounds.
     mHighlightDeleted = false;
 
-    moonFace = ResourcesCompat.getFont(mContext, R.font.archivo_narrow);
-
     changeSettingsValues = new ChangeSettingsValues(mContext);
+
+    fullViewBackgroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
+
   }
 
   public void exitHighlightMode() {
@@ -218,10 +219,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         });
 
       } else {
-        workoutHolder.fullView.setBackgroundColor(Color.BLACK);
+        workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
       }
     } else {
-      workoutHolder.fullView.setBackgroundColor(Color.BLACK);
+      workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
     }
 
     if (mHighlightDeleted) {
@@ -372,7 +373,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           for (int j = 0; j < tempList.size(); j++) {
             //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
             if (position==tempList.get(j)) {
-              workoutHolder.fullView.setBackgroundColor(Color.BLACK);
+              workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
               mHighlightPositionList.remove(Integer.valueOf(position));
               //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
               changed = true;

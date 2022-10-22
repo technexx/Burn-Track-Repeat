@@ -63,6 +63,8 @@
     <color name="black_denim">#191C27</color>
     <color name="cool_black">#151922</color>
     <color name="iron_black">#343432</color>
+    <color name="alien_black">#1A2228</color>
+    <color name="night_shadow">#1C1C1C</color>
 
     <color name="android_green">#ff00ff00</color>
     <color name="android_red">#ffff0000</color>

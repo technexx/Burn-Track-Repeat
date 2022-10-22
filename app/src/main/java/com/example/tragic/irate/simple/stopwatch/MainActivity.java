@@ -634,9 +634,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: "Reset" appears on new stopwatch launch.
   //Todo: Add disclaimer at beginning of app w/ confirmation to dismiss it permanently.
       //Todo: Can also transition to User Settings from here.
-  //Todo: Notifications showing after app is killed. Likely a priority level issue.
+  //Todo: Any colors changed need to be done in /1920 xml too.
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.

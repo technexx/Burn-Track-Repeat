@@ -5,7 +5,7 @@
     android:layout_height="match_parent"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:theme="@style/StatFragmentThemeDark"
-    android:background="@color/iron_black">
+    android:background="@color/night_shadow">
 
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/calorie_comparison_tab_layout"
@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="0dp"
         android:background="@drawable/daily_total_stats_border"
-        android:backgroundTint="@color/ebony">
+        android:backgroundTint="@color/cool_black">
 
         <TextView
             android:id="@+id/activity_stats_duration_header_textView"
@@ -210,7 +210,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintBottom_toTopOf="@id/stats_calendar"
-        app:layout_constraintStart_toStartOf="parent">
+        app:layout_constraintStart_toStartOf="parent"
+        android:background="@color/alien_black">
 
         <androidx.constraintlayout.widget.Guideline
             android:id="@+id/activity_stats_total_guideline_1"

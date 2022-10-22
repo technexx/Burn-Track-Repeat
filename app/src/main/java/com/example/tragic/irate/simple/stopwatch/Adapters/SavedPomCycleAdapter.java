@@ -51,6 +51,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int BREAK_COLOR;
     int REST_COLOR;
 
+    int fullViewBackGroundColor;
+
     public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
         if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
         if (typeOFRound==4) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -96,6 +98,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         mHighlightPositionList = new ArrayList<>();
 
         changeSettingsValues = new ChangeSettingsValues(mContext);
+
+        fullViewBackGroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
     }
 
     public void exitHighlightMode() {
@@ -143,10 +147,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 pomHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
             } else {
-                pomHolder.fullView.setBackgroundColor(Color.BLACK);
+                pomHolder.fullView.setBackgroundColor(fullViewBackGroundColor);
             }
         } else {
-            pomHolder.fullView.setBackgroundColor(Color.BLACK);
+            pomHolder.fullView.setBackgroundColor(fullViewBackGroundColor);
         }
 
         if (mHighlightDeleted) {
@@ -211,7 +215,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                     //Using tempList for stable loop since mHighlightPositionList changes.
                     for (int j=0; j<tempList.size(); j++) {
                         if (position==tempList.get(j)) {
-                            pomHolder.fullView.setBackgroundColor(Color.BLACK);
+                            pomHolder.fullView.setBackgroundColor(fullViewBackGroundColor);
                             mHighlightPositionList.remove(Integer.valueOf(position));
                             //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
                             changed = true;
