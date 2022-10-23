@@ -9,6 +9,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
@@ -64,6 +65,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -634,11 +636,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
-  //Todo: Tablayout bg is same color as "reset/resume" mode highlight.
   //Todo: Add disclaimer at beginning of app w/ confirmation to dismiss it permanently.
       //Todo: Can also transition to User Settings from here.
-  //Todo: Any colors changed need to be done in /1920 xml too.
 
   //Todo: Should we nix reset/resume and allow all timers to run concurrently? Could have multiple notification rows. May also be functionally better since user can minimize app/not worry about accidental presses in pocket.
 
@@ -1309,11 +1310,58 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopWatchPopUpWindow = new PopupWindow(stopWatchPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
   }
 
+  private void firstTimeAppUseDisclaimerAlertDialog() {
+    AlertDialog alertDialog = new AlertDialog.Builder(this).create();
+    alertDialog.setCancelable(false);
+    alertDialog.setCanceledOnTouchOutside(false);
+
+    alertDialog.setTitle("Disclaimer:");
+    alertDialog.setMessage(getString(R.string.disclaimer));
+
+    alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.accept),
+            new DialogInterface.OnClickListener() {
+              public void onClick(DialogInterface dialog, int which) {
+
+              }
+            });
+
+    alertDialog.setButton(AlertDialog.BUTTON_NEGATIVE, getString(R.string.decline),
+            new DialogInterface.OnClickListener() {
+              public void onClick(DialogInterface dialog, int which) {
+
+              }
+            });
+
+    alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+      @Override
+      public void onShow(DialogInterface dialog) {
+
+        Button acceptButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_POSITIVE);
+        Button declineButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEGATIVE);
+
+        acceptButton.setOnClickListener(v-> {
+          Log.i("testButton", "accept button clicked!");
+
+//          alertDialog.dismiss();
+        });
+
+        declineButton.setOnClickListener(v-> {
+          Log.i("testButton", "decline button clicked!");
+        });
+      }
+    });
+
+
+    alertDialog.show();
+  }
+
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    firstTimeAppUseDisclaimerAlertDialog();
 
    Log.i("testVer", "ver is " + Build.VERSION.SDK_INT);
 
@@ -6183,7 +6231,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (themeMode == DAY_MODE) {
       mainView.setBackgroundColor(Color.WHITE);
-      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
+      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.alien_black));
       savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.BLACK);
 
       fabDrawable.setStroke(3, Color.BLACK);
@@ -6191,7 +6239,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (themeMode == NIGHT_MODE) {
       mainView.setBackgroundColor(Color.BLACK);
-      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.darker_grey));
+      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.alien_black));
       savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.WHITE);
 
       fabDrawable.setStroke(3, Color.WHITE);

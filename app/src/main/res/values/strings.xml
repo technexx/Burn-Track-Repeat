@@ -293,6 +293,9 @@
         This app is for informational and recreational purposes only. It is not meant to offer any medical or dietary advice, nor should it be used as a substitute for such. You should consult with a physician before beginning any exercise, fitness, dietary, or nutrition routine. All information included in this app is presented in good faith, and no guarantee is made regarding the accuracy of this information. Any actions taken upon the information presented in this app is strictly at your own risk, and the publisher will not be liable for any losses and/or damages resulting from its use.
     </string>
 
+    <string name="accept">Accept</string>
+    <string name="decline">Decline</string>
+
     <string-array name="bicycling">
         <item>Mountain biking - general </item>
         <item>Mountain biking- uphill and vigorous </item>

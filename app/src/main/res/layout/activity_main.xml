@@ -22,13 +22,13 @@
         android:layout_height="35dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/darker_grey"
         app:tabTextColor="@color/white"
         app:tabSelectedTextColor="@color/blue_2"
         app:tabIndicatorColor="@color/white"
         app:tabTextAppearance="@style/TabLayoutTextStyle"
         app:tabIndicatorFullWidth="true"
-        app:tabRippleColor="@android:color/transparent">
+        app:tabRippleColor="@android:color/transparent"
+        android:background="@color/green">
     </com.google.android.material.tabs.TabLayout>
 
     <TextView
