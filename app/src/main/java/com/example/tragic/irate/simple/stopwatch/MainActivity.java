@@ -147,7 +147,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton fab;
   ImageButton stopWatchLaunchButton;
   TextView emptyCycleList;
-  TextView userSettingsPromptTextView;
 
   CyclesDatabase cyclesDatabase;
   Cycles cycles;
@@ -1372,12 +1371,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean hasAppBeenLaunchedBefore = sharedPreferences.getBoolean("hasAppBeenLaunchedBefore", false);
 
     if (!hasAppBeenLaunchedBefore) {
-      userSettingsPromptTextView.setVisibility(View.VISIBLE);
-      emptyCycleList.setVisibility(View.GONE);
-      userSettingsPromptTextView.setText(R.string.user_settings_prompt);
-
+      emptyCycleList.setText(R.string.user_settings_prompt);
+      emptyCycleList.setEnabled(true);
       prefEdit.putBoolean("hasAppBeenLaunchedBefore", true);
       prefEdit.apply();
+    } else {
+      emptyCycleList.setText(R.string.empty_cycle_list);
+      emptyCycleList.setEnabled(false);
     }
   }
 
@@ -1393,6 +1393,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     groupAllAppStartInstantiations();
 
     prefEdit.putBoolean("disclaimerHasBeenAccepted", false);
+    prefEdit.putBoolean("hasAppBeenLaunchedBefore", false);
     prefEdit.apply();
 
     launchDisclaimerIfNotPreviouslyAgreedTo();
@@ -1409,17 +1410,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     infinityTimerForSetsRunnable = infinityRunnableForSets();
     infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
 
+    emptyCycleList.setOnClickListener(v-> {
+      mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
+      mainActivityFragmentFrameLayout.setVisibility(View.VISIBLE);
+
+      if (rootSettingsFragment != null) {
+        getSupportFragmentManager().beginTransaction()
+                .replace(R.id.settings_fragment_frameLayout, tdeeSettingsFragment)
+                .commit();
+      }
+      sortButton.setVisibility(View.INVISIBLE);
+
+      setTypeOfOnOptionsSelectedMenu(SETTINGS_MENU);
+
+      mHandler.postDelayed(()-> {
+        emptyCycleList.setText(R.string.empty_cycle_list);
+        emptyCycleList.setEnabled(false);
+      },500);
+    });
+
     addTDEEfirstMainTextView.setOnClickListener(v -> {
       inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
 
       addTdeePopUpWindow.showAsDropDown(topOfMainActivityView);
 //      addTdeePopUpWindow.showAsDropDown(bottomEditTitleDividerView);
-    });
-
-    userSettingsPromptTextView.setOnClickListener(v-> {
-      getSupportFragmentManager().beginTransaction()
-              .replace(R.id.settings_fragment_frameLayout, tdeeSettingsFragment)
-              .commit();
     });
 
     addActivityConfirmButton.setOnClickListener(v -> {
@@ -1996,8 +2010,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab = findViewById(R.id.fab);
     stopWatchLaunchButton = findViewById(R.id.stopwatch_launch_button);
     emptyCycleList = findViewById(R.id.empty_cycle_list);
-    userSettingsPromptTextView = findViewById(R.id.user_settings_prompt_textView);
-    userSettingsPromptTextView.setVisibility(View.GONE);
 
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
     savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
