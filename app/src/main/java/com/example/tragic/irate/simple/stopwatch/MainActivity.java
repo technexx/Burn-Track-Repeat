@@ -639,7 +639,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
 
-  //Todo: Should we nix reset/resume and allow all timers to run concurrently? Could have multiple notification rows. May also be functionally better since user can minimize app/not worry about accidental presses in pocket.
+  //Todo: We should allow all timers to run concurrently w/ multiple notification rows. Functionally better since user can switch windows/not worry about exiting out, esp. during long (e.g. job) sets.
+      //Todo: Cycles and Pom Cycles not exclusive, either. Conceivably could be reading + working out.
+      //Todo: We can set fade animation on the spannable section of current round in progress.
+      //Todo: Will likely need sep pause/end etc. vars for Cycles and Pom Cycles.
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
@@ -1340,7 +1343,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         acceptButton.setOnClickListener(v-> {
           prefEdit.putBoolean("disclaimerHasBeenAccepted", true);
           prefEdit.apply();
-          //Todo: Launch User Settings fragment.
+          //Todo: Launch User Settings fragment and add conditional boolean to skip this method from shardPref.
 
           alertDialog.dismiss();
         });
@@ -1354,8 +1357,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     });
 
-
     alertDialog.show();
+  }
+
+  private void launchDisclaimerIfNotPreviouslyAgreedTo() {
+    boolean agreementClicked = sharedPreferences.getBoolean("disclaimerHasBeenAccepted", false);
+
+    if (!agreementClicked) {
+      Log.i("testDisclaimer", "boolean is + " + " and launching agreement");
+      firstTimeAppUseDisclaimerAlertDialog();
+    }
+
+    Log.i("testDisclaimer", "boolean is + " + agreementClicked + " and not launching");
   }
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
@@ -1364,12 +1377,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
 
-    firstTimeAppUseDisclaimerAlertDialog();
-
    Log.i("testVer", "ver is " + Build.VERSION.SDK_INT);
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
+
+    prefEdit.putBoolean("disclaimerHasBeenAccepted", false);
+    prefEdit.apply();
+
+    launchDisclaimerIfNotPreviouslyAgreedTo();
 
     mainView = findViewById(R.id.main_layout);
     topOfMainActivityView = findViewById(R.id.top_of_main_activity_view);
