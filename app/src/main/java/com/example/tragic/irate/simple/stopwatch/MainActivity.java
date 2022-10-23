@@ -637,9 +637,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Delete
+  //Todo: Getting some ghosting vertical lines when adding rounds. Likely due to color changes (new blacks) w/ in adapter.
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
+  //Todo: User settings at first app launch should have an "okay" button to denote exit.
 
   //Todo: We should allow all timers to run concurrently w/ multiple notification rows. Functionally better since user can switch windows/not worry about exiting out, esp. during long (e.g. job) sets.
       //Todo: Cycles and Pom Cycles not exclusive, either. Conceivably could be reading + working out.
@@ -976,7 +977,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset) {
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
-      timerIsPaused = true;
+//      timerIsPaused = true;
       progressBar.setProgress(currentProgressBarValue);
       setTotalCycleTimeValuesToTextView();
 
@@ -1040,15 +1041,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void timerPopUpDismissalLogic() {
     timerDisabled = false;
     timerPopUpIsVisible = false;
-    reset.setVisibility(View.INVISIBLE);
 
     if (mode == 1) {
-      pauseAndResumeTimer(PAUSING_TIMER);
       savedCycleAdapter.notifyDataSetChanged();
 
       if (trackActivityWithinCycle) {
 //        storeDailyTimesForCycleResuming();
-
         AsyncTask.execute(()-> {
           setAndUpdateActivityTimeAndCaloriesInDatabase();
 
@@ -1069,7 +1067,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     toggleSortButtonBasedOnIfCycleIsActive();
 
-    mHandler.removeCallbacksAndMessages(null);
   }
 
   private void deleteLastAccessedActivityCycleIfItHasZeroTime(int positionOfCycle) {
@@ -1392,9 +1389,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setPhoneDimensions();
     groupAllAppStartInstantiations();
 
-    prefEdit.putBoolean("disclaimerHasBeenAccepted", false);
-    prefEdit.putBoolean("hasAppBeenLaunchedBefore", false);
-    prefEdit.apply();
+//    prefEdit.putBoolean("disclaimerHasBeenAccepted", false);
+//    prefEdit.putBoolean("hasAppBeenLaunchedBefore", false);
+//    prefEdit.apply();
 
     launchDisclaimerIfNotPreviouslyAgreedTo();
     setPromptToLaunchUserSettingsOnFirstAppLaunch();
@@ -3814,8 +3811,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         savedCycleAdapter.notifyDataSetChanged();
       }
-      //If between rounds, post runnable for next round without starting timer or object animator.
-//      if (!objectAnimator.isStarted()) mHandler.post(postRoundRunnableForFirstMode());
 
       prefEdit.putInt("savedProgressBarValueForModeOne", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeOne", timeLeft.getText().toString());
@@ -3834,8 +3829,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         savedPomCycleAdapter.notifyDataSetChanged();
       }
-//      if (!objectAnimatorPom.isStarted()) mHandler.post(postRoundRunnableForThirdMode());
-
       prefEdit.putInt("savedProgressBarValueForModeThree", currentProgressBarValue);
       prefEdit.putString("timeLeftValueForModeThree", timeLeft.getText().toString());
       prefEdit.putInt("positionOfSelectedCycleForModeThree", positionOfSelectedCycle);
@@ -4933,6 +4926,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
+        Log.i("testRunnable", "cycle times running!");
+
         mHandler.postDelayed(this, 10);
       }
     };
@@ -5644,6 +5639,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       mHandler.removeCallbacks(infinityRunnableForCyclesTimer);
     }
+    //Todo: Not running but not removed on timer dismiss.
+    Log.i("testRunnable", "cycle runnable removed!");
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
