@@ -321,7 +321,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams cyclesCompletedLayoutParams;
   ConstraintLayout.LayoutParams totalSetTimeHeaderLayoutParams;
   ConstraintLayout.LayoutParams totalBreakTimeHeaderLayoutParams;
-  ConstraintLayout.LayoutParams progressBarLayoutParams;
   ConstraintLayout.LayoutParams timerTextViewLayoutParams;
 
   ConstraintLayout.LayoutParams roundRecyclerOneLayoutParams;
@@ -350,6 +349,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View stopWatchPopUpView;
 
   ProgressBar progressBar;
+  ProgressBar progressBarForPom;
   TextView timeLeft;
   CountDownTimer timer;
   TextView reset;
@@ -637,6 +637,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Need separate progressBar for each mode.
   //Todo: Getting some ghosting vertical lines when adding rounds. Likely due to color changes (new blacks) w/ in adapter.
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
@@ -977,11 +978,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset) {
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
-//      timerIsPaused = true;
-      progressBar.setProgress(currentProgressBarValue);
       setTotalCycleTimeValuesToTextView();
 
       if (mode == 1) {
+        progressBar.setVisibility(View.VISIBLE);
+        progressBar.setProgress(currentProgressBarValue);
+
         if (trackActivityWithinCycle) {
           setAllActivityTimesAndCaloriesToTextViews();
 //          setStoredDailyTimesOnCycleResume();
@@ -1013,6 +1015,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       if (mode == 3) {
+        progressBarForPom.setVisibility(View.VISIBLE);
+        progressBarForPom.setProgress(currentProgressBarValue);
         setStoredSetAndBreakTimeOnPomCycleResume();
 
         changeTextSizeWithoutAnimator(pomMillis);
@@ -1043,6 +1047,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = false;
 
     if (mode == 1) {
+      progressBar.setVisibility(View.GONE);
       savedCycleAdapter.notifyDataSetChanged();
 
       if (trackActivityWithinCycle) {
@@ -1060,6 +1065,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycle);
 
     } else if (mode == 3) {
+      progressBar.setVisibility(View.GONE);
       storeSetAndBreakTimeForPomCycleResuming();
       pauseAndResumePomodoroTimer(PAUSING_TIMER);
       savedPomCycleAdapter.notifyDataSetChanged();
@@ -1616,10 +1622,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       @Override
       public void onAnimationEnd(Animation animation) {
-        progressBar.startAnimation(fadeProgressIn);
+        if (mode==1) {
+          progressBar.startAnimation(fadeProgressIn);
+          progressBar.setProgress(maxProgress);
+        }
+        if (mode==3) {
+          progressBarForPom.startAnimation(fadeProgressIn);
+          progressBarForPom.setProgress(maxProgress);
+        }
         timeLeft.startAnimation(fadeProgressIn);
         //Resets progressBar to max (full blue) value at same time we fade it back in (looks nicer).
-        progressBar.setProgress(maxProgress);
       }
 
       @Override
@@ -1879,6 +1891,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsAdapter.onAlphaSend(MainActivity.this);
     pomDotsAdapter.onPomAlphaSend(MainActivity.this);
     progressBar.setProgress(maxProgress);
+    progressBarForPom.setProgress(maxProgress);
   }
 
   private void instantiateGlobalClasses() {
@@ -1898,7 +1911,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomCycles = new PomCycles();
 
     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
-    objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
+    objectAnimatorPom = ObjectAnimator.ofInt(progressBarForPom, "progress", maxProgress, 0);
     Log.i("testProg", "prog bar value on activity launch is " + objectAnimator.getAnimatedValue());
 
 
@@ -2140,7 +2153,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopwatchReset = stopWatchPopUpView.findViewById(R.id.stopwatch_reset);
 
     progressBar = timerPopUpView.findViewById(R.id.progressBar);
-    progressBarLayout = timerPopUpView.findViewById(R.id.timer_progress_bar_layout);
+    progressBarForPom = timerPopUpView.findViewById(R.id.progressBarForPom);
     timeLeft = timerPopUpView.findViewById(R.id.timeLeft);
     reset_total_cycle_times = timerPopUpView.findViewById(R.id.reset_total_cycle_times);
     reset_total_cycle_times.setVisibility(View.GONE);
@@ -2506,7 +2519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cyclesCompletedLayoutParams = (ConstraintLayout.LayoutParams) cycles_completed_textView.getLayoutParams();
     totalSetTimeHeaderLayoutParams = (ConstraintLayout.LayoutParams) total_set_header.getLayoutParams();
     totalBreakTimeHeaderLayoutParams = (ConstraintLayout.LayoutParams) total_break_header.getLayoutParams();
-    progressBarLayoutParams = (ConstraintLayout.LayoutParams) progressBarLayout.getLayoutParams();
     timerTextViewLayoutParams = (ConstraintLayout.LayoutParams) timeLeft.getLayoutParams();
 
     roundRecyclerOneLayoutParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
@@ -2536,6 +2548,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomRoundRecycler.setVisibility(View.GONE);
     savedPomCycleRecycler.setVisibility(View.GONE);
     pomDotsRecycler.setVisibility(View.GONE);
+
+    progressBar.setVisibility(View.GONE);
+    progressBarForPom.setVisibility(View.GONE);
   }
 
   private void setDefaultLayoutTexts() {
@@ -3979,7 +3994,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     endAnimationForTimer.setStartOffset(0);
     endAnimationForTimer.setRepeatMode(Animation.REVERSE);
     endAnimationForTimer.setRepeatCount(Animation.INFINITE);
-    progressBar.startAnimation(endAnimationForTimer);
+    if (mode==1) progressBar.startAnimation(endAnimationForTimer);
+    if (mode==3) progressBarForPom.startAnimation(endAnimationForTimer);
     timeLeft.startAnimation(endAnimationForTimer);
   }
 
@@ -4250,6 +4266,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
+    progressBarForPom.setVisibility(View.VISIBLE);
+
     if (savedPomCycleAdapter.isCycleActive()) {
       savedPomCycleAdapter.removeCycleAsActive();
       savedPomCycleAdapter.notifyDataSetChanged();
@@ -4291,6 +4309,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
+
+    progressBar.setVisibility(View.VISIBLE);
 
     Calendar calendar = Calendar.getInstance(Locale.getDefault());
     dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
@@ -5292,9 +5312,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setNotificationValues();
     }
 
-    Log.i("testTime", "ended early at " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
-
     globalNextRoundLogic();
+    progressBar.startAnimation(fadeProgressOut);
     mHandler.post(endFadeForModeOne);
 
     if (endingEarly) {
@@ -5358,6 +5377,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setNotificationValues();
     }
 
+    progressBarForPom.startAnimation(fadeProgressOut);
     globalNextRoundLogic();
 
 //    roundPomCycleTimeValuesForEndOfRoundDisplay();
@@ -5372,7 +5392,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (endingEarly) {
       if (timer != null) timer.cancel();
       if (objectAnimatorPom != null) objectAnimatorPom.cancel();
-      progressBar.setProgress(0);
+      progressBarForPom.setProgress(0);
       savedPomCycleAdapter.setCycleAsActive();
     }
 
@@ -5407,7 +5427,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerDisabled = true;
     setHasTextSizeChangedForTimers(false);
 
-    progressBar.startAnimation(fadeProgressOut);
     timeLeft.startAnimation(fadeProgressOut);
     reset.setVisibility(View.INVISIBLE);
 
@@ -5510,7 +5529,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           postPomCycleTimeRunnable();
         } else {
           animateTimerEnding();
-          progressBar.setProgress(0);
+          progressBarForPom.setProgress(0);
           timerEnded = true;
           setCyclesCompletedTextView();
         }
@@ -5639,8 +5658,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       mHandler.removeCallbacks(infinityRunnableForCyclesTimer);
     }
-    //Todo: Not running but not removed on timer dismiss.
-    Log.i("testRunnable", "cycle runnable removed!");
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
@@ -5811,7 +5828,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       objectAnimator.start();
     }
     if (mode == 3) {
-      objectAnimatorPom = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
+      objectAnimatorPom = ObjectAnimator.ofInt(progressBarForPom, "progress", maxProgress, 0);
       objectAnimatorPom.setInterpolator(new LinearInterpolator());
       objectAnimatorPom.setDuration(duration);
       objectAnimatorPom.start();
