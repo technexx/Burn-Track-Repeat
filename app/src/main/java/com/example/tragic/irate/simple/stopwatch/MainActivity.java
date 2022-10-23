@@ -638,8 +638,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
-  //Todo: Add disclaimer at beginning of app w/ confirmation to dismiss it permanently.
-      //Todo: Can also transition to User Settings from here.
 
   //Todo: Should we nix reset/resume and allow all timers to run concurrently? Could have multiple notification rows. May also be functionally better since user can minimize app/not worry about accidental presses in pocket.
 
@@ -1315,7 +1313,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     alertDialog.setCancelable(false);
     alertDialog.setCanceledOnTouchOutside(false);
 
-    alertDialog.setTitle("Disclaimer:");
+    alertDialog.setTitle("Disclaimer");
     alertDialog.setMessage(getString(R.string.disclaimer));
 
     alertDialog.setButton(AlertDialog.BUTTON_POSITIVE, getString(R.string.accept),
@@ -1340,13 +1338,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         Button declineButton = ((AlertDialog) dialog).getButton(AlertDialog.BUTTON_NEGATIVE);
 
         acceptButton.setOnClickListener(v-> {
-          Log.i("testButton", "accept button clicked!");
+          prefEdit.putBoolean("disclaimerHasBeenAccepted", true);
+          prefEdit.apply();
+          //Todo: Launch User Settings fragment.
 
-//          alertDialog.dismiss();
+          alertDialog.dismiss();
         });
 
         declineButton.setOnClickListener(v-> {
-          Log.i("testButton", "decline button clicked!");
+          AlertDialog alertDialogTwo = new AlertDialog.Builder(MainActivity.this).create();
+          alertDialogTwo.setTitle("Warning:");
+          alertDialogTwo.setMessage("You must accept the disclaimer terms before continuing!");
+          alertDialogTwo.show();
         });
       }
     });
