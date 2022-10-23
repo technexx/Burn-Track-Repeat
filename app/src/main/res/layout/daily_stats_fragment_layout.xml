@@ -13,13 +13,13 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:background="@color/black_denim"
         app:tabTextColor="@color/lighter_grey"
         app:tabTextAppearance="@style/TabLayoutTextStyle"
         app:tabIndicatorColor="@color/off_white"
         app:tabSelectedTextColor="@color/blue_2"
         app:tabRippleColor="@android:color/transparent"
-        app:tabIndicatorFullWidth="true" />
+        app:tabIndicatorFullWidth="true"
+        android:background="@color/alien_black" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_duration_header_layout"
@@ -29,7 +29,7 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="0dp"
         android:background="@drawable/daily_total_stats_border"
-        android:backgroundTint="@color/cool_black">
+        android:backgroundTint="@color/retro_black">
 
         <TextView
             android:id="@+id/activity_stats_duration_header_textView"

@@ -634,10 +634,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Total stats in frag can be 1 sec less than in timer.
   //Todo: Tablayout bg is same color as "reset/resume" mode highlight.
   //Todo: Add disclaimer at beginning of app w/ confirmation to dismiss it permanently.
       //Todo: Can also transition to User Settings from here.
   //Todo: Any colors changed need to be done in /1920 xml too.
+
+  //Todo: Should we nix reset/resume and allow all timers to run concurrently? Could have multiple notification rows. May also be functionally better since user can minimize app/not worry about accidental presses in pocket.
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
