@@ -296,6 +296,8 @@
     <string name="accept">Accept</string>
     <string name="decline">Decline</string>
 
+    <string name="user_settings_prompt">Click here to set your user profile!</string>
+
     <string-array name="bicycling">
         <item>Mountain biking - general </item>
         <item>Mountain biking- uphill and vigorous </item>

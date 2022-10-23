@@ -74,6 +74,7 @@ import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.GridLayoutManager;
@@ -146,6 +147,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ImageButton fab;
   ImageButton stopWatchLaunchButton;
   TextView emptyCycleList;
+  TextView userSettingsPromptTextView;
 
   CyclesDatabase cyclesDatabase;
   Cycles cycles;
@@ -636,6 +638,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: Delete
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
 
@@ -650,11 +653,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
   //Todo: Test w/ fresh install for all default values.
-  //Todo: Test everything 10x. Incl. round selection/replacement.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
-  //Todo: Have a fun icon made!
 
   //Todo: Had an instance of stats skipping (e.g. 2->4) when ending a round early. Also occurred after a second had iterated in new round.
       //Todo: What happens: Ends early at 3950 so "3" is displayed, but it goes past 5000+ before timeLeft textView changes to allow its textView to change.
@@ -670,9 +671,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle
   //Todo: storeDailyTimesForCycleResuming() and setStoredDailyTimesForCycleResuming() commented out when using ms for daily stats.
 
-  //Todo: Drawable height may sync w/ textView height for alignment.
-  //Todo: We can also commit just specific files, remember!
-  //Todo: REMINDER, Try next app w/ Kotlin + learn Kotlin.
+  //Drawable height may sync w/ textView height for alignment.
+  //We can also commit just specific files, remember!
+  //REMINDER: Try next app w/ Kotlin + learn Kotlin.
 
   @Override
   public void onResume() {
@@ -1343,7 +1344,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         acceptButton.setOnClickListener(v-> {
           prefEdit.putBoolean("disclaimerHasBeenAccepted", true);
           prefEdit.apply();
-          //Todo: Launch User Settings fragment and add conditional boolean to skip this method from shardPref.
 
           alertDialog.dismiss();
         });
@@ -1364,11 +1364,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean agreementClicked = sharedPreferences.getBoolean("disclaimerHasBeenAccepted", false);
 
     if (!agreementClicked) {
-      Log.i("testDisclaimer", "boolean is + " + " and launching agreement");
       firstTimeAppUseDisclaimerAlertDialog();
     }
+  }
 
-    Log.i("testDisclaimer", "boolean is + " + agreementClicked + " and not launching");
+  private void setPromptToLaunchUserSettingsOnFirstAppLaunch() {
+    boolean hasAppBeenLaunchedBefore = sharedPreferences.getBoolean("hasAppBeenLaunchedBefore", false);
+
+    if (!hasAppBeenLaunchedBefore) {
+      userSettingsPromptTextView.setVisibility(View.VISIBLE);
+      emptyCycleList.setVisibility(View.GONE);
+      userSettingsPromptTextView.setText(R.string.user_settings_prompt);
+
+      prefEdit.putBoolean("hasAppBeenLaunchedBefore", true);
+      prefEdit.apply();
+    }
   }
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
@@ -1386,6 +1396,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     prefEdit.apply();
 
     launchDisclaimerIfNotPreviouslyAgreedTo();
+    setPromptToLaunchUserSettingsOnFirstAppLaunch();
 
     mainView = findViewById(R.id.main_layout);
     topOfMainActivityView = findViewById(R.id.top_of_main_activity_view);
@@ -1403,7 +1414,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       addTdeePopUpWindow.showAsDropDown(topOfMainActivityView);
 //      addTdeePopUpWindow.showAsDropDown(bottomEditTitleDividerView);
+    });
 
+    userSettingsPromptTextView.setOnClickListener(v-> {
+      getSupportFragmentManager().beginTransaction()
+              .replace(R.id.settings_fragment_frameLayout, tdeeSettingsFragment)
+              .commit();
     });
 
     addActivityConfirmButton.setOnClickListener(v -> {
@@ -1688,8 +1704,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       Toast.makeText(getApplicationContext(), "Deleted!", Toast.LENGTH_SHORT).show();
 
       AsyncTask.execute(() -> {
-        if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
-          deleteTotalCycleTimes();
+        if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
+          deleteAllCycles();
         }
         if (delete_all_text.getText().equals(getString(R.string.delete_activities_from_selected_duration))) {
           deleteActivityStatsForSelectedDays();
@@ -1980,6 +1996,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab = findViewById(R.id.fab);
     stopWatchLaunchButton = findViewById(R.id.stopwatch_launch_button);
     emptyCycleList = findViewById(R.id.empty_cycle_list);
+    userSettingsPromptTextView = findViewById(R.id.user_settings_prompt_textView);
+    userSettingsPromptTextView.setVisibility(View.GONE);
 
     savedCycleRecycler = findViewById(R.id.cycle_list_recycler);
     savedPomCycleRecycler = findViewById(R.id.pom_list_recycler);
