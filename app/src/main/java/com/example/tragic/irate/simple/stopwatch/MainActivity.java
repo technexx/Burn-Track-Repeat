@@ -641,11 +641,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: Set/Break/Work/Rest totals (using same textView) don't get set until timer iterates when switching tabs.
-
   //Todo: We can branch back have this be a future update, too.
       //Todo: However, this logic seems better, esp. when it comes to animations since we don't want one mode's intruding on another's.
 
+  //Todo: Sound (and likely other) settings not being retained on app re-launch.
   //Todo: Set rows of notification for cycles/pom/stopwatch.
       //Todo: notifcationsRunnable() only has cyclesTimeLeft at moment.
   //Todo: Fade/grey out main cycle spannables as rounds end.
@@ -987,7 +986,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void resumeOrResetCycleFromAdapterList(int resumeOrReset) {
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
       setTotalCycleTimeValuesToTextView();
-//      Log.i("testRun", "time being set!");
 
       if (mode == 1) {
         timeLeftForPomCyclesTimer.setVisibility(View.GONE);
@@ -997,9 +995,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (trackActivityWithinCycle) {
           setAllActivityTimesAndCaloriesToTextViews();
-//          setStoredDailyTimesOnCycleResume();
         } else {
-          setStoredSetAndBreakTimeOnCycleResume();
+//          setStoredSetAndBreakTimeOnCycleResume();
         }
 
         toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
@@ -4729,7 +4726,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setTotalCycleTimeValuesToTextView() {
     if (mode == 1) {
-//      Log.i("testRun", "set time is " + totalCycleSetTimeInMillis);
+      Log.i("testRun", "set time is " + totalCycleSetTimeInMillis);
+      Log.i("testRun", "time being set!");
 
       total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleSetTimeInMillis));
       total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleBreakTimeInMillis));
@@ -4987,10 +4985,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         long timeToIterate = timerIteration.getDifference();
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
 
-        Log.i("testRun", "CYCLE_TIME is " + CYCLE_TIME_TO_ITERATE);
-
         if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
-          Log.i("testRun", "iterating");
           totalCycleSetTimeInMillis = timerIteration.getNewTotal();
         }
         if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
@@ -5773,7 +5768,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       mHandler.removeCallbacks(runnableForSetAndBreakTotalTimes);
     }
-    Log.i("testRun", "set/break or stats runnable removed!");
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
