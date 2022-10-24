@@ -987,6 +987,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode == 1) {
         timeLeftForPomCyclesTimer.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
+        timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
         progressBar.setProgress(currentProgressBarValue);
 
         if (trackActivityWithinCycle) {
@@ -1022,6 +1023,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode == 3) {
         progressBarForPom.setVisibility(View.VISIBLE);
         progressBarForPom.setProgress(currentProgressBarValue);
+        timeLeftForPomCyclesTimer.setVisibility(View.VISIBLE);
         setStoredSetAndBreakTimeOnPomCycleResume();
 
         changeTextSizeWithoutAnimator(pomMillis);
