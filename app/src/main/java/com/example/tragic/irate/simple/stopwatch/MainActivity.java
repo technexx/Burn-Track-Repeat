@@ -488,18 +488,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable infinityTimerForBreaksRunnable;
   Runnable stopWatchTimerRunnable;
 
-  Runnable infinityRunnableForCyclesTimer;
-  Runnable infinityRunnableForPomCyclesTimer;
+  Runnable runnableForSetAndBreakTotalTimes;
+  Runnable runnableForWorkAndRestTotalTimes;
   Runnable infinityRunnableForDailyActivityTimer;
 
   Runnable globalNotficationsRunnable;
 
   int CYCLE_TIME_TO_ITERATE;
+  int POM_CYCLE_TIME_TO_ITERATE;
 
   int CYCLE_SETS = 0;
   int CYCLE_BREAKS = 1;
-  int POM_CYCLE_WORK = 2;
-  int POM_CYCLE_REST = 3;
+  int POM_CYCLE_WORK = 0;
+  int POM_CYCLE_REST = 2;
 
   int TOTAL_DAILY_TIME = 0;
   int SINGLE_ACTIVITY_TIME = 1;
@@ -639,6 +640,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
+
+  //Todo: Set/Break/Work/Rest totals (using same textView) don't get set until timer iterates when switching tabs.
 
   //Todo: We can branch back have this be a future update, too.
       //Todo: However, this logic seems better, esp. when it comes to animations since we don't want one mode's intruding on another's.
@@ -1424,8 +1427,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleDayAndNightModesForTimer(colorThemeMode);
 
     stopWatchTimerRunnable = stopWatchRunnable();
-    infinityTimerForSetsRunnable = infinityRunnableForSets();
-    infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
+    infinityTimerForSetsRunnable = infinityRunnableForSetRounds();
+    infinityTimerForBreaksRunnable = infinityRunnableForBreakRounds();
 
     emptyCycleList.setOnClickListener(v-> {
       mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
@@ -4711,6 +4714,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
+      //Todo: This returning true but not textView not updating.
+      Log.i("testRun", "returning true");
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
 
       setTotalCycleTimeValuesToTextView();
@@ -4725,6 +4730,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleSetTimeInMillis));
       total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleBreakTimeInMillis));
+
+      //Todo: Not updating.
+      Log.i("testRun", "setTime in millis is " + totalCycleSetTimeInMillis);
 
     }
     if (mode == 3) {
@@ -4804,10 +4812,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) {
       switch (pomDotCounter) {
         case 0: case 2: case 4: case 6:
-          CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
+          POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
           break;
         case 1: case 3: case 5: case 7:
-          CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
+          POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
           break;
       }
     }
@@ -4940,7 +4948,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalSetTimeForCurrentDayInMillis = timerIteration.getNewDailyTotal();
         totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewActivityTotal();
 
-//        Log.i("testTime", "daily time is " + totalSetTimeForCurrentDayInMillis);
         Log.i("testTime", "activity time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
 
         calorieIteration.setNewTotalCalories(calorieIteration.getPreviousTotalCalories() + caloriesToIterate);
@@ -4957,7 +4964,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private Runnable infinityRunnableForCyclesTimer() {
+  private Runnable runnableForSetAndBreakTotalTimes() {
     setCycleTimeToIterate();
 
     TimerIteration timerIteration = new TimerIteration();
@@ -4969,6 +4976,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
       timerIteration.setPreviousTotal(totalCycleSetTimeInMillis);
+      Log.i("testRun", "setting previous total at " + totalCycleSetTimeInMillis);
     }
     if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
       timerIteration.setPreviousTotal(totalCycleBreakTimeInMillis);
@@ -4990,15 +4998,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
-        Log.i("testRunnable", "cycle times running!");
-
         mHandler.postDelayed(this, 10);
       }
     };
   }
 
   //Runs work/rest time, which iterates up.
-  private Runnable infinityRunnableForPomCyclesTimer() {
+  private Runnable runnableForWorkAndRestTotalTimes() {
     setCycleTimeToIterate();
 
     TimerIteration timerIteration = new TimerIteration();
@@ -5008,10 +5014,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     textViewDisplaySync.setFirstTextView((String) timeLeftForPomCyclesTimer.getText());
     textViewDisplaySync.setSecondTextView((String) timeLeftForPomCyclesTimer.getText());
 
-    if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
+    if (POM_CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
       timerIteration.setPreviousTotal(totalCycleWorkTimeInMillis);
     }
-    if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
+    if (POM_CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
       timerIteration.setPreviousTotal(totalCycleRestTimeInMillis);
     }
 
@@ -5022,10 +5028,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         long timeToIterate = timerIteration.getDifference();
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
 
-        if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
+        if (POM_CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
           totalCycleWorkTimeInMillis = timerIteration.getNewTotal();
         }
-        if (CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
+        if (POM_CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
           totalCycleRestTimeInMillis = timerIteration.getNewTotal();
         }
 
@@ -5036,7 +5042,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private Runnable infinityRunnableForSets() {
+  private Runnable infinityRunnableForSetRounds() {
     if (valueAnimatorDown.isStarted()) {
       valueAnimatorDown.cancel();
     }
@@ -5081,7 +5087,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private Runnable infinityRunnableForBreaks() {
+  private Runnable infinityRunnableForBreakRounds() {
     if (valueAnimatorDown.isStarted()) {
       valueAnimatorDown.cancel();
     }
@@ -5571,7 +5577,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             case 2:
               timeLeftForCyclesTimer.setText("0");
               //Do not want to consolidate infinityTimer runnable methods, since we only want its global re-instantiated here, not in our pause/resume option.
-              infinityTimerForSetsRunnable = infinityRunnableForSets();
+              infinityTimerForSetsRunnable = infinityRunnableForSetRounds();
               mHandler.post(infinityTimerForSetsRunnable);
 
               if (trackActivityWithinCycle) {
@@ -5589,7 +5595,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 4:
               timeLeftForCyclesTimer.setText("0");
-              infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
+              infinityTimerForBreaksRunnable = infinityRunnableForBreakRounds();
               mHandler.post(infinityTimerForBreaksRunnable);
               break;
           }
@@ -5688,7 +5694,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
             case 2:
-              infinityTimerForSetsRunnable = infinityRunnableForSets();
+              infinityTimerForSetsRunnable = infinityRunnableForSetRounds();
               if (!mHandler.hasCallbacks(infinityTimerForSetsRunnable)) {
                 mHandler.post(infinityTimerForSetsRunnable);
               }
@@ -5712,7 +5718,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
             case 4:
-              infinityTimerForBreaksRunnable = infinityRunnableForBreaks();
+              infinityTimerForBreaksRunnable = infinityRunnableForBreakRounds();
               if (!mHandler.hasCallbacks(infinityTimerForBreaksRunnable)) {
                 mHandler.post(infinityTimerForBreaksRunnable);
 
@@ -5747,10 +5753,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void postCycleTimeRunnable() {
-    infinityRunnableForCyclesTimer = infinityRunnableForCyclesTimer();
+    runnableForSetAndBreakTotalTimes = runnableForSetAndBreakTotalTimes();
 
-    if (!mHandler.hasCallbacks(infinityRunnableForCyclesTimer)) {
-      mHandler.post(infinityRunnableForCyclesTimer);
+    if (!mHandler.hasCallbacks(runnableForSetAndBreakTotalTimes)) {
+      mHandler.post(runnableForSetAndBreakTotalTimes);
     }
   }
 
@@ -5758,8 +5764,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (trackingActivity) {
       mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
     } else {
-      mHandler.removeCallbacks(infinityRunnableForCyclesTimer);
+      mHandler.removeCallbacks(runnableForSetAndBreakTotalTimes);
     }
+    Log.i("testRun", "set/break or stats runnable removed!");
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
@@ -5799,15 +5806,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void postPomCycleTimeRunnable() {
-    infinityRunnableForPomCyclesTimer = infinityRunnableForPomCyclesTimer();
+    runnableForWorkAndRestTotalTimes = runnableForWorkAndRestTotalTimes();
 
-    if (!mHandler.hasCallbacks(infinityRunnableForPomCyclesTimer)) {
-      mHandler.post(infinityRunnableForPomCyclesTimer);
+    if (!mHandler.hasCallbacks(runnableForWorkAndRestTotalTimes)) {
+      mHandler.post(runnableForWorkAndRestTotalTimes);
     }
   }
 
   private void removePomCycleTimeRunnable() {
-    mHandler.removeCallbacks(infinityRunnableForPomCyclesTimer);
+    mHandler.removeCallbacks(runnableForWorkAndRestTotalTimes);
   }
 
   private void enableOrDisableCycleResetButton(boolean enable) {
@@ -6080,6 +6087,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void resetCyclesTimer() {
     resetTimerLogicForAllTimers();
 
+    removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
+
     currentProgressBarValueForModeOne = maxProgress;
     progressBar.setProgress(maxProgress);
 
@@ -6160,6 +6169,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void resetPomCyclesTimer() {
     resetTimerLogicForAllTimers();
+
+    removePomCycleTimeRunnable();
 
     currentProgressBarValueForModeThree = maxProgress;
     progressBarForPom.setProgress(maxProgress);
