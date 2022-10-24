@@ -6056,36 +6056,36 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void resetCyclesTimer() {
-    //Todo: Adjust stuff outside of Mode 1 that we want for both.
-    setHasTextSizeChangedForTimers(false);
-
+  private void resetTimerLogicForAllTimers() {
     vibrator.cancel();
-    if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
-    if (endAnimationForCyclesTimer != null) endAnimationForCyclesTimer.cancel();
 
     if (mediaPlayer.isPlaying()) {
       mediaPlayer.stop();
       mediaPlayer.reset();
     }
 
+    setHasTextSizeChangedForTimers(false);
+    clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+
+    setCyclesCompletedTextView();
+
     timerIsPaused = true;
     timerEnded = false;
     timerDisabled = false;
     next_round.setEnabled(true);
-
     progressBar.setProgress(10000);
-    currentProgressBarValue = 10000;
+  }
+
+  private void resetCyclesTimer() {
+    resetTimerLogicForAllTimers();
+
+    if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
+    if (endAnimationForCyclesTimer != null) endAnimationForCyclesTimer.cancel();
+
+//    currentProgressBarValue = 10000;
 
     resetButtonForCycles.setText(R.string.reset);
     resetButtonForCycles.setVisibility(View.INVISIBLE);
-
-//    cycles_completed_textView.setText(R.string.cycles_done);
-
-    toggleLayoutParamsForCyclesAndStopwatch();
-    setCyclesCompletedTextView();
-
-    clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
     mHandler.removeCallbacks(infinityTimerForSetsRunnable);
     mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
@@ -6158,6 +6158,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetPomCyclesTimer() {
+    resetTimerLogicForAllTimers();
+
     if (modeThreeCountDownTimer != null) modeThreeCountDownTimer.cancel();
     if (endAnimationForPomCyclesTimer != null) endAnimationForPomCyclesTimer.cancel();
 
@@ -6212,16 +6214,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-  private void toggleLayoutParamsForCyclesAndStopwatch() {
-    if (mode != 4) {
-      cycleTitleLayoutParams.topMargin = convertDensityPixelsToScalable(15);
-      cyclesCompletedLayoutParams.topMargin = convertDensityPixelsToScalable(12);
-    } else {
-      cyclesCompletedLayoutParams.topMargin = 0;
-      cycleTitleLayoutParams.topMargin = -25;
-    }
-  }
 
   private void toggleEditPopUpViewsForAddingActivity(boolean activityExists) {
     if (mode == 1) {
