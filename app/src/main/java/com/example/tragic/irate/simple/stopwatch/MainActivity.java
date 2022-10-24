@@ -1016,7 +1016,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             runOnUiThread(()-> {
               retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-              setAllActivityTimesAndCaloriesToTextViews();
             });
           }
         });
@@ -1026,10 +1025,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBarForPom.setVisibility(View.VISIBLE);
         progressBarForPom.setProgress(currentProgressBarValueForModeThree);
         timeLeftForPomCyclesTimer.setVisibility(View.VISIBLE);
-        setStoredSetAndBreakTimeOnPomCycleResume();
+        setTotalCycleTimeValuesToTextView();
+        // setStoredSetAndBreakTimeOnPomCycleResume();
 
         changeTextSizeWithoutAnimator(pomMillis);
         toggleViewsForTotalDailyAndCycleTimes(false);
+
         timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
       }
 
@@ -4712,8 +4713,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
-      //Todo: This returning true but not textView not updating.
-      Log.i("testRun", "returning true");
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
 
       setTotalCycleTimeValuesToTextView();
@@ -4726,9 +4725,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setTotalCycleTimeValuesToTextView() {
     if (mode == 1) {
-      Log.i("testRun", "set time is " + totalCycleSetTimeInMillis);
-      Log.i("testRun", "time being set!");
-
       total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleSetTimeInMillis));
       total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleBreakTimeInMillis));
     }
