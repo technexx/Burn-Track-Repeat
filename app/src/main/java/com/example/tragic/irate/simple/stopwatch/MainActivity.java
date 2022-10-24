@@ -639,8 +639,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  //Todo: We can branch back have this be a future update, too.
+      //Todo: However, this logic seems better, esp. when it comes to animations since we don't want one mode's intruding on another's.
+
   //Todo: Set rows of notification for cycles/pom/stopwatch.
       //Todo: notifcationsRunnable() only has cyclesTimeLeft at moment.
+  //Todo: Fade/grey out main cycle spannables as rounds end.
 
   //Todo: Getting some ghosting vertical lines when adding rounds. Likely due to color changes (new blacks) w/ in adapter.
   //Todo: Delete popUp coloring could use a few changes.

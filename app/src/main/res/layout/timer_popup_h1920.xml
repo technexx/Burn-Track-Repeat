@@ -329,7 +329,19 @@
         android:layout_marginBottom="20dp">
 
         <TextView
-            android:id="@+id/timeLeft"
+            android:id="@+id/timeLeftForCyclesTimerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="80sp"
+            app:layout_constraintBottom_toBottomOf="@id/progressBar"
+            app:layout_constraintEnd_toEndOf="@id/progressBar"
+            app:layout_constraintStart_toStartOf="@id/progressBar"
+            app:layout_constraintTop_toTopOf="@id/progressBar">
+        </TextView>
+
+        <TextView
+            android:id="@+id/timeLeftForPomCyclesTimerTextView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@color/white"
@@ -342,6 +354,21 @@
 
         <ProgressBar
             android:id="@+id/progressBar"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:layout_marginBottom="4dp"
+            android:background="@drawable/circle_shape"
+            android:max="10000"
+            android:progressDrawable="@drawable/circle_progress"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+        </ProgressBar>
+
+        <ProgressBar
+            android:id="@+id/progressBarForPom"
             style="?android:attr/progressBarStyleHorizontal"
             android:layout_width="240dp"
             android:layout_height="240dp"
@@ -372,7 +399,19 @@
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
-        android:id="@+id/reset"
+        android:id="@+id/resetButtonForCycles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:text="Reset"
+        android:textColor="@color/white"
+        android:textSize="20sp">
+    </TextView>
+
+    <TextView
+        android:id="@+id/resetButtonForPomCycles"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
