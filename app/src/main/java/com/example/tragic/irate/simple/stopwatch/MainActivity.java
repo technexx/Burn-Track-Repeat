@@ -645,6 +645,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Set rows of notification for cycles/pom/stopwatch.
       //Todo: notifcationsRunnable() only has cyclesTimeLeft at moment.
   //Todo: Fade/grey out main cycle spannables as rounds end.
+  //Todo: Test simultaneous timer endings.
 
   //Todo: Getting some ghosting vertical lines when adding rounds. Likely due to color changes (new blacks) w/ in adapter.
   //Todo: Delete popUp coloring could use a few changes.
@@ -1692,16 +1693,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     resetButtonForCycles.setOnClickListener(v -> {
-
-      if (mode == 1) {
-
-      }
-      if (mode == 3) {
-
-      }
-    });
-
-    resetButtonForPomCycles.setOnClickListener(v-> {
       AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       resetCyclesTimer();
       if (!trackActivityWithinCycle) {
@@ -2177,6 +2168,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     progressBar = timerPopUpView.findViewById(R.id.progressBar);
     progressBarForPom = timerPopUpView.findViewById(R.id.progressBarForPom);
     timeLeftForCyclesTimer = timerPopUpView.findViewById(R.id.timeLeftForCyclesTimerTextView);
+    timeLeftForPomCyclesTimer = timerPopUpView.findViewById(R.id.timeLeftForPomCyclesTimerTextView);
     reset_total_cycle_times = timerPopUpView.findViewById(R.id.reset_total_cycle_times);
     reset_total_cycle_times.setVisibility(View.GONE);
     pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
@@ -2573,6 +2565,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timeLeftForPomCyclesTimer.setVisibility(View.GONE);
     progressBar.setVisibility(View.GONE);
     progressBarForPom.setVisibility(View.GONE);
+    resetButtonForCycles.setVisibility(View.GONE);
+    resetButtonForPomCycles.setVisibility(View.GONE);
   }
 
   private void setDefaultLayoutTexts() {
@@ -4335,6 +4329,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         public void run() {
           setTimerLaunchViews(typeOfLaunch);
           setTimerLaunchLogic(false);
+          resetPomCyclesTimer();
         }
       });
     });
@@ -4406,6 +4401,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         public void run() {
           setTimerLaunchLogic(trackActivityWithinCycle);
           setTimerLaunchViews(typeOfLaunch);
+          resetCyclesTimer();
         }
       });
     });
@@ -5413,7 +5409,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     globalNextRoundLogic();
 
-    resetButtonForCycles.setVisibility(View.INVISIBLE);
+    resetButtonForCycles.setVisibility(View.GONE);
     timeLeftForCyclesTimer.startAnimation(fadeProgressOut);
     progressBar.startAnimation(fadeProgressOut);
     mHandler.post(endFadeForModeOne);
@@ -5479,7 +5475,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setNotificationValues();
     }
 
-    resetButtonForPomCycles.setVisibility(View.INVISIBLE);
+    resetButtonForPomCycles.setVisibility(View.GONE);
     timeLeftForPomCyclesTimer.startAnimation(fadeProgressOut);
     progressBarForPom.startAnimation(fadeProgressOut);
     globalNextRoundLogic();
@@ -5727,7 +5723,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           savedCycleAdapter.setCycleAsActive();
           timerIsPaused = false;
-          resetButtonForCycles.setVisibility(View.INVISIBLE);
+          resetButtonForCycles.setVisibility(View.GONE);
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       } else {
@@ -5786,7 +5782,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           savedPomCycleAdapter.setCycleAsActive();
           timerIsPaused = false;
-          resetButtonForPomCycles.setVisibility(View.INVISIBLE);
+          resetButtonForPomCycles.setVisibility(View.GONE);
 
           postPomCycleTimeRunnable();
         }
@@ -6086,10 +6082,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
     if (endAnimationForCyclesTimer != null) endAnimationForCyclesTimer.cancel();
 
-//    currentProgressBarValue = 10000;
-
     resetButtonForCycles.setText(R.string.reset);
-    resetButtonForCycles.setVisibility(View.INVISIBLE);
+    resetButtonForCycles.setVisibility(View.GONE);
 
     mHandler.removeCallbacks(infinityTimerForSetsRunnable);
     mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
@@ -6181,7 +6175,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomCyclesTextSizeHasChanged = false;
 
     resetButtonForPomCycles.setText(R.string.reset);
-    resetButtonForPomCycles.setVisibility(View.INVISIBLE);
+    resetButtonForPomCycles.setVisibility(View.GONE);
 
     roundDownPomCycleWorkTime();
     roundDownPomCycleRestTime();
