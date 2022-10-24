@@ -431,7 +431,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long pomMillis;
 
   int maxProgress = 10000;
-  int currentProgressBarValue = 10000;
+  int currentProgressBarValueForModeOne = 10000;
+  int currentProgressBarValueForModeThree = 10000;
   long setMillisUntilFinished;
   long breakMillisUntilFinished;
 
@@ -988,7 +989,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeftForPomCyclesTimer.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
         timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
-        progressBar.setProgress(currentProgressBarValue);
+        progressBar.setProgress(currentProgressBarValueForModeOne);
 
         if (trackActivityWithinCycle) {
           setAllActivityTimesAndCaloriesToTextViews();
@@ -1022,7 +1023,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (mode == 3) {
         progressBarForPom.setVisibility(View.VISIBLE);
-        progressBarForPom.setProgress(currentProgressBarValue);
+        progressBarForPom.setProgress(currentProgressBarValueForModeThree);
         timeLeftForPomCyclesTimer.setVisibility(View.VISIBLE);
         setStoredSetAndBreakTimeOnPomCycleResume();
 
@@ -1081,7 +1082,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       resetButtonForPomCycles.setVisibility(View.GONE);
 
       storeSetAndBreakTimeForPomCycleResuming();
-      pauseAndResumePomodoroTimer(PAUSING_TIMER);
       savedPomCycleAdapter.notifyDataSetChanged();
     }
 
@@ -3845,7 +3845,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.notifyDataSetChanged();
       }
 
-      prefEdit.putInt("savedProgressBarValueForModeOne", currentProgressBarValue);
       prefEdit.putInt("positionOfSelectedCycleForModeOne", positionOfSelectedCycle);
       prefEdit.putBoolean("modeOneTimerPaused", timerIsPaused);
       prefEdit.putBoolean("modeOneTimerEnded", timerEnded);
@@ -3861,7 +3860,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         savedPomCycleAdapter.notifyDataSetChanged();
       }
-      prefEdit.putInt("savedProgressBarValueForModeThree", currentProgressBarValue);
       prefEdit.putInt("positionOfSelectedCycleForModeThree", positionOfSelectedCycle);
       prefEdit.putBoolean("modeThreeTimerPaused", timerIsPaused);
       prefEdit.putBoolean("modeThreeTimerEnded", timerEnded);
@@ -5144,7 +5142,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     modeOneCountdownTimer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
-        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
+        currentProgressBarValueForModeOne = (int) objectAnimator.getAnimatedValue();
         setMillis = millisUntilFinished;
         timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
 
@@ -5170,7 +5168,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     modeOneCountdownTimer = new CountDownTimer(breakMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
-        currentProgressBarValue = (int) objectAnimator.getAnimatedValue();
+        currentProgressBarValueForModeOne = (int) objectAnimator.getAnimatedValue();
         breakMillis = millisUntilFinished;
         timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
         if (breakMillis < 500) timerDisabled = true;
@@ -5196,7 +5194,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void onTick(long millisUntilFinished) {
 
-        currentProgressBarValue = (int) objectAnimatorPom.getAnimatedValue();
+        currentProgressBarValueForModeThree = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
         timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
         if (pomMillis < 500) timerDisabled = true;
@@ -5414,6 +5412,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetButtonForCycles.setVisibility(View.GONE);
     timeLeftForCyclesTimer.startAnimation(fadeProgressOut);
     progressBar.startAnimation(fadeProgressOut);
+    currentProgressBarValueForModeOne = maxProgress;
+
     mHandler.post(endFadeForModeOne);
 
     if (endingEarly) {
@@ -5480,6 +5480,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetButtonForPomCycles.setVisibility(View.GONE);
     timeLeftForPomCyclesTimer.startAnimation(fadeProgressOut);
     progressBarForPom.startAnimation(fadeProgressOut);
+    currentProgressBarValueForModeThree = maxProgress;
+
+    mHandler.post(endFadeForModeThree);
+
     globalNextRoundLogic();
 
 //    roundPomCycleTimeValuesForEndOfRoundDisplay();
@@ -5487,7 +5491,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundDownPomCycleRestTime();
     setTotalCycleTimeValuesToTextView();
 
-    mHandler.post(endFadeForModeThree);
 
     removePomCycleTimeRunnable();
 
@@ -5529,7 +5532,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerDisabled = true;
     setHasTextSizeChangedForTimers(false);
 
-    currentProgressBarValue = 10000;
     next_round.setEnabled(false);
 
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
@@ -5730,7 +5732,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       } else {
         resetCyclesTimer();
-//        deleteTotalCycleTimes();
       }
     }
   }
@@ -5771,6 +5772,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (modeThreeCountDownTimer != null) modeThreeCountDownTimer.cancel();
 
           timerIsPaused = true;
+
           resetButtonForPomCycles.setText(R.string.reset);
           resetButtonForPomCycles.setVisibility(View.VISIBLE);
 
@@ -5887,7 +5889,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     switch (mode) {
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
-          if (currentProgressBarValue == maxProgress) {
+          if (currentProgressBarValueForModeOne == maxProgress) {
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(setMillis);
           } else {
@@ -5897,7 +5899,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
-          if (currentProgressBarValue == maxProgress) {
+          if (currentProgressBarValueForModeOne == maxProgress) {
             timerIsPaused = false;
             instantiateAndStartObjectAnimator(breakMillis);
           } else {
@@ -5909,7 +5911,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         break;
       case 3:
-        if (currentProgressBarValue == maxProgress) {
+        if (currentProgressBarValueForModeThree == maxProgress) {
           timerIsPaused = false;
           pomMillis = pomValuesTime.get(pomDotCounter);
           instantiateAndStartObjectAnimator(pomMillis);
@@ -6040,7 +6042,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void getTimerVariablesForEachMode() {
     if (mode == 1) {
-      currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeOne", 10000);
       timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
       positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
       timerIsPaused = sharedPreferences.getBoolean("modeOneTimerPaused", false);
@@ -6049,7 +6050,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode == 3) {
-      currentProgressBarValue = sharedPreferences.getInt("savedProgressBarValueForModeThree", 10000);
       timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
       positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
       timerIsPaused = sharedPreferences.getBoolean("modeThreeTimerPaused", false);
@@ -6080,7 +6080,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void resetCyclesTimer() {
     resetTimerLogicForAllTimers();
 
-    currentProgressBarValue = maxProgress;
+    currentProgressBarValueForModeOne = maxProgress;
     progressBar.setProgress(maxProgress);
 
     if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
@@ -6161,7 +6161,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void resetPomCyclesTimer() {
     resetTimerLogicForAllTimers();
 
-    currentProgressBarValue = maxProgress;
+    currentProgressBarValueForModeThree = maxProgress;
     progressBarForPom.setProgress(maxProgress);
 
     if (modeThreeCountDownTimer != null) modeThreeCountDownTimer.cancel();
