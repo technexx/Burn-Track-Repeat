@@ -6073,11 +6073,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerEnded = false;
     timerDisabled = false;
     next_round.setEnabled(true);
-    progressBar.setProgress(10000);
   }
 
   private void resetCyclesTimer() {
     resetTimerLogicForAllTimers();
+
+    currentProgressBarValue = maxProgress;
+    progressBar.setProgress(maxProgress);
 
     if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
     if (endAnimationForCyclesTimer != null) endAnimationForCyclesTimer.cancel();
@@ -6136,7 +6138,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       roundCycleSetTimeDown();
       roundCycleBreakTimeDown();
-//        roundDailyStatTimesDown();
 
       if (objectAnimator != null) {
         objectAnimator.cancel();
@@ -6157,6 +6158,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void resetPomCyclesTimer() {
     resetTimerLogicForAllTimers();
+
+    currentProgressBarValue = maxProgress;
+    progressBarForPom.setProgress(maxProgress);
 
     if (modeThreeCountDownTimer != null) modeThreeCountDownTimer.cancel();
     if (endAnimationForPomCyclesTimer != null) endAnimationForPomCyclesTimer.cancel();
