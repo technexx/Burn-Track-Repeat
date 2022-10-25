@@ -11,6 +11,10 @@ public class StateOfTimers {
     boolean modeThreeTimerEnded;
     boolean modeThreeTimerDisabled;
 
+    boolean stopWatchTimerActive;
+    boolean stopWatchTimerPaused = true;
+    boolean stopWatchTimerEnded;
+
     public boolean isModeOneTimerActive() {
         return modeOneTimerActive;
     }
@@ -73,5 +77,29 @@ public class StateOfTimers {
 
     public void setModeThreeTimerDisabled(boolean modeThreeTimerDisabled) {
         this.modeThreeTimerDisabled = modeThreeTimerDisabled;
+    }
+
+    public boolean isStopWatchTimerActive() {
+        return stopWatchTimerActive;
+    }
+
+    public void setStopWatchTimerActive(boolean stopWatchTimerActive) {
+        this.stopWatchTimerActive = stopWatchTimerActive;
+    }
+
+    public boolean isStopWatchTimerPaused() {
+        return stopWatchTimerPaused;
+    }
+
+    public void setStopWatchTimerPaused(boolean stopWatchTimerPaused) {
+        this.stopWatchTimerPaused = stopWatchTimerPaused;
+    }
+
+    public boolean isStopWatchTimerEnded() {
+        return stopWatchTimerEnded;
+    }
+
+    public void setStopWatchTimerEnded(boolean stopWatchTimerEnded) {
+        this.stopWatchTimerEnded = stopWatchTimerEnded;
     }
 }

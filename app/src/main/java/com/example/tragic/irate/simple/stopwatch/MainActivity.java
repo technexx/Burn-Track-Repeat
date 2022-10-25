@@ -465,9 +465,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int numberOfRoundsLeft;
   int currentRound;
 
-  boolean stopWatchIsPaused = true;
-  boolean stopWatchTimerEnded;
-
   LinearLayoutManager lapRecyclerLayoutManager;
 
   ValueAnimator sizeAnimator;
@@ -1752,7 +1749,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     stopWatchPauseResumeButton.setOnClickListener(v -> {
-      if (!stopWatchIsPaused) {
+      if (!stateOfTimers.isStopWatchTimerPaused()) {
         pauseAndResumeStopwatch(PAUSING_TIMER);
       } else {
         pauseAndResumeStopwatch(RESUMING_TIMER);
@@ -4899,7 +4896,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           animateStopwatchEnding();
           new_lap.setEnabled(false);
 
-          stopWatchTimerEnded = true;
+          stateOfTimers.setStopWatchTimerEnded(true);
           mHandler.removeCallbacks(stopWatchTimerRunnable);
         }
       }
@@ -5736,6 +5733,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
         } else if (pausing == RESUMING_TIMER) {
+          stateOfTimers.setModeOneTimerActive(true);
           stateOfTimers.setModeOneTimerPaused(false);
 
           switch (typeOfRound.get(currentRound)) {
@@ -5842,6 +5840,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           removePomCycleTimeRunnable();
 
         } else if (pausing == RESUMING_TIMER) {
+          stateOfTimers.setModeThreeTimerActive(true);
           stateOfTimers.setModeThreeTimerPaused(false);
 
           if (objectAnimatorPom.isPaused() || !objectAnimatorPom.isStarted()) {
@@ -5887,9 +5886,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumeStopwatch(int pausing) {
-    if (!stopWatchTimerEnded) {
+    if (!stateOfTimers.isStopWatchTimerEnded()) {
       if (pausing == PAUSING_TIMER) {
-        stopWatchIsPaused = true;
+        stateOfTimers.setStopWatchTimerPaused(true);
 
         new_lap.setAlpha(0.3f);
         new_lap.setEnabled(false);
@@ -5898,7 +5897,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         mHandler.removeCallbacks(stopWatchTimerRunnable);
       } else if (pausing == RESUMING_TIMER) {
-        stopWatchIsPaused = false;
+        stateOfTimers.setStopWatchTimerPaused(false);
+
         stopWatchstartTime = System.currentTimeMillis();
 
         new_lap.setAlpha(1.0f);
@@ -5915,8 +5915,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetStopwatchTimer() {
-    stopWatchTimerEnded = false;
-    stopWatchIsPaused = true;
+    stateOfTimers.setStopWatchTimerEnded(false);
+    stateOfTimers.setStopWatchTimerPaused(true);
 
     stopWatchstartTime = 0;
     stopWatchTotalTime = 0;
@@ -6136,6 +6136,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeOneTimerPaused(true);
     stateOfTimers.setModeOneTimerEnded(false);
     stateOfTimers.setModeOneTimerDisabled(false);
+    stateOfTimers.setModeOneTimerActive(false);
 
     resetTimerLogicForAllTimers();
 
@@ -6223,6 +6224,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeThreeTimerPaused(true);
     stateOfTimers.setModeThreeTimerEnded(false);
     stateOfTimers.setModeThreeTimerDisabled(false);
+    stateOfTimers.setModeThreeTimerActive(false);
 
     resetTimerLogicForAllTimers();
 

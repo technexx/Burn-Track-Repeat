@@ -124,7 +124,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         android:textColor="@color/white"
         android:layout_marginBottom="4dp"
-        android:textSize="18sp">
+        android:textSize="20sp">
     </TextView>
 
     <ImageButton
