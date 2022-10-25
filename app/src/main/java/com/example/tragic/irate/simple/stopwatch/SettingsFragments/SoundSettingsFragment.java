@@ -59,7 +59,10 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.sounds_settings_fragment_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues(getContext());
 
-        SharedPreferences prefShared = getActivity().getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
+        Log.i("testSettings", "sound setting fragment launched!");
+
+        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+//        SharedPreferences prefShared = getActivity().getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
         setPreference = findPreference("soundSettingForSets");
         breakPreference = findPreference("soundSettingForBreaks");
@@ -154,8 +157,12 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
     private void setDefaultSoundSettingsIfNoneSelected() {
         String[] soundStringArray = getResources().getStringArray(R.array.sound_setting_options);
 
+        Log.i("testSettings", "setting default");
+
         if (defaultSoundSettingForSets.equals("")) {
             setPreference.setSummary(soundStringArray[1]);
+
+            mOnChangedSoundSetting.changeSoundSetting(SET_SETTING, 1);
         }
 
         if (defaultSoundSettingForBreaks.equals("")) {

@@ -2,6 +2,7 @@ package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -13,6 +14,7 @@ import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
+import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -74,6 +76,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int NIGHT_MODE = 1;
 
   int fullViewBackgroundColor;
+
+  ColorStateList colorStateList;
 
   public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
     if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
@@ -139,7 +143,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     changeSettingsValues = new ChangeSettingsValues(mContext);
 
     fullViewBackgroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
-
   }
 
   public void exitHighlightMode() {
@@ -324,6 +327,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           if (j<=mNumberOfRoundsCompleted-1) {
             span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.darker_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
+
         }
       }
       //Within this loop, we update our permSpan charSequence with the new workout Spannable object.

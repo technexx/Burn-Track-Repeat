@@ -77,6 +77,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -1053,44 +1054,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     toggleSortButtonBasedOnIfCycleIsActive();
   }
 
-  private void timerPopUpDismissalLogic() {
-    timerDisabled = false;
-    timerPopUpIsVisible = false;
-
-    if (mode == 1) {
-      timeLeftForCyclesTimer.setVisibility(View.GONE);
-      progressBar.setVisibility(View.GONE);
-      resetButtonForCycles.setVisibility(View.GONE);
-
-      savedCycleAdapter.notifyDataSetChanged();
-
-      if (trackActivityWithinCycle) {
-//        storeDailyTimesForCycleResuming();
-        AsyncTask.execute(()-> {
-          setAndUpdateActivityTimeAndCaloriesInDatabase();
-
-          //This is used if we're converting our Strings in timer popUp to millis. Needed if we go back to rounding instead of using milliseconds when dismissing timer.
-//          setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString();
-        });
-      }  else {
-        storeSetAndBreakTimeForCycleResuming();
-      }
-
-      deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycle);
-
-    } else if (mode == 3) {
-      timeLeftForPomCyclesTimer.setVisibility(View.GONE);
-      progressBarForPom.setVisibility(View.GONE);
-      resetButtonForPomCycles.setVisibility(View.GONE);
-
-      storeSetAndBreakTimeForPomCycleResuming();
-      savedPomCycleAdapter.notifyDataSetChanged();
-    }
-
-    toggleSortButtonBasedOnIfCycleIsActive();
-
-  }
-
   private void deleteLastAccessedActivityCycleIfItHasZeroTime(int positionOfCycle) {
     if (dailyStatsAccess.getTotalSetTimeForSelectedActivity() == 0) {
       AsyncTask.execute(() -> {
@@ -1303,7 +1266,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     editCyclesPopupWindow = new PopupWindow(editCyclesPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
-
   }
 
   private void setTimerLayoutForDifferentHeights() {
@@ -1410,6 +1372,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setPhoneDimensions();
     groupAllAppStartInstantiations();
+
 
 //    prefEdit.putBoolean("disclaimerHasBeenAccepted", false);
 //    prefEdit.putBoolean("hasAppBeenLaunchedBefore", false);
@@ -3163,7 +3126,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setDefaultUserSettings() {
     retrieveUserStats();
 
-    SharedPreferences prefShared = getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
+    SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
+//    SharedPreferences prefShared = getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
     String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
     String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_twice");
@@ -3187,7 +3151,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     vibrationSettingForWork = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForWork);
     vibrationSettingForMiniBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForMiniBreak);
     isFullBreakSoundContinuous = changeSettingsValues.assignFinalRoundSwitchValue(defaultSoundSettingForFullBreak);
-
 
     int setColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForSets);
     int breakColorNumericValue = changeSettingsValues.assignColorSettingNumericValue(defaultColorSettingForBreaks);
@@ -4447,6 +4410,44 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     adjustDotRecyclerLayoutMargins();
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+  }
+
+  private void timerPopUpDismissalLogic() {
+    timerDisabled = false;
+    timerPopUpIsVisible = false;
+
+    if (mode == 1) {
+      timeLeftForCyclesTimer.setVisibility(View.GONE);
+      progressBar.setVisibility(View.GONE);
+      resetButtonForCycles.setVisibility(View.GONE);
+
+      savedCycleAdapter.notifyDataSetChanged();
+
+      if (trackActivityWithinCycle) {
+//        storeDailyTimesForCycleResuming();
+        AsyncTask.execute(()-> {
+          setAndUpdateActivityTimeAndCaloriesInDatabase();
+
+          //This is used if we're converting our Strings in timer popUp to millis. Needed if we go back to rounding instead of using milliseconds when dismissing timer.
+//          setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString();
+        });
+      }  else {
+        storeSetAndBreakTimeForCycleResuming();
+      }
+
+      deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycle);
+
+    } else if (mode == 3) {
+      timeLeftForPomCyclesTimer.setVisibility(View.GONE);
+      progressBarForPom.setVisibility(View.GONE);
+      resetButtonForPomCycles.setVisibility(View.GONE);
+
+      storeSetAndBreakTimeForPomCycleResuming();
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
+
+    toggleSortButtonBasedOnIfCycleIsActive();
+
   }
 
   //10/06 is 279.
