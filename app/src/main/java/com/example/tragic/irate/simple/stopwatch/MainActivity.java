@@ -5481,6 +5481,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
         if (mode==1) {
           timeLeftForCyclesTimer.setText("0");
+          timeLeftForCyclesTimer.startAnimation(fadeProgressOut);
+          progressBar.startAnimation(fadeProgressOut);
         }
       }
       setNotificationValues();
@@ -5489,10 +5491,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalNextRoundLogic();
 
     resetButtonForCycles.setVisibility(View.GONE);
-    timeLeftForCyclesTimer.startAnimation(fadeProgressOut);
-    progressBar.startAnimation(fadeProgressOut);
     currentProgressBarValueForModeOne = maxProgress;
-
     mHandler.post(endFadeForModeOne);
 
     if (endingEarly) {
@@ -5559,8 +5558,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setNotificationValues();
     }
 
+    if (mode == 3) {
+      timeLeftForPomCyclesTimer.startAnimation(fadeProgressOut);
+    }
+
     resetButtonForPomCycles.setVisibility(View.GONE);
-    timeLeftForPomCyclesTimer.startAnimation(fadeProgressOut);
     progressBarForPom.startAnimation(fadeProgressOut);
     currentProgressBarValueForModeThree = maxProgress;
 
