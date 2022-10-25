@@ -2253,9 +2253,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     roundRecycler.setLayoutManager(gridLayoutManager);
     roundRecycler.setAdapter(cycleRoundsAdapter);
+    roundRecycler.setNestedScrollingEnabled(false);
+    roundRecycler.setHasFixedSize(true);
 
     pomRoundRecycler.setLayoutManager(gridLayoutManager2);
     pomRoundRecycler.setAdapter(cycleRoundsAdapter);
+
+    //Disables "ghost scrolling"
+    roundRecycler.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        return true;
+      }
+    });
+
+    pomRoundRecycler.setOnTouchListener(new View.OnTouchListener() {
+      @Override
+      public boolean onTouch(View v, MotionEvent event) {
+        return true;
+      }
+    });
   }
 
   private void setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight() {
@@ -3133,7 +3150,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  //Todo: Visting settings after install defaults to silent on NEXT app launch.
   private void setDefaultUserSettings() {
     retrieveUserStats();
 
@@ -3695,8 +3711,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat = NotificationManagerCompat.from(this);
   }
 
-  //Todo: timerIsPaused will need changing, either another var for Pom or a different conditional.
-  //Todo: Need a diff. conditional for stopwatch, since runnable removed when paused and we still want notifications then.
+  //Todo: Only being set if textView has changed, hence why stopwatch not updating.
+  //Todo: updateNotificationsIfTimerTextViewHasChanged() using mode 1/3 right now, which is not optimal for multiple timers at once.
+  //Todo: Make headers bold.
   private void setNotificationValues() {
     if (!dismissNotification) {
       String headerOne = "";
@@ -4926,6 +4943,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
       setNotificationValues();
     }
+
   }
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
