@@ -640,7 +640,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: ProgressBar animation not resetting if timer ends while another timer's screen is up.
+  //Todo: set/break/work/rest times not resetting when adding new cycle while one is active.
+      //Todo: Also not iterating to last second at end of round.
   //Todo: Should have timer pop up when clicking notification.
 
   //Todo: Main recyclerView should indicate whether timer is paused or not.
@@ -998,6 +999,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar.setVisibility(View.VISIBLE);
         timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
         progressBar.setProgress(currentProgressBarValueForModeOne);
+
+        Log.i("testProg", "current prof value in RESUME is " + currentProgressBarValueForModeOne);
 
         if (trackActivityWithinCycle) {
           setAllActivityTimesAndCaloriesToTextViews();
@@ -1895,9 +1898,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomCycles = new PomCycles();
 
     objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
-    objectAnimatorPom = ObjectAnimator.ofInt(progressBarForPom, "progress", maxProgress, 0);
-    Log.i("testProg", "prog bar value on activity launch is " + objectAnimator.getAnimatedValue());
-
+    objectAnimatorPom = ObjectAnimator.ofInt(progressBarForPom, "progressPom", maxProgress, 0);
 
     ringToneUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
     mediaPlayer = MediaPlayer.create(this, ringToneUri);
@@ -4289,53 +4290,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void launchPomTimerCycle(int typeOfLaunch) {
-    if (pomValuesTime.size() == 0) {
-      showToastIfNoneActive("Cycle cannot be empty!");
-      return;
-    }
-
-    timeLeftForPomCyclesTimer.setVisibility(View.VISIBLE);
-    progressBarForPom.setVisibility(View.VISIBLE);
-    resetButtonForPomCycles.setVisibility(View.VISIBLE);
-
-    if (savedPomCycleAdapter.isCycleActive()) {
-      savedPomCycleAdapter.removeCycleAsActive();
-      savedPomCycleAdapter.notifyDataSetChanged();
-    }
-
-    if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
-      if (cycleNameEdit.getText().toString().isEmpty()) {
-        cycleTitle = getCurrentDateAsFullTextString();
-      } else {
-        cycleTitle = cycleNameEdit.getText().toString();
-      }
-    }
-
-    AsyncTask.execute(() -> {
-      saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase(false);
-      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-
-      if (!isNewCycle) {
-//        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-      } else {
-        positionOfSelectedCycle = pomArray.size() - 1;
-      }
-
-      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
-
-      runOnUiThread(new Runnable() {
-        @Override
-        public void run() {
-          setTimerLaunchViews(typeOfLaunch);
-          setTimerLaunchLogic(false);
-          resetPomCyclesTimer();
-        }
-      });
-    });
-  }
-
   private void launchTimerCycle(int typeOfLaunch) {
     if (workoutTimeIntegerArray.size() == 0) {
       showToastIfNoneActive("Cycle cannot be empty!");
@@ -4408,6 +4362,53 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  private void launchPomTimerCycle(int typeOfLaunch) {
+    if (pomValuesTime.size() == 0) {
+      showToastIfNoneActive("Cycle cannot be empty!");
+      return;
+    }
+
+    timeLeftForPomCyclesTimer.setVisibility(View.VISIBLE);
+    progressBarForPom.setVisibility(View.VISIBLE);
+    resetButtonForPomCycles.setVisibility(View.VISIBLE);
+
+    if (savedPomCycleAdapter.isCycleActive()) {
+      savedPomCycleAdapter.removeCycleAsActive();
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
+
+    if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
+      if (cycleNameEdit.getText().toString().isEmpty()) {
+        cycleTitle = getCurrentDateAsFullTextString();
+      } else {
+        cycleTitle = cycleNameEdit.getText().toString();
+      }
+    }
+
+    AsyncTask.execute(() -> {
+      saveAddedOrEditedCycleASyncRunnable();
+      queryAndSortAllCyclesFromDatabase(false);
+      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+
+      if (!isNewCycle) {
+//        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      } else {
+        positionOfSelectedCycle = pomArray.size() - 1;
+      }
+
+      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+
+      runOnUiThread(new Runnable() {
+        @Override
+        public void run() {
+          setTimerLaunchViews(typeOfLaunch);
+          setTimerLaunchLogic(false);
+          resetPomCyclesTimer();
+        }
+      });
+    });
+  }
+
   private void setTimerLaunchLogic(boolean trackingActivity) {
     toggleViewsForTotalDailyAndCycleTimes(trackingActivity);
 
@@ -4416,9 +4417,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     clearRoundAndCycleAdapterArrayLists();
     populateCycleRoundAndRoundTypeArrayLists();
-
-//    resetCyclesTimer();
-//    deleteTotalCycleTimes();
 
     if (trackingActivity) {
       setAllActivityTimesAndCaloriesToTextViews();
@@ -5199,10 +5197,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setInitialTextSizeForTimers(setMillis);
     }
 
+    Log.i("testProg", "prog value in setTimer method before runnable is " + currentProgressBarValueForModeOne);
+
     modeOneCountdownTimer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
+        //Todo: It's objectAnimator's fetch.
         currentProgressBarValueForModeOne = (int) objectAnimator.getAnimatedValue();
+
+//        Log.i("testProg", "prog value at runnable start is " + currentProgressBarValueForModeOne);
+
         setMillis = millisUntilFinished;
         timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
 
@@ -5495,6 +5499,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     resetButtonForCycles.setVisibility(View.GONE);
     currentProgressBarValueForModeOne = maxProgress;
+
     mHandler.post(endFadeForModeOne);
 
     if (trackActivityWithinCycle) {
@@ -5634,7 +5639,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
 
               if (!objectAnimator.isStarted()) {
-                startObjectAnimatorAndTotalCycleTimeCounters();
+                modeOneStartObjectAnimator();
                 startSetTimer();
               }
 
@@ -5663,7 +5668,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
 
               if (!objectAnimator.isStarted()) {
-                startObjectAnimatorAndTotalCycleTimeCounters();
+                modeOneStartObjectAnimator();
                 startBreakTimer();
               }
               postSetAndBreakTimeTotalRunnable();
@@ -5710,7 +5715,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
 
           if (!objectAnimatorPom.isStarted()) {
-            startObjectAnimatorAndTotalCycleTimeCounters();
+            modeThreeStartObjectAnimator();
             startPomTimer();
           }
           postPomCycleTimeRunnable();
@@ -5765,7 +5770,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           switch (typeOfRound.get(currentRound)) {
             case 1:
               if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
-                startObjectAnimatorAndTotalCycleTimeCounters();
+                modeOneStartObjectAnimator();
                 startSetTimer();
               }
 
@@ -5789,7 +5794,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
             case 3:
               if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
-                startObjectAnimatorAndTotalCycleTimeCounters();
+                modeOneStartObjectAnimator();
                 startBreakTimer();
 
                 if (trackActivityWithinCycle) {
@@ -5870,7 +5875,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           stateOfTimers.setModeThreeTimerPaused(false);
 
           if (objectAnimatorPom.isPaused() || !objectAnimatorPom.isStarted()) {
-            startObjectAnimatorAndTotalCycleTimeCounters();
+            modeThreeStartObjectAnimator();
             startPomTimer();
           }
 
@@ -5977,57 +5982,56 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setHasTextSizeChangedForStopWatch(false);
   }
 
-  private void startObjectAnimatorAndTotalCycleTimeCounters() {
-    switch (mode) {
-      case 1:
-        if (typeOfRound.get(currentRound).equals(1)) {
-          if (currentProgressBarValueForModeOne == maxProgress) {
-            stateOfTimers.setModeOneTimerPaused(false);
-            instantiateAndStartObjectAnimator(setMillis);
-          } else {
-            setMillis = setMillisUntilFinished;
-            if (objectAnimator != null) {
-              objectAnimator.resume();
-            }
-          }
-        } else if (typeOfRound.get(currentRound).equals(3)) {
-          if (currentProgressBarValueForModeOne == maxProgress) {
-            stateOfTimers.setModeOneTimerPaused(false);
-            instantiateAndStartObjectAnimator(breakMillis);
-          } else {
-            breakMillis = breakMillisUntilFinished;
-            if (objectAnimator != null) {
-              objectAnimator.resume();
-            }
-          }
+  private void modeOneStartObjectAnimator() {
+    if (typeOfRound.get(currentRound).equals(1)) {
+      if (currentProgressBarValueForModeOne == maxProgress) {
+        stateOfTimers.setModeOneTimerPaused(false);
+        instantiateAndStartObjectAnimatorForModeOne(setMillis);
+      } else {
+        setMillis = setMillisUntilFinished;
+        if (objectAnimator != null) {
+          objectAnimator.resume();
         }
-        break;
-      case 3:
-        if (currentProgressBarValueForModeThree == maxProgress) {
-          stateOfTimers.setModeThreeTimerPaused(false);
-          pomMillis = pomValuesTime.get(pomDotCounter);
-          instantiateAndStartObjectAnimator(pomMillis);
-        } else {
-          pomMillis = pomMillisUntilFinished;
-          if (objectAnimatorPom != null) objectAnimatorPom.resume();
+      }
+    } else if (typeOfRound.get(currentRound).equals(3)) {
+      if (currentProgressBarValueForModeOne == maxProgress) {
+        stateOfTimers.setModeOneTimerPaused(false);
+        instantiateAndStartObjectAnimatorForModeOne(breakMillis);
+      } else {
+        breakMillis = breakMillisUntilFinished;
+        if (objectAnimator != null) {
+          objectAnimator.resume();
         }
-        break;
+      }
     }
   }
 
-  private void instantiateAndStartObjectAnimator(long duration) {
-    if (mode == 1) {
-      objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
-      objectAnimator.setInterpolator(new LinearInterpolator());
-      objectAnimator.setDuration(duration);
-      objectAnimator.start();
+  private void modeThreeStartObjectAnimator() {
+    if (currentProgressBarValueForModeThree == maxProgress) {
+      stateOfTimers.setModeThreeTimerPaused(false);
+      pomMillis = pomValuesTime.get(pomDotCounter);
+      instantiateAndStartObjectAnimatorForModeThree(pomMillis);
+    } else {
+      pomMillis = pomMillisUntilFinished;
+      if (objectAnimatorPom != null) {
+        objectAnimatorPom.resume();
+      }
     }
-    if (mode == 3) {
-      objectAnimatorPom = ObjectAnimator.ofInt(progressBarForPom, "progress", maxProgress, 0);
-      objectAnimatorPom.setInterpolator(new LinearInterpolator());
-      objectAnimatorPom.setDuration(duration);
-      objectAnimatorPom.start();
-    }
+  }
+
+  private void instantiateAndStartObjectAnimatorForModeOne(long duration) {
+    objectAnimator = ObjectAnimator.ofInt(progressBar, "progress", maxProgress, 0);
+    objectAnimator.setInterpolator(new LinearInterpolator());
+    objectAnimator.setDuration(duration);
+
+    objectAnimator.start();
+  }
+
+  private void instantiateAndStartObjectAnimatorForModeThree(long duration) {
+    objectAnimatorPom = ObjectAnimator.ofInt(progressBarForPom, "progress", maxProgress, 0);
+    objectAnimatorPom.setInterpolator(new LinearInterpolator());
+    objectAnimatorPom.setDuration(duration);
+    objectAnimatorPom.start();
   }
 
   private void setDefaultTimerValuesAndTheirEditTextViews() {
