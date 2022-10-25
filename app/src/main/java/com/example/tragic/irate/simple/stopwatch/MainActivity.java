@@ -707,7 +707,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dismissNotification = false;
 
-    if (objectAnimator.isStarted() || objectAnimatorPom.isStarted() || !displayTime.equals("0") || !displayMs.equals("0")) {
+    if (stateOfTimers.isModeOneTimerActive() || stateOfTimers.isModeThreeTimerActive() || stateOfTimers.isStopWatchTimerActive()) {
       //Shows even if paused and timer does not change.
       setNotificationValues();
       //Runnable to display in sync w/ timer change.
@@ -3718,9 +3718,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Only being set if textView has changed, hence why stopwatch not updating.
   //Todo: Should have timer pop up when clicking notification.
-  //Todo: updateNotificationsIfTimerTextViewHasChanged() using mode 1/3 right now, which is not optimal for multiple timers at once.
-      //Todo: Will b0rk if e.g. on Mode 3 w/ active timer, but we switch to Mode 1 w/ inactive timer.
-  //Todo: Make headers bold.
   private void setNotificationValues() {
     if (!dismissNotification) {
       String headerOne = "";
@@ -3730,17 +3727,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyTwo = "";
       String bodyThree = "";
 
-      //Todo: Just use sep. var for timerStarted on all 3 timers and set it to false on reset.
-      if ((typeOfRound.get(currentRound) == 1 && objectAnimator.isStarted()) || (typeOfRound.get(currentRound) == 2 && mHandler.hasCallbacks(infinityTimerForSetsRunnable))) {
-        headerOne = setNotificationHeader("Workout", "Set", stateOfTimers.isModeOneTimerPaused());
-        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
-      }
-      if ((typeOfRound.get(currentRound) == 3 && objectAnimator.isStarted()) || (typeOfRound.get(currentRound) == 4 && mHandler.hasCallbacks(infinityTimerForBreaksRunnable))) {
-        headerOne = setNotificationHeader("Workout", "Break", stateOfTimers.isModeOneTimerPaused());
-        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+      if (stateOfTimers.isModeOneTimerActive()) {
+        if ((typeOfRound.get(currentRound) == 1) || (typeOfRound.get(currentRound) == 2)) {
+          headerOne = setNotificationHeader("Workout", "Set", stateOfTimers.isModeOneTimerPaused());
+          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+        }
+        if ((typeOfRound.get(currentRound) == 3) || (typeOfRound.get(currentRound) == 4)) {
+          headerOne = setNotificationHeader("Workout", "Break", stateOfTimers.isModeOneTimerPaused());
+          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+        }
       }
 
-      if (objectAnimatorPom.isStarted()) {
+      if (stateOfTimers.isModeThreeTimerActive()) {
         int numberOfRoundsLeft = 8 - pomDotCounter;
         switch (pomDotCounter) {
           case 0:
@@ -3768,11 +3766,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       Spannable headerOneBold = new SpannableString(headerOne);
       headerOneBold.setSpan(new StyleSpan(Typeface.BOLD), 0, headerOne.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-      Spannable headerTwoBold = new SpannableString(headerOne);
-      headerOneBold.setSpan(new StyleSpan(Typeface.BOLD), 0, headerTwo.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+      Spannable headerTwoBold = new SpannableString(headerTwo);
+      headerTwoBold.setSpan(new StyleSpan(Typeface.BOLD), 0, headerTwo.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
-      Spannable headerThreeBold = new SpannableString(headerOne);
-      headerOneBold.setSpan(new StyleSpan(Typeface.BOLD), 0, headerThree.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+      Spannable headerThreeBold = new SpannableString(headerThree);
+      headerThreeBold.setSpan(new StyleSpan(Typeface.BOLD), 0, headerThree.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
 
       notificationManagerBuilder.setStyle(new NotificationCompat.InboxStyle()
               .addLine(headerOneBold)
