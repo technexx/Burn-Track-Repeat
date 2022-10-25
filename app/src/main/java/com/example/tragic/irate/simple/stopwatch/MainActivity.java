@@ -15,6 +15,7 @@ import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioAttributes;
@@ -34,6 +35,7 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.util.TypedValue;
@@ -3712,7 +3714,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Todo: Only being set if textView has changed, hence why stopwatch not updating.
+  //Todo: Should have timer pop up when clicking notification.
   //Todo: updateNotificationsIfTimerTextViewHasChanged() using mode 1/3 right now, which is not optimal for multiple timers at once.
+      //Todo: Will b0rk if e.g. on Mode 3 w/ active timer, but we switch to Mode 1 w/ inactive timer.
   //Todo: Make headers bold.
   private void setNotificationValues() {
     if (!dismissNotification) {
@@ -3723,14 +3727,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyTwo = "";
       String bodyThree = "";
 
-      if (objectAnimator.isStarted()) {
-        if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-          headerOne = setNotificationHeader("Workout", "Set", timerIsPaused);
-          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
-        } else {
-          headerOne = setNotificationHeader("Workout", "Break", timerIsPaused);
-          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
-        }
+      //Todo: Will not work either because callsbacks are removed onPause.
+      if ((typeOfRound.get(currentRound) == 1 && objectAnimator.isStarted()) || (typeOfRound.get(currentRound) == 2 && mHandler.hasCallbacks(infinityTimerForSetsRunnable))) {
+        headerOne = setNotificationHeader("Workout", "Set", timerIsPaused);
+        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+      }
+      if ((typeOfRound.get(currentRound) == 3 && objectAnimator.isStarted()) || (typeOfRound.get(currentRound) == 4 && mHandler.hasCallbacks(infinityTimerForBreaksRunnable))) {
+        headerOne = setNotificationHeader("Workout", "Break", timerIsPaused);
+        bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
       }
 
       if (objectAnimatorPom.isStarted()) {
@@ -3753,14 +3757,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
 
-
       if (!displayTime.equals("0") || displayMs.equals("0")) {
         headerThree = getString(R.string.notification_stopwatch_header);
         bodyThree = longToStringConverters.convertTimerValuesToStringForNotifications((long) stopWatchSeconds);
       }
 
+      Spannable headerOneBold = new SpannableString(headerOne);
+      headerOneBold.setSpan(new StyleSpan(Typeface.BOLD), 0, headerOne.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+      Spannable headerTwoBold = new SpannableString(headerOne);
+      headerOneBold.setSpan(new StyleSpan(Typeface.BOLD), 0, headerTwo.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+      Spannable headerThreeBold = new SpannableString(headerOne);
+      headerOneBold.setSpan(new StyleSpan(Typeface.BOLD), 0, headerThree.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
       notificationManagerBuilder.setStyle(new NotificationCompat.InboxStyle()
-              .addLine(headerOne)
+              .addLine(headerOneBold)
               .addLine(bodyOne)
               .addLine(headerTwo)
               .addLine(bodyTwo)
@@ -3813,7 +3825,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void run() {
         updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySyncForNotifications);
 
-        mHandler.postDelayed(this, 10);
+        mHandler.postDelayed(this, 50);
       }
     };
   }
