@@ -124,6 +124,9 @@ import java.util.Locale;
 
 public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapter.onRoundSelected, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DailyStatsFragment.changeSortMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
 
+  StateOfTimers stateOfTimers;
+  LongToStringConverters longToStringConverters;
+
   SharedPreferences sharedPreferences;
   SharedPreferences.Editor prefEdit;
 
@@ -145,7 +148,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View bottomEditTitleDividerView;
 
   Calendar calendar;
-  LongToStringConverters longToStringConverters;
 
   ImageButton fab;
   ImageButton stopWatchLaunchButton;
@@ -463,9 +465,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int numberOfRoundsLeft;
   int currentRound;
 
-  boolean timerEnded;
-  boolean timerDisabled;
-  boolean timerIsPaused = true;
   boolean stopWatchIsPaused = true;
   boolean stopWatchTimerEnded;
 
@@ -1689,18 +1688,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     pauseResumeButton.setOnClickListener(v -> {
-      if (!timerIsPaused) {
-        if (mode == 1) {
+      if (mode == 1) {
+        if (!stateOfTimers.isModeOneTimerPaused()) {
           pauseAndResumeTimer(PAUSING_TIMER);
-        }
-        if (mode == 3) {
-          pauseAndResumePomodoroTimer(PAUSING_TIMER);
-        }
-      } else {
-        if (mode == 1) {
+        } else {
           pauseAndResumeTimer(RESUMING_TIMER);
         }
-        if (mode == 3) {
+      }
+      if (mode == 3) {
+        if (!stateOfTimers.isModeThreeTimerPaused()) {
+          pauseAndResumePomodoroTimer(PAUSING_TIMER);
+        } else {
           pauseAndResumePomodoroTimer(RESUMING_TIMER);
         }
       }
@@ -1886,11 +1884,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void instantiateGlobalClasses() {
+    stateOfTimers = new StateOfTimers();
+    longToStringConverters = new LongToStringConverters();
+
     fragmentManager = getSupportFragmentManager();
     changeSettingsValues = new ChangeSettingsValues(getApplicationContext());
     tDEEChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getApplicationContext());
     dailyStatsAccess = new DailyStatsAccess(getApplicationContext());
-    longToStringConverters = new LongToStringConverters();
 
     mHandler = new Handler();
     mSavingCycleHandler = new Handler();
@@ -2617,18 +2617,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (cycleHasActivityAssigned) {
             createNewListOfActivitiesIfDayHasChanged();
           }
+          if (!stateOfTimers.isModeOneTimerPaused()) {
+            mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
+          } else {
+            mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
+          }
         }
+
         if (mode == 3) {
           pomCycles.setTotalWorkTime(totalCycleWorkTimeInMillis);
           pomCycles.setTotalRestTime(totalCycleRestTimeInMillis);
           pomCycles.setCyclesCompleted(cyclesCompleted);
           cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
-        }
 
-        if (!timerIsPaused) {
-          mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
-        } else {
-          mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
+          if (!stateOfTimers.isModeThreeTimerPaused()) {
+            mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
+          } else {
+            mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
+          }
         }
       }
     };
@@ -3727,13 +3733,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyTwo = "";
       String bodyThree = "";
 
-      //Todo: Will not work either because callsbacks are removed onPause.
+      //Todo: Just use sep. var for timerStarted on all 3 timers and set it to false on reset.
       if ((typeOfRound.get(currentRound) == 1 && objectAnimator.isStarted()) || (typeOfRound.get(currentRound) == 2 && mHandler.hasCallbacks(infinityTimerForSetsRunnable))) {
-        headerOne = setNotificationHeader("Workout", "Set", timerIsPaused);
+        headerOne = setNotificationHeader("Workout", "Set", stateOfTimers.isModeOneTimerPaused());
         bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
       }
       if ((typeOfRound.get(currentRound) == 3 && objectAnimator.isStarted()) || (typeOfRound.get(currentRound) == 4 && mHandler.hasCallbacks(infinityTimerForBreaksRunnable))) {
-        headerOne = setNotificationHeader("Workout", "Break", timerIsPaused);
+        headerOne = setNotificationHeader("Workout", "Break", stateOfTimers.isModeOneTimerPaused());
         bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
       }
 
@@ -3744,14 +3750,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 2:
           case 4:
           case 6:
-            headerTwo = setNotificationHeader("Pomodoro", "Work", timerIsPaused);
+            headerTwo = setNotificationHeader("Pomodoro", "Work", stateOfTimers.isModeThreeTimerPaused());
             bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
             break;
           case 1:
           case 3:
           case 5:
           case 7:
-            headerTwo = setNotificationHeader("Pomodoro", "Break", timerIsPaused);
+            headerTwo = setNotificationHeader("Pomodoro", "Break", stateOfTimers.isModeThreeTimerPaused());
             bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
             break;
         }
@@ -3856,9 +3862,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       prefEdit.putInt("positionOfSelectedCycleForModeOne", positionOfSelectedCycle);
-      prefEdit.putBoolean("modeOneTimerPaused", timerIsPaused);
-      prefEdit.putBoolean("modeOneTimerEnded", timerEnded);
-      prefEdit.putBoolean("modeOneTimerDisabled", timerDisabled);
     }
 
     if (mode == 3) {
@@ -3871,9 +3874,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.notifyDataSetChanged();
       }
       prefEdit.putInt("positionOfSelectedCycleForModeThree", positionOfSelectedCycle);
-      prefEdit.putBoolean("modeThreeTimerPaused", timerIsPaused);
-      prefEdit.putBoolean("modeThreeTimerEnded", timerEnded);
-      prefEdit.putBoolean("modeThreeTimerDisabled", timerDisabled);
     }
     prefEdit.apply();
   }
@@ -4458,10 +4458,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void timerPopUpDismissalLogic() {
-    timerDisabled = false;
     timerPopUpIsVisible = false;
 
     if (mode == 1) {
+      stateOfTimers.setModeOneTimerDisabled(false);
+
       timeLeftForCyclesTimer.setVisibility(View.GONE);
       progressBar.setVisibility(View.GONE);
       resetButtonForCycles.setVisibility(View.GONE);
@@ -4483,6 +4484,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycle);
 
     } else if (mode == 3) {
+      stateOfTimers.setModeThreeTimerDisabled(false);
+
       timeLeftForPomCyclesTimer.setVisibility(View.GONE);
       progressBarForPom.setVisibility(View.GONE);
       resetButtonForPomCycles.setVisibility(View.GONE);
@@ -5191,7 +5194,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = millisUntilFinished;
         timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
 
-        if (setMillis < 500) timerDisabled = true;
+        if (setMillis < 500) {
+          stateOfTimers.setModeOneTimerDisabled(true);
+        }
 
         increaseTextSizeForTimers(startMillis, setMillis);
 
@@ -5216,7 +5221,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentProgressBarValueForModeOne = (int) objectAnimator.getAnimatedValue();
         breakMillis = millisUntilFinished;
         timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
-        if (breakMillis < 500) timerDisabled = true;
+        if (breakMillis < 500) {
+          stateOfTimers.setModeOneTimerDisabled(true);
+        }
 
         increaseTextSizeForTimers(startMillis, breakMillis);
 
@@ -5242,7 +5249,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         currentProgressBarValueForModeThree = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
         timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
-        if (pomMillis < 500) timerDisabled = true;
+        if (pomMillis < 500) {
+          stateOfTimers.setModeThreeTimerDisabled(true);
+        }
 
         increaseTextSizeForTimers(startMillis, pomMillis);
 
@@ -5445,6 +5454,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
+    stateOfTimers.setModeOneTimerPaused(false);
+    stateOfTimers.setModeOneTimerDisabled(true);
+
     if (!endingEarly) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
         timeLeftForCyclesTimer.setText("0");
@@ -5517,6 +5529,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
+    stateOfTimers.setModeThreeTimerPaused(false);
+    stateOfTimers.setModeThreeTimerDisabled(true);
+
     if (!endingEarly) {
       timeLeftForPomCyclesTimer.setText("0");
       setNotificationValues();
@@ -5573,12 +5588,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void globalNextRoundLogic() {
-    timerIsPaused = false;
-    timerDisabled = true;
     setHasTextSizeChangedForTimers(false);
-
     next_round.setEnabled(false);
-
     AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
   }
 
@@ -5596,7 +5607,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setMillis = 0;
         breakMillis = 0;
-        timerIsPaused = false;
 
         if (numberOfRoundsLeft > 0) {
           switch (typeOfRound.get(currentRound)) {
@@ -5645,14 +5655,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
           }
         } else {
+          stateOfTimers.setModeOneTimerEnded(true);
           animateTimerEnding();
           currentRound = 0;
-          timerEnded = true;
           cyclesCompleted++;
           setCyclesCompletedTextView();
         }
 
-        timerDisabled = false;
+        stateOfTimers.setModeOneTimerDisabled(false);
         next_round.setEnabled(true);
       }
     };
@@ -5682,12 +5692,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           postPomCycleTimeRunnable();
         } else {
+          stateOfTimers.setModeThreeTimerEnded(true);
           animateTimerEnding();
           progressBarForPom.setProgress(0);
-          timerEnded = true;
           setCyclesCompletedTextView();
         }
-        timerDisabled = false;
+        stateOfTimers.setModeThreeTimerDisabled(false);
         next_round.setEnabled(true);
       }
     };
@@ -5698,9 +5708,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumeTimer(int pausing) {
-    if (!timerDisabled) {
-      if (!timerEnded) {
+    if (!stateOfTimers.isModeOneTimerDisabled()) {
+      if (!stateOfTimers.isModeOneTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
+          stateOfTimers.setModeOneTimerPaused(true);
+
           switch (typeOfRound.get(currentRound)) {
             case 1:
               setMillisUntilFinished = setMillis;
@@ -5716,7 +5728,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               break;
           }
 
-          timerIsPaused = true;
           resetButtonForCycles.setVisibility(View.VISIBLE);
 
           if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
@@ -5725,6 +5736,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
         } else if (pausing == RESUMING_TIMER) {
+          stateOfTimers.setModeOneTimerPaused(false);
+
           switch (typeOfRound.get(currentRound)) {
             case 1:
               if (objectAnimator.isPaused() || !objectAnimator.isStarted()) {
@@ -5777,7 +5790,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
 
           savedCycleAdapter.setCycleAsActive();
-          timerIsPaused = false;
           resetButtonForCycles.setVisibility(View.GONE);
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
@@ -5814,15 +5826,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
-    if (!timerDisabled) {
-      if (!timerEnded) {
+    if (!stateOfTimers.isModeThreeTimerDisabled()) {
+      if (!stateOfTimers.isModeThreeTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
+          stateOfTimers.setModeThreeTimerPaused(true)
+          ;
           pomMillisUntilFinished = pomMillis;
 
           if (objectAnimatorPom != null) objectAnimatorPom.pause();
           if (modeThreeCountDownTimer != null) modeThreeCountDownTimer.cancel();
-
-          timerIsPaused = true;
 
           resetButtonForPomCycles.setText(R.string.reset);
           resetButtonForPomCycles.setVisibility(View.VISIBLE);
@@ -5830,13 +5842,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           removePomCycleTimeRunnable();
 
         } else if (pausing == RESUMING_TIMER) {
+          stateOfTimers.setModeThreeTimerPaused(false);
+
           if (objectAnimatorPom.isPaused() || !objectAnimatorPom.isStarted()) {
             startObjectAnimatorAndTotalCycleTimeCounters();
             startPomTimer();
           }
 
           savedPomCycleAdapter.setCycleAsActive();
-          timerIsPaused = false;
           resetButtonForPomCycles.setVisibility(View.GONE);
 
           postPomCycleTimeRunnable();
@@ -5941,7 +5954,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         if (typeOfRound.get(currentRound).equals(1)) {
           if (currentProgressBarValueForModeOne == maxProgress) {
-            timerIsPaused = false;
+            stateOfTimers.setModeOneTimerPaused(false);
             instantiateAndStartObjectAnimator(setMillis);
           } else {
             setMillis = setMillisUntilFinished;
@@ -5951,7 +5964,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         } else if (typeOfRound.get(currentRound).equals(3)) {
           if (currentProgressBarValueForModeOne == maxProgress) {
-            timerIsPaused = false;
+            stateOfTimers.setModeOneTimerPaused(false);
             instantiateAndStartObjectAnimator(breakMillis);
           } else {
             breakMillis = breakMillisUntilFinished;
@@ -5963,7 +5976,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         if (currentProgressBarValueForModeThree == maxProgress) {
-          timerIsPaused = false;
+          stateOfTimers.setModeThreeTimerPaused(false);
           pomMillis = pomValuesTime.get(pomDotCounter);
           instantiateAndStartObjectAnimator(pomMillis);
         } else {
@@ -6095,17 +6108,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
       positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
-      timerIsPaused = sharedPreferences.getBoolean("modeOneTimerPaused", false);
-      timerEnded = sharedPreferences.getBoolean("modeOneTimerEnded", false);
-      timerDisabled = sharedPreferences.getBoolean("modeOneTimerDisabled", false);
     }
 
     if (mode == 3) {
       timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
       positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
-      timerIsPaused = sharedPreferences.getBoolean("modeThreeTimerPaused", false);
-      timerEnded = sharedPreferences.getBoolean("modeThreeTimerEnded", false);
-      timerDisabled = sharedPreferences.getBoolean("modeThreeTimerDisabled", false);
     }
   }
 
@@ -6122,13 +6129,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setCyclesCompletedTextView();
 
-    timerIsPaused = true;
-    timerEnded = false;
-    timerDisabled = false;
     next_round.setEnabled(true);
   }
 
   private void resetCyclesTimer() {
+    stateOfTimers.setModeOneTimerPaused(true);
+    stateOfTimers.setModeOneTimerEnded(false);
+    stateOfTimers.setModeOneTimerDisabled(false);
+
     resetTimerLogicForAllTimers();
 
     removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
@@ -6212,6 +6220,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetPomCyclesTimer() {
+    stateOfTimers.setModeThreeTimerPaused(true);
+    stateOfTimers.setModeThreeTimerEnded(false);
+    stateOfTimers.setModeThreeTimerDisabled(false);
+
     resetTimerLogicForAllTimers();
 
     removePomCycleTimeRunnable();
@@ -6478,10 +6490,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_header.setTextColor(getColor(R.color.black));
       total_break_time.setTextColor(getColor(R.color.black));
 
-      //      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.black));
       dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.black));
       dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.black));
-//      dailySingleActivityStringHeader.setTextColor(getColor(R.color.black));
       dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
       dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
 
@@ -6502,10 +6512,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_header.setTextColor(getColor(R.color.white));
       total_break_time.setTextColor(getColor(R.color.white));
 
-//      tracking_daily_stats_header_textView.setTextColor(getColor(R.color.white));
       dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.white));
       dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.white));
-//      dailySingleActivityStringHeader.setTextColor(getColor(R.color.white));
       dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
       dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.white));
 

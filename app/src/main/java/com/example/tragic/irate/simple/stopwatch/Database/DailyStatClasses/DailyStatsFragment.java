@@ -2213,14 +2213,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateTextViewsAndMiscClasses() {
+        longToStringConverters = new LongToStringConverters();
+
         sharedPref = getContext().getSharedPreferences("pref", 0);
         prefEdit = sharedPref.edit();
 
         tdeeChosenActivitySpinnerValues = new TDEEChosenActivitySpinnerValues(getActivity());
-        longToStringConverters = new LongToStringConverters();
         inflater = (LayoutInflater) getActivity().getSystemService(Context.LAYOUT_INFLATER_SERVICE);
-
-
 
         activityStatsDurationRangeTextView = mRoot.findViewById(R.id.duration_date_range_textView);
         activityStatsDurationSwitcherButtonLeft = mRoot.findViewById(R.id.stat_duration_switcher_button_left);
