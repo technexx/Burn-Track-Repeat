@@ -325,7 +325,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (mActiveCycle) {
         if (position==mPositionOfActiveCycle) {
           if (j<=mNumberOfRoundsCompleted-1) {
-            span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.darker_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.mid_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
 
         }

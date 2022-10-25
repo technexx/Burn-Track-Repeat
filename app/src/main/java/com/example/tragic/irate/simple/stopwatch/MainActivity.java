@@ -1373,7 +1373,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setPhoneDimensions();
     groupAllAppStartInstantiations();
 
-
 //    prefEdit.putBoolean("disclaimerHasBeenAccepted", false);
 //    prefEdit.putBoolean("hasAppBeenLaunchedBefore", false);
 //    prefEdit.apply();
@@ -3123,6 +3122,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  //Todo: Second launch after install gets defaulted to silent.
   private void setDefaultUserSettings() {
     retrieveUserStats();
 
