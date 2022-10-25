@@ -640,16 +640,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: We can branch back have this be a future update, too.
-      //Todo: However, this logic seems better, esp. when it comes to animations since we don't want one mode's intruding on another's.
+  //Todo: ProgressBar animation not resetting if timer ends while another timer's screen is up.
+  //Todo: textView of "0" showing on timer popUp if a different timer ends + sizeChange increase for that 0 also effects textView on timer popUp (noticable if it's using a smaller font, and vice-versa).
 
-  //Todo: Sound (and likely other) settings not being retained on app re-launch.
-  //Todo: Set rows of notification for cycles/pom/stopwatch.
-      //Todo: notifcationsRunnable() only has cyclesTimeLeft at moment.
-  //Todo: Fade/grey out main cycle spannables as rounds end.
+  //Todo: Main recyclerView should indicate whether timer is paused or not.
   //Todo: Test simultaneous timer endings.
 
-  //Todo: Getting some ghosting vertical lines when adding rounds. Likely due to color changes (new blacks) w/ in adapter.
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
   //Todo: User settings at first app launch should have an "okay" button to denote exit.
@@ -5100,7 +5096,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       valueAnimatorDown.cancel();
     }
 
-    setInitialTextSizeForTimers(0);
+    if (mode==1) {
+      setInitialTextSizeForTimers(0);
+    }
 
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -5145,7 +5143,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       valueAnimatorDown.cancel();
     }
 
-    setInitialTextSizeForTimers(0);
+    if (mode == 1) {
+      setInitialTextSizeForTimers(0);
+    }
 
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -5196,7 +5196,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void startSetTimer() {
     long startMillis = setMillis;
     long initialMillisValue = setMillis;
-    setInitialTextSizeForTimers(setMillis);
+
+    if (mode==1) {
+      setInitialTextSizeForTimers(setMillis);
+    }
 
     modeOneCountdownTimer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
@@ -5209,7 +5212,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           stateOfTimers.setModeOneTimerDisabled(true);
         }
 
-        increaseTextSizeForTimers(startMillis, setMillis);
+        if (mode==1) {
+          increaseTextSizeForTimers(startMillis, setMillis);
+        }
 
         dotsAdapter.notifyDataSetChanged();
       }
@@ -5236,7 +5241,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           stateOfTimers.setModeOneTimerDisabled(true);
         }
 
-        increaseTextSizeForTimers(startMillis, breakMillis);
+        if (mode == 1) {
+          increaseTextSizeForTimers(startMillis, breakMillis);
+        }
 
         dotsAdapter.notifyDataSetChanged();
       }
@@ -5264,7 +5271,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           stateOfTimers.setModeThreeTimerDisabled(true);
         }
 
-        increaseTextSizeForTimers(startMillis, pomMillis);
+        if (mode == 3) {
+          increaseTextSizeForTimers(startMillis, pomMillis);
+        }
 
         pomDotsAdapter.notifyDataSetChanged();
       }
@@ -5470,7 +5479,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (!endingEarly) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
-        timeLeftForCyclesTimer.setText("0");
+        if (mode==1) {
+          timeLeftForCyclesTimer.setText("0");
+        }
       }
       setNotificationValues();
     }
@@ -5637,7 +5648,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
             case 2:
-              timeLeftForCyclesTimer.setText("0");
+              if (mode==1) {
+                timeLeftForCyclesTimer.setText("0");
+              }
               //Do not want to consolidate infinityTimer runnable methods, since we only want its global re-instantiated here, not in our pause/resume option.
               infinityTimerForSetsRunnable = infinityRunnableForSetRounds();
               mHandler.post(infinityTimerForSetsRunnable);
@@ -5659,7 +5672,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               postSetAndBreakTimeTotalRunnable();
               break;
             case 4:
-              timeLeftForCyclesTimer.setText("0");
+              if (mode==1) {
+                timeLeftForCyclesTimer.setText("0");
+              }
               infinityTimerForBreaksRunnable = infinityRunnableForBreakRounds();
               mHandler.post(infinityTimerForBreaksRunnable);
               postSetAndBreakTimeTotalRunnable();
