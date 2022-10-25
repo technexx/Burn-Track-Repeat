@@ -705,11 +705,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVisible(false);
 
     dismissNotification = false;
-    //Shows even if paused and timer does not change.
-    setNotificationValues();
-    //Runnable to display in sync w/ timer change.
-    globalNotficationsRunnable = notifcationsRunnable();
-    mHandler.post(globalNotficationsRunnable);
+
+    if (objectAnimator.isStarted() || objectAnimatorPom.isStarted() || mHandler.hasCallbacks(stopWatchTimerRunnable)) {
+      //Shows even if paused and timer does not change.
+      setNotificationValues();
+      //Runnable to display in sync w/ timer change.
+      globalNotficationsRunnable = notifcationsRunnable();
+      mHandler.post(globalNotficationsRunnable);
+    }
+
   }
 
   @Override
@@ -3682,6 +3686,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat = NotificationManagerCompat.from(this);
   }
 
+  //Todo: timerIsPaused will need changing, either another var for Pom or a different conditional.
   private void setNotificationValues() {
     if (!dismissNotification) {
       String headerOne = "";
@@ -3738,7 +3743,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       );
 
       Notification notification = notificationManagerBuilder.build();
-
       notificationManagerCompat.notify(1, notification);
     }
   }
