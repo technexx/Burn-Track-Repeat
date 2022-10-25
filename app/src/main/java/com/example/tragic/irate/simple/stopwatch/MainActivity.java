@@ -641,7 +641,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar settingsActionBar;
 
   //Todo: ProgressBar animation not resetting if timer ends while another timer's screen is up.
-  //Todo: textView of "0" showing on timer popUp if a different timer ends + sizeChange increase for that 0 also effects textView on timer popUp (noticable if it's using a smaller font, and vice-versa).
+  //Todo: Should have timer pop up when clicking notification.
 
   //Todo: Main recyclerView should indicate whether timer is paused or not.
   //Todo: Test simultaneous timer endings.
@@ -3712,8 +3712,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat = NotificationManagerCompat.from(this);
   }
 
-  //Todo: Modes 1/3 should be changed in updateNotificationsIfTimerTextViewHasChanged()...
-  //Todo: Should have timer pop up when clicking notification.
   private void setNotificationValues() {
     if (!dismissNotification) {
       String headerOne = "";
@@ -5479,13 +5477,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (!endingEarly) {
       if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
-        if (mode==1) {
-          timeLeftForCyclesTimer.setText("0");
-          timeLeftForCyclesTimer.startAnimation(fadeProgressOut);
-          progressBar.startAnimation(fadeProgressOut);
-        }
+        timeLeftForCyclesTimer.setText("0");
       }
-      setNotificationValues();
+    } else {
+      if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
+      if (objectAnimator != null) objectAnimator.cancel();
+      progressBar.setProgress(0);
+      savedCycleAdapter.setCycleAsActive();
+    }
+
+    if (mode==1) {
+      timeLeftForCyclesTimer.startAnimation(fadeProgressOut);
+      progressBar.startAnimation(fadeProgressOut);
     }
 
     globalNextRoundLogic();
@@ -5493,13 +5496,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetButtonForCycles.setVisibility(View.GONE);
     currentProgressBarValueForModeOne = maxProgress;
     mHandler.post(endFadeForModeOne);
-
-    if (endingEarly) {
-      if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
-      if (objectAnimator != null) objectAnimator.cancel();
-      progressBar.setProgress(0);
-      savedCycleAdapter.setCycleAsActive();
-    }
 
     if (trackActivityWithinCycle) {
       setAllActivityTimesAndCaloriesToTextViews();
@@ -5574,7 +5570,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     roundDownPomCycleWorkTime();
     roundDownPomCycleRestTime();
     setTotalCycleTimeValuesToTextView();
-
 
     removePomCycleTimeRunnable();
 
