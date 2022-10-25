@@ -704,14 +704,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onStop();
     setVisible(false);
 
-    if (timerPopUpWindow.isShowing() || stopWatchPopUpWindow.isShowing()) {
-      dismissNotification = false;
-      //Shows even if paused and timer does not change.
-      setNotificationValues();
-      //Runnable to display in sync w/ timer change.
-      globalNotficationsRunnable = notifcationsRunnable();
-      mHandler.post(globalNotficationsRunnable);
-    }
+    dismissNotification = false;
+    //Shows even if paused and timer does not change.
+    setNotificationValues();
+    //Runnable to display in sync w/ timer change.
+    globalNotficationsRunnable = notifcationsRunnable();
+    mHandler.post(globalNotficationsRunnable);
   }
 
   @Override
@@ -3688,57 +3686,60 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!dismissNotification) {
       String headerOne = "";
       String headerTwo = "";
+      String headerThree = "";
       String bodyOne = "";
       String bodyTwo = "";
+      String bodyThree = "";
 
-      if (timerPopUpWindow.isShowing() || stopWatchPopUpWindow.isShowing()) {
+      Log.i("testNote", "object animator started is " + objectAnimator.isStarted());
 
-        if (timerPopUpWindow.isShowing()) {
-          if (mode == 1) {
-            if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
-              headerOne = setNotificationHeader("Workout", "Set", timerIsPaused);
-              bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
-            } else {
-              headerOne = setNotificationHeader("Workout", "Break", timerIsPaused);
-              bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
-            }
-          }
-
-          if (mode == 3) {
-            int numberOfRoundsLeft = 8 - pomDotCounter;
-            switch (pomDotCounter) {
-              case 0:
-              case 2:
-              case 4:
-              case 6:
-                headerOne = setNotificationHeader("Pomodoro", "Work", timerIsPaused);
-                bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
-                break;
-              case 1:
-              case 3:
-              case 5:
-              case 7:
-                headerOne = setNotificationHeader("Pomodoro", "Break", timerIsPaused);
-                bodyOne = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
-                break;
-            }
-          }
+      if (objectAnimator.isStarted()) {
+        if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+          headerOne = setNotificationHeader("Workout", "Set", timerIsPaused);
+          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+        } else {
+          headerOne = setNotificationHeader("Workout", "Break", timerIsPaused);
+          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
         }
-
-        if (stopWatchPopUpWindow.isShowing()) {
-          headerOne = getString(R.string.notification_stopwatch_header);
-          bodyOne = longToStringConverters.convertTimerValuesToStringForNotifications((long) stopWatchSeconds);
-        }
-
-        notificationManagerBuilder.setStyle(new NotificationCompat.InboxStyle()
-                .addLine(headerOne)
-                .addLine(bodyOne)
-        );
-
-        Notification notification = notificationManagerBuilder.build();
-
-        notificationManagerCompat.notify(1, notification);
       }
+
+      if (objectAnimatorPom.isStarted()) {
+        int numberOfRoundsLeft = 8 - pomDotCounter;
+        switch (pomDotCounter) {
+          case 0:
+          case 2:
+          case 4:
+          case 6:
+            headerTwo = setNotificationHeader("Pomodoro", "Work", timerIsPaused);
+            bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+            break;
+          case 1:
+          case 3:
+          case 5:
+          case 7:
+            headerTwo = setNotificationHeader("Pomodoro", "Break", timerIsPaused);
+            bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+            break;
+        }
+      }
+
+      if (stopWatchPopUpWindow.isShowing()) {
+        headerThree = getString(R.string.notification_stopwatch_header);
+        bodyThree = longToStringConverters.convertTimerValuesToStringForNotifications((long) stopWatchSeconds);
+      }
+
+      notificationManagerBuilder.setStyle(new NotificationCompat.InboxStyle()
+              .addLine(headerOne)
+              .addLine(bodyOne)
+              .addLine(headerTwo)
+              .addLine(bodyTwo)
+              .addLine(headerThree)
+              .addLine(bodyThree)
+      );
+
+      Notification notification = notificationManagerBuilder.build();
+
+      notificationManagerCompat.notify(1, notification);
     }
   }
 
@@ -4907,6 +4908,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) {
       textViewDisplaySync.setFirstTextView((String) timeLeftForPomCyclesTimer.getText());
     }
+
+    Log.i("testNote", "textView difference boolean is " + textViewDisplaySync.areTextViewsDifferent());
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
