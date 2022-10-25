@@ -688,10 +688,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onResume() {
     super.onResume();
     setVisible(true);
+
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
-
     mHandler.removeCallbacks(globalNotficationsRunnable);
+
+    Log.i("testNote", "note runnable being removed!");
+
   }
 
   @Override
@@ -706,12 +709,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     dismissNotification = false;
 
-    if (objectAnimator.isStarted() || objectAnimatorPom.isStarted() || mHandler.hasCallbacks(stopWatchTimerRunnable)) {
+    if (objectAnimator.isStarted() || objectAnimatorPom.isStarted() || !displayTime.equals("0") || !displayMs.equals("0")) {
       //Shows even if paused and timer does not change.
       setNotificationValues();
       //Runnable to display in sync w/ timer change.
       globalNotficationsRunnable = notifcationsRunnable();
       mHandler.post(globalNotficationsRunnable);
+
+      Log.i("testNote", "posting note runnable!");
     }
 
   }
@@ -719,7 +724,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onDestroy() {
     super.onDestroy();
+
+    notificationManagerCompat.cancel(1);
     mHandler.removeCallbacks(globalNotficationsRunnable);
+    Log.i("testNote", "note runnable being removed!");
+
   }
 
   //Remember, this does not execute if we are dismissing a popUp.
@@ -3687,6 +3696,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   //Todo: timerIsPaused will need changing, either another var for Pom or a different conditional.
+  //Todo: Need a diff. conditional for stopwatch, since runnable removed when paused and we still want notifications then.
   private void setNotificationValues() {
     if (!dismissNotification) {
       String headerOne = "";
@@ -3695,8 +3705,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyOne = "";
       String bodyTwo = "";
       String bodyThree = "";
-
-      Log.i("testNote", "object animator started is " + objectAnimator.isStarted());
 
       if (objectAnimator.isStarted()) {
         if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
@@ -3728,7 +3736,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
 
-      if (stopWatchPopUpWindow.isShowing()) {
+
+      if (!displayTime.equals("0") || displayMs.equals("0")) {
         headerThree = getString(R.string.notification_stopwatch_header);
         bodyThree = longToStringConverters.convertTimerValuesToStringForNotifications((long) stopWatchSeconds);
       }
@@ -4912,8 +4921,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) {
       textViewDisplaySync.setFirstTextView((String) timeLeftForPomCyclesTimer.getText());
     }
-
-    Log.i("testNote", "textView difference boolean is " + textViewDisplaySync.areTextViewsDifferent());
 
     if (textViewDisplaySync.areTextViewsDifferent()) {
       textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
