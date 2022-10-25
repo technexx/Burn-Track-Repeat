@@ -3,30 +3,70 @@ package com.example.tragic.irate.simple.stopwatch.Miscellaneous;
 import android.util.Log;
 
 public class TextViewDisplaySync {
-    String mFirstTextView = "";
-    String mSecondTextView = "";
+    String modeOneFirstTextView = "";
+    String modeOneSecondTextView = "";
+    String modeThreeFirstTextView = "";
+    String modeThreeSecondTextView = "";
+    String stopWatchFirstTextView = "";
+    String stopWatchSecondTextView = "";
 
-    public TextViewDisplaySync() {
+    public String getModeOneFirstTextView() {
+        return modeOneFirstTextView;
     }
 
-    public String getFirstTextView() {
-        return mFirstTextView;
+    public void setModeOneFirstTextView(String modeOneFirstTextView) {
+        this.modeOneFirstTextView = modeOneFirstTextView;
     }
 
-    public void setFirstTextView(String firstTextView) {
-        this.mFirstTextView = firstTextView;
+    public String getModeOneSecondTextView() {
+        return modeOneSecondTextView;
     }
 
-    public String getSecondTextView() {
-        return mSecondTextView;
+    public void setModeOneSecondTextView(String modeOneSecondTextView) {
+        this.modeOneSecondTextView = modeOneSecondTextView;
     }
 
-    public void setSecondTextView(String secondTextView) {
-        this.mSecondTextView = secondTextView;
+    public String getModeThreeFirstTextView() {
+        return modeThreeFirstTextView;
     }
 
-    public boolean areTextViewsDifferent() {
-//        Log.i("testRun", "In comparison, first is " + mFirstTextView + " and second is " + mSecondTextView);
-        return !mFirstTextView.equals(mSecondTextView);
+    public void setModeThreeFirstTextView(String modeThreeFirstTextView) {
+        this.modeThreeFirstTextView = modeThreeFirstTextView;
+    }
+
+    public String getModeThreeSecondTextView() {
+        return modeThreeSecondTextView;
+    }
+
+    public void setModeThreeSecondTextView(String modeThreeSecondTextView) {
+        this.modeThreeSecondTextView = modeThreeSecondTextView;
+    }
+
+    public String getStopWatchFirstTextView() {
+        return stopWatchFirstTextView;
+    }
+
+    public void setStopWatchFirstTextView(String stopWatchFirstTextView) {
+        this.stopWatchFirstTextView = stopWatchFirstTextView;
+    }
+
+    public String getStopWatchSecondTextView() {
+        return stopWatchSecondTextView;
+    }
+
+    public void setStopWatchSecondTextView(String stopWatchSecondTextView) {
+        this.stopWatchSecondTextView = stopWatchSecondTextView;
+    }
+
+    public boolean areModeOneTextViewsDifferent() {
+        return !modeOneFirstTextView.equals(modeOneSecondTextView);
+    }
+
+    public boolean areModeThreeTextViewsDifferent() {
+        return !modeThreeFirstTextView.equals(modeThreeSecondTextView);
+    }
+
+    public boolean areStopWatchTextViewsDifferent() {
+        return !stopWatchFirstTextView.equals(stopWatchSecondTextView);
     }
 }

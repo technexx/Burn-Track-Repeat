@@ -3716,7 +3716,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat = NotificationManagerCompat.from(this);
   }
 
-  //Todo: Only being set if textView has changed, hence why stopwatch not updating.
+  //Todo: Modes 1/3 should be changed in updateNotificationsIfTimerTextViewHasChanged()...
   //Todo: Should have timer pop up when clicking notification.
   private void setNotificationValues() {
     if (!dismissNotification) {
@@ -3809,7 +3809,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (timeLeft < 100) {
       timeRemaining = "00:00";
     } else {
-//      long roundedTimeLeft = roundToNearestFullThousandth(timeLeft);
       timeRemaining = longToStringConverters.convertTimerValuesToStringForNotifications(dividedMillisForTimerDisplay(timeLeft));
     }
 
@@ -3817,14 +3816,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable notifcationsRunnable() {
-    TextViewDisplaySync textViewDisplaySyncForNotifications = new TextViewDisplaySync();
-    textViewDisplaySyncForNotifications.setFirstTextView((String) timeLeftForCyclesTimer.getText());
-    textViewDisplaySyncForNotifications.setSecondTextView((String) timeLeftForCyclesTimer.getText());
+    //Instance of class for first value to compare. updateNotificationsIfTimerTextViewHasChanged()... fetches the second.
+    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
+
+    textViewDisplaySync.setModeOneFirstTextView((String) timeLeftForCyclesTimer.getText());
+    textViewDisplaySync.setModeThreeFirstTextView((String) timeLeftForPomCyclesTimer.getText());
+    textViewDisplaySync.setStopWatchFirstTextView((String) stopWatchTimeTextView.getText());
 
     return new Runnable() {
       @Override
       public void run() {
-        updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySyncForNotifications);
+        updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySync);
 
         mHandler.postDelayed(this, 50);
       }
@@ -4750,16 +4752,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void updateCycleTimesTextViewsIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
     if (mode == 1) {
-      textViewDisplaySync.setFirstTextView((String) timeLeftForCyclesTimer.getText());
+      textViewDisplaySync.setModeOneFirstTextView((String) timeLeftForCyclesTimer.getText());
+
+      if (textViewDisplaySync.areModeOneTextViewsDifferent()) {
+        textViewDisplaySync.setModeOneSecondTextView(textViewDisplaySync.getModeOneFirstTextView());
+
+        setTotalCycleTimeValuesToTextView();
+      }
     }
+
     if (mode == 3) {
-      textViewDisplaySync.setFirstTextView((String) timeLeftForPomCyclesTimer.getText());
-    }
+      textViewDisplaySync.setModeThreeFirstTextView((String) timeLeftForPomCyclesTimer.getText());
 
-    if (textViewDisplaySync.areTextViewsDifferent()) {
-      textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
+      if (textViewDisplaySync.areModeThreeTextViewsDifferent()) {
+        textViewDisplaySync.setModeThreeSecondTextView(textViewDisplaySync.getModeThreeFirstTextView());
 
-      setTotalCycleTimeValuesToTextView();
+        setTotalCycleTimeValuesToTextView();
+      }
     }
   }
 
@@ -4942,15 +4951,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void updateNotificationsIfTimerTextViewHasChanged(TextViewDisplaySync textViewDisplaySync) {
-    if (mode == 1) {
-      textViewDisplaySync.setFirstTextView((String) timeLeftForCyclesTimer.getText());
-    }
-    if (mode == 3) {
-      textViewDisplaySync.setFirstTextView((String) timeLeftForPomCyclesTimer.getText());
+    textViewDisplaySync.setModeOneFirstTextView((String) timeLeftForCyclesTimer.getText());
+    textViewDisplaySync.setModeThreeFirstTextView((String) timeLeftForPomCyclesTimer.getText());
+    textViewDisplaySync.setStopWatchFirstTextView((String) stopWatchTimeTextView.getText());
+
+    if (textViewDisplaySync.areModeOneTextViewsDifferent()) {
+      textViewDisplaySync.setModeOneSecondTextView(textViewDisplaySync.getModeOneFirstTextView());
+      setNotificationValues();
     }
 
-    if (textViewDisplaySync.areTextViewsDifferent()) {
-      textViewDisplaySync.setSecondTextView(textViewDisplaySync.getFirstTextView());
+    if (textViewDisplaySync.areModeThreeTextViewsDifferent()) {
+      textViewDisplaySync.setModeThreeSecondTextView(textViewDisplaySync.getModeThreeFirstTextView());
+      setNotificationValues();
+    }
+
+    if (textViewDisplaySync.areStopWatchTextViewsDifferent()) {
+      textViewDisplaySync.setStopWatchSecondTextView(textViewDisplaySync.getStopWatchFirstTextView());
       setNotificationValues();
     }
 
@@ -4967,8 +4983,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     calorieIteration.setPreviousActivityCalories(totalCaloriesBurnedForSpecificActivityForCurrentDay);
 
     TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
-    textViewDisplaySync.setFirstTextView((String) timeLeftForCyclesTimer.getText());
-    textViewDisplaySync.setSecondTextView((String) timeLeftForCyclesTimer.getText());
+    textViewDisplaySync.setModeOneFirstTextView((String) timeLeftForCyclesTimer.getText());
+    textViewDisplaySync.setModeOneSecondTextView((String) timeLeftForCyclesTimer.getText());
 
     setNotificationValues();
 
@@ -5009,8 +5025,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerIteration.setStableTime(System.currentTimeMillis());
 
     TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
-    textViewDisplaySync.setFirstTextView((String) timeLeftForCyclesTimer.getText());
-    textViewDisplaySync.setSecondTextView((String) timeLeftForCyclesTimer.getText());
+    textViewDisplaySync.setModeOneFirstTextView((String) timeLeftForCyclesTimer.getText());
+    textViewDisplaySync.setModeOneSecondTextView((String) timeLeftForCyclesTimer.getText());
 
     if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
       timerIteration.setPreviousTotal(totalCycleSetTimeInMillis);
@@ -5048,8 +5064,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerIteration.setStableTime(System.currentTimeMillis());
 
     TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
-    textViewDisplaySync.setFirstTextView((String) timeLeftForPomCyclesTimer.getText());
-    textViewDisplaySync.setSecondTextView((String) timeLeftForPomCyclesTimer.getText());
+    textViewDisplaySync.setModeThreeFirstTextView((String) timeLeftForPomCyclesTimer.getText());
+    textViewDisplaySync.setModeThreeSecondTextView((String) timeLeftForPomCyclesTimer.getText());
 
     if (POM_CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
       timerIteration.setPreviousTotal(totalCycleWorkTimeInMillis);
@@ -5895,6 +5911,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         mHandler.removeCallbacks(stopWatchTimerRunnable);
       } else if (pausing == RESUMING_TIMER) {
+        stateOfTimers.setStopWatchTimerActive(true);
         stateOfTimers.setStopWatchTimerPaused(false);
 
         stopWatchstartTime = System.currentTimeMillis();
@@ -5913,6 +5930,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetStopwatchTimer() {
+    stateOfTimers.setStopWatchTimerActive(false);
     stateOfTimers.setStopWatchTimerEnded(false);
     stateOfTimers.setStopWatchTimerPaused(true);
 
