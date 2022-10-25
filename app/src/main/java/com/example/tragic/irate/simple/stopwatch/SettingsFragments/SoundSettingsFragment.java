@@ -59,24 +59,24 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.sounds_settings_fragment_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues(getContext());
 
-        Log.i("testSettings", "sound setting fragment launched!");
-
         SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getActivity());
 //        SharedPreferences prefShared = getActivity().getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
-        setPreference = findPreference("soundSettingForSets");
-        breakPreference = findPreference("soundSettingForBreaks");
-        SwitchPreference lastRoundPreference = findPreference("soundSettingForLastRound");
+        setPreference = findPreference("listPrefSoundSettingForSets");
+        breakPreference = findPreference("listPrefSoundSettingForBreaks");
+        SwitchPreference lastRoundPreference = findPreference("listPrefSoundSettingForLastCycleRound");
 
-        workPreference = findPreference("soundSettingForWork");
-        miniBreakPreference = findPreference("soundSettingForMiniBreaks");
-        SwitchPreference fullBreakPreference = findPreference("soundSettingForFullBreak");
+        workPreference = findPreference("listPrefSoundSettingForWork");
+        miniBreakPreference = findPreference("listPrefSoundSettingForMiniBreaks");
+        SwitchPreference fullBreakPreference = findPreference("listPrefSoundSettingForLastCycleRound");
 
         defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
         defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_twice");
 
-        defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
-        defaultSoundSettingForMiniBreaks = prefShared.getString("soundSettingForMiniBreaks", "vibrate_twice");
+        defaultSoundSettingForWork = prefShared.getString("listPrefSoundSettingForWork", "vibrate_once");
+        defaultSoundSettingForMiniBreaks = prefShared.getString("listPrefSoundSettingForMiniBreaks", "vibrate_twice");
+
+        Log.i("testSettings", "default settings for sets in fragment is " + defaultSoundSettingForSets);
 
         CharSequence[] soundEntryListForSets = setPreference.getEntries();
         CharSequence[] soundEntryListForBreaks = breakPreference.getEntries();

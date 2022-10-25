@@ -3122,7 +3122,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
-  //Todo: Second launch after install gets defaulted to silent.
+  //Todo: Visting settings after install defaults to silent on NEXT app launch.
   private void setDefaultUserSettings() {
     retrieveUserStats();
 
@@ -3143,6 +3143,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "green_setting");
     String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
     String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "cyan_setting");
+
+    Log.i("testSettings", "default settings for sets in Main is " + defaultSoundSettingForSets);
 
     vibrationSettingForSets = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);

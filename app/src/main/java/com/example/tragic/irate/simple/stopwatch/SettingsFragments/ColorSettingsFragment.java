@@ -58,16 +58,14 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.color_settings_fragment_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues(getContext());
 
-        Log.i("testSettings", "color setting fragment launched!");
-
         SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
 //        SharedPreferences prefShared = getActivity().getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
-        setPreference = findPreference("colorSettingForSets");
-        breakPreference = findPreference("colorSettingForBreaks");
-        workPreference = findPreference("colorSettingForWork");
-        miniBreakPreference =  findPreference("colorSettingForMiniBreaks");
-        fullBreakPreference = findPreference("colorSettingForFullBreak");
+        setPreference = findPreference("listPrefColorSettingForSets");
+        breakPreference = findPreference("listPrefColorSettingForBreaks");
+        workPreference = findPreference("listPrefColorSettingForWork");
+        miniBreakPreference =  findPreference("listPrefColorSettingForMiniBreaks");
+        fullBreakPreference = findPreference("listPrefColorSettingForFullBreak");
 
         defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "green_setting");
         defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "red_setting");

@@ -10,7 +10,7 @@
         android:title="@string/workout_mode">
 
         <ListPreference
-            android:key="colorSettingForSets"
+            android:key="listPrefColorSettingForSets"
             android:title="Sets"
             android:entries="@array/color_setting_options"
             android:entryValues="@array/color_setting_option_values"
@@ -18,7 +18,7 @@
         </ListPreference>
 
         <ListPreference
-            android:key="colorSettingForBreaks"
+            android:key="listPrefColorSettingForBreaks"
             android:title="Breaks"
             android:entries="@array/color_setting_options"
             android:entryValues="@array/color_setting_option_values"
@@ -31,7 +31,7 @@
         android:layout="@layout/preference_category_layout">
 
         <ListPreference
-            android:key="colorSettingForWork"
+            android:key="listPrefColorSettingForWork"
             android:title="Work"
             android:entries="@array/color_setting_options"
             android:entryValues="@array/color_setting_option_values"
@@ -39,7 +39,7 @@
         </ListPreference>
 
         <ListPreference
-            android:key="colorSettingForMiniBreaks"
+            android:key="listPrefColorSettingForMiniBreaks"
             android:title="Break"
             android:entries="@array/color_setting_options"
             android:entryValues="@array/color_setting_option_values"
@@ -47,7 +47,7 @@
         </ListPreference>
 
         <ListPreference
-            android:key="colorSettingForFullBreak"
+            android:key="listPrefColorSettingForFullBreak"
             android:title="Rest"
             android:entries="@array/color_setting_options"
             android:entryValues="@array/color_setting_option_values"

@@ -10,7 +10,7 @@
             android:title="@string/workout_mode">
 
                 <ListPreference
-                    android:key="soundSettingForSets"
+                    android:key="listPrefSoundSettingForSets"
                     android:title="Sets"
                     android:entries="@array/sound_setting_options"
                     android:entryValues="@array/sound_setting_option_values"
@@ -18,7 +18,7 @@
                 </ListPreference>
 
                 <ListPreference
-                    android:key="soundSettingForBreaks"
+                    android:key="listPrefSoundSettingForBreaks"
                     android:title="Breaks"
                     android:entries="@array/sound_setting_options"
                     android:entryValues="@array/sound_setting_option_values"
@@ -26,7 +26,7 @@
                 </ListPreference>
 
                 <SwitchPreference
-                    android:key="soundSettingForLastRound"
+                    android:key="listPrefSoundSettingForLastCycleRound"
                     android:title="Last Round"
                     android:summary="Continuous"
                     android:defaultValue="true">
@@ -39,7 +39,7 @@
             android:layout="@layout/preference_category_layout">
 
                 <ListPreference
-                    android:key="soundSettingForWork"
+                    android:key="listPrefSoundSettingForWork"
                     android:title="Work"
                     android:entries="@array/sound_setting_options"
                     android:entryValues="@array/sound_setting_option_values"
@@ -47,7 +47,7 @@
                 </ListPreference>
 
                 <ListPreference
-                    android:key="soundSettingForMiniBreaks"
+                    android:key="listPrefSoundSettingForMiniBreaks"
                     android:title="Breaks"
                     android:entries="@array/sound_setting_options"
                     android:entryValues="@array/sound_setting_option_values"
@@ -55,7 +55,7 @@
                 </ListPreference>
 
                 <SwitchPreference
-                    android:key="soundSettingForFullBreak"
+                    android:key="listPrefSoundSettingForLastPomCycleRound"
                     android:title="Last Round"
                     android:summary="Continuous"
                     android:defaultValue="true">
