@@ -94,6 +94,9 @@
     <string name="notification_stopwatch_header">Stopwatch</string>
     <string name="paused">Paused</string>
 
+    <string name="pause">Pause</string>
+    <string name="resume">Resume</string>
+
     <string name="workout_mode">Workout Mode</string>
     <string name="pomodoro_mode">Pomodoro Mode</string>
 

@@ -44,6 +44,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   List<Boolean> mActiveTdeeModeBooleanList;
   ArrayList<String> mWorkoutActivityString;
 
+  onPauseOrResumeListener mOnPauseOrResumeListener;
   onCycleClickListener mOnCycleClickListener;
   onHighlightListener mOnHighlightListener;
   onResumeOrResetCycle mOnResumeOrResetCycle;
@@ -77,19 +78,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   int fullViewBackgroundColor;
 
-  ColorStateList colorStateList;
+  boolean mTimerPaused;
 
-  public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
-    if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
-    if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+  public interface onPauseOrResumeListener {
+    void onPauseOrResume(boolean timerIsPaused);
   }
 
-  public boolean isCycleActive() {
-    return mActiveCycle;
-  }
-
-  public boolean isHighlightModeActive() {
-    return mHighlightMode;
+  public void setTimerPauseOrResume(onPauseOrResumeListener xOnPauseOrResumeListener) {
+    this.mOnPauseOrResumeListener = xOnPauseOrResumeListener;
   }
 
   public interface onCycleClickListener {
@@ -132,6 +128,19 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     this.mThemeMode = themeMode;
   }
 
+  public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
+    if (typeOFRound==1) SET_COLOR = changeSettingsValues.assignColor(settingNumber);
+    if (typeOFRound==2) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+  }
+
+  public boolean isCycleActive() {
+    return mActiveCycle;
+  }
+
+  public boolean isHighlightModeActive() {
+    return mHighlightMode;
+  }
+
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
   public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> typeOfRound, ArrayList<String> workoutTitle, ArrayList<Boolean> tdeeActivityExistsInCycleList, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
     this.mContext = context; mWorkoutList = workoutList; this.mTypeOfRound = typeOfRound; this.mWorkoutTitle = workoutTitle; this.mTdeeActivityExistsInCycleList = tdeeActivityExistsInCycleList; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
@@ -143,6 +152,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     changeSettingsValues = new ChangeSettingsValues(mContext);
 
     fullViewBackgroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
+  }
+
+  public void setTimerIsPaused(boolean paused) {
+    this.mTimerPaused = paused;
   }
 
   public void exitHighlightMode() {
@@ -207,6 +220,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     //Used to store highlighted positions that we callback to Main to delete.
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
+    workoutHolder.pauseOrResume.setVisibility(View.GONE);
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
     if (mHighlightDeleted) {
@@ -386,11 +400,23 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
+        if (mTimerPaused) {
+          workoutHolder.pauseOrResume.setText(R.string.resume);
+        } else {
+          workoutHolder.pauseOrResume.setText(R.string.pause);
+        }
 
+        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 
+        workoutHolder.pauseOrResume.setOnClickListener(v-> {
+          workoutHolder.pauseOrResume.setText(R.string.pause);
+          mOnPauseOrResumeListener.onPauseOrResume(mTimerPaused);
+        });
+
         workoutHolder.resetCycle.setOnClickListener(v-> {
+          workoutHolder.pauseOrResume.setText(R.string.resume);
           mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
         });
 
@@ -411,6 +437,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public View fullView;
     public TextView workoutName;
     public TextView workOutCycle;
+    public TextView pauseOrResume;
     public TextView resetCycle;
     public TextView tdeeActivityStringToggleTextView;
 
@@ -423,6 +450,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       fullView = itemView;
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
+      pauseOrResume = itemView.findViewById(R.id.pause_or_resume_cycle_button_for_mode_1);
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
       tdeeActivityStringToggleTextView = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
 

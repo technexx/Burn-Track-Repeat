@@ -122,7 +122,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapter.onRoundSelected, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DailyStatsFragment.changeSortMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onPauseOrResumeListener, SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapter.onRoundSelected, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DailyStatsFragment.changeSortMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
 
   StateOfTimers stateOfTimers;
   LongToStringConverters longToStringConverters;
@@ -642,6 +642,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Dismiss soft kb on onResume() in case user has it open.
   //Todo: Main recyclerView should indicate whether timer is paused or not.
   //Todo: Test simultaneous timer endings.
 
@@ -1134,6 +1135,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cyclesToUpdate.setCurrentlyTrackingCycle(newTrackingBoolean);
 
     cyclesDatabase.cyclesDao().updateCycles(cyclesToUpdate);
+  }
+
+  @Override
+  public void onPauseOrResume(boolean timerIsPaused) {
+    if (mode == 1) {
+      if (timerIsPaused) {
+        pauseAndResumeTimer(RESUMING_TIMER);
+        Log.i("testPause", "resuming from recyclerView!");
+      } else {
+        pauseAndResumeTimer(PAUSING_TIMER);
+        Log.i("testPause", "pausing from recyclerView!");
+      }
+      savedCycleAdapter.notifyDataSetChanged();
+    }
+
+    if (mode == 3) {
+      if (timerIsPaused) {
+        pauseAndResumePomodoroTimer(RESUMING_TIMER);
+      } else {
+        pauseAndResumePomodoroTimer(PAUSING_TIMER);
+      }
+    }
+    savedPomCycleAdapter.notifyDataSetChanged();
   }
 
   @Override
@@ -2192,6 +2216,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCycleRecycler.setAdapter(savedCycleAdapter);
     savedCycleRecycler.setLayoutManager(workoutCyclesRecyclerLayoutManager);
 
+    savedCycleAdapter.setTimerPauseOrResume(MainActivity.this);
     savedCycleAdapter.setTdeeToggle(MainActivity.this);
     savedCycleAdapter.setItemClick(MainActivity.this);
     savedCycleAdapter.setHighlight(MainActivity.this);
@@ -5758,6 +5783,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (!stateOfTimers.isModeOneTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
           stateOfTimers.setModeOneTimerPaused(true);
+          savedCycleAdapter.setTimerIsPaused(true);
 
           switch (typeOfRound.get(currentRound)) {
             case 1:
@@ -5782,6 +5808,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
         } else if (pausing == RESUMING_TIMER) {
+          savedCycleAdapter.setTimerIsPaused(false);
           stateOfTimers.setModeOneTimerActive(true);
           stateOfTimers.setModeOneTimerPaused(false);
 
