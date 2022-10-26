@@ -642,7 +642,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Pom reset confirm should also be in recyclerView.
       //Todo: Or, save/retrieve total work/break time. May be better to go back to that for both modes.
-  //Todo: Should have timer pop up when clicking notification.
 
   //Todo: Main recyclerView should indicate whether timer is paused or not.
   //Todo: Test simultaneous timer endings.
@@ -670,6 +669,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Right now we're not recalling the total set/break/work/rest time from globalSaveTotalTimesAndCaloriesInDatabaseRunnable().
       //Todo: May want to revert that, for Pom at least.
   //Todo: if (mode == 1) and if (mode == 3) should be checked if weird timer bugs occur.
+  //Todo: android:launchMode="singleTop" added to manifest.
 
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtones?
@@ -685,13 +685,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onResume() {
     super.onResume();
+    //Prevents crashing on resime.
     setVisible(true);
 
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
     mHandler.removeCallbacks(globalNotficationsRunnable);
-
-    Log.i("testNote", "note runnable being removed!");
 
   }
 
@@ -713,10 +712,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Runnable to display in sync w/ timer change.
       globalNotficationsRunnable = notifcationsRunnable();
       mHandler.post(globalNotficationsRunnable);
-
-      Log.i("testNote", "posting note runnable!");
     }
-
   }
 
   @Override
@@ -3662,23 +3658,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //These broadcast the Pending Intents we have created. MUST BE DECLARED IN MANIFEST.
-  public static class DismissReceiver extends BroadcastReceiver {
-    @Override
-    public void onReceive(Context context, Intent intent) {
-      dismissNotification = true;
-    }
-  }
-
-  private PendingIntent dismissNotificationIntent(Context context, int notificationId) {
-    Intent dismissIntent = new Intent(context, DismissReceiver.class);
-    dismissIntent.putExtra("Dismiss ID", notificationId);
-
-    PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), notificationId, dismissIntent, 0);
-
-    return dismissPendingIntent;
-  }
-
   private void instantiateNotifications() {
     // Create the NotificationChannel, but only on API 26+ because
     // the NotificationChannel class is new and not in the support library
@@ -3702,16 +3681,39 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerBuilder.setAutoCancel(false);
     //Higher priority will cause it to show at top of screen.
     notificationManagerBuilder.setPriority(Notification.PRIORITY_DEFAULT);
-    notificationManagerBuilder.setDeleteIntent(dismissNotificationIntent(this, 1));
-
-    PackageManager pm = getApplicationContext().getPackageManager();
-    Intent pmIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
-    pmIntent.setPackage(null);
-
-    PendingIntent pendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, pmIntent, PendingIntent.FLAG_UPDATE_CURRENT);
-    notificationManagerBuilder.setContentIntent(pendingIntent);
+    notificationManagerBuilder.setDeleteIntent(dismissNotificationPendingIntent(this, 1));
+    notificationManagerBuilder.setContentIntent(recallAppPendingIntent());
 
     notificationManagerCompat = NotificationManagerCompat.from(this);
+  }
+
+  private PendingIntent recallAppPendingIntent() {
+    PackageManager pm = getApplicationContext().getPackageManager();
+
+    Intent recallAppIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
+    recallAppIntent.setPackage(null);
+
+    PendingIntent recallAppPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, recallAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    return recallAppPendingIntent;
+  }
+
+  private PendingIntent dismissNotificationPendingIntent(Context context, int notificationId) {
+    Intent dismissIntent = new Intent(context, DismissReceiver.class);
+    dismissIntent.putExtra("testMethod", "launchTimer");
+    dismissIntent.putExtra("Dismiss ID", notificationId);
+
+    PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), notificationId, dismissIntent, 0);
+
+    return dismissPendingIntent;
+  }
+
+  //These broadcast the Pending Intents we have created. MUST BE DECLARED IN MANIFEST.
+  public static class DismissReceiver extends BroadcastReceiver {
+    @Override
+    public void onReceive(Context context, Intent intent) {
+      dismissNotification = true;
+    }
   }
 
   private void setNotificationValues() {
