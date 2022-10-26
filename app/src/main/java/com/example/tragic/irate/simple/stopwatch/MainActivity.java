@@ -640,8 +640,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
-  //Todo: set/break/work/rest times not resetting when adding new cycle while one is active.
-      //Todo: Also not iterating to last second at end of round.
+  //Todo: Pom reset confirm should also be in recyclerView.
   //Todo: Should have timer pop up when clicking notification.
 
   //Todo: Main recyclerView should indicate whether timer is paused or not.
@@ -668,7 +667,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
+  //Todo: Right now we're not recalling the total set/break/work/rest time from globalSaveTotalTimesAndCaloriesInDatabaseRunnable().
+      //Todo: May want to revert that, for Pom at least.
+  //Todo: if (mode == 1) and if (mode == 3) should be checked if weird timer bugs occur.
 
+  //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtones?
   //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Add Day/Night modes.
@@ -999,8 +1002,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         progressBar.setVisibility(View.VISIBLE);
         timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
         progressBar.setProgress(currentProgressBarValueForModeOne);
-
-        Log.i("testProg", "current prof value in RESUME is " + currentProgressBarValueForModeOne);
 
         if (trackActivityWithinCycle) {
           setAllActivityTimesAndCaloriesToTextViews();
@@ -2600,7 +2601,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     globalSaveTotalTimesAndCaloriesInDatabaseRunnable = new Runnable() {
       @Override
       public void run() {
-        if (mode == 1) {
+        if (stateOfTimers.isModeOneTimerActive()) {
           if (!trackActivityWithinCycle) {
             setCycleValuesAndUpdateInDatabase();
           } else {
@@ -2618,7 +2619,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         }
 
-        if (mode == 3) {
+        if (stateOfTimers.isModeThreeTimerActive()) {
           pomCycles.setTotalWorkTime(totalCycleWorkTimeInMillis);
           pomCycles.setTotalRestTime(totalCycleRestTimeInMillis);
           pomCycles.setCyclesCompleted(cyclesCompleted);
@@ -4330,8 +4331,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
 
         runOnUiThread(() -> {
-          if (mode == 1) savedCycleRecycler.startAnimation(slideOutFromLeftLong);
-          if (mode == 3) savedPomCycleRecycler.startAnimation(slideOutFromLeftLong);
+          savedCycleRecycler.startAnimation(slideOutFromLeftLong);
         });
       }
 
@@ -4429,6 +4429,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = true;
     cycle_title_textView.setText(cycleTitle);
 
+    deleteTotalCycleTimes();
+
+    adjustDotRecyclerLayoutMargins();
+    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
+
     if (mode == 1) {
       changeTextSizeWithoutAnimator(workoutTimeIntegerArray.get(0));
     }
@@ -4439,9 +4444,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (editCyclesPopupWindow.isShowing()) {
       editCyclesPopupWindow.dismiss();
     }
-
-    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
-    adjustDotRecyclerLayoutMargins();
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
@@ -5197,15 +5199,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setInitialTextSizeForTimers(setMillis);
     }
 
-    Log.i("testProg", "prog value in setTimer method before runnable is " + currentProgressBarValueForModeOne);
-
     modeOneCountdownTimer = new CountDownTimer(setMillis, timerRunnableDelay) {
       @Override
       public void onTick(long millisUntilFinished) {
-        //Todo: It's objectAnimator's fetch.
         currentProgressBarValueForModeOne = (int) objectAnimator.getAnimatedValue();
-
-//        Log.i("testProg", "prog value at runnable start is " + currentProgressBarValueForModeOne);
 
         setMillis = millisUntilFinished;
         timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
@@ -5505,8 +5502,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (trackActivityWithinCycle) {
       setAllActivityTimesAndCaloriesToTextViews();
     } else {
-      roundCycleSetTimeDown();
-      roundCycleBreakTimeDown();
+//      roundCycleSetTimeDown();
+//      roundCycleBreakTimeDown();
+      roundCycleTimeValuesForEndOfRoundDisplay();
 
       setTotalCycleTimeValuesToTextView();
     }
@@ -5571,10 +5569,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     globalNextRoundLogic();
 
-//    roundPomCycleTimeValuesForEndOfRoundDisplay();
-    roundDownPomCycleWorkTime();
-    roundDownPomCycleRestTime();
+    roundPomCycleTimeValuesForEndOfRoundDisplay();
     setTotalCycleTimeValuesToTextView();
+//    roundDownPomCycleWorkTime();
+//    roundDownPomCycleRestTime();
 
     removePomCycleTimeRunnable();
 
