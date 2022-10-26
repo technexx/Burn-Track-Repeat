@@ -137,29 +137,9 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         PomHolder pomHolder = (PomHolder) holder;
         pomHolder.resetCycle.setVisibility(View.GONE);
 
-        if (mActiveCycle) {
-            if (position==mPositionOfActiveCycle) {
-                pomHolder.resetCycle.setVisibility(View.VISIBLE);
-
-                pomHolder.resetCycle.setOnClickListener(v-> {
-                    mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
-                });
-
-                pomHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
-            } else {
-                pomHolder.fullView.setBackgroundColor(fullViewBackGroundColor);
-            }
-        } else {
-            pomHolder.fullView.setBackgroundColor(fullViewBackGroundColor);
-        }
-
         if (mHighlightDeleted) {
-            //Clears highlight list.
             mHighlightPositionList.clear();
-            //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
             mHighlightMode = false;
-
-//            pomHolder.fullView.setBackgroundColor(Color.BLACK);
         }
 
         pomHolder.pomName.setText(mPomTitle.get(position));
@@ -247,6 +227,28 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             }
             return true;
         });
+
+        if (mActiveCycle) {
+            pomHolder.resetCycle.setText(R.string.reset);
+
+            if (position==mPositionOfActiveCycle) {
+                pomHolder.resetCycle.setVisibility(View.VISIBLE);
+
+                pomHolder.resetCycle.setOnClickListener(v-> {
+                    if (pomHolder.resetCycle.getText().equals(mContext.getString(R.string.reset))) {
+                        pomHolder.resetCycle.setText(R.string.confirm_cycle_reset);
+                    } else {
+                        mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
+                    }
+                });
+
+                pomHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+            } else {
+                pomHolder.fullView.setBackgroundColor(fullViewBackGroundColor);
+            }
+        } else {
+            pomHolder.fullView.setBackgroundColor(fullViewBackGroundColor);
+        }
     }
 
     @Override

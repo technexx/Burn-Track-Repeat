@@ -209,23 +209,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
-    if (mActiveCycle) {
-      if (position==mPositionOfActiveCycle) {
-
-        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
-        workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
-
-        workoutHolder.resetCycle.setOnClickListener(v-> {
-          mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
-        });
-
-      } else {
-        workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
-      }
-    } else {
-      workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
-    }
-
     if (mHighlightDeleted) {
       //Clears highlight list.
       mHighlightPositionList.clear();
@@ -400,6 +383,23 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
       return true;
     });
+
+    if (mActiveCycle) {
+      if (position==mPositionOfActiveCycle) {
+
+        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
+        workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+
+        workoutHolder.resetCycle.setOnClickListener(v-> {
+          mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
+        });
+
+      } else {
+        workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
+      }
+    } else {
+      workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
+    }
   }
 
   @Override

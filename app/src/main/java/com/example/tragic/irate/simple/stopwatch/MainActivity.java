@@ -642,8 +642,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Pom reset confirm should also be in recyclerView.
-
   //Todo: Main recyclerView should indicate whether timer is paused or not.
   //Todo: Test simultaneous timer endings.
 
@@ -661,9 +659,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
 
-  //Todo: Had an instance of stats skipping (e.g. 2->4) when ending a round early. Also occurred after a second had iterated in new round.
-      //Todo: What happens: Ends early at 3950 so "3" is displayed, but it goes past 5000+ before timeLeft textView changes to allow its textView to change.
-      //Todo: Not iterating on <1 second (as base timer does) presents an issue w/ calorie tracking as that iterates in milliseconds.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
