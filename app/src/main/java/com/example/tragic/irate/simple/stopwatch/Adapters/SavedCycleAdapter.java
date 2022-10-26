@@ -209,8 +209,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
-//    Log.i("testActive", "boolean in adapter is " + mActiveCycle);
-
     if (mActiveCycle) {
       if (position==mPositionOfActiveCycle) {
 
@@ -231,12 +229,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (mHighlightDeleted) {
       //Clears highlight list.
       mHighlightPositionList.clear();
-
-      //Turns our highlight mode off so single clicks launch a cycle instead of highlight it for deletion.
       mHighlightMode = false;
-
-//      mHighlightDeleted = false;
-//      workoutHolder.fullView.setBackgroundColor(Color.BLACK);
     }
 
     if (mThemeMode == DAY_MODE) {
@@ -363,14 +356,15 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       boolean changed = false;
       //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
       if (!mHighlightMode) {
-        if (mActiveCycle && position==mPositionOfActiveCycle) {
-          mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER);
+        if (mActiveCycle) {
+          if (position == mPositionOfActiveCycle) {
+            mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER);
+          }
         } else {
           mOnCycleClickListener.onCycleClick(position);
         }
         workoutHolder.fullView.setBackgroundColor(Color.BLACK);
-      }
-      else {
+      } else {
         ArrayList<Integer> tempList = new ArrayList<>(mHighlightPositionList);
         for (int i = 0; i < mWorkoutList.size(); i++) {
           //Using tempList for stable loop since mHighlightPositionList changes.

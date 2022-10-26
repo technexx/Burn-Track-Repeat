@@ -1674,7 +1674,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetButtonForPomCycles.setText(R.string.confirm_cycle_reset);
       } else {
         resetPomCyclesTimer();
-        deleteTotalCycleTimesFromDatabaseAndZeroOutVars();
       }
     });
 
