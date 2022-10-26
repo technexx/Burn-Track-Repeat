@@ -640,14 +640,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
+  boolean resetCycleTimeVarsWithinRunnable;
+
   //Todo: Pom reset confirm should also be in recyclerView.
-      //Todo: Or, save/retrieve total work/break time. May be better to go back to that for both modes.
 
   //Todo: Main recyclerView should indicate whether timer is paused or not.
   //Todo: Test simultaneous timer endings.
 
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
+  //Todo: Set/Break time can occassionally skip one if timer is reset very near to next iteration.
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
@@ -1707,6 +1709,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       AsyncTask.execute(() -> {
         if (delete_all_text.getText().equals(getString(R.string.delete_cycles_times_and_completed_cycles))) {
           deleteTotalCycleTimesFromDatabaseAndZeroOutVars();
+          resetCycleTimeVarsWithinRunnable = true;
         }
         if (delete_all_text.getText().equals(getString(R.string.delete_all_cycles))) {
           deleteAllCycles();
@@ -5033,6 +5036,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
+        if (resetCycleTimeVarsWithinRunnable) {
+          timerIteration.setStableTime(System.currentTimeMillis());
+
+          long remainder = timerIteration.getNewTotal() % 1000;
+          long roundedRemainder = roundToNearestFullThousandth(remainder);
+          timerIteration.setPreviousTotal(1000);
+
+          resetCycleTimeVarsWithinRunnable = false;
+        }
+
         timerIteration.setCurrentTime(System.currentTimeMillis());
         long timeToIterate = timerIteration.getDifference();
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
@@ -5072,6 +5085,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
+
+        if (resetCycleTimeVarsWithinRunnable) {
+          timerIteration.setStableTime(System.currentTimeMillis());
+
+          long remainder = timerIteration.getNewTotal() % 1000;
+          long roundedRemainder = roundToNearestFullThousandth(remainder);
+          timerIteration.setPreviousTotal(1000);
+
+          resetCycleTimeVarsWithinRunnable = false;
+        }
+
         timerIteration.setCurrentTime(System.currentTimeMillis());
         long timeToIterate = timerIteration.getDifference();
         timerIteration.setNewTotal(timerIteration.getPreviousTotal() + timeToIterate);
