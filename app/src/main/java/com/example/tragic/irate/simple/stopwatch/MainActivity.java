@@ -641,6 +641,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar settingsActionBar;
 
   //Todo: Pom reset confirm should also be in recyclerView.
+      //Todo: Or, save/retrieve total work/break time. May be better to go back to that for both modes.
   //Todo: Should have timer pop up when clicking notification.
 
   //Todo: Main recyclerView should indicate whether timer is paused or not.
@@ -648,7 +649,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
-  //Todo: User settings at first app launch should have an "okay" button to denote exit.
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
@@ -3771,9 +3771,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       notificationManagerBuilder.setStyle(new NotificationCompat.InboxStyle()
               .addLine(headerOneBold)
               .addLine(bodyOne)
-              .addLine(headerTwo)
+              .addLine(headerTwoBold)
               .addLine(bodyTwo)
-              .addLine(headerThree)
+              .addLine(headerThreeBold)
               .addLine(bodyThree)
       );
 
