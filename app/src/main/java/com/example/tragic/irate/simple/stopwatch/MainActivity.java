@@ -4782,6 +4782,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (textViewDisplaySync.areModeOneTextViewsDifferent()) {
         textViewDisplaySync.setModeOneSecondTextView(textViewDisplaySync.getModeOneFirstTextView());
 
+        iterateRecyclerViewTimesOnModeOne();
         setTotalCycleTimeValuesToTextView();
       }
     }
@@ -5053,8 +5054,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerIteration.setPreviousTotal(totalCycleBreakTimeInMillis);
     }
 
-    mHandler.post(testUpdateRunnable());
-
+    ArrayList<Integer> integerCycleArray = integerArrayOfRoundStringsForModeOne();
 
     return new Runnable() {
       @Override
@@ -5087,27 +5087,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private Runnable testUpdateRunnable() {
-    Gson gson = new Gson();
+  private void iterateRecyclerViewTimesOnModeOne() {
+    ArrayList<Integer> integerCycleArray = integerArrayOfRoundStringsForModeOne();
 
-    ArrayList<Integer> integerArray = integerArrayOfRoundStringsForModeOne();
+    workoutCyclesArray.set(positionOfSelectedCycle, newRoundStringForModeOne(integerCycleArray));
 
-    return new Runnable() {
-      @Override
-      public void run() {
-        workoutCyclesArray.set(positionOfSelectedCycle, newRoundStringForModeOne(integerArray));
-
-        savedCycleAdapter.notifyDataSetChanged();
-
-        mHandler.postDelayed(this, 1000);
-
-      }
-    };
+    savedCycleAdapter.notifyDataSetChanged();
   }
 
   private ArrayList<Integer> integerArrayOfRoundStringsForModeOne() {
     String[] fetchedRounds = {};
-    ArrayList<String> singleRoundStrings = new ArrayList<>();
     ArrayList<Integer> newIntegerArray = new ArrayList<>();
 
     if (workoutCyclesArray.size() - 1  >= positionOfSelectedCycle) {
