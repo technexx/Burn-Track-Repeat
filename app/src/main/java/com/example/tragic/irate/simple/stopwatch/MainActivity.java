@@ -645,6 +645,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Test simultaneous timer endings.
 
+  //Todo: Cursor ghosting on adding rounds (seems to be just on first app launch).
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
   //Todo: Set/Break time can occassionally skip one if timer is reset very near to next iteration.
@@ -5089,6 +5090,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private Runnable testUpdateRunnable() {
     Gson gson = new Gson();
 
+    ArrayList<Integer> integerArray = integerArrayOfRoundStringsForModeOne();
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        workoutCyclesArray.set(positionOfSelectedCycle, newRoundStringForModeOne(integerArray));
+
+        savedCycleAdapter.notifyDataSetChanged();
+
+        mHandler.postDelayed(this, 1000);
+
+      }
+    };
+  }
+
+  private ArrayList<Integer> integerArrayOfRoundStringsForModeOne() {
     String[] fetchedRounds = {};
     ArrayList<String> singleRoundStrings = new ArrayList<>();
     ArrayList<Integer> newIntegerArray = new ArrayList<>();
@@ -5101,28 +5118,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       newIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
     }
 
-    return new Runnable() {
-      @Override
-      public void run() {
-        int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
-
-        newIntegerArray.set(currentRoundPosition, (int) setMillis);
-
-        String newRoundString = "";
-        newRoundString = gson.toJson(newIntegerArray);
-        newRoundString = friendlyString(newRoundString);
-
-        workoutCyclesArray.set(positionOfSelectedCycle, newRoundString);
-
-        savedCycleAdapter.notifyDataSetChanged();
-        Log.i("testArray", "cycles array is " + workoutCyclesArray);
-        mHandler.postDelayed(this, 1000);
-
-      }
-    };
+    return newIntegerArray;
   }
 
-  //Runs work/rest time, which iterates up.
+  private String newRoundStringForModeOne(ArrayList<Integer> arrayListToConvert) {
+    Gson gson = new Gson();
+
+    int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
+
+    arrayListToConvert.set(currentRoundPosition, (int) setMillis);
+
+    String newRoundString = "";
+    newRoundString = gson.toJson(arrayListToConvert);
+    newRoundString = friendlyString(newRoundString);
+
+    return newRoundString;
+  }
+
   private Runnable runnableForWorkAndRestTotalTimes() {
     setCycleTimeToIterate();
 
