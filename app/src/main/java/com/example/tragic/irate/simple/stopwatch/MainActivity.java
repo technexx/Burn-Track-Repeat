@@ -643,13 +643,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Main recyclerView should indicate whether timer is paused or not.
   //Todo: Test simultaneous timer endings.
 
   //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
   //Todo: Set/Break time can occassionally skip one if timer is reset very near to next iteration.
 
+  //Todo: Stats for Pom.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test tablet screens.
@@ -5089,18 +5089,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private Runnable testUpdateRunnable() {
     Gson gson = new Gson();
 
-    int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
+    String[] fetchedRounds = {};
+    ArrayList<String> singleRoundStrings = new ArrayList<>();
+    ArrayList<Integer> newIntegerArray = new ArrayList<>();
+
+    if (workoutCyclesArray.size() - 1  >= positionOfSelectedCycle) {
+      fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
+    }
+
+    for (int i = 0; i<fetchedRounds.length; i++) {
+      newIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
+    }
 
     return new Runnable() {
       @Override
       public void run() {
-        workoutTimeIntegerArray.set(currentRoundPosition, (int) setMillis);
+        int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
 
-        String newTime = gson.toJson(workoutTimeIntegerArray);
-        newTime = friendlyString(newTime);
+        newIntegerArray.set(currentRoundPosition, (int) setMillis);
 
-        workoutCyclesArray.set(currentRoundPosition, newTime);
-        savedCycleAdapter.notifyDataSetChanged();
+        String newRoundString = "";
+        newRoundString = gson.toJson(newIntegerArray);
+        newRoundString = friendlyString(newRoundString);
+
+        workoutCyclesArray.set(currentRoundPosition, newRoundString);
+
+        Log.i("testArray", "cycles array is " + workoutCyclesArray);
+
+//        savedCycleAdapter.notifyDataSetChanged();
 
         mHandler.postDelayed(this, 1000);
 
