@@ -5018,7 +5018,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalSetTimeForCurrentDayInMillis = timerIteration.getNewDailyTotal();
         totalSetTimeForSpecificActivityForCurrentDayInMillis = timerIteration.getNewActivityTotal();
 
-//        Log.i("testTime", "activity time is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
 
         calorieIteration.setNewTotalCalories(calorieIteration.getPreviousTotalCalories() + caloriesToIterate);
         calorieIteration.setNewActivityCalories(calorieIteration.getPreviousActivityCalories() + caloriesToIterate);
@@ -5051,6 +5050,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerIteration.setPreviousTotal(totalCycleBreakTimeInMillis);
     }
 
+    mHandler.post(testUpdateRunnable());
+
+
     return new Runnable() {
       @Override
       public void run() {
@@ -5078,6 +5080,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         mHandler.postDelayed(this, 10);
+      }
+    };
+  }
+
+  private Runnable testUpdateRunnable() {
+    Gson gson = new Gson();
+
+    int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        workoutTimeIntegerArray.set(currentRoundPosition, (int) setMillis);
+
+        String newTime = gson.toJson(workoutTimeIntegerArray);
+        newTime = friendlyString(newTime);
+
+        workoutCyclesArray.set(currentRoundPosition, newTime);
+        savedCycleAdapter.notifyDataSetChanged();
+
+        mHandler.postDelayed(this, 1000);
+
       }
     };
   }

@@ -12,13 +12,16 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
+import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.ImageSpan;
+import android.text.style.StyleSpan;
 import android.text.style.TextAppearanceSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -256,6 +259,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
+    //Sets String as orange, while round spans are set below to user colors.
+    workoutHolder.workOutCycle.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+
     //Clearing Spannable object, since it will re-populate for every position passed in through this method.
     permSpan = "";
     //Retrieves the concatenated String of workout TIMES from current position.
@@ -316,9 +322,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           if (j<=mNumberOfRoundsCompleted-1) {
             span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.mid_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
-
+          if (j == mNumberOfRoundsCompleted) {
+//            span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.white)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+//            span.setSpan(new StyleSpan(Typeface.ITALIC), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+          }
         }
       }
+
       //Within this loop, we update our permSpan charSequence with the new workout Spannable object.
       permSpan = TextUtils.concat(permSpan, span);
     }
@@ -398,6 +408,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     });
 
     if (mActiveCycle) {
+      workoutHolder.resetCycle.setText(R.string.reset);
+
       if (position==mPositionOfActiveCycle) {
         if (mTimerPaused) {
           workoutHolder.pauseOrResume.setText(R.string.resume);
@@ -407,6 +419,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
+
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 
         workoutHolder.pauseOrResume.setOnClickListener(v-> {
