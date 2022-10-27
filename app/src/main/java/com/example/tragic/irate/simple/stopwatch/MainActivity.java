@@ -3885,7 +3885,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void activateResumeOrResetOptionForCycle() {
     if (mode == 1) {
-      if (savedCycleAdapter.isCycleActive()) {
+      if (stateOfTimers.isModeOneTimerActive()) {
         if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size() - 1;
         savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
@@ -3898,7 +3898,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode == 3) {
-      if (savedPomCycleAdapter.isCycleActive()) {
+      if (stateOfTimers.isModeThreeTimerActive()) {
         if (isNewCycle) positionOfSelectedCycle = pomArray.size() - 1;
         savedPomCycleAdapter.setCycleAsActive();
         savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
@@ -5144,6 +5144,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateRecyclerViewStringIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         iterateRecyclerViewTimesOnModeOne(integerArrayList);
+        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeft);
 
         mHandler.postDelayed(this, 100);
       }
@@ -5199,6 +5200,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateRecyclerViewStringIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         iterateRecyclerViewTimesOnModeThree(integerArrayList);
+        savedPomCycleAdapter.setNumberOfRoundsCompleted(pomDotCounter);
 
         mHandler.postDelayed(this, 100);
       }
