@@ -122,7 +122,7 @@ import java.util.List;
 import java.util.Locale;
 
 
-public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onPauseOrResumeListener, SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapter.onRoundSelected, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DailyStatsFragment.changeSortMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
+public class MainActivity extends AppCompatActivity implements SavedCycleAdapter.onPauseOrResumeListener, SavedCycleAdapter.onCycleClickListener, SavedCycleAdapter.onHighlightListener, SavedCycleAdapter.onTdeeModeToggle, SavedPomCycleAdapter.onPauseOrResumeListener, SavedPomCycleAdapter.onCycleClickListener, SavedPomCycleAdapter.onHighlightListener, CycleRoundsAdapter.onFadeFinished, CycleRoundsAdapter.onRoundSelected, SavedCycleAdapter.onResumeOrResetCycle, SavedPomCycleAdapter.onResumeOrResetCycle, RootSettingsFragment.onChangedSettings, SoundSettingsFragment.onChangedSoundSetting, ColorSettingsFragment.onChangedColorSetting, DailyStatsFragment.changeOnOptionsItemSelectedMenu, DailyStatsFragment.changeSortMenu, DotsAdapter.sendDotAlpha, PomDotsAdapter.sendPomDotAlpha {
 
   StateOfTimers stateOfTimers;
   LongToStringConverters longToStringConverters;
@@ -1142,10 +1142,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       if (timerIsPaused) {
         pauseAndResumeTimer(RESUMING_TIMER);
-        Log.i("testPause", "resuming from recyclerView!");
       } else {
         pauseAndResumeTimer(PAUSING_TIMER);
-        Log.i("testPause", "pausing from recyclerView!");
       }
       savedCycleAdapter.notifyDataSetChanged();
     }
@@ -2229,6 +2227,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
     savedPomCycleRecycler.setLayoutManager(pomCyclesRecyclerLayoutManager);
 
+    savedPomCycleAdapter.setTimerPauseOrResume(MainActivity.this);
     savedPomCycleAdapter.setItemClick(MainActivity.this);
     savedPomCycleAdapter.setHighlight(MainActivity.this);
     savedPomCycleAdapter.setResumeOrResetCycle(MainActivity.this);
@@ -5903,8 +5902,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!stateOfTimers.isModeThreeTimerDisabled()) {
       if (!stateOfTimers.isModeThreeTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
-          stateOfTimers.setModeThreeTimerPaused(true)
-          ;
+          savedPomCycleAdapter.setTimerIsPaused(true);
+          stateOfTimers.setModeThreeTimerPaused(true);
+
           pomMillisUntilFinished = pomMillis;
 
           if (objectAnimatorPom != null) objectAnimatorPom.pause();
@@ -5916,6 +5916,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           removePomCycleTimeRunnable();
 
         } else if (pausing == RESUMING_TIMER) {
+          savedPomCycleAdapter.setTimerIsPaused(false);
           stateOfTimers.setModeThreeTimerActive(true);
           stateOfTimers.setModeThreeTimerPaused(false);
 

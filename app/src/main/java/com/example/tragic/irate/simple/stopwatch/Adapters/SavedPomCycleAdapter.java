@@ -29,6 +29,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     ArrayList<String> mPomList;
     ArrayList<String> mPomTitle;
 
+    onPauseOrResumeListener mOnPauseOrResumeListener;
     onCycleClickListener mOnCycleClickListener;
     onHighlightListener mOnHighlightListener;
     onResumeOrResetCycle mOnResumeOrResetCycle;
@@ -42,6 +43,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int RESUMING_CYCLE_FROM_TIMER = 1;
     int RESETTING_CYCLE_FROM_TIMER = 2;
 
+    boolean mTimerPaused;
     boolean mActiveCycle;
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
@@ -53,18 +55,13 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     int fullViewBackGroundColor;
 
-    public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
-        if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
-        if (typeOFRound==4) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
-        if (typeOFRound==5) REST_COLOR = changeSettingsValues.assignColor(settingNumber);
+
+    public interface onPauseOrResumeListener {
+        void onPauseOrResume(boolean timerIsPaused);
     }
 
-    public boolean isCycleActive() {
-        return mActiveCycle;
-    }
-
-    public boolean isHighlightModeActive() {
-        return mHighlightMode;
+    public void setTimerPauseOrResume(onPauseOrResumeListener xOnPauseOrResumeListener) {
+        this.mOnPauseOrResumeListener = xOnPauseOrResumeListener;
     }
 
     public interface onCycleClickListener {
@@ -102,6 +99,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         fullViewBackGroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
     }
 
+    public void setTimerIsPaused(boolean paused) {
+        this.mTimerPaused = paused;
+    }
+
     public void exitHighlightMode() {
         mHighlightDeleted = true;
         mHighlightMode = false;
@@ -124,6 +125,20 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         this.mNumberOfRoundsCompleted = number;
     }
 
+    public void setColorSettingsFromMainActivity(int typeOFRound, int settingNumber) {
+        if (typeOFRound==3) WORK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==4) BREAK_COLOR = changeSettingsValues.assignColor(settingNumber);
+        if (typeOFRound==5) REST_COLOR = changeSettingsValues.assignColor(settingNumber);
+    }
+
+    public boolean isCycleActive() {
+        return mActiveCycle;
+    }
+
+    public boolean isHighlightModeActive() {
+        return mHighlightMode;
+    }
+
     @NonNull
     @Override
     public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -135,6 +150,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         PomHolder pomHolder = (PomHolder) holder;
+        pomHolder.pauseOrResume.setVisibility(View.GONE);
         pomHolder.resetCycle.setVisibility(View.GONE);
 
         if (mHighlightDeleted) {
@@ -232,7 +248,18 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             pomHolder.resetCycle.setText(R.string.reset);
 
             if (position==mPositionOfActiveCycle) {
+                if (mTimerPaused) {
+                    pomHolder.pauseOrResume.setText(R.string.resume);
+                } else {
+                    pomHolder.pauseOrResume.setText(R.string.pause);
+                }
+
+                pomHolder.pauseOrResume.setVisibility(View.VISIBLE);
                 pomHolder.resetCycle.setVisibility(View.VISIBLE);
+
+                pomHolder.pauseOrResume.setOnClickListener(v-> {
+                    mOnPauseOrResumeListener.onPauseOrResume(mTimerPaused);
+                });
 
                 pomHolder.resetCycle.setOnClickListener(v-> {
                     if (pomHolder.resetCycle.getText().equals(mContext.getString(R.string.reset))) {
@@ -260,12 +287,14 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         public TextView pomName;
         public TextView pomView;
         public View fullView;
+        public TextView pauseOrResume;
         public TextView resetCycle;
 
         public PomHolder(@NonNull View itemView) {
             super(itemView);
             pomName = itemView.findViewById(R.id.pom_header);
             pomView = itemView.findViewById(R.id.pom_view);
+            pauseOrResume = itemView.findViewById(R.id.pause_or_resume_cycle_button_for_mode_3);
             fullView = itemView;
             resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_3);
         }

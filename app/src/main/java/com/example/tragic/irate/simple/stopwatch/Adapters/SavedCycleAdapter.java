@@ -60,6 +60,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   CharSequence permSpan;
   Spannable span;
 
+  boolean mTimerPaused;
   boolean mActiveCycle;
   int mPositionOfActiveCycle;
   int mNumberOfRoundsCompleted;
@@ -77,8 +78,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int NIGHT_MODE = 1;
 
   int fullViewBackgroundColor;
-
-  boolean mTimerPaused;
 
   public interface onPauseOrResumeListener {
     void onPauseOrResume(boolean timerIsPaused);
@@ -411,7 +410,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 
         workoutHolder.pauseOrResume.setOnClickListener(v-> {
-          workoutHolder.pauseOrResume.setText(R.string.pause);
           mOnPauseOrResumeListener.onPauseOrResume(mTimerPaused);
         });
 
