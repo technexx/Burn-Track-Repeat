@@ -82,6 +82,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   int fullViewBackgroundColor;
 
+  WorkoutHolder mWorkoutHolder;
+
   public interface onPauseOrResumeListener {
     void onPauseOrResume(boolean timerIsPaused);
   }
@@ -220,10 +222,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   @SuppressLint("ClickableViewAccessibility")
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-    //Used to store highlighted positions that we callback to Main to delete.
-    WorkoutHolder workoutHolder = (WorkoutHolder) holder;
-    workoutHolder.pauseOrResume.setVisibility(View.GONE);
-    workoutHolder.resetCycle.setVisibility(View.GONE);
+    mWorkoutHolder = (WorkoutHolder) holder;
+
+    mWorkoutHolder.pauseOrResume.setVisibility(View.GONE);
+    mWorkoutHolder.resetCycle.setVisibility(View.GONE);
 
     if (mHighlightDeleted) {
       //Clears highlight list.
@@ -232,35 +234,35 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     if (mThemeMode == DAY_MODE) {
-      workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.BLACK);
+      mWorkoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.BLACK);
     }
     if (mThemeMode == NIGHT_MODE) {
-      workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.WHITE);
+      mWorkoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.WHITE);
     }
 
     if (mTdeeActivityExistsInCycleList.get(position)) {
-      workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
-      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
+      mWorkoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
+      mWorkoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
 
-      workoutHolder.workoutNameLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
-      workoutHolder.workoutCyclesLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
+      mWorkoutHolder.workoutNameLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
+      mWorkoutHolder.workoutCyclesLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
 
     } else {
-      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
-      workoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
-      workoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
+      mWorkoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
+      mWorkoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
+      mWorkoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
 
 
     if (mActiveTdeeModeBooleanList.get(position)) {
-      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(1.0f);
+      mWorkoutHolder.tdeeActivityStringToggleTextView.setAlpha(1.0f);
     } else {
-      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.4f);
+      mWorkoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.4f);
     }
 
-    workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
+    mWorkoutHolder.workoutName.setText(mWorkoutTitle.get(position));
     //Sets String as orange, while round spans are set below to user colors.
-    workoutHolder.workOutCycle.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+    mWorkoutHolder.workOutCycle.setTextColor(ContextCompat.getColor(mContext, R.color.white));
 
     //Clearing Spannable object, since it will re-populate for every position passed in through this method.
     permSpan = "";
@@ -322,10 +324,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           if (j<=mNumberOfRoundsCompleted-1) {
             span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.mid_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
-          if (j == mNumberOfRoundsCompleted) {
-//            span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.white)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-//            span.setSpan(new StyleSpan(Typeface.ITALIC), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-          }
         }
       }
 
@@ -342,7 +340,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             if (tempTypeArray[k].contains("2") || tempTypeArray[k].contains("4")) {
               k = tempTypeArray.length;
             } else {
-              workoutHolder.workOutCycle.setLineSpacing(0, 1.3f);
+              mWorkoutHolder.workOutCycle.setLineSpacing(0, 1.3f);
               spacingChanged = true;
             }
           }
@@ -350,15 +348,17 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       }
     }
 
-    workoutHolder.workOutCycle.setText(permSpan);
+    mWorkoutHolder.workOutCycle.setText(permSpan);
 
-    workoutHolder.tdeeActivityStringToggleTextView.setOnClickListener(v-> {
+    mWorkoutHolder.tdeeActivityStringToggleTextView.setOnClickListener(v-> {
       if (!mActiveCycle && !mHighlightMode) {
         mOnTdeeModeToggle.toggleTdeeMode(position);
       }
     });
 
-    workoutHolder.fullView.setOnClickListener(v -> {
+    mWorkoutHolder.fullView.setOnClickListener(v -> {
+      Log.i("testClick", "click registered!");
+
       boolean changed = false;
       //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
       if (!mHighlightMode) {
@@ -369,7 +369,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else {
           mOnCycleClickListener.onCycleClick(position);
         }
-        workoutHolder.fullView.setBackgroundColor(Color.BLACK);
+        mWorkoutHolder.fullView.setBackgroundColor(Color.BLACK);
       } else {
         ArrayList<Integer> tempList = new ArrayList<>(mHighlightPositionList);
         for (int i = 0; i < mWorkoutList.size(); i++) {
@@ -377,7 +377,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           for (int j = 0; j < tempList.size(); j++) {
             //If our cycle position matches a value in our "highlighted positions list", we un-highlight it, and remove it from our list.
             if (position==tempList.get(j)) {
-              workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
+              mWorkoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
               mHighlightPositionList.remove(Integer.valueOf(position));
               //Since we want a single highlight toggle per click, our boolean set to true will preclude the addition of a highlight below.
               changed = true;
@@ -388,18 +388,18 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         if (!changed) {
           //Adds the position at its identical index for easy removal access.
           mHighlightPositionList.add(position);
-          workoutHolder.fullView.setBackgroundColor(Color.GRAY);
+          mWorkoutHolder.fullView.setBackgroundColor(Color.GRAY);
         }
         //Callback to send position list (Using Strings to make removing values easier) back to Main.
         mOnHighlightListener.onCycleHighlight(mHighlightPositionList, false);
       }
     });
 
-    workoutHolder.fullView.setOnLongClickListener(v -> {
+    mWorkoutHolder.fullView.setOnLongClickListener(v -> {
       if (!mHighlightMode && !mActiveCycle) {
         //Adds position of clicked item to position list.
         mHighlightPositionList.add(position);
-        workoutHolder.fullView.setBackgroundColor(Color.GRAY);
+        mWorkoutHolder.fullView.setBackgroundColor(Color.GRAY);
 
         mHighlightMode = true;
         mOnHighlightListener.onCycleHighlight(mHighlightPositionList, true);
@@ -408,34 +408,34 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     });
 
     if (mActiveCycle) {
-      workoutHolder.resetCycle.setText(R.string.reset);
+      mWorkoutHolder.resetCycle.setText(R.string.reset);
 
       if (position==mPositionOfActiveCycle) {
         if (mTimerPaused) {
-          workoutHolder.pauseOrResume.setText(R.string.resume);
+          mWorkoutHolder.pauseOrResume.setText(R.string.resume);
         } else {
-          workoutHolder.pauseOrResume.setText(R.string.pause);
+          mWorkoutHolder.pauseOrResume.setText(R.string.pause);
         }
 
-        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
-        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
+        mWorkoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
+        mWorkoutHolder.resetCycle.setVisibility(View.VISIBLE);
 
-        workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+        mWorkoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 
-        workoutHolder.pauseOrResume.setOnClickListener(v-> {
+        mWorkoutHolder.pauseOrResume.setOnClickListener(v-> {
           mOnPauseOrResumeListener.onPauseOrResume(mTimerPaused);
         });
 
-        workoutHolder.resetCycle.setOnClickListener(v-> {
-          workoutHolder.pauseOrResume.setText(R.string.resume);
+        mWorkoutHolder.resetCycle.setOnClickListener(v-> {
+          mWorkoutHolder.pauseOrResume.setText(R.string.resume);
           mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
         });
 
       } else {
-        workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
+        mWorkoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
       }
     } else {
-      workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
+      mWorkoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
     }
   }
 

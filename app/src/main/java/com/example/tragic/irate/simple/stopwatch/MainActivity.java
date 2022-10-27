@@ -4801,7 +4801,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void updateRecyclerViewStringIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
     if (mode == 1) {
-      savedCycleAdapter.notifyDataSetChanged();
+      textViewDisplaySync.setModeOneFirstTextView((String) timeLeftForCyclesTimer.getText());
+
+      if (textViewDisplaySync.areModeOneTextViewsDifferent()) {
+        textViewDisplaySync.setModeOneSecondTextView(textViewDisplaySync.getModeOneFirstTextView());
+
+        savedCycleAdapter.notifyDataSetChanged();
+      }
     }
   }
 
@@ -5122,7 +5128,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         iterateRecyclerViewTimesOnModeOne(integerArrayList);
 
-        mHandler.postDelayed(this, 50);
+        mHandler.postDelayed(this, 100);
       }
     };
   }
