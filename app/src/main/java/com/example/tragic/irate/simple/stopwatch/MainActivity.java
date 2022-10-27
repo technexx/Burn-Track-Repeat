@@ -648,6 +648,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: RecyclerView timer iteration is 1 lower than dots.
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
+  //Todo: Notification persist on app close.
   //Todo: Test simultaneous timer endings.
 
   //Todo: Cursor ghosting on adding rounds (seems to be just on first app launch).

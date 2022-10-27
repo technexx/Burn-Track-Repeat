@@ -35,14 +35,14 @@
     </TextView>
 
     <TextView
-        android:text="Reset"
         android:id="@+id/pause_or_resume_cycle_button_for_mode_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/reset_active_cycle_button_for_mode_1"
+        app:layout_constraintEnd_toStartOf="@id/workout_recycler_center_horizontal_guideline"
         app:layout_constraintTop_toBottomOf="@id/saved_custom_set_view"
         android:layout_marginTop="8dp"
+        android:layout_marginStart="30dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:textStyle="bold"
@@ -53,10 +53,11 @@
         android:id="@+id/reset_active_cycle_button_for_mode_1"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toEndOf="@id/workout_recycler_center_horizontal_guideline"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/saved_custom_set_view"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="30dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:textStyle="bold"
@@ -94,4 +95,12 @@
         app:layout_constraintStart_toEndOf="@id/saved_custom_set_view"
         app:layout_constraintEnd_toStartOf="@id/activity_string_textView_for_tracking_cycles">
     </View>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/workout_recycler_center_horizontal_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".5">
+    </androidx.constraintlayout.widget.Guideline>
 </androidx.constraintlayout.widget.ConstraintLayout>
