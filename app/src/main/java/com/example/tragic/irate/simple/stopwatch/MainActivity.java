@@ -3,6 +3,7 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
+import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -642,7 +643,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Dismiss soft kb on onResume() in case user has it open.
   //Todo: Main recyclerView should indicate whether timer is paused or not.
   //Todo: Test simultaneous timer endings.
 
@@ -689,6 +689,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
     mHandler.removeCallbacks(globalNotficationsRunnable);
+
+//    inputMethodManager.hideSoftInputFromWindow(mainView.getWindowToken(), 0);
 
   }
 
