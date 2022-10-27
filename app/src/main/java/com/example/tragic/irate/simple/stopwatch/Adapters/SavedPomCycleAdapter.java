@@ -6,6 +6,7 @@ import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
+import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,11 +36,11 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     onResumeOrResetCycle mOnResumeOrResetCycle;
 
     Spannable pomSpan;
+    CharSequence permSpan;
     boolean mHighlightDeleted;
     boolean mHighlightMode;
 
     List<Integer> mHighlightPositionList;
-    ArrayList<Integer> mSizeToggle = new ArrayList<>();
     int RESUMING_CYCLE_FROM_TIMER = 1;
     int RESETTING_CYCLE_FROM_TIMER = 2;
 
@@ -89,8 +90,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public SavedPomCycleAdapter(Context context, ArrayList<String> pomList, ArrayList<String> pomTitle) {
         this.mContext = context; this.mPomList = pomList; this.mPomTitle = pomTitle;
-        //Populates a toggle list for Pom's spannable colors so we can simply replace them at will w/ out resetting the list. This should only be called in our initial adapter instantiation.
-        if (mSizeToggle.size()==0) for (int i=0; i<8; i++) mSizeToggle.add(0);
         //Must be instantiated here so it does not loop and reset in onBindView.
         mHighlightPositionList = new ArrayList<>();
 
@@ -159,42 +158,53 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
 
         pomHolder.pomName.setText(mPomTitle.get(position));
-        String tempPom = (convertTime(mPomList).get(position));
 
-        tempPom = tempPom.replace("-", mContext.getString(R.string.bullet));
-        tempPom = tempPom + "     ";
-        pomSpan = new SpannableString(tempPom);
+        String bullet = mContext.getString(R.string.bullet);
 
-        mSizeToggle = retrievedRoundSizeFromConcatenatedString(tempPom, " " + mContext.getString(R.string.bullet) + " ");
+        String tempPomString = (convertTime(mPomList).get(position));
+        String[] tempPomStringArray = tempPomString.split(mContext.getString(R.string.bullet));
 
-        int moving = 0;
-        int rangeStart = 0;
-        int rangeEnd = 4;
+        int tempSpace = 0;
+        permSpan = "";
 
-        for (int i=0; i<8; i++) {
-            if (mSizeToggle.get(i)==5) rangeEnd = 5;
-            if (moving+rangeEnd<=pomSpan.length()) {
-                if (i!=7) {
-                    if (i%2==0) {
-                        pomSpan.setSpan(new ForegroundColorSpan(WORK_COLOR), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                    }
-                    else {
-                        pomSpan.setSpan(new ForegroundColorSpan(BREAK_COLOR), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-                    }
+        for (int i = 0; i<tempPomStringArray.length; i++) {
+            if (i == tempPomStringArray.length - 1) bullet = "";
+
+            pomSpan = new SpannableString(tempPomStringArray[i] + bullet);
+
+            if (i!=0) {
+                tempSpace = 2;
+            } else {
+                tempSpace = 1;
+            }
+
+            if (i != tempPomStringArray.length - 1) {
+                tempSpace = pomSpan.length() - 2;
+            }
+            else {
+                tempSpace = pomSpan.length();
+            }
+
+            if (i!=7) {
+                if (i%2==0) {
+                    pomSpan.setSpan(new ForegroundColorSpan(WORK_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                 } else {
-                    pomSpan.setSpan(new ForegroundColorSpan(REST_COLOR), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                    pomSpan.setSpan(new ForegroundColorSpan(BREAK_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                 }
+            } else {
+                pomSpan.setSpan(new ForegroundColorSpan(REST_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             }
+
             if (mActiveCycle) {
-                if (position==mPositionOfActiveCycle) {
-                    if (i<=mNumberOfRoundsCompleted-1) {
-                        pomSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.test_grey)), moving + rangeStart, moving + rangeEnd, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                if (position == mPositionOfActiveCycle) {
+                    if (i <= mNumberOfRoundsCompleted - 1) {
+                        pomSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.test_grey)), 0, 2, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                     }
                 }
             }
-            if (i!=7) if (mSizeToggle.get(i)==4) moving+=7; else moving+=8;
+            permSpan = TextUtils.concat(permSpan, pomSpan);
+            pomHolder.pomView.setText(permSpan);
         }
-        pomHolder.pomView.setText(pomSpan);
 
         pomHolder.fullView.setOnClickListener(v-> {
             boolean changed = false;
@@ -333,13 +343,19 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         return finalList;
     }
 
+    //Todo: Trying to split w/ bullet when we're refactoring w/ hyphen, which leads to smaller arrays for mSizeToggle.
     public ArrayList<Integer> retrievedRoundSizeFromConcatenatedString(String stringToSeparate, String charToSplit) {
         ArrayList<Integer> arrayToPopulate = new ArrayList<>();
 
         String[] pulledValue = stringToSeparate.split(charToSplit);
+
         for (int i=0; i<pulledValue.length; i++) {
             arrayToPopulate.add(pulledValue[i].length());
         }
+
+//        for (String s : pulledValue) {
+//            arrayToPopulate.add(s.length());
+//        }
 
         return arrayToPopulate;
     }

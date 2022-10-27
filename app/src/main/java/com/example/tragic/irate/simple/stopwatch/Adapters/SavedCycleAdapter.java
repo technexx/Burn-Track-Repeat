@@ -279,27 +279,24 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     int tempSpace = 0;
     //Bullet string. Cleared if on final round.
     String bullet = mContext.getString(R.string.bullet);
+
+
     //Iterates through the length of our split roundType array, which will always correspond to the length of our split workout array.
     for (int j = 0; j < tempTypeArray.length; j++) {
       //If we are on the last round object, clear our bullet String so the view does not end with one.
       if (j == tempTypeArray.length - 1) bullet = "";
       //If round is counting up, create a Spannable w/ the count-down time of the round. Otherwise, create a new Spannable w/ a placeholder for an ImageSpan.
 
+      span = new SpannableString(" " + mContext.getString(R.string.infinity_test) + " " + bullet);
+
       if (tempTypeArray[j].contains("1") || (tempTypeArray[j].contains("3"))) {
         span = new SpannableString(tempWorkoutArray[j] + bullet);
-        //tempSpace is used as the "end" mark of our Spannable object manipulation. We set it to 2 spaces less than the span's length so we leave the bullet occupying the last places [space + bullet] alone). If on LAST spannable, use the full length so we do not fall short in coloring, since there is no space+bullet after.
       } else {
-        //Uses slightly different spacing for first round entry.
         if (j != 0) {
-          span = new SpannableString(" " + mContext.getString(R.string.infinity_test) + " " + bullet);
-//          span = new SpannableString("   " + bullet);
-          //Our ImageSpan is set (below) on indices 1 and 2, so we set tempSpace to 2 to cover its entirety (i.e. changing its color/size).
           tempSpace = 2;
         } else {
-          span = new SpannableString(mContext.getString(R.string.infinity_test) + " " + bullet);
           tempSpace = 1;
         }
-
       }
 
       if (j != tempTypeArray.length - 1) {
@@ -357,8 +354,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     });
 
     mWorkoutHolder.fullView.setOnClickListener(v -> {
-      Log.i("testClick", "click registered!");
-
       boolean changed = false;
       //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
       if (!mHighlightMode) {

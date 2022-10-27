@@ -491,7 +491,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable runnableForSetAndBreakTotalTimes;
   Runnable runnableForWorkAndRestTotalTimes;
   Runnable infinityRunnableForDailyActivityTimer;
+
   Runnable runnableForRecyclerViewTimesForModeOne;
+  Runnable runnableForRecyclerViewTimesForModeThree;
 
   Runnable globalNotficationsRunnable;
 
@@ -644,6 +646,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: RecyclerView timer iteration is 1 lower than dots.
+  //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
   //Todo: Test simultaneous timer endings.
 
   //Todo: Cursor ghosting on adding rounds (seems to be just on first app launch).
@@ -1417,7 +1421,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSetRounds();
     infinityTimerForBreaksRunnable = infinityRunnableForBreakRounds();
+
     runnableForRecyclerViewTimesForModeOne = runnableForRecyclerViewTimesForModeOne();
+    runnableForRecyclerViewTimesForModeThree = runnableForRecyclerViewTimesForModeThree();
 
     emptyCycleList.setOnClickListener(v-> {
       mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
@@ -4809,6 +4815,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedCycleAdapter.notifyDataSetChanged();
       }
     }
+
+    if (mode == 3) {
+      textViewDisplaySync.setModeThreeFirstTextView((String) timeLeftForPomCyclesTimer.getText());
+
+      if (textViewDisplaySync.areModeThreeTextViewsDifferent()) {
+        textViewDisplaySync.setModeThreeSecondTextView(textViewDisplaySync.getModeThreeFirstTextView());
+
+        savedPomCycleAdapter.notifyDataSetChanged();
+      }
+    }
   }
 
   private void setCyclesCompletedTextView() {
@@ -5160,6 +5176,65 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeOne();
 
     int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
+
+    arrayListToConvert.set(currentRoundPosition, (int) setMillis);
+
+    String newRoundString = "";
+    newRoundString = gson.toJson(arrayListToConvert);
+    newRoundString = friendlyString(newRoundString);
+
+    return newRoundString;
+  }
+
+  private Runnable runnableForRecyclerViewTimesForModeThree() {
+    ArrayList<Integer> integerArrayList = integerArrayOfRoundStringsForModeThree();
+
+    TimerIteration timerIteration = newTimerIterationInstance();
+    TextViewDisplaySync textViewDisplaySync = textViewDisplaySyncForModeThree();
+
+    return new Runnable() {
+      @Override
+      public void run() {
+        updateRecyclerViewStringIfTimerHasAlsoUpdated(textViewDisplaySync);
+
+        iterateRecyclerViewTimesOnModeThree(integerArrayList);
+
+        Log.i("testRecycler", "posting!");
+
+        mHandler.postDelayed(this, 100);
+      }
+    };
+  }
+
+  private void iterateRecyclerViewTimesOnModeThree(ArrayList<Integer> integerArrayList) {
+    ArrayList<Integer> integerCycleArray = integerArrayList;
+
+    pomArray.set(positionOfSelectedCycle, newRoundStringForModeThree());
+  }
+
+  private ArrayList<Integer> integerArrayOfRoundStringsForModeThree() {
+    String[] fetchedRounds = {};
+    ArrayList<Integer> newIntegerArray = new ArrayList<>();
+
+    if (pomArray.size() - 1 >= positionOfSelectedCycle)  {
+      fetchedRounds = pomArray.get(positionOfSelectedCycle).split(" - ");
+    }
+
+    Log.i("testRecycler", "string array is " + pomArray);
+
+    for (int i = 0; i<fetchedRounds.length; i++) {
+      newIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
+    }
+
+    return newIntegerArray;
+  }
+
+  private String newRoundStringForModeThree() {
+    Gson gson = new Gson();
+
+    ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeOne();
+
+    int currentRoundPosition = pomDotCounter;
 
     arrayListToConvert.set(currentRoundPosition, (int) setMillis);
 
@@ -5991,6 +6066,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedPomCycleAdapter.setTimerIsPaused(true);
           stateOfTimers.setModeThreeTimerPaused(true);
 
+          mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
+
           pomMillisUntilFinished = pomMillis;
 
           if (objectAnimatorPom != null) objectAnimatorPom.pause();
@@ -6002,6 +6079,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           removePomCycleTimeRunnable();
 
         } else if (pausing == RESUMING_TIMER) {
+          runnableForRecyclerViewTimesForModeThree = runnableForRecyclerViewTimesForModeThree();
+          mHandler.post(runnableForRecyclerViewTimesForModeThree);
+
           savedPomCycleAdapter.setTimerIsPaused(false);
           stateOfTimers.setModeThreeTimerActive(true);
           stateOfTimers.setModeThreeTimerPaused(false);
@@ -6393,7 +6473,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetTimerLogicForAllTimers();
 
     removePomCycleTimeRunnable();
-    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeOne);
+    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
 
     currentProgressBarValueForModeThree = maxProgress;
     progressBarForPom.setProgress(maxProgress);
