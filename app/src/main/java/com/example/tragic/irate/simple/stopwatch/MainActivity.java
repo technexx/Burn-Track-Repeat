@@ -4796,6 +4796,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setTotalCycleTimeValuesToTextView();
       }
     }
+
   }
 
   private void setCyclesCompletedTextView() {
@@ -5037,15 +5038,34 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  private Runnable runnableForSetAndBreakTotalTimes() {
-    setCycleTimeToIterate();
-
+  private TimerIteration newTimerIterationInstance() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
 
+    return timerIteration;
+  }
+
+  private TextViewDisplaySync textViewDisplaySyncForModeOne() {
     TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
     textViewDisplaySync.setModeOneFirstTextView((String) timeLeftForCyclesTimer.getText());
     textViewDisplaySync.setModeOneSecondTextView((String) timeLeftForCyclesTimer.getText());
+
+    return textViewDisplaySync;
+  }
+
+  private TextViewDisplaySync textViewDisplaySyncForModeThree() {
+    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
+    textViewDisplaySync.setModeThreeFirstTextView((String) timeLeftForPomCyclesTimer.getText());
+    textViewDisplaySync.setModeThreeSecondTextView((String) timeLeftForPomCyclesTimer.getText());
+
+    return textViewDisplaySync;
+  }
+
+  private Runnable runnableForSetAndBreakTotalTimes() {
+    setCycleTimeToIterate();
+
+    TimerIteration timerIteration = newTimerIterationInstance();
+    TextViewDisplaySync textViewDisplaySync = textViewDisplaySyncForModeOne();
 
     if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
       timerIteration.setPreviousTotal(totalCycleSetTimeInMillis);
@@ -5053,8 +5073,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
       timerIteration.setPreviousTotal(totalCycleBreakTimeInMillis);
     }
-
-    ArrayList<Integer> integerCycleArray = integerArrayOfRoundStringsForModeOne();
 
     return new Runnable() {
       @Override
@@ -5083,6 +5101,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         mHandler.postDelayed(this, 10);
+      }
+    };
+  }
+
+  private Runnable runnableForRecyclerViewTimesForModeOne() {
+
+    return new Runnable() {
+      @Override
+      public void run() {
+
       }
     };
   }
@@ -5127,12 +5155,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private Runnable runnableForWorkAndRestTotalTimes() {
     setCycleTimeToIterate();
 
-    TimerIteration timerIteration = new TimerIteration();
-    timerIteration.setStableTime(System.currentTimeMillis());
-
-    TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
-    textViewDisplaySync.setModeThreeFirstTextView((String) timeLeftForPomCyclesTimer.getText());
-    textViewDisplaySync.setModeThreeSecondTextView((String) timeLeftForPomCyclesTimer.getText());
+    TimerIteration timerIteration = newTimerIterationInstance();
+    TextViewDisplaySync textViewDisplaySync = textViewDisplaySyncForModeThree();
 
     if (POM_CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
       timerIteration.setPreviousTotal(totalCycleWorkTimeInMillis);
@@ -5144,7 +5168,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-
         if (resetCycleTimeVarsWithinRunnable) {
           timerIteration.setStableTime(System.currentTimeMillis());
 
@@ -5642,9 +5665,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!endingEarly) {
       timeLeftForPomCyclesTimer.setText("0");
       setNotificationValues();
-      roundDownPomCycleTimeValues();
-    } else {
       roundPomCycleTimeValuesToNearestThousandth();
+    } else {
+      roundDownPomCycleTimeValues();
     }
 
     if (mode == 3) {
