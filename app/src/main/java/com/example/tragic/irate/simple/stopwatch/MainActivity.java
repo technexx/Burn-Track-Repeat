@@ -491,6 +491,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   Runnable runnableForSetAndBreakTotalTimes;
   Runnable runnableForWorkAndRestTotalTimes;
   Runnable infinityRunnableForDailyActivityTimer;
+  Runnable runnableForRecyclerViewTimesForModeOne;
 
   Runnable globalNotficationsRunnable;
 
@@ -1416,6 +1417,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopWatchTimerRunnable = stopWatchRunnable();
     infinityTimerForSetsRunnable = infinityRunnableForSetRounds();
     infinityTimerForBreaksRunnable = infinityRunnableForBreakRounds();
+    runnableForRecyclerViewTimesForModeOne = runnableForRecyclerViewTimesForModeOne();
 
     emptyCycleList.setOnClickListener(v-> {
       mainActivityFragmentFrameLayout.startAnimation(slideInFromLeftShort);
@@ -4782,7 +4784,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (textViewDisplaySync.areModeOneTextViewsDifferent()) {
         textViewDisplaySync.setModeOneSecondTextView(textViewDisplaySync.getModeOneFirstTextView());
 
-        iterateRecyclerViewTimesOnModeOne();
         setTotalCycleTimeValuesToTextView();
       }
     }
@@ -4796,7 +4797,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setTotalCycleTimeValuesToTextView();
       }
     }
+  }
 
+  private void updateRecyclerViewStringIfTimerHasAlsoUpdated(TextViewDisplaySync textViewDisplaySync) {
+    if (mode == 1) {
+      savedCycleAdapter.notifyDataSetChanged();
+    }
   }
 
   private void setCyclesCompletedTextView() {
@@ -5017,7 +5023,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         long timeToIterate = timerIteration.getDifference();
         double caloriesToIterate = calculateCaloriesBurnedPerMillis() * timeToIterate;
 
-        //If calories have not iterated in hundredths during tick, display will not update, which is why they won't be 100% sync'd at faster interval delays.
         timerIteration.setNewDailyTotal(timerIteration.getPreviousDailyTotal() + timeToIterate);
         timerIteration.setNewActivityTotal(timerIteration.getPreviousActivityTotal() + timeToIterate);
         totalSetTimeForCurrentDayInMillis = timerIteration.getNewDailyTotal();
@@ -5031,7 +5036,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
         setAllActivityTimesAndCaloriesToTextViews();
-//        updateDailyStatTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         mHandler.postDelayed(this, 10);
       }
@@ -5106,21 +5110,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable runnableForRecyclerViewTimesForModeOne() {
+    ArrayList<Integer> integerArrayList = integerArrayOfRoundStringsForModeOne();
+
+    TimerIteration timerIteration = newTimerIterationInstance();
+    TextViewDisplaySync textViewDisplaySync = textViewDisplaySyncForModeOne();
 
     return new Runnable() {
       @Override
       public void run() {
+        updateRecyclerViewStringIfTimerHasAlsoUpdated(textViewDisplaySync);
 
+        iterateRecyclerViewTimesOnModeOne(integerArrayList);
+
+        mHandler.postDelayed(this, 50);
       }
     };
   }
 
-  private void iterateRecyclerViewTimesOnModeOne() {
-    ArrayList<Integer> integerCycleArray = integerArrayOfRoundStringsForModeOne();
+  private void iterateRecyclerViewTimesOnModeOne(ArrayList<Integer> integerArrayList) {
+    ArrayList<Integer> integerCycleArray = integerArrayList;
 
-    workoutCyclesArray.set(positionOfSelectedCycle, newRoundStringForModeOne(integerCycleArray));
-
-    savedCycleAdapter.notifyDataSetChanged();
+    workoutCyclesArray.set(positionOfSelectedCycle, newRoundStringForModeOne());
   }
 
   private ArrayList<Integer> integerArrayOfRoundStringsForModeOne() {
@@ -5138,8 +5148,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return newIntegerArray;
   }
 
-  private String newRoundStringForModeOne(ArrayList<Integer> arrayListToConvert) {
+  private String newRoundStringForModeOne() {
     Gson gson = new Gson();
+
+    ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeOne();
 
     int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
 
@@ -5868,12 +5880,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
           if (objectAnimator != null) objectAnimator.pause();
 
+          mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeOne);
           removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
         } else if (pausing == RESUMING_TIMER) {
           savedCycleAdapter.setTimerIsPaused(false);
           stateOfTimers.setModeOneTimerActive(true);
           stateOfTimers.setModeOneTimerPaused(false);
+
+          mHandler.post(runnableForRecyclerViewTimesForModeOne);
+          runnableForRecyclerViewTimesForModeOne = runnableForRecyclerViewTimesForModeOne();
 
           switch (typeOfRound.get(currentRound)) {
             case 1:
@@ -6295,6 +6311,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     mHandler.removeCallbacks(infinityTimerForSetsRunnable);
     mHandler.removeCallbacks(infinityTimerForBreaksRunnable);
+    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeOne);
 
     if (workoutTimeIntegerArray.size() > 0) {
       switch (typeOfRound.get(0)) {
@@ -6370,6 +6387,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     resetTimerLogicForAllTimers();
 
     removePomCycleTimeRunnable();
+    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeOne);
 
     currentProgressBarValueForModeThree = maxProgress;
     progressBarForPom.setProgress(maxProgress);
