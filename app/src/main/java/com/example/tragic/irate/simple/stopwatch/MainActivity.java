@@ -5112,12 +5112,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         newRoundString = gson.toJson(newIntegerArray);
         newRoundString = friendlyString(newRoundString);
 
-        workoutCyclesArray.set(currentRoundPosition, newRoundString);
+        workoutCyclesArray.set(positionOfSelectedCycle, newRoundString);
 
+        savedCycleAdapter.notifyDataSetChanged();
         Log.i("testArray", "cycles array is " + workoutCyclesArray);
-
-//        savedCycleAdapter.notifyDataSetChanged();
-
         mHandler.postDelayed(this, 1000);
 
       }
