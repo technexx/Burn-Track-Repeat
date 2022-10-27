@@ -5199,8 +5199,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         iterateRecyclerViewTimesOnModeThree(integerArrayList);
 
-        Log.i("testRecycler", "posting!");
-
         mHandler.postDelayed(this, 100);
       }
     };
@@ -5232,11 +5230,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private String newRoundStringForModeThree() {
     Gson gson = new Gson();
 
-    ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeOne();
+    ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeThree();
 
     int currentRoundPosition = pomDotCounter;
 
-    arrayListToConvert.set(currentRoundPosition, (int) setMillis);
+    arrayListToConvert.set(currentRoundPosition, (int) pomMillis);
 
     String newRoundString = "";
     newRoundString = gson.toJson(arrayListToConvert);
