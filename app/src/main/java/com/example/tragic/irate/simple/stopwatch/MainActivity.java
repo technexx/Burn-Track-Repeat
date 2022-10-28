@@ -646,7 +646,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Adding new cycle doesn't clear old cycle set/time textViews right away after launch.
   //Todo: Infinity symbol doesn't iterate up, and will set to "0" like non-infinity
   //Todo: "Pause" recyclerView button simply functions as a reset if all rounds are complete.
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
@@ -3174,21 +3173,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     runOnUiThread(() -> {
       deleteCyclePopupWindow.dismiss();
-      if (mode == 1) {
-        totalCycleSetTimeInMillis = 0;
-        totalCycleBreakTimeInMillis = 0;
-      }
-      if (mode == 3) {
-        totalCycleWorkTimeInMillis = 0;
-        totalCycleRestTimeInMillis = 0;
-      }
 
+      zeroOutTotalCycleTimes();
       cyclesCompleted = 0;
 
       total_set_time.setText("0");
       total_break_time.setText("0");
       setCyclesCompletedTextView();
     });
+  }
+
+  private void zeroOutTotalCycleTimes() {
+    if (mode == 1) {
+      totalCycleSetTimeInMillis = 0;
+      totalCycleBreakTimeInMillis = 0;
+    }
+    if (mode == 3) {
+      totalCycleWorkTimeInMillis = 0;
+      totalCycleRestTimeInMillis = 0;
+    }
   }
 
   private void setDefaultUserSettings() {
@@ -4391,6 +4394,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (isNewCycle) {
+        zeroOutTotalCycleTimes();
         positionOfSelectedCycle = workoutCyclesArray.size() - 1;
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
@@ -4440,6 +4444,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (isNewCycle) {
+        zeroOutTotalCycleTimes();
         positionOfSelectedCycle = pomArray.size() - 1;
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
