@@ -343,23 +343,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         return finalList;
     }
 
-    //Todo: Trying to split w/ bullet when we're refactoring w/ hyphen, which leads to smaller arrays for mSizeToggle.
-    public ArrayList<Integer> retrievedRoundSizeFromConcatenatedString(String stringToSeparate, String charToSplit) {
-        ArrayList<Integer> arrayToPopulate = new ArrayList<>();
-
-        String[] pulledValue = stringToSeparate.split(charToSplit);
-
-        for (int i=0; i<pulledValue.length; i++) {
-            arrayToPopulate.add(pulledValue[i].length());
-        }
-
-//        for (String s : pulledValue) {
-//            arrayToPopulate.add(s.length());
-//        }
-
-        return arrayToPopulate;
-    }
-
     public String convertSeconds(long totalSeconds) {
         DecimalFormat df = new DecimalFormat("00");
         long minutes;

@@ -646,7 +646,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: RecyclerView timer iteration is 1 lower than dots.
+  //Todo: "Pause" recyclerView button simply functions as a reset if all rounds are complete.
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
   //Todo: Notification persist on app close.
   //Todo: Test simultaneous timer endings.
@@ -1051,11 +1051,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     } else if (resumeOrReset == RESETTING_CYCLE_FROM_ADAPTER) {
       if (mode == 1) {
+        mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeOne);
         savedCycleAdapter.removeCycleAsActive();
         savedCycleAdapter.notifyDataSetChanged();
         resetCyclesTimer();
       }
       if (mode == 3) {
+        mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
         savedPomCycleAdapter.removeCycleAsActive();
         savedPomCycleAdapter.notifyDataSetChanged();
         resetPomCyclesTimer();
@@ -5146,7 +5148,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         iterateRecyclerViewTimesOnModeOne(integerArrayList);
         savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeft);
 
-        mHandler.postDelayed(this, 100);
+        mHandler.postDelayed(this, 50);
       }
     };
   }
@@ -5154,7 +5156,49 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void iterateRecyclerViewTimesOnModeOne(ArrayList<Integer> integerArrayList) {
     ArrayList<Integer> integerCycleArray = integerArrayList;
 
-    workoutCyclesArray.set(positionOfSelectedCycle, newRoundStringForModeOne());
+    int fetchedRoundType = typeOfRound.get(currentRound);
+    workoutCyclesArray.set(positionOfSelectedCycle, newRoundStringForModeOne(fetchedRoundType));
+  }
+
+  private String newRoundStringForModeOne(int typeOfRound) {
+    Gson gson = new Gson();
+    ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeOne();
+
+    long millisValueRetrieved = 0;
+    long millisValueToSet = 0;
+    int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
+
+    if (typeOfRound == 1 || typeOfRound == 3) {
+      millisValueRetrieved = setMillis;
+      if (typeOfRound == 1) {
+        millisValueToSet = setMillis + 999;
+      }
+      if (typeOfRound == 3) {
+        millisValueToSet = setMillis;
+      }
+
+    }
+    if (typeOfRound == 2 || typeOfRound == 4) {
+      millisValueRetrieved = breakMillis;
+      if (typeOfRound == 2) {
+        millisValueToSet = breakMillis + 999;
+      }
+      if (typeOfRound == 4) {
+        millisValueToSet = breakMillis;
+      }
+    }
+
+    if (millisValueRetrieved < 100) millisValueToSet = 0;
+
+    arrayListToConvert.set(currentRoundPosition, (int) millisValueToSet);
+
+    String newRoundString = "";
+    newRoundString = gson.toJson(arrayListToConvert);
+    newRoundString = friendlyString(newRoundString);
+
+    Log.i("testRun", "running!");
+
+    return newRoundString;
   }
 
   private ArrayList<Integer> integerArrayOfRoundStringsForModeOne() {
@@ -5172,22 +5216,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return newIntegerArray;
   }
 
-  private String newRoundStringForModeOne() {
-    Gson gson = new Gson();
-
-    ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeOne();
-
-    int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
-
-    arrayListToConvert.set(currentRoundPosition, (int) setMillis);
-
-    String newRoundString = "";
-    newRoundString = gson.toJson(arrayListToConvert);
-    newRoundString = friendlyString(newRoundString);
-
-    return newRoundString;
-  }
-
   private Runnable runnableForRecyclerViewTimesForModeThree() {
     ArrayList<Integer> integerArrayList = integerArrayOfRoundStringsForModeThree();
 
@@ -5202,7 +5230,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         iterateRecyclerViewTimesOnModeThree(integerArrayList);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(pomDotCounter);
 
-        mHandler.postDelayed(this, 100);
+        mHandler.postDelayed(this, 50);
       }
     };
   }
@@ -5220,8 +5248,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (pomArray.size() - 1 >= positionOfSelectedCycle)  {
       fetchedRounds = pomArray.get(positionOfSelectedCycle).split(" - ");
     }
-
-    Log.i("testRecycler", "string array is " + pomArray);
 
     for (int i = 0; i<fetchedRounds.length; i++) {
       newIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
