@@ -5139,7 +5139,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: Should we pause this at end of round?
   private Runnable runnableForRecyclerViewTimesForModeOne() {
     ArrayList<Integer> integerArrayList = integerArrayOfRoundStringsForModeOne();
 
@@ -5183,7 +5182,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         millisValueToSet = setMillis;
       }
 
+      if (millisValueRetrieved < 250) {
+        millisValueToSet = 0;
+      }
+
     }
+
     if (typeOfRound == 2 || typeOfRound == 4) {
       millisValueRetrieved = breakMillis;
       if (typeOfRound == 2) {
@@ -5192,10 +5196,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (typeOfRound == 4) {
         millisValueToSet = breakMillis;
       }
-    }
-
-    if (millisValueRetrieved < 1000) {
-      millisValueToSet = roundToNearestFullThousandth(millisValueRetrieved);
     }
 
     arrayListToConvert.set(currentRoundPosition, (int) millisValueToSet);
@@ -5774,6 +5774,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
     }
 
+    //Refreshes so recyclerView timer iteration will display "0" for ending round.
+    savedCycleAdapter.notifyDataSetChanged();
+    //Removed so next round in array does not display as "0".
+    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeOne);
     removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
 
     numberOfRoundsLeft--;
@@ -5845,6 +5849,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       pomDotCounter++;
     }
 
+    //Refreshes so recyclerView timer iteration will display "0" for ending round.
+    savedCycleAdapter.notifyDataSetChanged();
+    //Removed so next round in array does not display as "0".
+    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
+
     mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
 
   }
@@ -5862,6 +5871,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeft);
         dotsAdapter.resetModeOneAlpha();
         dotsAdapter.setModeOneAlpha();
+
+        //Re-posts after ends in nextRound().
+        mHandler.post(runnableForRecyclerViewTimesForModeOne);
 
         if (mHandler.hasCallbacks(endFadeForModeOne)) {
           mHandler.removeCallbacks(endFadeForModeOne);
@@ -5942,6 +5954,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomDotsAdapter.updatePomDotCounter(pomDotCounter);
         pomDotsAdapter.resetModeThreeAlpha();
         pomDotsAdapter.setModeThreeAlpha();
+
+        //Re-posts after ends in nextRound().
+        mHandler.post(runnableForRecyclerViewTimesForModeThree);
 
         if (mHandler.hasCallbacks(endFadeForModeThree)) {
           mHandler.removeCallbacks(endFadeForModeThree);
