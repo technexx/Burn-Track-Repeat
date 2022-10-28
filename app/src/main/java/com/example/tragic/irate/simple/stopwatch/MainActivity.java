@@ -5275,9 +5275,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     arrayListToConvert.set(currentRoundPosition, (int) millisValueToSet);
 
-    Log.i("testPom", "millis value is " + pomMillis);
-    Log.i("testPom", "array list is " + arrayListToConvert);
-
     String newRoundString = "";
     newRoundString = gson.toJson(arrayListToConvert);
     newRoundString = friendlyString(newRoundString);
