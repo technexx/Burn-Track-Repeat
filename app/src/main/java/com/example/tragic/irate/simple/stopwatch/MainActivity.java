@@ -646,8 +646,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Enter/exit from timer is adding a second to first round.
-  //Todo: Start of new recyclerView round carries over the 0.
+  //Todo: Adding new cycle doesn't clear old cycle set/time textViews right away after launch.
+  //Todo: First round as infinity symbol indented too far.
+  //Todo: Infinity symbol doesn't iterate up, and will set to "0" like non-infinity
   //Todo: "Pause" recyclerView button simply functions as a reset if all rounds are complete.
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
   //Todo: Notification persist on app close.
@@ -5181,11 +5182,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (typeOfRound == 3) {
         millisValueToSet = setMillis;
       }
-
-      if (millisValueRetrieved < 250) {
-        millisValueToSet = 0;
-      }
-
     }
 
     if (typeOfRound == 2 || typeOfRound == 4) {
@@ -5195,6 +5191,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       if (typeOfRound == 4) {
         millisValueToSet = breakMillis;
+      }
+    }
+
+    if (typeOfRound == 1 || typeOfRound == 3) {
+      if (millisValueRetrieved < 250) {
+        millisValueToSet = 0;
       }
     }
 
@@ -5712,6 +5714,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
+    //Refreshes so recyclerView timer iteration will display "0" for ending round. Needs to occur before round vars change below.
+    savedCycleAdapter.notifyDataSetChanged();
+    //Removed so next round in array does not display as "0".
+    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeOne);
+    removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
+
     stateOfTimers.setModeOneTimerPaused(false);
     stateOfTimers.setModeOneTimerDisabled(true);
 
@@ -5774,12 +5782,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
     }
 
-    //Refreshes so recyclerView timer iteration will display "0" for ending round.
-    savedCycleAdapter.notifyDataSetChanged();
-    //Removed so next round in array does not display as "0".
-    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeOne);
-    removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
-
     numberOfRoundsLeft--;
     if (currentRound < typeOfRound.size() - 1) {
       currentRound++;
@@ -5794,6 +5796,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       resetPomCyclesTimer();
       return;
     }
+
+    //Refreshes so recyclerView timer iteration will display "0" for ending round.
+    savedCycleAdapter.notifyDataSetChanged();
+    //Removed so next round in array does not display as "0".
+    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
 
     stateOfTimers.setModeThreeTimerPaused(false);
     stateOfTimers.setModeThreeTimerDisabled(true);
@@ -5848,11 +5855,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (pomDotCounter < 8) {
       pomDotCounter++;
     }
-
-    //Refreshes so recyclerView timer iteration will display "0" for ending round.
-    savedCycleAdapter.notifyDataSetChanged();
-    //Removed so next round in array does not display as "0".
-    mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
 
     mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
 
