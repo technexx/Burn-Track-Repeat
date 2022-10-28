@@ -646,6 +646,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Enter/exit from timer is adding a second to first round.
   //Todo: Start of new recyclerView round carries over the 0.
   //Todo: "Pause" recyclerView button simply functions as a reset if all rounds are complete.
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
@@ -5138,6 +5139,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  //Todo: Should we pause this at end of round?
   private Runnable runnableForRecyclerViewTimesForModeOne() {
     ArrayList<Integer> integerArrayList = integerArrayOfRoundStringsForModeOne();
 
@@ -6006,8 +6008,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           stateOfTimers.setModeOneTimerActive(true);
           stateOfTimers.setModeOneTimerPaused(false);
 
-          mHandler.post(runnableForRecyclerViewTimesForModeOne);
           runnableForRecyclerViewTimesForModeOne = runnableForRecyclerViewTimesForModeOne();
+          mHandler.post(runnableForRecyclerViewTimesForModeOne);
 
           switch (typeOfRound.get(currentRound)) {
             case 1:
