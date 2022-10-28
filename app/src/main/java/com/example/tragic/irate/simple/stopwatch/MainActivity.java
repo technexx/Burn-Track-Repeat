@@ -650,6 +650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: "Pause" recyclerView button simply functions as a reset if all rounds are complete.
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
   //Todo: Notification persist on app close.
+  //Todo: Test timer launch when cycle has ended from recyclerView.
   //Todo: Test simultaneous timer endings.
 
   //Todo: Cursor ghosting on adding rounds (seems to be just on first app launch).
@@ -1015,7 +1016,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
-        if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 2) {
+        if (typeOfRound.get(currentRound) == 1 || typeOfRound.get(currentRound) == 3) {
           timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
           changeTextSizeWithoutAnimator(setMillis);
         } else {
