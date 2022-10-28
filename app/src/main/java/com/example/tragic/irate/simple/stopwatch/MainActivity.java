@@ -5188,7 +5188,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    if (millisValueRetrieved < 100) millisValueToSet = 0;
+    if (millisValueRetrieved < 1000) {
+      millisValueToSet = roundToNearestFullThousandth(millisValueRetrieved);
+    }
 
     arrayListToConvert.set(currentRoundPosition, (int) millisValueToSet);
 
