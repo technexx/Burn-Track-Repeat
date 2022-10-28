@@ -321,8 +321,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           if (j<=mNumberOfRoundsCompleted-1) {
             span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.mid_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
+          //Todo: We can use several shades of a similar color instead of animation.
           if (j==mNumberOfRoundsCompleted) {
-
+            span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.white)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
 
         }

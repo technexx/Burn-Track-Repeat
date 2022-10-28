@@ -647,9 +647,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: getTimerVariablesForEachMode() will retain oob values if set during testing OR anytime during app use.
+  //Todo: Should mimic mode one's rounds for mode three.
+
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
   //Todo: Notification persist on app close.
-  //Todo: Test timer launch when cycle has ended from recyclerView.
   //Todo: Test simultaneous timer endings.
 
   //Todo: Cursor ghosting on adding rounds (seems to be just on first app launch).
@@ -1415,7 +1417,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //    prefEdit.putBoolean("disclaimerHasBeenAccepted", false);
 //    prefEdit.putBoolean("hasAppBeenLaunchedBefore", false);
 //    prefEdit.apply();
-
     launchDisclaimerIfNotPreviouslyAgreedTo();
     setPromptToLaunchUserSettingsOnFirstAppLaunch();
 
@@ -3917,6 +3918,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         savedPomCycleAdapter.notifyDataSetChanged();
       }
+
       prefEdit.putInt("positionOfSelectedCycleForModeThree", positionOfSelectedCycle);
     }
     prefEdit.apply();
@@ -5274,7 +5276,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Gson gson = new Gson();
     ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeThree();
 
-    int currentRoundPosition = 7 - (8 - pomDotCounter);
+    int currentRoundPosition = pomDotCounter;
 
     long millisValueRetrieved = pomMillis;
     long millisValueToSet = pomMillis +999;
