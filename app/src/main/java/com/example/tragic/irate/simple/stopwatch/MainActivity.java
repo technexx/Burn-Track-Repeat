@@ -647,7 +647,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Adding new cycle doesn't clear old cycle set/time textViews right away after launch.
-  //Todo: First round as infinity symbol indented too far.
   //Todo: Infinity symbol doesn't iterate up, and will set to "0" like non-infinity
   //Todo: "Pause" recyclerView button simply functions as a reset if all rounds are complete.
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.

@@ -287,15 +287,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (j == tempTypeArray.length - 1) bullet = "";
       //If round is counting up, create a Spannable w/ the count-down time of the round. Otherwise, create a new Spannable w/ a placeholder for an ImageSpan.
 
-      span = new SpannableString(" " + mContext.getString(R.string.infinity_test) + " " + bullet);
 
-      if (tempTypeArray[j].contains("1") || (tempTypeArray[j].contains("3"))) {
+      if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
         span = new SpannableString(tempWorkoutArray[j] + bullet);
       } else {
-        if (j != 0) {
-          tempSpace = 2;
+        if (j==0) {
+          span = new SpannableString(mContext.getString(R.string.infinity_test) + " " + bullet);
         } else {
-          tempSpace = 1;
+          span = new SpannableString(" " + mContext.getString(R.string.infinity_test) + " " + bullet);
         }
       }
 
