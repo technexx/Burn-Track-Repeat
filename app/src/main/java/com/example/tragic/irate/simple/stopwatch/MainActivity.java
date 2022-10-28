@@ -462,7 +462,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int cyclesCompleted;
   int lapsNumber;
 
-  int startRounds;
+  int startRoundsForModeOne;
   int numberOfRoundsLeftForModeOne;
   int numberOfRoundsLeftForModeThree;
   int currentRoundForModeOne;
@@ -3777,11 +3777,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (stateOfTimers.isModeOneTimerActive()) {
         if ((typeOfRound.get(currentRoundForModeOne) == 1) || (typeOfRound.get(currentRoundForModeOne) == 2)) {
           headerOne = setNotificationHeader("Workout", "Set", stateOfTimers.isModeOneTimerPaused());
-          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRounds, setMillis);
+          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, setMillis);
         }
         if ((typeOfRound.get(currentRoundForModeOne) == 3) || (typeOfRound.get(currentRoundForModeOne) == 4)) {
           headerOne = setNotificationHeader("Workout", "Break", stateOfTimers.isModeOneTimerPaused());
-          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRounds, breakMillis);
+          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, breakMillis);
         }
       }
 
@@ -3900,7 +3900,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size() - 1;
         savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
-        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeftForModeOne);
+        savedCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeOne - numberOfRoundsLeftForModeOne);
 
         savedCycleAdapter.notifyDataSetChanged();
       }
@@ -4582,8 +4582,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables() {
     totalSetTimeForSpecificActivityForCurrentDayInMillis = dailyStatsAccess.getTotalSetTimeForSelectedActivity();
     totalCaloriesBurnedForSpecificActivityForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForSelectedActivity();
-
-    Log.i("testStats", "activity total retrieved from db is " + totalSetTimeForSpecificActivityForCurrentDayInMillis);
   }
 
   private void retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList() {
@@ -5160,7 +5158,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateRecyclerViewStringIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         iterateRecyclerViewTimesOnModeOne(integerArrayList);
-        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeftForModeOne);
+        savedCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeOne - numberOfRoundsLeftForModeOne);
 
         mHandler.postDelayed(this, 50);
       }
@@ -5878,7 +5876,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeftForModeOne);
+        dotsAdapter.updateCycleRoundCount(startRoundsForModeOne, numberOfRoundsLeftForModeOne);
         dotsAdapter.resetModeOneAlpha();
         dotsAdapter.setModeOneAlpha();
 
@@ -6494,14 +6492,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       currentRoundForModeOne = 0;
-      startRounds = workoutTimeIntegerArray.size();
-      numberOfRoundsLeftForModeOne = startRounds;
+      startRoundsForModeOne = workoutTimeIntegerArray.size();
+      numberOfRoundsLeftForModeOne = startRoundsForModeOne;
 
       ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
 
       dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
       dotsAdapter.setTypeOfRoundList(typeOfRound);
-      dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeftForModeOne);
+      dotsAdapter.updateCycleRoundCount(startRoundsForModeOne, numberOfRoundsLeftForModeOne);
 
       dotsAdapter.resetModeOneAlpha();
       dotsAdapter.setModeOneAlpha();
