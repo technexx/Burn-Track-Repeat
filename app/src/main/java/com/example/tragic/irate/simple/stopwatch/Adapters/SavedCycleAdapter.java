@@ -321,9 +321,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           if (j<=mNumberOfRoundsCompleted-1) {
             span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.mid_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
-          //Todo: Since this executes constantly, animations will not work.
           if (j==mNumberOfRoundsCompleted) {
+
           }
+
         }
       }
 
@@ -388,7 +389,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           mHighlightPositionList.add(position);
           mWorkoutHolder.fullView.setBackgroundColor(Color.GRAY);
         }
-        //Callback to send position list (Using Strings to make removing values easier) back to Main.
         mOnHighlightListener.onCycleHighlight(mHighlightPositionList, false);
       }
     });

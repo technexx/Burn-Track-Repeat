@@ -463,7 +463,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int lapsNumber;
 
   int startRounds;
-  int numberOfRoundsLeft;
+  int numberOfRoundsLeftForModeOne;
   int currentRound;
 
   LinearLayoutManager lapRecyclerLayoutManager;
@@ -646,8 +646,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Infinity symbol doesn't iterate up, and will set to "0" like non-infinity
-  //Todo: "Pause" recyclerView button simply functions as a reset if all rounds are complete.
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
   //Todo: Notification persist on app close.
   //Todo: Test timer launch when cycle has ended from recyclerView.
@@ -1153,19 +1151,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onPauseOrResume(boolean timerIsPaused) {
     if (mode == 1) {
-      if (timerIsPaused) {
-        pauseAndResumeTimer(RESUMING_TIMER);
-      } else {
-        pauseAndResumeTimer(PAUSING_TIMER);
+      if (numberOfRoundsLeftForModeOne > 0) {
+        if (timerIsPaused) {
+          pauseAndResumeTimer(RESUMING_TIMER);
+        } else {
+          pauseAndResumeTimer(PAUSING_TIMER);
+        }
+        savedCycleAdapter.notifyDataSetChanged();
       }
-      savedCycleAdapter.notifyDataSetChanged();
     }
 
     if (mode == 3) {
-      if (timerIsPaused) {
-        pauseAndResumePomodoroTimer(RESUMING_TIMER);
-      } else {
-        pauseAndResumePomodoroTimer(PAUSING_TIMER);
+      if (pomDotCounter < 8) {
+        if (timerIsPaused) {
+          pauseAndResumePomodoroTimer(RESUMING_TIMER);
+        } else {
+          pauseAndResumePomodoroTimer(PAUSING_TIMER);
+        }
       }
     }
     savedPomCycleAdapter.notifyDataSetChanged();
@@ -3774,30 +3776,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (stateOfTimers.isModeOneTimerActive()) {
         if ((typeOfRound.get(currentRound) == 1) || (typeOfRound.get(currentRound) == 2)) {
           headerOne = setNotificationHeader("Workout", "Set", stateOfTimers.isModeOneTimerPaused());
-          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, setMillis);
+          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRounds, setMillis);
         }
         if ((typeOfRound.get(currentRound) == 3) || (typeOfRound.get(currentRound) == 4)) {
           headerOne = setNotificationHeader("Workout", "Break", stateOfTimers.isModeOneTimerPaused());
-          bodyOne = setNotificationBody(numberOfRoundsLeft, startRounds, breakMillis);
+          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRounds, breakMillis);
         }
       }
 
       if (stateOfTimers.isModeThreeTimerActive()) {
-        int numberOfRoundsLeft = 8 - pomDotCounter;
+        int roundsRemaining = 8 - pomDotCounter;
         switch (pomDotCounter) {
           case 0:
           case 2:
           case 4:
           case 6:
             headerTwo = setNotificationHeader("Pomodoro", "Work", stateOfTimers.isModeThreeTimerPaused());
-            bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+            bodyTwo = setNotificationBody(roundsRemaining, 8, pomMillis);
             break;
           case 1:
           case 3:
           case 5:
           case 7:
             headerTwo = setNotificationHeader("Pomodoro", "Break", stateOfTimers.isModeThreeTimerPaused());
-            bodyTwo = setNotificationBody(numberOfRoundsLeft, 8, pomMillis);
+            bodyTwo = setNotificationBody(roundsRemaining, 8, pomMillis);
             break;
         }
       }
@@ -3897,7 +3899,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size() - 1;
         savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
-        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeft);
+        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeftForModeOne);
 
         savedCycleAdapter.notifyDataSetChanged();
       }
@@ -5157,7 +5159,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateRecyclerViewStringIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         iterateRecyclerViewTimesOnModeOne(integerArrayList);
-        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeft);
+        savedCycleAdapter.setNumberOfRoundsCompleted(startRounds - numberOfRoundsLeftForModeOne);
 
         mHandler.postDelayed(this, 50);
       }
@@ -5177,7 +5179,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     long millisValueRetrieved = 0;
     long millisValueToSet = 0;
-    int currentRoundPosition = numberOfRoundsLeft - (numberOfRoundsLeft - currentRound);
+    int currentRoundPosition = numberOfRoundsLeftForModeOne - (numberOfRoundsLeftForModeOne - currentRound);
 
     if (typeOfRound == 1 || typeOfRound == 3) {
       millisValueRetrieved = setMillis;
@@ -5360,8 +5362,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(setMillis/1000));
 
-        if (workoutTimeIntegerArray.size() >= numberOfRoundsLeft) {
-          workoutTimeIntegerArray.set(workoutTimeIntegerArray.size() - numberOfRoundsLeft, (int) setMillis);
+        if (workoutTimeIntegerArray.size() >= numberOfRoundsLeftForModeOne) {
+          workoutTimeIntegerArray.set(workoutTimeIntegerArray.size() - numberOfRoundsLeftForModeOne, (int) setMillis);
         }
 
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
@@ -5406,8 +5408,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(breakMillis/1000));
 
-        if (workoutTimeIntegerArray.size() >= numberOfRoundsLeft) {
-          workoutTimeIntegerArray.set(workoutTimeIntegerArray.size() - numberOfRoundsLeft, (int) breakMillis);
+        if (workoutTimeIntegerArray.size() >= numberOfRoundsLeftForModeOne) {
+          workoutTimeIntegerArray.set(workoutTimeIntegerArray.size() - numberOfRoundsLeftForModeOne, (int) breakMillis);
         }
 
         ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
@@ -5713,7 +5715,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextRound(boolean endingEarly) {
-    if (numberOfRoundsLeft == 0) {
+    if (numberOfRoundsLeftForModeOne == 0) {
       mHandler.removeCallbacks(endFadeForModeOne);
       resetCyclesTimer();
       return;
@@ -5766,7 +5768,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     boolean isAlertRepeating = false;
 
-    if (numberOfRoundsLeft == 1 && isLastRoundSoundContinuous) {
+    if (numberOfRoundsLeftForModeOne == 1 && isLastRoundSoundContinuous) {
       isAlertRepeating = true;
     }
 
@@ -5787,7 +5789,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
     }
 
-    numberOfRoundsLeft--;
+    numberOfRoundsLeftForModeOne--;
     if (currentRound < typeOfRound.size() - 1) {
       currentRound++;
     }
@@ -5875,7 +5877,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return new Runnable() {
       @Override
       public void run() {
-        dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeft);
+        dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeftForModeOne);
         dotsAdapter.resetModeOneAlpha();
         dotsAdapter.setModeOneAlpha();
 
@@ -5889,10 +5891,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setMillis = 0;
         breakMillis = 0;
 
-        if (numberOfRoundsLeft > 0) {
+        if (numberOfRoundsLeftForModeOne > 0) {
           switch (typeOfRound.get(currentRound)) {
             case 1:
-              setMillis = workoutTimeIntegerArray.get(workoutTimeIntegerArray.size() - numberOfRoundsLeft);
+              setMillis = workoutTimeIntegerArray.get(workoutTimeIntegerArray.size() - numberOfRoundsLeftForModeOne);
               timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
 
               if (!objectAnimator.isStarted()) {
@@ -5921,7 +5923,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               break;
             case 3:
-              breakMillis = workoutTimeIntegerArray.get(workoutTimeIntegerArray.size() - numberOfRoundsLeft);
+              breakMillis = workoutTimeIntegerArray.get(workoutTimeIntegerArray.size() - numberOfRoundsLeftForModeOne);
               timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
 
               if (!objectAnimator.isStarted()) {
@@ -6492,13 +6494,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       currentRound = 0;
       startRounds = workoutTimeIntegerArray.size();
-      numberOfRoundsLeft = startRounds;
+      numberOfRoundsLeftForModeOne = startRounds;
 
       ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
 
       dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
       dotsAdapter.setTypeOfRoundList(typeOfRound);
-      dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeft);
+      dotsAdapter.updateCycleRoundCount(startRounds, numberOfRoundsLeftForModeOne);
 
       dotsAdapter.resetModeOneAlpha();
       dotsAdapter.setModeOneAlpha();
