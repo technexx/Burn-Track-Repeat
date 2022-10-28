@@ -646,6 +646,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Start of new recyclerView round carries over the 0.
   //Todo: "Pause" recyclerView button simply functions as a reset if all rounds are complete.
   //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
   //Todo: Notification persist on app close.
@@ -4316,12 +4317,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
 
           /////---------Testing pom round iterations---------------/////////
-//          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
+          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
+
           for (int i = 0; i < fetchedPomCycle.length; i++) {
             int integerValue = Integer.parseInt(fetchedPomCycle[i]);
-            pomValuesTime.add(integerValue);
+//            pomValuesTime.add(integerValue);
             pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue / 1000));
           }
+
+          Log.i("testRound", "string list is " + pomStringListOfRoundValues);
 
           pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
           pomDotsAdapter.updatePomDotCounter(pomDotCounter);
@@ -5198,8 +5202,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     newRoundString = gson.toJson(arrayListToConvert);
     newRoundString = friendlyString(newRoundString);
 
-    Log.i("testRun", "running!");
-
     return newRoundString;
   }
 
@@ -5260,12 +5262,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private String newRoundStringForModeThree() {
     Gson gson = new Gson();
-
     ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeThree();
 
     int currentRoundPosition = pomDotCounter;
 
-    arrayListToConvert.set(currentRoundPosition, (int) pomMillis);
+    long millisValueRetrieved = pomMillis;
+    long millisValueToSet = pomMillis +999;
+
+    if (millisValueRetrieved < 1000 ){
+      millisValueToSet = roundToNearestFullThousandth(millisValueRetrieved);
+    }
+
+    arrayListToConvert.set(currentRoundPosition, (int) millisValueToSet);
+
+    Log.i("testPom", "millis value is " + pomMillis);
+    Log.i("testPom", "array list is " + arrayListToConvert);
 
     String newRoundString = "";
     newRoundString = gson.toJson(arrayListToConvert);
