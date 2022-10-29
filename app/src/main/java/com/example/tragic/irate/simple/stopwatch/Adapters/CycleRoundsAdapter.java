@@ -165,12 +165,9 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       ModeOneRounds modeOneRounds = (ModeOneRounds) holder;
       modeOneRounds.selection_bullet.setVisibility(View.INVISIBLE);
 
-      Log.i("testBullet", "invisible for position " + position);
-
       if (mRoundSelected){
         if (position==mPositionOfSelectedRound) {
           modeOneRounds.selection_bullet.setVisibility(View.VISIBLE);
-          Log.i("testBullet", "visible for position " + position);
         }
       }
 

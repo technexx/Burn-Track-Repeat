@@ -650,13 +650,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Pom crash on last round bug: Should mimic mode one's rounds for mode three.
-
-  //Todo: Test simultaneous timer endings.
+  //Todo: 1 sec left on timeleft textView at end of round if on recyclerView and switching back to Timer.
+  //Todo: Some second skipping on Pom if resetting cycle times during active timer.
   //Todo: Total stats in frag can be 1 sec less than in timer.
   //Todo: Set/Break time can occassionally skip one if timer is reset very near to next iteration.
+  //Todo: Test simultaneous timer endings.
 
-  //Todo: Stats for Pom.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test tablet screens.
@@ -3377,6 +3376,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     fab.setEnabled(true);
+    cycleRoundsAdapter.setIsRoundCurrentlySelectedBoolean(false);
     cycleRoundsAdapter.notifyDataSetChanged();
 
     setSingleColumnRoundRecyclerView();
