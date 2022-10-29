@@ -464,8 +464,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int startRoundsForModeOne;
   int numberOfRoundsLeftForModeOne;
-  int numberOfRoundsLeftForModeThree;
   int currentRoundForModeOne;
+
+  int startRoundsForModeThree;
+  int numberOfRoundsLeftForModeThree;
+  int currentRoundForModeThree;
 
   LinearLayoutManager lapRecyclerLayoutManager;
 
@@ -1163,7 +1166,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (mode == 3) {
-      if (pomDotCounter < 8) {
+      if (numberOfRoundsLeftForModeThree > 0) {
         if (timerIsPaused) {
           pauseAndResumePomodoroTimer(RESUMING_TIMER);
         } else {
@@ -3785,21 +3788,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       if (stateOfTimers.isModeThreeTimerActive()) {
-        int roundsRemaining = 8 - pomDotCounter;
         switch (pomDotCounter) {
           case 0:
           case 2:
           case 4:
           case 6:
             headerTwo = setNotificationHeader("Pomodoro", "Work", stateOfTimers.isModeThreeTimerPaused());
-            bodyTwo = setNotificationBody(roundsRemaining, 8, pomMillis);
+            bodyTwo = setNotificationBody(numberOfRoundsLeftForModeThree, startRoundsForModeThree, pomMillis);
             break;
           case 1:
           case 3:
           case 5:
           case 7:
             headerTwo = setNotificationHeader("Pomodoro", "Break", stateOfTimers.isModeThreeTimerPaused());
-            bodyTwo = setNotificationBody(roundsRemaining, 8, pomMillis);
+            bodyTwo = setNotificationBody(numberOfRoundsLeftForModeThree, startRoundsForModeThree, pomMillis);
             break;
         }
       }
@@ -3912,7 +3914,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (isNewCycle) positionOfSelectedCycle = pomArray.size() - 1;
         savedPomCycleAdapter.setCycleAsActive();
         savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
-        savedPomCycleAdapter.setNumberOfRoundsCompleted(pomDotCounter);
+        savedPomCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeThree - numberOfRoundsLeftForModeThree);
 
         savedPomCycleAdapter.notifyDataSetChanged();
       }
@@ -5178,6 +5180,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     long millisValueRetrieved = 0;
     long millisValueToSet = 0;
+
     int currentRoundPosition = numberOfRoundsLeftForModeOne - (numberOfRoundsLeftForModeOne - currentRoundForModeOne);
 
     if (typeOfRound == 1 || typeOfRound == 3) {
@@ -5242,7 +5245,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         updateRecyclerViewStringIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         iterateRecyclerViewTimesOnModeThree(integerArrayList);
-        savedPomCycleAdapter.setNumberOfRoundsCompleted(pomDotCounter);
+        savedPomCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeThree - numberOfRoundsLeftForModeThree);
 
         mHandler.postDelayed(this, 50);
       }
@@ -5274,7 +5277,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Gson gson = new Gson();
     ArrayList<Integer> arrayListToConvert = integerArrayOfRoundStringsForModeThree();
 
-    int currentRoundPosition = pomDotCounter;
+    int currentRoundPosition = numberOfRoundsLeftForModeThree - (numberOfRoundsLeftForModeThree - currentRoundForModeThree);
 
     long millisValueRetrieved = pomMillis;
     long millisValueToSet = pomMillis +999;
@@ -5789,7 +5792,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     numberOfRoundsLeftForModeOne--;
-    if (currentRoundForModeOne < typeOfRound.size() - 1) {
+
+    if (currentRoundForModeOne < startRoundsForModeOne - 1) {
       currentRoundForModeOne++;
     }
 
@@ -5797,7 +5801,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void nextPomRound(boolean endingEarly) {
-    if (pomDotCounter == 8) {
+    if (numberOfRoundsLeftForModeThree == 0) {
       mHandler.removeCallbacks(endFadeForModeThree);
       resetPomCyclesTimer();
       return;
@@ -5860,6 +5864,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (pomDotCounter < 8) {
       pomDotCounter++;
+    }
+
+    numberOfRoundsLeftForModeThree--;
+
+    if (currentRoundForModeThree < startRoundsForModeThree - 1) {
+      currentRoundForModeThree++;
     }
 
     mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
@@ -5970,8 +5980,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           mHandler.removeCallbacks(endFadeForModeThree);
         }
 
-        if (pomDotCounter <= 7) {
-          pomMillis = pomValuesTime.get(pomDotCounter);
+        if (numberOfRoundsLeftForModeThree > 0) {
+          pomMillis = pomValuesTime.get(currentRoundForModeThree);
 
           timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
 
@@ -5981,6 +5991,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
           postPomCycleTimeRunnable();
         } else {
+          currentRoundForModeThree = 0;
           stateOfTimers.setModeThreeTimerEnded(true);
           animateTimerEnding();
           progressBarForPom.setProgress(0);
@@ -6283,7 +6294,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void modeThreeStartObjectAnimator() {
     if (currentProgressBarValueForModeThree == maxProgress) {
       stateOfTimers.setModeThreeTimerPaused(false);
-      pomMillis = pomValuesTime.get(pomDotCounter);
+      pomMillis = pomValuesTime.get(currentRoundForModeThree);
       instantiateAndStartObjectAnimatorForModeThree(pomMillis);
     } else {
       pomMillis = pomMillisUntilFinished;
@@ -6527,6 +6538,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetPomCyclesTimer() {
+    startRoundsForModeThree = 8;
+    currentRoundForModeThree = 0;
+    numberOfRoundsLeftForModeThree = startRoundsForModeThree;
+
     stateOfTimers.setModeThreeTimerPaused(true);
     stateOfTimers.setModeThreeTimerEnded(false);
     stateOfTimers.setModeThreeTimerDisabled(false);
@@ -6544,6 +6559,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (endAnimationForPomCyclesTimer != null) endAnimationForPomCyclesTimer.cancel();
 
     pomDotCounter = 0;
+
     if (pomValuesTime.size() > 0) {
       pomMillis = pomValuesTime.get(0);
       timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
