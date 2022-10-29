@@ -76,8 +76,8 @@ import androidx.core.app.NotificationCompat;
 import androidx.core.app.NotificationManagerCompat;
 import androidx.core.content.ContextCompat;
 import androidx.core.graphics.drawable.DrawableCompat;
+
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.preference.PreferenceManager;
@@ -647,15 +647,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: getTimerVariablesForEachMode() will retain oob values if set during testing OR anytime during app use.
-  //Todo: Should mimic mode one's rounds for mode three.
+  //Todo: Pom crash on last round bug: Should mimic mode one's rounds for mode three.
 
-  //Todo: Because adapter is refreshing, confirm button on Pom's will revert each refresh.
-  //Todo: Notification persist on app close.
   //Todo: Test simultaneous timer endings.
-
-  //Todo: Cursor ghosting on adding rounds (seems to be just on first app launch).
-  //Todo: Delete popUp coloring could use a few changes.
   //Todo: Total stats in frag can be 1 sec less than in timer.
   //Todo: Set/Break time can occassionally skip one if timer is reset very near to next iteration.
 
@@ -1048,6 +1042,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleViewsForTotalDailyAndCycleTimes(false);
 
         timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
+
+        savedPomCycleAdapter.setIsConfirmStringVisible(false);
       }
 
       timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
@@ -1060,6 +1056,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetCyclesTimer();
       }
       if (mode == 3) {
+        savedPomCycleAdapter.setIsConfirmStringVisible(false);
+
         mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
         savedPomCycleAdapter.removeCycleAsActive();
         savedPomCycleAdapter.notifyDataSetChanged();

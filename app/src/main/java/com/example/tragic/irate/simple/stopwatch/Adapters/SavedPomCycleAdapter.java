@@ -46,6 +46,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     boolean mTimerPaused;
     boolean mActiveCycle;
+    boolean isConfirmStringVisible;
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
 
@@ -55,7 +56,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int REST_COLOR;
 
     int fullViewBackGroundColor;
-
 
     public interface onPauseOrResumeListener {
         void onPauseOrResume(boolean timerIsPaused);
@@ -258,8 +258,11 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             return true;
         });
 
+        //Todo: Set confirm if textView equals Reset w/ in mActive conditional, and reset textView in RESUME/RESET and Reset() in Main.
         if (mActiveCycle) {
-            pomHolder.resetCycle.setText(R.string.reset);
+            if (!isConfirmStringVisible) {
+                pomHolder.resetCycle.setText(R.string.reset);
+            }
 
             if (position==mPositionOfActiveCycle) {
                 if (mTimerPaused) {
@@ -278,8 +281,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 pomHolder.resetCycle.setOnClickListener(v-> {
                     if (pomHolder.resetCycle.getText().equals(mContext.getString(R.string.reset))) {
                         pomHolder.resetCycle.setText(R.string.confirm_cycle_reset);
+                        isConfirmStringVisible = true;
                     } else {
                         mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
+//                        isConfirmStringVisible = false;
                     }
                 });
 
@@ -290,6 +295,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         } else {
             pomHolder.fullView.setBackgroundColor(fullViewBackGroundColor);
         }
+    }
+
+    public void setIsConfirmStringVisible(boolean isVisible) {
+        this.isConfirmStringVisible = isVisible;
     }
 
     @Override

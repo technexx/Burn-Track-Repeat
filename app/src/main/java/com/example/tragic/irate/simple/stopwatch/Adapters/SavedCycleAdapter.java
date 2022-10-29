@@ -85,6 +85,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   WorkoutHolder mWorkoutHolder;
 
+  int colorFadeProgressInteger;
+
   public interface onPauseOrResumeListener {
     void onPauseOrResume(boolean timerIsPaused);
   }
@@ -146,6 +148,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     return mHighlightMode;
   }
 
+  private void iterateColorFadeInteger() {
+    if (colorFadeProgressInteger < 6) {
+      colorFadeProgressInteger++;
+    } else {
+      colorFadeProgressInteger = 0;
+    }
+  }
+
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
   public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> typeOfRound, ArrayList<String> workoutTitle, ArrayList<Boolean> tdeeActivityExistsInCycleList, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
     this.mContext = context; mWorkoutList = workoutList; this.mTypeOfRound = typeOfRound; this.mWorkoutTitle = workoutTitle; this.mTdeeActivityExistsInCycleList = tdeeActivityExistsInCycleList; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
@@ -203,6 +213,29 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public void setPositionToToggle(int position) {
     this.mPositionToToggle = position;
+  }
+
+  private int colorFromFadeInteger(int value) {
+    int valueToReturn = 0;
+
+    switch (value) {
+      case 0:
+        valueToReturn = R.color.white; break;
+      case 1:
+        valueToReturn = R.color.fade_white_1; break;
+      case 2:
+        valueToReturn = R.color.fade_white_2; break;
+      case 3:
+        valueToReturn = R.color.fade_white_3; break;
+      case 4:
+        valueToReturn = R.color.fade_white_4; break;
+      case 5:
+        valueToReturn = R.color.fade_white_5; break;
+      case 6:
+        valueToReturn = R.color.fade_white_6; break;
+    }
+
+    return valueToReturn;
   }
 
   @NonNull
@@ -321,7 +354,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           if (j<=mNumberOfRoundsCompleted-1) {
             span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.mid_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
-          //Todo: We can use several shades of a similar color instead of animation.
           if (j==mNumberOfRoundsCompleted) {
             span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.white)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }

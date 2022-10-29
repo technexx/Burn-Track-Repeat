@@ -38,10 +38,11 @@
         android:id="@+id/pause_or_resume_cycle_button_for_mode_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/pom_view"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/reset_active_cycle_button_for_mode_3"
+        app:layout_constraintEnd_toStartOf="@id/pom_cycles_recycler_center_horizontal_guideline"
+        app:layout_constraintTop_toBottomOf="@id/pom_view"
         android:layout_marginTop="6dp"
+        android:layout_marginStart="30dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:textSize="21sp"
@@ -52,10 +53,11 @@
         android:id="@+id/reset_active_cycle_button_for_mode_3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/pom_view"
-        app:layout_constraintStart_toEndOf="@id/pause_or_resume_cycle_button_for_mode_3"
+        app:layout_constraintStart_toEndOf="@id/pom_cycles_recycler_center_horizontal_guideline"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pom_view"
         android:layout_marginTop="6dp"
+        android:layout_marginEnd="30dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:textSize="21sp"
@@ -71,5 +73,13 @@
         android:layout_marginTop="4dp"
         android:background="@color/mid_grey">
     </View>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/pom_cycles_recycler_center_horizontal_guideline"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".5">
+    </androidx.constraintlayout.widget.Guideline>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
