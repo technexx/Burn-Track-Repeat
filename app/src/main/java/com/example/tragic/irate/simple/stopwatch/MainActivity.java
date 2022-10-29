@@ -3778,11 +3778,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (stateOfTimers.isModeOneTimerActive()) {
         if ((typeOfRound.get(currentRoundForModeOne) == 1) || (typeOfRound.get(currentRoundForModeOne) == 2)) {
           headerOne = setNotificationHeader("Workout", "Set", stateOfTimers.isModeOneTimerPaused());
-          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, setMillis);
+          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, setMillis) + " " + getString(R.string.arrow_down);
         }
         if ((typeOfRound.get(currentRoundForModeOne) == 3) || (typeOfRound.get(currentRoundForModeOne) == 4)) {
           headerOne = setNotificationHeader("Workout", "Break", stateOfTimers.isModeOneTimerPaused());
-          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, breakMillis);
+          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, breakMillis) + " " + getString(R.string.arrow_up);
         }
       }
 
@@ -3859,11 +3859,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeRemaining = longToStringConverters.convertTimerValuesToStringForNotifications(dividedMillisForTimerDisplay(timeLeft));
     }
 
-    return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining, getUpOrDownArrowForNotifications());
+    return getString(R.string.notification_text, currentTimerRound, totalRounds, timeRemaining);
   }
 
   private Runnable notifcationsRunnable() {
-    //Instance of class for first value to compare. updateNotificationsIfTimerTextViewHasChanged()... fetches the second.
     TextViewDisplaySync textViewDisplaySync = new TextViewDisplaySync();
 
     textViewDisplaySync.setModeOneFirstTextView((String) timeLeftForCyclesTimer.getText());
@@ -3880,15 +3879,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  //Todo: Only shows arrow if Main is on mode 1.
   private String getUpOrDownArrowForNotifications() {
     String stringToReturn = "";
 
-    if (mode == 1) {
-      if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 3) {
-        stringToReturn = getString(R.string.arrow_down);
-      } else {
-        stringToReturn = getString(R.string.arrow_up);
-      }
+    if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 3) {
+      stringToReturn = getString(R.string.arrow_down);
+    } else {
+      stringToReturn = getString(R.string.arrow_up);
     }
 
     return stringToReturn;
