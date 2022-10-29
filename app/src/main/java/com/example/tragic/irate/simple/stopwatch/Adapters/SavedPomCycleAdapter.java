@@ -258,7 +258,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             return true;
         });
 
-        //Todo: Set confirm if textView equals Reset w/ in mActive conditional, and reset textView in RESUME/RESET and Reset() in Main.
         if (mActiveCycle) {
             if (!isConfirmStringVisible) {
                 pomHolder.resetCycle.setText(R.string.reset);

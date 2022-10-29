@@ -650,7 +650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: 1 sec left on timeleft textView at end of round if on recyclerView and switching back to Timer.
   //Todo: Total stats in frag can be 1 sec less than in timer.
   //Todo: Set/Break time can occassionally skip one if timer is reset very near to next iteration.
   //Todo: Test simultaneous timer endings.
@@ -1013,10 +1012,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
         if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 3) {
-          timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
+          if (numberOfRoundsLeftForModeOne > 0) {
+            timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
+          }
           changeTextSizeWithoutAnimator(setMillis);
         } else {
-          timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
+          if (numberOfRoundsLeftForModeOne > 0) {
+            timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
+          }
           changeTextSizeWithoutAnimator(breakMillis);
         }
 
@@ -1039,10 +1042,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setTotalCycleTimeValuesToTextView();
         // setStoredSetAndBreakTimeOnPomCycleResume();
 
-        changeTextSizeWithoutAnimator(pomMillis);
         toggleViewsForTotalDailyAndCycleTimes(false);
 
-        timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
+        if (numberOfRoundsLeftForModeThree > 0) {
+          timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
+        }
+        changeTextSizeWithoutAnimator(pomMillis);
 
         savedPomCycleAdapter.setIsConfirmStringVisible(false);
       }
@@ -5981,6 +5986,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomMillis = pomValuesTime.get(currentRoundForModeThree);
 
           timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
+
+          Log.i("testTimer", "setting to millis String in post-round-runnable");
 
           if (!objectAnimatorPom.isStarted()) {
             modeThreeStartObjectAnimator();

@@ -343,7 +343,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         span.setSpan(new ForegroundColorSpan(SET_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
       } else
         span.setSpan(new ForegroundColorSpan(BREAK_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-
+      //Todo: Diff. size for <1920h.
       if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
         span.setSpan(new AbsoluteSizeSpan(26, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
       }
@@ -356,6 +356,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           }
           if (j==mNumberOfRoundsCompleted) {
             span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.white)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+//            if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
+//              span.setSpan(new AbsoluteSizeSpan(28, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+//            } else {
+//              span.setSpan(new AbsoluteSizeSpan(22, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+//            }
           }
 
         }
