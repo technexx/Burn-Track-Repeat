@@ -63,7 +63,6 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
         SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
         SharedPreferences.Editor prefEdit = prefShared.edit();
-//        SharedPreferences prefShared = getActivity().getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
         setPreference = findPreference("listPrefSoundSettingForSets");
         breakPreference = findPreference("listPrefSoundSettingForBreaks");
@@ -214,6 +213,5 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
     private String entryValuesKey(CharSequence[] keyList, int entry) {
         return (String) keyList[entry];
-
     }
 }

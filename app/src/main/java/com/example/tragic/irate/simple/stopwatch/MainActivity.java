@@ -3208,7 +3208,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     retrieveUserStats();
 
     SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-//    SharedPreferences prefShared = getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
     String defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
     String defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_twice");

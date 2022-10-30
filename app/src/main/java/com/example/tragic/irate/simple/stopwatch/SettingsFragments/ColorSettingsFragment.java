@@ -58,11 +58,12 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.color_settings_fragment_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues(getContext());
 
-        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getContext());
-//        SharedPreferences prefShared = getActivity().getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
+        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        SharedPreferences.Editor prefEdit = prefShared.edit();
 
         setPreference = findPreference("listPrefColorSettingForSets");
         breakPreference = findPreference("listPrefColorSettingForBreaks");
+
         workPreference = findPreference("listPrefColorSettingForWork");
         miniBreakPreference =  findPreference("listPrefColorSettingForMiniBreaks");
         fullBreakPreference = findPreference("listPrefColorSettingForFullBreak");
@@ -106,6 +107,10 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryTextChange(colorEntryListForSets, setValue);
             setPreference.setSummary(entryString);
+
+            prefEdit.putString("colorSettingForSets", entryValuesKey(setPreference.getEntryValues(), setValue));
+            prefEdit.apply();
+
             return true;
         });
 
@@ -115,6 +120,10 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryTextChange(colorEntryListForBreaks, breakValue);
             breakPreference.setSummary(entryString);
+
+            prefEdit.putString("colorSettingForBreaks", entryValuesKey(breakPreference.getEntryValues(), breakValue));
+            prefEdit.apply();
+
             return true;
         });
 
@@ -124,6 +133,10 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryTextChange(colorEntryListForWork, workValue);
             workPreference.setSummary(entryString);
+
+            prefEdit.putString("colorSettingForWork", entryValuesKey(workPreference.getEntryValues(), workValue));
+            prefEdit.apply();
+
             return true;
         });
 
@@ -133,6 +146,10 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryTextChange(colorEntryListForMiniBreaks, miniBreakValue);
             miniBreakPreference.setSummary(entryString);
+
+            prefEdit.putString("colorSettingForMiniBreaks", entryValuesKey(miniBreakPreference.getEntryValues(), miniBreakValue));
+            prefEdit.apply();
+
             return true;
         });
 
@@ -142,6 +159,10 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryTextChange(colorEntryListForMFullBreak, fullBreakValue);
             fullBreakPreference.setSummary(entryString);
+
+            prefEdit.putString("colorSettingForFullBreak", entryValuesKey(fullBreakPreference.getEntryValues(), fullBreakValue));
+            prefEdit.apply();
+
             return true;
         });
     }
@@ -176,5 +197,9 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
 
     private String summaryTextChange(CharSequence[] settingsList, int entry) {
         return (String) settingsList[entry];
+    }
+
+    private String entryValuesKey(CharSequence[] keyList, int entry) {
+        return (String) keyList[entry];
     }
 }
