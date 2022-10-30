@@ -2079,6 +2079,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             tabThree = caloriesComparisonTabLayout.newTab().setText("Calories Compared");
         }
 
+//        tabOne.setCustomView(R.layout.custom_tab_layout);
+//        tabTwo.setCustomView(R.layout.custom_tab_layout);
+//        tabThree.setCustomView(R.layout.custom_tab_layout);
+
         caloriesComparisonTabLayout.addTab(tabOne);
         caloriesComparisonTabLayout.addTab(tabTwo);
         caloriesComparisonTabLayout.addTab(tabThree);
@@ -2088,6 +2092,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    //Todo: We have a custom tab here!
     private void setCustomTextViewOnTab(TabLayout.Tab tabToChange) {
         TextView tabTextView = new TextView(getContext());
         tabToChange.setCustomView(tabTextView);
@@ -2097,7 +2102,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tabTextView.setText(tabToChange.getText());
         tabTextView.setTextSize(16);
-        tabTextView.setGravity(Gravity.CENTER_HORIZONTAL);
+        tabTextView.setGravity(Gravity.CENTER);
 
         if (phoneHeight <= 1920) {
             tabTextView.setMinLines(1);

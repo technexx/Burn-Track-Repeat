@@ -30,10 +30,11 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
     ListPreference setPreference;
     ListPreference breakPreference;
-    ListPreference preferenceForLastCycleRound;
+    SwitchPreference preferenceForLastCycleRound;
+
     ListPreference workPreference;
     ListPreference miniBreakPreference;
-    ListPreference preferenceForRestRound;
+    SwitchPreference preferenceForRestRound;
 
     String defaultSoundSettingForSets;
     String defaultSoundSettingForBreaks;

@@ -650,9 +650,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Pom vibration settings not saving.
   //Todo: First Stats Recycler tab in large emulator is one line that is uncentered on top.
       //Todo: Consider replacing w/ simple textViews.
+  //Todo: Have recyclerView iterations hit 0 before vibrations begin.
   //Todo: Total stats in frag can be 1 sec less than in timer.
 
   //Todo: Test simultaneous timer endings.
@@ -3223,8 +3223,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "green_setting");
     String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
     String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "cyan_setting");
-
-    Log.i("testSettings", "value retrieved is " + defaultSoundSettingForWork);
 
     vibrationSettingForSets = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
