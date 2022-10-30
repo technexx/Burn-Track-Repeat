@@ -650,13 +650,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Pom vibration settings not saving.
+  //Todo: First Stats Recycler tab in large emulator is one line that is uncentered on top.
+      //Todo: Consider replacing w/ simple textViews.
   //Todo: Total stats in frag can be 1 sec less than in timer.
-  //Todo: Set/Break time can occassionally skip one if timer is reset very near to next iteration.
-  //Todo: Test simultaneous timer endings.
 
+  //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
-  //Todo: Test tablet screens.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
   //Todo: Test w/ fresh install for all default values.
@@ -668,10 +669,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
-  //Todo: Right now we're not recalling the total set/break/work/rest time from globalSaveTotalTimesAndCaloriesInDatabaseRunnable().
-      //Todo: May want to revert that, for Pom at least.
   //Todo: if (mode == 1) and if (mode == 3) should be checked if weird timer bugs occur.
-  //Todo: android:launchMode="singleTop" added to manifest.
 
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtones?
@@ -679,6 +677,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add Day/Night modes.
   //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle
   //Todo: storeDailyTimesForCycleResuming() and setStoredDailyTimesForCycleResuming() commented out when using ms for daily stats.
+  //Todo: Tablet display needs work.
+  //Todo: Can be done later. Not meant for tablets.
+  //Todo Ideally, drawables should each have several different densities in different folders.
 
   //Drawable height may sync w/ textView height for alignment.
   //We can also commit just specific files, remember!
@@ -5334,6 +5335,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           totalCycleRestTimeInMillis = timerIteration.getNewTotal();
         }
 
+//        Log.i("testPom", "work time is " + totalCycleWorkTimeInMillis);
+//        Log.i("testPom", "rest time is " + totalCycleRestTimeInMillis);
+
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
         mHandler.postDelayed(this, 10);
@@ -5748,7 +5752,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         timeLeftForCyclesTimer.setText("0");
       }
       if (!trackActivityWithinCycle) {
-//        roundCycleTimeValuesToNearestThousandth();
+        roundCycleTimeValuesToNearestThousandth();
       }
     }
 
@@ -5817,12 +5821,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeThreeTimerPaused(false);
     stateOfTimers.setModeThreeTimerDisabled(true);
 
-    if (!endingEarly) {
-      timeLeftForPomCyclesTimer.setText("0");
-      setNotificationValues();
-//      roundPomCycleTimeValuesToNearestThousandth();
-    } else {
+    if (endingEarly) {
       roundDownPomCycleTimeValues();
+    } else {
+      timeLeftForPomCyclesTimer.setText("0");
+//      setNotificationValues();
+      roundPomCycleTimeValuesToNearestThousandth();
     }
 
     if (mode == 3) {

@@ -146,7 +146,7 @@ public class PomDotsAdapter extends RecyclerView.Adapter<PomDotsAdapter.PomDotsV
     }
 
     private float textSizeForEachRound(int numberOfRoundChars) {
-        int floatToReturn = 0;
+        int floatToReturn = 21;
 
         if (numberOfRoundChars == 4) {
             floatToReturn = 21;
