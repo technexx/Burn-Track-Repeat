@@ -30,8 +30,10 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
     ListPreference setPreference;
     ListPreference breakPreference;
+    ListPreference preferenceForLastCycleRound;
     ListPreference workPreference;
     ListPreference miniBreakPreference;
+    ListPreference preferenceForRestRound;
 
     String defaultSoundSettingForSets;
     String defaultSoundSettingForBreaks;
@@ -59,24 +61,25 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         setPreferencesFromResource(R.xml.sounds_settings_fragment_layout, rootKey);
         changeSettingsValues = new ChangeSettingsValues(getContext());
 
-        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getActivity());
+        SharedPreferences prefShared = PreferenceManager.getDefaultSharedPreferences(getActivity().getApplicationContext());
+        SharedPreferences.Editor prefEdit = prefShared.edit();
 //        SharedPreferences prefShared = getActivity().getApplicationContext().getSharedPreferences("sharedPrefForSettings", 0);
 
         setPreference = findPreference("listPrefSoundSettingForSets");
         breakPreference = findPreference("listPrefSoundSettingForBreaks");
-        SwitchPreference lastRoundPreference = findPreference("listPrefSoundSettingForLastCycleRound");
+        preferenceForLastCycleRound = findPreference("listPrefSoundSettingForLastCycleRound");
 
         workPreference = findPreference("listPrefSoundSettingForWork");
         miniBreakPreference = findPreference("listPrefSoundSettingForMiniBreaks");
-        SwitchPreference fullBreakPreference = findPreference("listPrefSoundSettingForLastCycleRound");
+        preferenceForRestRound = findPreference("listPrefSoundSettingForLastCycleRound");
 
         defaultSoundSettingForSets = prefShared.getString("soundSettingForSets", "vibrate_once");
         defaultSoundSettingForBreaks = prefShared.getString("soundSettingForBreaks", "vibrate_twice");
+        boolean defaultSoundSettingForFinalCyclesRound = prefShared.getBoolean("soundSettingForFinalCyclesRound", true);
 
-        defaultSoundSettingForWork = prefShared.getString("listPrefSoundSettingForWork", "vibrate_once");
-        defaultSoundSettingForMiniBreaks = prefShared.getString("listPrefSoundSettingForMiniBreaks", "vibrate_twice");
-
-        Log.i("testSettings", "default settings for sets in fragment is " + defaultSoundSettingForSets);
+        defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
+        defaultSoundSettingForMiniBreaks = prefShared.getString("soundSettingForMiniBreaks", "vibrate_twice");
+        boolean defaultSoundSettingForRestRound = prefShared.getBoolean("soundSettingForRestRound", true);
 
         CharSequence[] soundEntryListForSets = setPreference.getEntries();
         CharSequence[] soundEntryListForBreaks = breakPreference.getEntries();
@@ -107,6 +110,9 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
             String entryString = summaryTextChange(soundEntryListForSets, setValue);
             setPreference.setSummary(entryString);
 
+            prefEdit.putString("soundSettingForSets", entryValuesKey(setPreference.getEntryValues(), setValue));
+            prefEdit.apply();
+
             return true;
         });
 
@@ -116,14 +122,23 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryTextChange(soundEntryListForBreaks, breaksValue);
             breakPreference.setSummary(entryString);
+
+            prefEdit.putString("soundSettingForBreaks", entryValuesKey(breakPreference.getEntryValues(), breaksValue));
+            prefEdit.apply();
+
             return true;
         });
 
-        lastRoundPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+        preferenceForLastCycleRound.setOnPreferenceChangeListener((preference, newValue) -> {
             boolean isInfinityEnabled = (boolean) newValue;
             int infinityInteger = 0;
             if (isInfinityEnabled) infinityInteger = 1;
+
             mOnChangedSoundSetting.changeSoundSetting(LAST_ROUND_SETTING, infinityInteger);
+
+            prefEdit.putBoolean("soundSettingForLastRound", isInfinityEnabled);
+            prefEdit.apply();
+
             return true;
         });
 
@@ -133,6 +148,10 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryTextChange(soundEntryListForWork, workValue);
             workPreference.setSummary(entryString);
+
+            prefEdit.putString("soundSettingForWork", entryValuesKey(workPreference.getEntryValues(), workValue));
+            prefEdit.apply();
+
             return true;
         });
 
@@ -142,22 +161,29 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
             String entryString = summaryTextChange(soundEntryListForMiniBreaks, miniBreakValue);
             miniBreakPreference.setSummary(entryString);
+
+            prefEdit.putString("soundSettingForMiniBreaks", entryValuesKey(miniBreakPreference.getEntryValues(), miniBreakValue));
+            prefEdit.apply();
+
             return true;
         });
 
-        fullBreakPreference.setOnPreferenceChangeListener((preference, newValue) -> {
+        preferenceForRestRound.setOnPreferenceChangeListener((preference, newValue) -> {
             boolean isInfinityEnabled = (boolean) newValue;
             int infinityInteger = 0;
+
             if (isInfinityEnabled) infinityInteger = 1;
             mOnChangedSoundSetting.changeSoundSetting(FULL_BREAK_SETTING, infinityInteger);
+
+            prefEdit.putBoolean("soundSettingForRestRound", isInfinityEnabled);
+            prefEdit.apply();
+
             return true;
         });
     }
 
     private void setDefaultSoundSettingsIfNoneSelected() {
         String[] soundStringArray = getResources().getStringArray(R.array.sound_setting_options);
-
-        Log.i("testSettings", "setting default");
 
         if (defaultSoundSettingForSets.equals("")) {
             setPreference.setSummary(soundStringArray[1]);
@@ -186,4 +212,8 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
         return (String) settingsList[entry];
     }
 
+    private String entryValuesKey(CharSequence[] keyList, int entry) {
+        return (String) keyList[entry];
+
+    }
 }

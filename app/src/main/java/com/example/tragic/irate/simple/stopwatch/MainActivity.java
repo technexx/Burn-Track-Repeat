@@ -3216,7 +3216,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     String defaultSoundSettingForWork = prefShared.getString("soundSettingForWork", "vibrate_once");
     String defaultSoundSettingForMiniBreak = prefShared.getString("soundSettingForMiniBreaks", "vibrate_twice");
-    boolean defaultSoundSettingForFullBreak = prefShared.getBoolean("soundSettingForFullBreak", true);
+    boolean defaultSoundSettingForFullBreak = prefShared.getBoolean("soundSettingForRestRound", true);
 
     String defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "green_setting");
     String defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "red_setting");
@@ -3225,7 +3225,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
     String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "cyan_setting");
 
-    Log.i("testSettings", "default settings for sets in Main is " + defaultSoundSettingForSets);
+    Log.i("testSettings", "value retrieved is " + defaultSoundSettingForWork);
 
     vibrationSettingForSets = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
     vibrationSettingForBreaks = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForBreaks);
@@ -3885,7 +3885,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
-  //Todo: Only shows arrow if Main is on mode 1.
   private String getUpOrDownArrowForNotifications() {
     String stringToReturn = "";
 
