@@ -650,7 +650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Have recyclerView iterations hit 0 before vibrations begin.
+  //Todo: RecyclerView iterations hitting 0: Mode 1 is fine, but breaks don't move at all. Mode 3 isn't smooth/delays the hit to 0 slightly.
   //Todo: Total stats in frag can be 1 sec less than in timer.
 
   //Todo: Test simultaneous timer endings.
@@ -5186,19 +5186,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     int currentRoundPosition = numberOfRoundsLeftForModeOne - (numberOfRoundsLeftForModeOne - currentRoundForModeOne);
 
-    if (typeOfRound == 1 || typeOfRound == 3) {
+    if (typeOfRound == 1 || typeOfRound == 2) {
       millisValueRetrieved = setMillis;
       if (typeOfRound == 1) {
         millisValueToSet = setMillis + 999;
       }
-      if (typeOfRound == 3) {
+      if (typeOfRound == 2) {
         millisValueToSet = setMillis;
       }
     }
 
-    if (typeOfRound == 2 || typeOfRound == 4) {
+    if (typeOfRound == 3 || typeOfRound == 4) {
       millisValueRetrieved = breakMillis;
-      if (typeOfRound == 2) {
+      if (typeOfRound == 3) {
         millisValueToSet = breakMillis + 999;
       }
       if (typeOfRound == 4) {
