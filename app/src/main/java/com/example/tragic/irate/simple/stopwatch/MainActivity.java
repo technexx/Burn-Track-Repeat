@@ -650,7 +650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: RecyclerView iterations hitting 0: Mode 1 is fine, but breaks don't move at all. Mode 3 isn't smooth/delays the hit to 0 slightly.
   //Todo: Total stats in frag can be 1 sec less than in timer.
 
   //Todo: Test simultaneous timer endings.
@@ -4833,6 +4832,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         textViewDisplaySync.setModeOneSecondTextView(textViewDisplaySync.getModeOneFirstTextView());
 
         savedCycleAdapter.notifyDataSetChanged();
+
       }
     }
 
@@ -5257,7 +5257,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void iterateRecyclerViewTimesOnModeThree(ArrayList<Integer> integerArrayList) {
     ArrayList<Integer> integerCycleArray = integerArrayList;
-
     pomArray.set(positionOfSelectedCycle, newRoundStringForModeThree());
   }
 
@@ -5285,8 +5284,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long millisValueRetrieved = pomMillis;
     long millisValueToSet = pomMillis +999;
 
-    if (millisValueRetrieved < 1000 ){
-      millisValueToSet = roundToNearestFullThousandth(millisValueRetrieved);
+    if (millisValueRetrieved < 250) {
+      millisValueToSet = 0;
     }
 
     arrayListToConvert.set(currentRoundPosition, (int) millisValueToSet);
@@ -5334,9 +5333,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (POM_CYCLE_TIME_TO_ITERATE == POM_CYCLE_REST) {
           totalCycleRestTimeInMillis = timerIteration.getNewTotal();
         }
-
-//        Log.i("testPom", "work time is " + totalCycleWorkTimeInMillis);
-//        Log.i("testPom", "rest time is " + totalCycleRestTimeInMillis);
 
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
@@ -5814,7 +5810,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     //Refreshes so recyclerView timer iteration will display "0" for ending round.
-    savedCycleAdapter.notifyDataSetChanged();
+    savedPomCycleAdapter.notifyDataSetChanged();
     //Removed so next round in array does not display as "0".
     mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
 
