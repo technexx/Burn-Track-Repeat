@@ -328,8 +328,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ConstraintLayout.LayoutParams totalSetTimeHeaderLayoutParams;
   ConstraintLayout.LayoutParams totalBreakTimeHeaderLayoutParams;
 
-  ConstraintLayout.LayoutParams roundRecyclerOneLayoutParams;
-
   ConstraintLayout.LayoutParams firstRoundHeaderParams;
   ConstraintLayout.LayoutParams secondRoundHeaderParams;
   ConstraintLayout.LayoutParams thirdRoundHeaderParams;
@@ -650,7 +648,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Total stats in frag can be 1 sec less than in timer.
+  //Todo: Consider time instead of infinity symbol for recyclerView - could do normal font/outlined/etc.
+  //Todo: Active cycle w/ activity in recyclerView layout could use some love.
+  //Todo: Editing activity in popUp shows correct cat but defaults to 0 position in sub cat.
+  //Todo: Minimize calendar animation - could try fading the stats bar.
 
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -666,7 +667,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
-  //Todo: if (mode == 1) and if (mode == 3) should be checked if weird timer bugs occur.
 
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtones?
@@ -693,7 +693,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     mHandler.removeCallbacks(globalNotficationsRunnable);
 
 //    inputMethodManager.hideSoftInputFromWindow(mainView.getWindowToken(), 0);
-
   }
 
   @Override
@@ -2281,9 +2280,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setRoundRecyclersOnAdaptersAndLayoutManagers() {
-//    GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 2);
-//    gridLayoutManager.setOrientation(GridLayoutManager.VERTICAL);
-
     GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager.setOrientation(GridLayoutManager.HORIZONTAL);
 
@@ -2568,8 +2564,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cyclesCompletedLayoutParams = (ConstraintLayout.LayoutParams) cycles_completed_textView.getLayoutParams();
     totalSetTimeHeaderLayoutParams = (ConstraintLayout.LayoutParams) total_set_header.getLayoutParams();
     totalBreakTimeHeaderLayoutParams = (ConstraintLayout.LayoutParams) total_break_header.getLayoutParams();
-
-    roundRecyclerOneLayoutParams = (ConstraintLayout.LayoutParams) roundRecycler.getLayoutParams();
 
     firstRoundHeaderParams = (ConstraintLayout.LayoutParams) firstRoundTypeHeaderInEditPopUp.getLayoutParams();
     secondRoundHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
@@ -3772,14 +3766,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Iteration runnables reference this, and we set those at app start.
   private void setNotificationValues() {
     if (!dismissNotification) {
-      String headerOne = "";
-      String headerTwo = "";
-      String headerThree = "";
-      String bodyOne = "";
-      String bodyTwo = "";
-      String bodyThree = "";
+      String headerOne = " ";
+      String headerTwo = " ";
+      String headerThree = " ";
+      String bodyOne = " ";
+      String bodyTwo = " ";
+      String bodyThree = " ";
 
       if (stateOfTimers.isModeOneTimerActive()) {
         if ((typeOfRound.get(currentRoundForModeOne) == 1) || (typeOfRound.get(currentRoundForModeOne) == 2)) {
@@ -4132,7 +4127,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         subtractedRoundIsFading = true;
       } else {
-        showToastIfNoneActive("No rounds to clear!");
+        showToastIfNoneActive("Nothing to clear!");
       }
     }
   }
@@ -6632,7 +6627,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycle_title_textView.setVisibility(View.VISIBLE);
       tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
       cycles_completed_textView.setVisibility(View.VISIBLE);
-//      reset_total_cycle_times.setVisibility(View.VISIBLE);
+      reset_total_cycle_times.setVisibility(View.VISIBLE);
 
       total_set_header.setVisibility(View.VISIBLE);
       total_set_time.setVisibility(View.VISIBLE);
@@ -6653,7 +6648,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycle_title_textView.setVisibility(View.GONE);
       tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
       cycles_completed_textView.setVisibility(View.INVISIBLE);
-//      reset_total_cycle_times.setVisibility(View.INVISIBLE);
+      reset_total_cycle_times.setVisibility(View.INVISIBLE);
 
       total_set_header.setVisibility(View.INVISIBLE);
       total_set_time.setVisibility(View.INVISIBLE);

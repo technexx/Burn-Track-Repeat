@@ -34,6 +34,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ChangeSettingsValues;
 import com.example.tragic.irate.simple.stopwatch.R;
 
+import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
@@ -354,12 +355,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.mid_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
           if (j==mNumberOfRoundsCompleted) {
-            span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.white)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-//            if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
-//              span.setSpan(new AbsoluteSizeSpan(28, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-//            } else {
-//              span.setSpan(new AbsoluteSizeSpan(22, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-//            }
+            span.setSpan(new StyleSpan(Typeface.ITALIC), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+
+            if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
+              span.setSpan(new AbsoluteSizeSpan(30, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            } else {
+              span.setSpan(new AbsoluteSizeSpan(22, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            }
           }
 
         }
