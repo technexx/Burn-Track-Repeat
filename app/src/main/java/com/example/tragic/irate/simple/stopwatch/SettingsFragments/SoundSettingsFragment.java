@@ -52,7 +52,7 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = super.onCreateView(inflater, container, savedInstanceState);
-        view.setBackgroundColor(getResources().getColor(R.color.darker_grey));
+        view.setBackgroundColor(getResources().getColor(R.color.night_shadow));
 
         return view;
     }

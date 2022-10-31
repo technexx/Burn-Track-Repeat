@@ -22,6 +22,10 @@
 
     <PreferenceScreen
         android:key="aboutPref"
-        android:title="Disclaimer"/>
+        android:title="Disclaimer"
+        />
 
 </PreferenceScreen>
+
+    <!--Will allow custom layout-->
+    <!--        android:layout="@layout/custom_settings_layout"-->

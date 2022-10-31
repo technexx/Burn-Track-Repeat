@@ -650,8 +650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: First Stats Recycler tab in large emulator is one line that is uncentered on top.
-      //Todo: Consider replacing w/ simple textViews.
   //Todo: Have recyclerView iterations hit 0 before vibrations begin.
   //Todo: Total stats in frag can be 1 sec less than in timer.
 
@@ -945,6 +943,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (settingNumber == 4) fragmentToReplace = disclaimerFragment;
 
     getSupportFragmentManager().beginTransaction()
+            .setCustomAnimations(
+                    R.anim.slide_in_from_left_short,  // enter
+                    R.anim.slide_out_from_right,  // exit
+                    R.anim.slide_in_from_left_short,   // popEnter (backstack)
+                    R.anim.slide_out_from_right  // popExit (backstack))
+            )
             .replace(R.id.settings_fragment_frameLayout, fragmentToReplace)
             .commit();
   }
