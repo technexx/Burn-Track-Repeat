@@ -139,6 +139,8 @@ public class tdeeSettingsFragment extends Fragment {
 
         bmrTextView.setText(calculatedBMRString());
 
+        toggleMetricAndImperial(false);
+
         imperialSettingButton.setOnClickListener(v -> {
             toggleMetricAndImperial(false);
         });
@@ -147,13 +149,13 @@ public class tdeeSettingsFragment extends Fragment {
             toggleMetricAndImperial(true);
         });
 
-        saveTdeeSettingsButton.setOnClickListener(v -> {
-            saveSpinnerStatsToSharedPreferences(metricMode);
-            bmrTextView.setText(calculatedBMRString());
-            saveUpdatedBmrSettings();
-            showToastIfNoneActive("Updated");
-
-        });
+//        saveTdeeSettingsButton.setOnClickListener(v -> {
+//            saveSpinnerStatsToSharedPreferences(metricMode);
+//            bmrTextView.setText(calculatedBMRString());
+//            saveUpdatedBmrSettings();
+//            showToastIfNoneActive("Updated");
+//
+//        });
 
         return root;
     }
@@ -218,13 +220,13 @@ public class tdeeSettingsFragment extends Fragment {
 //            prefEdit.putInt("agePositionMetric", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionMetric", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionMetric", height_spinner.getSelectedItemPosition());
-//            prefEdit.putInt("activityLevelPositionMetric", activity_level_spinner.getSelectedItemPosition());
+            prefEdit.putInt("activityLevelPositionMetric", activity_level_spinner.getSelectedItemPosition());
         } else {
 //            prefEdit.putInt("genderPositionImperial", gender_spinner.getSelectedItemPosition());
 //            prefEdit.putInt("agePositionImperial", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionImperial", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionImperial", height_spinner.getSelectedItemPosition());
-//            prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
+            prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
         }
 
         prefEdit.putBoolean("metricMode", metricMode);
@@ -252,6 +254,7 @@ public class tdeeSettingsFragment extends Fragment {
         int agePosition;
         int weightPosition;
         int heightPosition;
+        int activityLevelPosition;
 
         if (selectingMetric) {
 //            genderPosition = sharedPreferences.getInt("genderPositionMetric", 0);
@@ -270,8 +273,8 @@ public class tdeeSettingsFragment extends Fragment {
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
 
-//        int activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 3);
-//        activity_level_spinner.setSelection(activityLevelPosition);
+         activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 3);
+        activity_level_spinner.setSelection(activityLevelPosition);
     }
 
     private int getIntegerValueFromFullSpinnerString(Spinner spinner) {

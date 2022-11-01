@@ -654,10 +654,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
-  //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
   //Todo: Test w/ fresh install for all default values.
   //Todo: Run code inspector for redundancies, etc.
-  //Todo: Rename app, of course.f
+  //Todo: Rename app, of course.
   //Todo: Backup cloud option.
 
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
