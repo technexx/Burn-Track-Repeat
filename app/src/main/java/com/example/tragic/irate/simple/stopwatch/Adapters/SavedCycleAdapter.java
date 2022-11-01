@@ -37,6 +37,7 @@ import com.example.tragic.irate.simple.stopwatch.R;
 import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -303,6 +304,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     permSpan = "";
     //Retrieves the concatenated String of workout TIMES from current position.
     String tempWorkoutString = convertTime(mWorkoutList).get(position);
+    tempWorkoutString = tempWorkoutString.replace(" ", "");
     //Retrieves the concatenated String of ROUND TYPES from current position.
     String tempTypeString = mTypeOfRound.get(position);
     //Splits concatenated workout String into String Array.
@@ -319,25 +321,24 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     //Iterates through the length of our split roundType array, which will always correspond to the length of our split workout array.
     for (int j = 0; j < tempTypeArray.length; j++) {
       //If we are on the last round object, clear our bullet String so the view does not end with one.
-      if (j == tempTypeArray.length - 1) bullet = "";
-      //If round is counting up, create a Spannable w/ the count-down time of the round. Otherwise, create a new Spannable w/ a placeholder for an ImageSpan.
+      if (j == tempTypeArray.length - 1) {
+        bullet = "";
+      }
 
-      span = new SpannableString(tempWorkoutArray[j] + bullet);
-
-//      if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
-//      } else {
-//        if (j==0) {
-//          span = new SpannableString(mContext.getString(R.string.infinity_test) + " " + bullet);
-//        } else {
-//          span = new SpannableString(" " + mContext.getString(R.string.infinity_test) + " " + bullet);
-//        }
-//      }
+      if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
+        span = new SpannableString(tempWorkoutArray[j] + " " + bullet + " ");
+      } else {
+        if (j==0) {
+          span = new SpannableString(tempWorkoutArray[j] +  mContext.getString(R.string.hollow_up_arrow) + " " + bullet + " ");
+        } else {
+          span = new SpannableString(tempWorkoutArray[j] + mContext.getString(R.string.hollow_up_arrow) + " " + bullet + " ");
+        }
+      }
 
       if (j != tempTypeArray.length - 1) {
+        tempSpace = span.length() - 3;
+      } else {
         tempSpace = span.length() - 2;
-      }
-      else {
-        tempSpace = span.length();
       }
 
       if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {

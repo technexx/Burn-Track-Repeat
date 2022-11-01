@@ -8,8 +8,15 @@
     <string name="infinity_symbol">&#8734;</string>
     <string name="infinity_test">\u221e</string>
     <string name="test_infinity"><font fgcolor='#ffffffff'>&#8734;</font></string>
+
     <string name="arrow_down">\u2193</string>
     <string name="arrow_up">\u2191</string>
+    <string name="string_up_arrow">"\u25B2"</string>
+    <string name="string_down_arrow">"\u25BC"</string>
+    <string name="hollow_up_arrow">\u21e7</string>
+    <string name="hollow_down_arrow">\u21e9</string>
+    <string name="filled_up_arrow">\u2b06</string>
+    <string name="filled__down_arrow">\u2b07</string>
 
     <string name="no_sets">Breaks Only</string>
     <string name="reset">Reset</string>
@@ -71,8 +78,6 @@
     <string name="total_sets">Set Time:</string>
     <string name="total_breaks">Break Time:</string>
     <string name="total_work">Work Time:</string>
-    <string name="string_up_arrow">"\u25B2"</string>
-    <string name="string_down_arrow">"\u25BC"</string>
 
     <string name="round_numbers">%1$s - </string>
     <string name="workout_rounds">%1$s - %2$s</string>
