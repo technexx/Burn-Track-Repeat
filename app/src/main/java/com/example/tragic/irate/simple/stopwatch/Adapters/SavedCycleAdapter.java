@@ -322,16 +322,16 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (j == tempTypeArray.length - 1) bullet = "";
       //If round is counting up, create a Spannable w/ the count-down time of the round. Otherwise, create a new Spannable w/ a placeholder for an ImageSpan.
 
+      span = new SpannableString(tempWorkoutArray[j] + bullet);
 
-      if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
-        span = new SpannableString(tempWorkoutArray[j] + bullet);
-      } else {
-        if (j==0) {
-          span = new SpannableString(mContext.getString(R.string.infinity_test) + " " + bullet);
-        } else {
-          span = new SpannableString(" " + mContext.getString(R.string.infinity_test) + " " + bullet);
-        }
-      }
+//      if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("3")) {
+//      } else {
+//        if (j==0) {
+//          span = new SpannableString(mContext.getString(R.string.infinity_test) + " " + bullet);
+//        } else {
+//          span = new SpannableString(" " + mContext.getString(R.string.infinity_test) + " " + bullet);
+//        }
+//      }
 
       if (j != tempTypeArray.length - 1) {
         tempSpace = span.length() - 2;
@@ -345,7 +345,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       } else
         span.setSpan(new ForegroundColorSpan(BREAK_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
       if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
-        span.setSpan(new AbsoluteSizeSpan(26, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+//        span.setSpan(new AbsoluteSizeSpan(26, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
       }
 
       //If a cycle is active, change color of completed rounds to "greyed out" version of original color.
@@ -358,9 +358,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             span.setSpan(new StyleSpan(Typeface.ITALIC), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
 
             if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
-              span.setSpan(new AbsoluteSizeSpan(30, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+//              span.setSpan(new AbsoluteSizeSpan(28, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             } else {
-              span.setSpan(new AbsoluteSizeSpan(22, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+//              span.setSpan(new AbsoluteSizeSpan(22, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
             }
           }
 

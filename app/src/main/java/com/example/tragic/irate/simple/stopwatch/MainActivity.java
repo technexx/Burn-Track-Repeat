@@ -648,8 +648,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Consider time instead of infinity symbol for recyclerView - could do normal font/outlined/etc.
-  //Todo: Active cycle w/ activity in recyclerView layout could use some love.
+  //Todo: Round recycler width needs reduced on lower res devices.
   //Todo: Editing activity in popUp shows correct cat but defaults to 0 position in sub cat.
   //Todo: Minimize calendar animation - could try fading the stats bar.
 
@@ -1463,8 +1462,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEfirstMainTextView.setOnClickListener(v -> {
       inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
 
-      addTdeePopUpWindow.showAsDropDown(topOfMainActivityView);
-//      addTdeePopUpWindow.showAsDropDown(bottomEditTitleDividerView);
+//      addTdeePopUpWindow.showAsDropDown(topOfMainActivityView);
+      addTdeePopUpWindow.showAsDropDown(bottomEditTitleDividerView);
     });
 
     addActivityConfirmButton.setOnClickListener(v -> {
@@ -3766,15 +3765,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Iteration runnables reference this, and we set those at app start.
   private void setNotificationValues() {
     if (!dismissNotification) {
-      String headerOne = " ";
-      String headerTwo = " ";
-      String headerThree = " ";
-      String bodyOne = " ";
-      String bodyTwo = " ";
-      String bodyThree = " ";
+      String headerOne = "";
+      String headerTwo = "";
+      String headerThree = "";
+      String bodyOne = "";
+      String bodyTwo = "";
+      String bodyThree = "";
 
       if (stateOfTimers.isModeOneTimerActive()) {
         if ((typeOfRound.get(currentRoundForModeOne) == 1) || (typeOfRound.get(currentRoundForModeOne) == 2)) {
