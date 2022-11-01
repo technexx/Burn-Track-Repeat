@@ -127,6 +127,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     boolean calendarIsMinimized;
     Animation slideOutCalendarToBottom;
     Animation slideInCalendarFromBottom;
+    Animation fadeOutStatsBar;
+    Animation fadeInStatsBar;
 
     Animation slideOutTotalStatValuesLayoutToBottom;
     Animation slideInTotalStatValuesLayoutFromBottom;
@@ -1878,8 +1880,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setCalendarMinimizationAnimations() {
         if (calendarIsMinimized) {
             calendarView.startAnimation(slideOutCalendarToBottom);
+            totalActivityStatsValuesTextViewLayout.startAnimation(fadeInStatsBar);
         } else {
             calendarView.startAnimation(slideInCalendarFromBottom);
+            totalActivityStatsValuesTextViewLayout.startAnimation(fadeInStatsBar);
         }
     }
 
@@ -2313,6 +2317,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         slideOutCalendarToBottom.setDuration(250);
         slideInCalendarFromBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_in_from_bottom);
         slideInCalendarFromBottom.setDuration(250);
+
+        fadeInStatsBar = AnimationUtils.loadAnimation(getContext(), R.anim.fade_in_short);
+        fadeInStatsBar.setDuration(500);
+        fadeOutStatsBar = AnimationUtils.loadAnimation(getContext(), R.anim.fade_out_short);
 
         slideOutTotalStatValuesLayoutToBottom = AnimationUtils.loadAnimation(getContext(), R.anim.slide_out_to_bottom_no_alpha_change);
         slideOutTotalStatValuesLayoutToBottom.setDuration(2000);

@@ -17,6 +17,7 @@
     <string name="hollow_down_arrow">\u21e9</string>
     <string name="filled_up_arrow">\u2b06</string>
     <string name="filled__down_arrow">\u2b07</string>
+    <string name="filled_right_arrow">\u27a1</string>
 
     <string name="no_sets">Breaks Only</string>
     <string name="reset">Reset</string>

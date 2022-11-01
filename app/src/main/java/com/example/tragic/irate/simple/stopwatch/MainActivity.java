@@ -648,11 +648,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Ending round early + infinity counting up can be confusing as to which type each round is.
-  //Todo: Next round button in adapter.
   //Todo: Round recycler width needs reduced on lower res devices.
-  //Todo: Editing activity in popUp shows correct cat but defaults to 0 position in sub cat.
-  //Todo: Minimize calendar animation - could try fading the stats bar.
 
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -661,7 +657,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test TDEE saves in metric/imperial and retention in stats fragment.
   //Todo: Test w/ fresh install for all default values.
   //Todo: Run code inspector for redundancies, etc.
-  //Todo: Rename app, of course.
+  //Todo: Rename app, of course.f
   //Todo: Backup cloud option.
 
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
@@ -3769,9 +3765,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setNotificationValues() {
     if (!dismissNotification) {
-      String headerOne = "";
-      String headerTwo = "";
-      String headerThree = "";
+      String headerOne = " ";
+      String headerTwo = " ";
+      String headerThree = " ";
       String bodyOne = "";
       String bodyTwo = "";
       String bodyThree = "";
