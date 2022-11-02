@@ -651,14 +651,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Pom b0rks after full cycle. First, clicking did not launch cycle. Then after launch, timer/pb was missing.
-      //Todo: Back/forth between resume in adapter and timer will also cause the end cycle animation to stop.
-      //Todo: Lack of click response likely due to activeCycle still @ true.
-      //Todo: resetPomCyclesTimer() is called a bunch after trying to get to timer from adapter during this.
-
-  //Todo: Pom index crash @  arrayListToConvert.set(currentRoundPosition, (int) millisValueToSet); Index of 2 and size of 0.
-      //Todo: Likely due to Runnable. It gets posted on endFade runnable and pauseAndResumePomodoroTimer, which gets called on adapter pause/resume.
-      //Todo: Can add a conditional for if (position <= array.size() -1))
+  //Todo: Anim reset at end of cycle when clicking in and out of timer.
 
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -4060,7 +4053,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     else return value;
   }
 
-  private void animateTimerEnding() {
+  private void loopProgressBarAnimationAtEndOfCycle() {
     if (mode==1) {
       endAnimationForCyclesTimer = new AlphaAnimation(1.0f, 0.0f);
       endAnimationForCyclesTimer.setDuration(300);
@@ -4504,6 +4497,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (editCyclesPopupWindow.isShowing()) {
       editCyclesPopupWindow.dismiss();
     }
+
+    fadeProgressIn.cancel();
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
@@ -5957,7 +5952,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           }
         } else {
           stateOfTimers.setModeOneTimerEnded(true);
-          animateTimerEnding();
+          loopProgressBarAnimationAtEndOfCycle();
           currentRoundForModeOne = 0;
           cyclesCompleted++;
           setCyclesCompletedTextView();
@@ -5998,7 +5993,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           currentRoundForModeThree = 0;
           progressBarForPom.setProgress(0);
 
-          animateTimerEnding();
+          loopProgressBarAnimationAtEndOfCycle();
           setCyclesCompletedTextView();
 
           stateOfTimers.setModeThreeTimerEnded(true);
@@ -6556,8 +6551,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (modeThreeCountDownTimer != null) modeThreeCountDownTimer.cancel();
     if (endAnimationForPomCyclesTimer != null) endAnimationForPomCyclesTimer.cancel();
-
-    Log.i("testPom", "pom reset method called");
 
     pomDotCounter = 0;
 
