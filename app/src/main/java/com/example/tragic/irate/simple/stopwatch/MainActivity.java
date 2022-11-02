@@ -651,7 +651,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Pom b0rks after full cycle. First, clicking did not launch cycle. Then after launch, timer/pb was missing.
+      //Todo: Back/forth between resume in adapter and timer will also cause the end cycle animation to stop.
       //Todo: Lack of click response likely due to activeCycle still @ true.
+      //Todo: resetPomCyclesTimer() is called a bunch after trying to get to timer from adapter during this.
+
+  //Todo: Pom index crash @  arrayListToConvert.set(currentRoundPosition, (int) millisValueToSet); Index of 2 and size of 0.
+      //Todo: Likely due to Runnable. It gets posted on endFade runnable and pauseAndResumePomodoroTimer, which gets called on adapter pause/resume.
 
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -5980,8 +5985,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
 
-          Log.i("testTimer", "setting to millis String in post-round-runnable");
-
           if (!objectAnimatorPom.isStarted()) {
             modeThreeStartObjectAnimator();
             startPomTimer();
@@ -6130,6 +6133,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
+    Log.i("testPom", "timer disabled is " + stateOfTimers.isModeThreeTimerDisabled());
+    Log.i("testPom", "timer ended is " + stateOfTimers.isModeThreeTimerEnded());
     if (!stateOfTimers.isModeThreeTimerDisabled()) {
       if (!stateOfTimers.isModeThreeTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
@@ -6434,9 +6439,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     vibrator.cancel();
 
     if (mediaPlayer.isPlaying()) {
+      //      mediaPlayer.release();
       mediaPlayer.stop();
       mediaPlayer.reset();
+      Log.i("testPom", "media player resetting");
     }
+
+    mediaPlayer = MediaPlayer.create(this, ringToneUri);
 
     setHasTextSizeChangedForTimers(false);
     clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
@@ -6554,6 +6563,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (modeThreeCountDownTimer != null) modeThreeCountDownTimer.cancel();
     if (endAnimationForPomCyclesTimer != null) endAnimationForPomCyclesTimer.cancel();
+
+    Log.i("testPom", "pom reset method called");
 
     pomDotCounter = 0;
 
