@@ -115,6 +115,8 @@ import com.example.tragic.irate.simple.stopwatch.SettingsFragments.tdeeSettingsF
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
+import org.w3c.dom.Text;
+
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;

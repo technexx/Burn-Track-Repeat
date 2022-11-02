@@ -5,6 +5,7 @@
     android:layout_height="wrap_content"
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
+    android:layout_marginStart="8dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/workout_recycler_layout">
 
