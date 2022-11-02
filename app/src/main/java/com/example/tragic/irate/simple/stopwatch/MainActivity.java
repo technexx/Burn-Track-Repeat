@@ -650,7 +650,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Round recycler width needs reduced on lower res devices.
+  //Todo: Got cycles starting w/ 1 extra second on clock.
+  //Todo: Consider 1 vertical row + larger fonts for rounds.
 
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
