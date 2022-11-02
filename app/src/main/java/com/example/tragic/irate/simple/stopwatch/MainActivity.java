@@ -651,6 +651,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Stats bar fading in calories compared tab.
+      //Todo: Also b0rky when switching any tab. Likely due to whole layout animating but some textViews set to invisible.
+  //Todo: Okay to release a 1.0.1 version!
+
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.

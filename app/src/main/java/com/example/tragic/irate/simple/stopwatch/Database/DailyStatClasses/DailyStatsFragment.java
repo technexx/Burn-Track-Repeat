@@ -1880,10 +1880,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     private void setCalendarMinimizationAnimations() {
         if (calendarIsMinimized) {
             calendarView.startAnimation(slideOutCalendarToBottom);
-            totalActivityStatsValuesTextViewLayout.startAnimation(fadeInStatsBar);
         } else {
             calendarView.startAnimation(slideInCalendarFromBottom);
+        }
+        if (caloriesComparisonTabLayout.getSelectedTabPosition() == 0) {
             totalActivityStatsValuesTextViewLayout.startAnimation(fadeInStatsBar);
+        }
+        if (caloriesComparisonTabLayout.getSelectedTabPosition() == 1) {
+            totalFoodStatsValuesTextViewLayout.startAnimation(fadeInStatsBar);
         }
     }
 
