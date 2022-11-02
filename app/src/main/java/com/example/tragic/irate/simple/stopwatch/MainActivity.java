@@ -1254,10 +1254,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       workoutStringListOfRoundValuesForSecondAdapter.clear();
       workoutIntegerListOfRoundTypeForSecondAdapter.clear();
 
-      for (int i = 0; i < workoutTimeIntegerArray.size(); i++) {
+      for (int i = 0; i < convertedWorkoutTimeStringArray.size(); i++) {
+        Log.i("testAnim", "list size is " + convertedWorkoutTimeStringArray.size());
         workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTimeStringArray.get(i));
         workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
       }
+
       cycleRoundsAdapter.notifyDataSetChanged();
     }
     //When fade animation for removing Pomodoro cycle is finished in adapter, its listener calls back here where we remove the cycle's values and update adapter w/ empty list.
@@ -1488,7 +1490,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.setOnDismissListener(() -> {
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-//      toggleCycleAndPomCycleRecyclerViewVisibilities(false);
+      toggleCycleAndPomCycleRecyclerViewVisibilities(false);
 
       toggleCustomActionBarButtonVisibilities(false);
 
@@ -4486,7 +4488,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView.setText(cycleTitle);
 
     adjustDotRecyclerLayoutMargins();
-//    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
+    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
     if (mode == 1) {
       changeTextSizeWithoutAnimator(workoutTimeIntegerArray.get(0));

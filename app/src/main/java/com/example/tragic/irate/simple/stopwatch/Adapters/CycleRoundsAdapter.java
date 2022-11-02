@@ -92,6 +92,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       @Override
       public void onAnimationEnd(Animation animation) {
         mOnFadeFinished.subtractionFadeHasFinished();
+        Log.i("testAnim", "end of animOut method executing");
       }
       @Override
       public void onAnimationRepeat(Animation animation) {
@@ -215,10 +216,10 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       if (mRunRoundAnimation) {
         //Animates round number.
         if (mPosAddHolder >=0 || mPosSubHolder >=0) {
-          setAnimation(modeOneRounds.round_count, position);
+          setAnimationOne(modeOneRounds.round_count, position);
           //Animates round value (either infinity or timer value).
           if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) {
-            setAnimation(modeOneRounds.workout_rounds, position);
+            setAnimationOne(modeOneRounds.workout_rounds, position);
           } else {
             setAnimationTwo(modeOneRounds.infinity_rounds, position);
           }
@@ -304,13 +305,14 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
   }
 
   //Animates each round in or out depending on args received from Main.
-  public void setAnimation(TextView textView, int position) {
+  public void setAnimationOne(TextView textView, int position) {
     if (position==mPosAddHolder) {
       textView.clearAnimation();
       textView.startAnimation(animateIn);
     } else if (position==mPosSubHolder) {
       textView.clearAnimation();
       textView.startAnimation(animateOut);
+      Log.i("testAnim", "setAnimationOne running");
     }
   }
 
@@ -321,6 +323,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     } else if (position==mPosSubHolder) {
       imageView.clearAnimation();
       imageView.startAnimation(animateOut);
+      Log.i("testAnim", "setAnimationTwo running");
     }
   }
 
@@ -334,6 +337,7 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       } else {
         //Fades out all rounds at once when removing cycle.
         textView.startAnimation(animateOut);
+        Log.i("testAnim", "setAnimationThree running");
       }
     }
   }
