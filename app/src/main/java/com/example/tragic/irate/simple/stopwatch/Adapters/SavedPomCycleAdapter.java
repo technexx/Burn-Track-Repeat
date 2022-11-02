@@ -8,6 +8,7 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -202,7 +203,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                     }
 
                     if (i == mNumberOfRoundsCompleted) {
-                        pomSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.white)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                        pomSpan.setSpan(new StyleSpan(Typeface.ITALIC), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                     }
                 }
             }

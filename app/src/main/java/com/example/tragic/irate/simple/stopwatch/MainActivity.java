@@ -650,8 +650,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Got cycles starting w/ 1 extra second on clock.
-  //Todo: Consider 1 vertical row + larger fonts for rounds.
+  //Todo: Pom b0rks after full cycle. First, clicking did not launch cycle. Then after launch, timer/pb was missing.
+      //Todo: Lack of click response likely due to activeCycle still @ true.
 
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -662,6 +662,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
 
+  //Todo: Had a bug of timer displaying and iterating +1 second from time listed in edit popUp's round.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
@@ -669,13 +670,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtones?
-  //Todo: Likely a more efficient way to handle disabling lap adapter animation.
   //Todo: Add Day/Night modes.
-  //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle
+  //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle.
   //Todo: storeDailyTimesForCycleResuming() and setStoredDailyTimesForCycleResuming() commented out when using ms for daily stats.
   //Todo: Tablet display needs work.
-  //Todo: Can be done later. Not meant for tablets.
-  //Todo Ideally, drawables should each have several different densities in different folders.
+      //Todo: Can be done later. Not meant for tablets.
 
   //Drawable height may sync w/ textView height for alignment.
   //We can also commit just specific files, remember!
@@ -3767,9 +3766,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void setNotificationValues() {
     if (!dismissNotification) {
-      String headerOne = " ";
-      String headerTwo = " ";
-      String headerThree = " ";
+      //Anything added (e.g. spaces) to these will cause unwanted empty vertical space in notifications.
+      String headerOne = "";
+      String headerTwo = "";
+      String headerThree = "";
       String bodyOne = "";
       String bodyTwo = "";
       String bodyThree = "";
@@ -4322,7 +4322,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
 
           /////---------Testing pom round iterations---------------/////////
-          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(7000);
+          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(2000); else pomValuesTime.add(3000);
 
           for (int i = 0; i < fetchedPomCycle.length; i++) {
             int integerValue = Integer.parseInt(fetchedPomCycle[i]);

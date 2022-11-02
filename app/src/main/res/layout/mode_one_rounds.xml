@@ -15,7 +15,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        android:textSize="21sp"
+        android:textSize="25sp"
         android:layout_marginStart="6dp"
         android:textColor="@color/white">
     </TextView>
@@ -28,7 +28,7 @@
         app:layout_constraintTop_toTopOf="@id/round_count"
         app:layout_constraintBottom_toBottomOf="@id/round_count"
         android:layout_marginStart="3dp"
-        android:textSize="23sp">
+        android:textSize="27sp">
     </TextView>
 
     <ImageView

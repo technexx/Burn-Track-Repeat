@@ -439,8 +439,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
         mHighlightMode = true;
         mOnHighlightListener.onCycleHighlight(mHighlightPositionList, true);
-
-        Log.i("testHighlight", "position being highlighted is " + position);
       }
       return true;
     });
