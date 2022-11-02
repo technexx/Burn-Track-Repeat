@@ -278,7 +278,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
                 pomHolder.pauseOrResume.setOnClickListener(v-> {
                     mOnPauseOrResumeListener.onPauseOrResume(mTimerPaused);
-                    Log.i("testPom", "pause/resuming from adapter!");
                 });
 
                 pomHolder.resetCycle.setOnClickListener(v-> {
@@ -287,7 +286,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                         isConfirmStringVisible = true;
                     } else {
                         mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
-//                        isConfirmStringVisible = false;
                     }
                 });
 

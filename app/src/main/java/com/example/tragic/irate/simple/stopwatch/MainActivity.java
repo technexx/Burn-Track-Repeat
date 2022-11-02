@@ -266,7 +266,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortModeForActivities;
   int sortModeForFoodConsumed;
 
-  int positionOfSelectedCycle = 0;
+  int positionOfSelectedCycleForModeOne = 0;
+  int positionOfSelectedCycleForModeThree = 0;
   String cycleTitle = "";
   List<Integer> receivedHighlightPositions;
 
@@ -657,6 +658,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Pom index crash @  arrayListToConvert.set(currentRoundPosition, (int) millisValueToSet); Index of 2 and size of 0.
       //Todo: Likely due to Runnable. It gets posted on endFade runnable and pauseAndResumePomodoroTimer, which gets called on adapter pause/resume.
+      //Todo: Can add a conditional for if (position <= array.size() -1))
 
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -991,15 +993,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   @Override
+  public void onPauseOrResume(boolean timerIsPaused) {
+    if (mode == 1) {
+      if (numberOfRoundsLeftForModeOne > 0) {
+        if (timerIsPaused) {
+          pauseAndResumeTimer(RESUMING_TIMER);
+        } else {
+          pauseAndResumeTimer(PAUSING_TIMER);
+        }
+        savedCycleAdapter.notifyDataSetChanged();
+      }
+    }
+
+    if (mode == 3) {
+      if (numberOfRoundsLeftForModeThree > 0) {
+        if (timerIsPaused) {
+          pauseAndResumePomodoroTimer(RESUMING_TIMER);
+        } else {
+          pauseAndResumePomodoroTimer(PAUSING_TIMER);
+        }
+      }
+    }
+    savedPomCycleAdapter.notifyDataSetChanged();
+  }
+
+  @Override
   public void ResumeOrResetCycle(int resumingOrResetting) {
     if (resumingOrResetting == RESUMING_CYCLE_FROM_ADAPTER) {
-      resumeOrResetCycleFromAdapterList(RESUMING_CYCLE_FROM_ADAPTER);
+      resumeOrResetCycle(RESUMING_CYCLE_FROM_ADAPTER);
     } else if (resumingOrResetting == RESETTING_CYCLE_FROM_ADAPTER) {
-      resumeOrResetCycleFromAdapterList(RESETTING_CYCLE_FROM_ADAPTER);
+      resumeOrResetCycle(RESETTING_CYCLE_FROM_ADAPTER);
     }
   }
 
-  private void resumeOrResetCycleFromAdapterList(int resumeOrReset) {
+  private void resumeOrResetCycle(int resumeOrReset) {
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
       setTotalCycleTimeValuesToTextView();
 
@@ -1162,34 +1189,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   @Override
-  public void onPauseOrResume(boolean timerIsPaused) {
-    if (mode == 1) {
-      if (numberOfRoundsLeftForModeOne > 0) {
-        if (timerIsPaused) {
-          pauseAndResumeTimer(RESUMING_TIMER);
-        } else {
-          pauseAndResumeTimer(PAUSING_TIMER);
-        }
-        savedCycleAdapter.notifyDataSetChanged();
-      }
-    }
-
-    if (mode == 3) {
-      if (numberOfRoundsLeftForModeThree > 0) {
-        if (timerIsPaused) {
-          pauseAndResumePomodoroTimer(RESUMING_TIMER);
-        } else {
-          pauseAndResumePomodoroTimer(PAUSING_TIMER);
-        }
-      }
-    }
-    savedPomCycleAdapter.notifyDataSetChanged();
-  }
-
-  @Override
   public void onCycleClick(int position) {
     isNewCycle = false;
-    positionOfSelectedCycle = position;
 
     if (mode == 1) {
       cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
@@ -1207,10 +1208,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsAdapter.notifyDataSetChanged();
 
     if (mode == 1) {
+      positionOfSelectedCycleForModeOne = position;
       savedCycleAdapter.removeCycleAsActive();
       launchTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
     }
     if (mode == 3) {
+      positionOfSelectedCycleForModeThree = position;
       savedPomCycleAdapter.removeCycleAsActive();
       launchPomTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
     }
@@ -1515,8 +1518,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       removeCycleHighlights();
       editHighlightedCycleLogic();
 
-      if (mode == 1) cycles = cyclesList.get(positionOfSelectedCycle);
-      if (mode == 3) pomCycles = pomCyclesList.get(positionOfSelectedCycle);
+      cycles = cyclesList.get(positionOfSelectedCycleForModeOne);
+      pomCycles = pomCyclesList.get(positionOfSelectedCycleForModeThree);
 
       clearRoundAndCycleAdapterArrayLists();
 
@@ -1992,7 +1995,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         replaceCycleListWithEmptyTextViewIfNoCyclesExist();
         setDefaultEditRoundViews();
-        getTimerVariablesForEachMode();
       }
 
       @Override
@@ -2234,7 +2236,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         setDefaultUserSettings();
         setDefaultEditRoundViews();
-        getTimerVariablesForEachMode();
       });
     });
   }
@@ -3062,24 +3063,30 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     currentlyEditingACycle = true;
     isNewCycle = false;
 
-    positionOfSelectedCycle = (receivedHighlightPositions.get(0));
 
     if (mode==1) {
-      cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycle);
+      positionOfSelectedCycleForModeOne = (receivedHighlightPositions.get(0));
+
+      cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycleForModeOne);
       toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
 
       if (cycleHasActivityAssigned) {
-        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
         retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
 
-      String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycle);
+      String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycleForModeOne);
       setTdeeSpinnersToDefaultValues();
       addTDEEfirstMainTextView.setText(tdeeString);
+
+      cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
     }
 
-    if (mode == 1) cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
-    if (mode == 3) cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
+    if (mode == 3) {
+      positionOfSelectedCycleForModeThree = receivedHighlightPositions.get(0);
+      cycleTitle = pomTitleArray.get(positionOfSelectedCycleForModeThree);
+    }
+
     cycleNameEdit.setText(cycleTitle);
   }
 
@@ -3898,30 +3905,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void activateResumeOrResetOptionForCycle() {
     if (mode == 1) {
       if (stateOfTimers.isModeOneTimerActive()) {
-        if (isNewCycle) positionOfSelectedCycle = workoutCyclesArray.size() - 1;
+        if (isNewCycle) positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
         savedCycleAdapter.setCycleAsActive();
-        savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
+        savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeOne);
         savedCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeOne - numberOfRoundsLeftForModeOne);
 
         savedCycleAdapter.notifyDataSetChanged();
       }
-
-      prefEdit.putInt("positionOfSelectedCycleForModeOne", positionOfSelectedCycle);
     }
 
     if (mode == 3) {
       if (stateOfTimers.isModeThreeTimerActive()) {
-        if (isNewCycle) positionOfSelectedCycle = pomArray.size() - 1;
+        if (isNewCycle) positionOfSelectedCycleForModeThree = pomArray.size() - 1;
         savedPomCycleAdapter.setCycleAsActive();
-        savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycle);
+        savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeThree);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeThree - numberOfRoundsLeftForModeThree);
 
         savedPomCycleAdapter.notifyDataSetChanged();
       }
-
-      prefEdit.putInt("positionOfSelectedCycleForModeThree", positionOfSelectedCycle);
     }
-    prefEdit.apply();
   }
 
   public int convertDensityPixelsToScalable(float pixels) {
@@ -4297,9 +4299,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         workoutTimeIntegerArray.clear();
         typeOfRound.clear();
-        if (workoutCyclesArray.size() - 1 >= positionOfSelectedCycle) {
-          String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
-          String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycle).split(" - ");
+        if (workoutCyclesArray.size() - 1 >= positionOfSelectedCycleForModeOne) {
+          String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycleForModeOne).split(" - ");
+          String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycleForModeOne).split(" - ");
 
           for (int i = 0; i < fetchedRounds.length; i++) {
             workoutTimeIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
@@ -4315,7 +4317,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dotsAdapter.setTypeOfRoundList(typeOfRound);
           dotsAdapter.notifyDataSetChanged();
 
-          cycleTitle = workoutTitleArray.get(positionOfSelectedCycle);
+          cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
         }
 
         break;
@@ -4323,8 +4325,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValuesTime.clear();
         pomStringListOfRoundValues.clear();
 
-        if (pomArray.size() - 1 >= positionOfSelectedCycle) {
-          String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycle).split(" - ");
+        if (pomArray.size() - 1 >= positionOfSelectedCycleForModeThree) {
+          String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");
 
           /////---------Testing pom round iterations---------------/////////
           for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(2000); else pomValuesTime.add(3000);
@@ -4341,7 +4343,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           pomDotsAdapter.updatePomDotCounter(pomDotCounter);
           pomDotsAdapter.notifyDataSetChanged();
 
-          cycleTitle = pomTitleArray.get(positionOfSelectedCycle);
+          cycleTitle = pomTitleArray.get(positionOfSelectedCycleForModeThree);
         }
         break;
     }
@@ -4383,8 +4385,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
-        cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycle);
-        trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycle);
+        cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycleForModeOne);
+        trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
 
         runOnUiThread(() -> {
           savedCycleRecycler.startAnimation(slideOutFromLeftLong);
@@ -4401,13 +4403,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (isNewCycle) {
         zeroOutTotalCycleTimes();
-        positionOfSelectedCycle = workoutCyclesArray.size() - 1;
+        positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
       if (!trackActivityWithinCycle) {
-        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
       }
 
       runOnUiThread(new Runnable() {
@@ -4451,12 +4453,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (isNewCycle) {
         zeroOutTotalCycleTimes();
-        positionOfSelectedCycle = pomArray.size() - 1;
+        positionOfSelectedCycleForModeThree = pomArray.size() - 1;
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
-      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycle);
+      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeThree);
 
       runOnUiThread(new Runnable() {
         @Override
@@ -4530,7 +4532,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         storeSetAndBreakTimeForCycleResuming();
       }
 
-      deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycle);
+      deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycleForModeOne);
 
     } else if (mode == 3) {
       stateOfTimers.setModeThreeTimerDisabled(false);
@@ -4619,7 +4621,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (isNewCycle) {
         cycles = new Cycles();
       } else if (cyclesList.size() > 0) {
-        cycleID = cyclesList.get(positionOfSelectedCycle).getId();
+        cycleID = cyclesList.get(positionOfSelectedCycleForModeOne).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
       workoutString = gson.toJson(workoutTimeIntegerArray);
@@ -4666,7 +4668,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (isNewCycle) {
         pomCycles = new PomCycles();
       } else if (pomCyclesList.size() > 0) {
-        cycleID = pomCyclesList.get(positionOfSelectedCycle).getId();
+        cycleID = pomCyclesList.get(positionOfSelectedCycleForModeThree).getId();
         pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
       }
 
@@ -5172,7 +5174,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<Integer> integerCycleArray = integerArrayList;
 
     int fetchedRoundType = typeOfRound.get(currentRoundForModeOne);
-    workoutCyclesArray.set(positionOfSelectedCycle, newRoundStringForModeOne(fetchedRoundType));
+    workoutCyclesArray.set(positionOfSelectedCycleForModeOne, newRoundStringForModeOne(fetchedRoundType));
   }
 
   private String newRoundStringForModeOne(int typeOfRound) {
@@ -5223,8 +5225,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String[] fetchedRounds = {};
     ArrayList<Integer> newIntegerArray = new ArrayList<>();
 
-    if (workoutCyclesArray.size() - 1  >= positionOfSelectedCycle) {
-      fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycle).split(" - ");
+    if (workoutCyclesArray.size() - 1  >= positionOfSelectedCycleForModeOne) {
+      fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycleForModeOne).split(" - ");
     }
 
     for (int i = 0; i<fetchedRounds.length; i++) {
@@ -5255,15 +5257,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void iterateRecyclerViewTimesOnModeThree(ArrayList<Integer> integerArrayList) {
     ArrayList<Integer> integerCycleArray = integerArrayList;
-    pomArray.set(positionOfSelectedCycle, newRoundStringForModeThree());
+    pomArray.set(positionOfSelectedCycleForModeThree, newRoundStringForModeThree());
   }
 
   private ArrayList<Integer> integerArrayOfRoundStringsForModeThree() {
     String[] fetchedRounds = {};
     ArrayList<Integer> newIntegerArray = new ArrayList<>();
 
-    if (pomArray.size() - 1 >= positionOfSelectedCycle)  {
-      fetchedRounds = pomArray.get(positionOfSelectedCycle).split(" - ");
+    Log.i("testPom", "pom array is " + pomArray);
+    Log.i("testPom", "position of selected cycle is " + positionOfSelectedCycleForModeThree);
+
+    if (pomArray.size() - 1 >= positionOfSelectedCycleForModeThree)  {
+      fetchedRounds = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");
     }
 
     for (int i = 0; i<fetchedRounds.length; i++) {
@@ -5973,7 +5978,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomDotsAdapter.resetModeThreeAlpha();
         pomDotsAdapter.setModeThreeAlpha();
 
-        //Re-posts after ends in nextRound().
         mHandler.post(runnableForRecyclerViewTimesForModeThree);
 
         if (mHandler.hasCallbacks(endFadeForModeThree)) {
@@ -5992,11 +5996,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           postPomCycleTimeRunnable();
         } else {
           currentRoundForModeThree = 0;
-          stateOfTimers.setModeThreeTimerEnded(true);
-          animateTimerEnding();
           progressBarForPom.setProgress(0);
+
+          animateTimerEnding();
           setCyclesCompletedTextView();
+
+          stateOfTimers.setModeThreeTimerEnded(true);
         }
+
         stateOfTimers.setModeThreeTimerDisabled(false);
         next_round.setEnabled(true);
       }
@@ -6133,8 +6140,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
-    Log.i("testPom", "timer disabled is " + stateOfTimers.isModeThreeTimerDisabled());
-    Log.i("testPom", "timer ended is " + stateOfTimers.isModeThreeTimerEnded());
     if (!stateOfTimers.isModeThreeTimerDisabled()) {
       if (!stateOfTimers.isModeThreeTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
@@ -6420,18 +6425,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //        savedCycleRecycler.setVisibility(View.GONE);
 //        savedPomCycleRecycler.setVisibility(View.VISIBLE);
         break;
-    }
-  }
-
-  private void getTimerVariablesForEachMode() {
-    if (mode == 1) {
-      timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeOne", "");
-      positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeOne", 0);
-    }
-
-    if (mode == 3) {
-      timeLeftValueHolder = sharedPreferences.getString("timeLeftValueForModeThree", "");
-      positionOfSelectedCycle = sharedPreferences.getInt("positionOfSelectedCycleForModeThree", 0);
     }
   }
 
