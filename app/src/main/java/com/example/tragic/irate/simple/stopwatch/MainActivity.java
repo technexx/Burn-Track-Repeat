@@ -651,8 +651,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Anim reset at end of cycle when clicking in and out of timer.
-
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
@@ -667,6 +665,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
+  //Todo: Anim reset at end of cycle when clicking in and out of timer likely due to visibility set to GONE and VISIBLE again.
 
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtones?
@@ -1489,7 +1488,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow.setOnDismissListener(() -> {
       activateResumeOrResetOptionForCycle();
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
-      toggleCycleAndPomCycleRecyclerViewVisibilities(false);
+//      toggleCycleAndPomCycleRecyclerViewVisibilities(false);
 
       toggleCustomActionBarButtonVisibilities(false);
 
@@ -2512,10 +2511,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimationWithoutAnimatedExit);
     editCyclesPopupWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
-    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
     stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     addTdeePopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     aboutSettingsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+
+    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+//    timerPopUpWindow.setAnimationStyle(R.style.SlideFromRightAnimation);
   }
 
   private void instantiateArrayLists() {
@@ -4485,7 +4486,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView.setText(cycleTitle);
 
     adjustDotRecyclerLayoutMargins();
-    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
+//    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
     if (mode == 1) {
       changeTextSizeWithoutAnimator(workoutTimeIntegerArray.get(0));
@@ -5258,9 +5259,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private ArrayList<Integer> integerArrayOfRoundStringsForModeThree() {
     String[] fetchedRounds = {};
     ArrayList<Integer> newIntegerArray = new ArrayList<>();
-
-    Log.i("testPom", "pom array is " + pomArray);
-    Log.i("testPom", "position of selected cycle is " + positionOfSelectedCycleForModeThree);
 
     if (pomArray.size() - 1 >= positionOfSelectedCycleForModeThree)  {
       fetchedRounds = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");
@@ -6430,7 +6428,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //      mediaPlayer.release();
       mediaPlayer.stop();
       mediaPlayer.reset();
-      Log.i("testPom", "media player resetting");
     }
 
     mediaPlayer = MediaPlayer.create(this, ringToneUri);

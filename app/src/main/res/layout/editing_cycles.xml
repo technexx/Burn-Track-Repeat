@@ -435,7 +435,7 @@
         android:layout_marginBottom="2dp"
         android:layout_marginEnd="0dp"
         android:minWidth="160dp"
-        android:background="@drawable/recycler_border_without_divider">
+        android:background="@drawable/recycler_border_without_divider_thin">
     </androidx.recyclerview.widget.RecyclerView>
 
     <androidx.recyclerview.widget.RecyclerView

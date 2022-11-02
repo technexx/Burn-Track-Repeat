@@ -212,12 +212,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
 
         pomHolder.fullView.setOnClickListener(v-> {
-            Log.i("testPom", "mActive is " + mActiveCycle);
             boolean changed = false;
             if (!mHighlightMode) {
                 if (mActiveCycle) {
                     if (position == mPositionOfActiveCycle) {
-                        Log.i("testPom", "resuming from adapter");
                         mOnResumeOrResetCycle.ResumeOrResetCycle(RESUMING_CYCLE_FROM_TIMER);
                     }
                 } else {
