@@ -2746,6 +2746,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     Log.i("testCap", "daily total is " + dividedDailyTotal);
     Log.i("testCap", "daily cap is " + dividedDailyCap);
+
     return dividedDailyTotal >= dividedDailyCap;
   }
 
@@ -5033,6 +5034,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         setAllActivityTimesAndCaloriesToTextViews();
 
         mHandler.postDelayed(this, 10);
+
+        if ((trackActivityWithinCycle && isDailyActivityTimeMaxed())) {
+          mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
+        }
       }
     };
   }
@@ -5419,6 +5424,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) {
           increaseTextSizeForTimers(startMillis, setMillis);
         }
+
+//        if (trackActivityWithinCycle && isDailyActivityTimeMaxed()) {
+//          removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
+//        }
 
         dotsAdapter.notifyDataSetChanged();
       }
