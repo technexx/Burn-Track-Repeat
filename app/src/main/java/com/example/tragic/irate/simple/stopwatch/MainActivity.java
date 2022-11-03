@@ -653,10 +653,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Day total will (sometimes) cap @ 23:59 instead of 24:00.
       //Todo: Related to non-rounded millis. Straights adds that are multiples of 1000 are fine.
-  //Todo: Timer begin iterating if time is capped, but runnables will continue + iterate if already running.
 
-  //Todo: If formerly @ 5 minutes but then forced lower (from a deletion + re-add after another activity takes more time), activity time in Timer will display old, higher value.
-  //Todo: Deleting activity in stats frag -sometimes- doesn't show immediate in timer (must start it first).
+  //Todo: Editing stats while timer is running b0rks it.
 
   //Todo: Change fonts in food consumed recycler to match activities.
   //Todo: Ghosting cursor may be a global app theme glitch w/ background. Also occurs in add/edit popUp in stats fragment.
@@ -1060,7 +1058,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         AsyncTask.execute(()-> {
           if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
-            Log.i("testTime", "stats edited and re-querying databae in timer popUp");
             insertActivityIntoDatabaseAndAssignItsValueToObjects();
             dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
 
@@ -5030,8 +5027,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         totalCaloriesBurnedForCurrentDay = calorieIteration.getNewTotalCalories();
         totalCaloriesBurnedForSpecificActivityForCurrentDay = calorieIteration.getNewActivityCalories();
 
-
         setAllActivityTimesAndCaloriesToTextViews();
+
+        AsyncTask.execute(() -> {
+          updateActiveTimerPopUpStatsIfEdited();
+        });
 
         mHandler.postDelayed(this, 10);
 
@@ -5040,6 +5040,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     };
+  }
+
+  private void updateActiveTimerPopUpStatsIfEdited() {
+    if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
+      insertActivityIntoDatabaseAndAssignItsValueToObjects();
+      dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
+
+      runOnUiThread(()-> {
+        retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+        setAllActivityTimesAndCaloriesToTextViews();
+
+        mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
+        infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
+        mHandler.post(infinityRunnableForDailyActivityTimer);
+      });
+    }
   }
 
   private TimerIteration newTimerIterationInstance() {
@@ -5424,10 +5440,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) {
           increaseTextSizeForTimers(startMillis, setMillis);
         }
-
-//        if (trackActivityWithinCycle && isDailyActivityTimeMaxed()) {
-//          removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
-//        }
 
         dotsAdapter.notifyDataSetChanged();
       }
