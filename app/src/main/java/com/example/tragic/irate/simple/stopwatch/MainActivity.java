@@ -651,15 +651,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Stats bar fading in calories compared tab.
-      //Todo: Also b0rky when switching any tab. Likely due to whole layout animating but some textViews set to invisible.
+  //Todo: Window anination is diff. when resuming timer than when launching it.
+  //Todo: Initial cursor ghosting when adding rounds when app first installed.
+  //Todo: Day total will (sometimes) cap @ 23:59 instead of 24:00.
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
-  //Todo: Test w/ fresh install for all default values.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.

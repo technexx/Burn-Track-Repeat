@@ -34,13 +34,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     List<Long> mSetTimes;
     List<Double> mCaloriesBurned;
     int mItemCount;
-
-    int HEADER_VIEW = 0;
     int MAIN_VIEW = 1;
     int FOOTER_VIEW = 2;
-
-    int REGULAR_TEXT = 0;
-    int BOLD_TEXT = 1;
 
     boolean mEditModeIsActive;
     boolean mRowIsSelectedForEditing;
@@ -61,6 +56,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     Typeface openSans;
     Typeface roboto;
+    Typeface robotoMedium;
 
     public interface tdeeEditedItemIsSelected {
         void activityEditItemSelected (int position);
@@ -216,6 +212,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
+            mMainViewHolder.activityTextView.setTypeface(robotoMedium);
+
             if (mPhoneHeight <= 1920) {
                 mMainViewHolder.activityTextView.setTextSize(17);
                 mMainViewHolder.setTimeTextView.setTextSize(17);
@@ -230,18 +228,14 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
             mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
 
-            mMainViewHolder.activityTextView.setTypeface(Typeface.DEFAULT);
-            mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT);
-            mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT);
-
             if (mPhoneHeight <= 1920 ) {
                 mMainViewHolder.activityTextView.setTextSize(15);
-                mMainViewHolder.setTimeTextView.setTextSize(15);
-                mMainViewHolder.caloriesBurnedTextView.setTextSize(15);
-            } else {
-                mMainViewHolder.activityTextView.setTextSize(17);
                 mMainViewHolder.setTimeTextView.setTextSize(17);
                 mMainViewHolder.caloriesBurnedTextView.setTextSize(17);
+            } else {
+                mMainViewHolder.activityTextView.setTextSize(17);
+                mMainViewHolder.setTimeTextView.setTextSize(19);
+                mMainViewHolder.caloriesBurnedTextView.setTextSize(19);
             }
         }
     }
@@ -269,10 +263,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             setTimeTextView = itemView.findViewById(R.id.set_time_in_daily_stats_textView);
             caloriesBurnedTextView = itemView.findViewById(R.id.calories_burned_in_daily_stats_textView);
 
-            activityTextView.setTypeface(roboto);
-            setTimeTextView.setTypeface(roboto);
-            caloriesBurnedTextView.setTypeface(roboto);
-
             fullView = itemView;
         }
     }
@@ -287,11 +277,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     private void instantiateFonts() {
-//        openSans = ResourcesCompat.getFont(mContext, R.font.open_sans);
-//        roboto = ResourcesCompat.getFont(mContext, R.font.roboto);
-
         openSans = Typeface.createFromAsset(mContext.getAssets(),"fonts/open_sans.ttf");
         roboto = Typeface.createFromAsset(mContext.getAssets(),"fonts/roboto.ttf");
+        robotoMedium = Typeface.createFromAsset(mContext.getAssets(),"fonts/roboto_medium.ttf");
     }
 
     //This doesn't round because input isn't a decimal (e.g. "0" is "0" until it is "1").
