@@ -913,6 +913,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String expendedTimeString = longToStringConverters.convertMillisToHourBasedString(totalExpendedTime);
         String expendedCaloriesString = formatDoubleToStringWithoutDecimals(totalExpendedCalories);
 
+        Log.i("testTotal", "bmr time is " + totalBmrTime);
+        Log.i("testTotal", "activity time is " + totalActivityTime);
+        Log.i("testTotal", "aggregate is " + totalExpendedTime);
+
         dailyStatsBmrTimeTextView.setText(bmrTimeString);
         dailyStatsBmrCaloriesTextView.setText(bmrCaloriesString);
 
@@ -1321,6 +1325,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         } else {
             activityTime = 0;
         }
+
+        Log.i("testTotal", "activity time to be added is " + activityTime);
+        Log.i("testTotal", "time remaining is " + remainingTime);
 
         return activityTime;
     }

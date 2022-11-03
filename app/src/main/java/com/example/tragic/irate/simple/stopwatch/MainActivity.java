@@ -651,9 +651,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Window anination is diff. when resuming timer than when launching it.
-  //Todo: Initial cursor ghosting when adding rounds when app first installed.
   //Todo: Day total will (sometimes) cap @ 23:59 instead of 24:00.
+      //Todo: Related to non-rounded millis. Straights adds that are multiples of 1000 are fine.
+  //Todo: Timer begin iterating if time is capped, but runnables will continue + iterate if already running.
+
+  //Todo: If formerly @ 5 minutes but then forced lower (from a deletion + re-add after another activity takes more time), activity time in Timer will display old, higher value.
+  //Todo: Deleting activity in stats frag -sometimes- doesn't show immediate in timer (must start it first).
+
+  //Todo: Change fonts in food consumed recycler to match activities.
+  //Todo: Ghosting cursor may be a global app theme glitch w/ background. Also occurs in add/edit popUp in stats fragment.
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Test simultaneous timer endings.
@@ -1024,7 +1030,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void resumeOrResetCycle(int resumeOrReset) {
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
-      setTotalCycleTimeValuesToTextView();
 
       if (mode == 1) {
         timeLeftForPomCyclesTimer.setVisibility(View.GONE);
@@ -1035,6 +1040,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (trackActivityWithinCycle) {
           setAllActivityTimesAndCaloriesToTextViews();
         } else {
+          setTotalCycleTimeValuesToTextView();
 //          setStoredSetAndBreakTimeOnCycleResume();
         }
 
@@ -1054,11 +1060,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         AsyncTask.execute(()-> {
           if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
+            Log.i("testTime", "stats edited and re-querying databae in timer popUp");
             insertActivityIntoDatabaseAndAssignItsValueToObjects();
             dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
 
             runOnUiThread(()-> {
               retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+              setAllActivityTimesAndCaloriesToTextViews();
             });
           }
         });
@@ -2658,7 +2666,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           if (!stateOfTimers.isModeOneTimerPaused()) {
             mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
+//            Log.i("testSave", "not paused and saving!");
           } else {
+//            Log.i("testSave", "paused and removing!");
             mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
           }
         }
@@ -2734,69 +2744,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     long dividedDailyTotal = totalSetTimeForCurrentDayInMillis / 1000 / 60;
     long dividedDailyCap = dailyStatsAccess.getTwentyFourHoursInMillis() / 1000 / 60;
 
+    Log.i("testCap", "daily total is " + dividedDailyTotal);
+    Log.i("testCap", "daily cap is " + dividedDailyCap);
     return dividedDailyTotal >= dividedDailyCap;
   }
 
   private void setAndUpdateActivityTimeAndCaloriesInDatabase() {
     dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(totalSetTimeForSpecificActivityForCurrentDayInMillis, totalCaloriesBurnedForSpecificActivityForCurrentDay);
   }
-
-//  private void setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString() {
-//    dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(getDailyActivityTimeFromTextView(), totalCaloriesBurnedForSpecificActivityForCurrentDay);
-//  }
-
-//  private long getDailyActivityTimeFromTextView() {
-//    String textView = (String) dailyTotalTimeForSingleActivityTextView.getText().toString();
-//    return convertStringToSecondsForTimerPopUp(textView) * 1000;
-//  }
-
-//  private int convertStringToSecondsForTimerPopUp(String timerString) {
-//    int hours = 0;
-//    int minutes = 0;
-//    int seconds = 0;
-//    timerString = timerString.replace(":", "");
-//
-//    //Range is exclusive of last position.
-//    if (timerString.length() == 3) {
-//      minutes = Integer.parseInt(timerString.substring(0, 1));
-//      seconds = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
-//    }
-//
-//    if (timerString.length() == 4) {
-//      minutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
-//      seconds = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
-//    }
-//
-//    if (timerString.length() == 5) {
-//      hours = Integer.parseInt(timerString.substring(0, 1));
-//      minutes = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
-//      seconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
-//    }
-//
-//    if (timerString.length() == 6) {
-//      hours = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
-//      minutes = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
-//      seconds = Integer.parseInt(timerString.substring(4, 5) + timerString.substring(5, 6));
-//    }
-//
-//    if (seconds > 60) {
-//      seconds = seconds % 60;
-//      minutes += 1;
-//    }
-//
-//    if (minutes>=60) {
-//      hours = minutes/60;
-//      minutes = minutes % 60;
-//    }
-//
-//    int totalTime = (minutes * 60) + seconds;
-//
-//    if (hours > 0) {
-//      totalTime += (hours * 60 * 60);
-//    }
-//
-//    return totalTime;
-//  }
 
   private void fabLogic() {
     cycleNameEdit.getText().clear();
@@ -3698,24 +3653,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleCycleAndPomCycleRecyclerViewVisibilities(boolean launchingPopUp) {
-    toggleDayAndNightModesForMain(colorThemeMode);
-
-    if (launchingPopUp) {
-      if (mode == 1) {
-        savedCycleRecycler.setVisibility(View.GONE);
-      }
-      if (mode == 3) {
-        savedPomCycleRecycler.setVisibility(View.GONE);
-      }
-      emptyCycleList.setVisibility(View.GONE);
-    } else {
-      if (mode == 1) {
-        savedCycleRecycler.setVisibility(View.VISIBLE);
-      }
-      if (mode == 3) {
-        savedPomCycleRecycler.setVisibility(View.VISIBLE);
-      }
-    }
+//    toggleDayAndNightModesForMain(colorThemeMode);
+//
+//    if (launchingPopUp) {
+//      if (mode == 1) {
+//        savedCycleRecycler.setVisibility(View.GONE);
+//      }
+//      if (mode == 3) {
+//        savedPomCycleRecycler.setVisibility(View.GONE);
+//      }
+//      emptyCycleList.setVisibility(View.GONE);
+//    } else {
+//      if (mode == 1) {
+//        savedCycleRecycler.setVisibility(View.VISIBLE);
+//      }
+//      if (mode == 3) {
+//        savedPomCycleRecycler.setVisibility(View.VISIBLE);
+//      }
+//    }
   }
 
   private void instantiateNotifications() {
@@ -4551,11 +4506,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   }
 
-  //10/06 is 279.
   private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
-    Log.i("testDay", "day of year is " + dayOfYear);
-//    dayOfYear = 280;
-
     dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
     dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
@@ -6857,4 +6808,61 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void toggleDayAndNightModeForStatsFragment() {
 
   }
+
+  //  private void setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString() {
+//    dailyStatsAccess.updateTotalTimesAndCaloriesForEachActivityForSelectedDay(getDailyActivityTimeFromTextView(), totalCaloriesBurnedForSpecificActivityForCurrentDay);
+//  }
+
+//  private long getDailyActivityTimeFromTextView() {
+//    String textView = (String) dailyTotalTimeForSingleActivityTextView.getText().toString();
+//    return convertStringToSecondsForTimerPopUp(textView) * 1000;
+//  }
+
+//  private int convertStringToSecondsForTimerPopUp(String timerString) {
+//    int hours = 0;
+//    int minutes = 0;
+//    int seconds = 0;
+//    timerString = timerString.replace(":", "");
+//
+//    //Range is exclusive of last position.
+//    if (timerString.length() == 3) {
+//      minutes = Integer.parseInt(timerString.substring(0, 1));
+//      seconds = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
+//    }
+//
+//    if (timerString.length() == 4) {
+//      minutes = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+//      seconds = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
+//    }
+//
+//    if (timerString.length() == 5) {
+//      hours = Integer.parseInt(timerString.substring(0, 1));
+//      minutes = Integer.parseInt(timerString.substring(1, 2) + timerString.substring(2, 3));
+//      seconds = Integer.parseInt(timerString.substring(3, 4) + timerString.substring(4, 5));
+//    }
+//
+//    if (timerString.length() == 6) {
+//      hours = Integer.parseInt(timerString.substring(0, 1) + timerString.substring(1, 2));
+//      minutes = Integer.parseInt(timerString.substring(2, 3) + timerString.substring(3, 4));
+//      seconds = Integer.parseInt(timerString.substring(4, 5) + timerString.substring(5, 6));
+//    }
+//
+//    if (seconds > 60) {
+//      seconds = seconds % 60;
+//      minutes += 1;
+//    }
+//
+//    if (minutes>=60) {
+//      hours = minutes/60;
+//      minutes = minutes % 60;
+//    }
+//
+//    int totalTime = (minutes * 60) + seconds;
+//
+//    if (hours > 0) {
+//      totalTime += (hours * 60 * 60);
+//    }
+//
+//    return totalTime;
+//  }
 }

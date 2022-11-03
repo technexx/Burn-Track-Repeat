@@ -1125,33 +1125,4 @@ public class DailyStatsAccess {
         Calendar calendar = Calendar.getInstance(Locale.getDefault());
         return calendar.get(Calendar.DAY_OF_YEAR);
     }
-
-    private String getDateString() {
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("EEE, MMMM d yyyy", Locale.getDefault());
-        Calendar calendar = Calendar.getInstance(Locale.getDefault());
-        return simpleDateFormat.format(calendar.getTime());
-    }
-
-    private void logIntegerAndEntityDayLists() {
-        Log.i("testList", "total activity list is " + mListOfActivityDaysSelected);
-        Log.i("testList", "populated activity list is " + mListOfActivityDaysWithPopulatedRows);
-        Log.i("testList", "unpopulated activity list is " + mListOfActivityDaysWithEmptyRows);
-
-        Log.i("testList", "total food list is " + mListOfFoodDaysSelected);
-        Log.i("testList", "populated food list is " + mListOfFoodDaysWithPopulatedRows);
-        Log.i("testList", "unpopulated food list is " + mListOfFoodDaysWithEmptyRows);
-    }
-
-
-    private void logSetTimeValues() {
-        Log.i("testCals", "total assigned set is " + totalSetTimeForSelectedDuration);
-        Log.i("testCals", "total aggregate set is " + totalAggregateTimeForSelectedDuration);
-    }
-
-    private void logActivityCalorieValues() {
-        Log.i("testCals", "total assigned calories are " + totalActivityCaloriesForSelectedDuration);
-        Log.i("testCals", "total unassigned calories are " + totalUnassignedCaloriesForSelectedDuration);
-        Log.i("testCals", "total aggregate calories are " + totalAggregateCaloriesForSelectedDuration);
-        Log.i("testCals", "decimal pct is " + decimalPercentageOfUnAssignedTime());
-    }
 }
