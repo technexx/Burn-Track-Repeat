@@ -894,6 +894,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return caloriesForEachFoodList;
     }
 
+    //Todo: Value being added is 1000 less than max (when added up).
     private void setTotalActivityStatsFooterTextViews() {
         long totalBmrTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
         double totalBmrCalories = dailyStatsAccess.getUnassignedCaloriesForSelectedDuration();
@@ -913,9 +914,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String expendedTimeString = longToStringConverters.convertMillisToHourBasedString(totalExpendedTime);
         String expendedCaloriesString = formatDoubleToStringWithoutDecimals(totalExpendedCalories);
 
-        Log.i("testTotal", "bmr time is " + totalBmrTime);
-        Log.i("testTotal", "activity time is " + totalActivityTime);
-        Log.i("testTotal", "aggregate is " + totalExpendedTime);
+//        Log.i("testTotal", "bmr time is " + totalBmrTime);
+//        Log.i("testTotal", "activity time is " + totalActivityTime);
+//        Log.i("testTotal", "aggregate is " + totalExpendedTime);
 
         dailyStatsBmrTimeTextView.setText(bmrTimeString);
         dailyStatsBmrCaloriesTextView.setText(bmrCaloriesString);
@@ -1326,8 +1327,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             activityTime = 0;
         }
 
-        Log.i("testTotal", "activity time to be added is " + activityTime);
-        Log.i("testTotal", "time remaining is " + remainingTime);
+//        Log.i("testTotal", "activity time to be added is " + activityTime);
+//        Log.i("testTotal", "time remaining is " + remainingTime);
 
         return activityTime;
     }

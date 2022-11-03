@@ -792,6 +792,7 @@ public class DailyStatsAccess {
 
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
+            Log.i("testTotal", "time being added is " + totalSetTimeListForEachActivityForSelectedDuration);
         }
 
         totalSetTimeForSelectedDuration = valueToReturn;
@@ -836,6 +837,10 @@ public class DailyStatsAccess {
 
     public void setUnassignedDailyTotalTime() {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
+
+        Log.i("testTotal", "aggregate time is " + totalAggregateTimeForSelectedDuration);
+        Log.i("testTotal", "set time is " + totalSetTimeForSelectedDuration);
+        Log.i("testTotal", "total unassigned time is " + totalUnassignedSetTimeForSelectedDuration);
     }
 
     public long getUnassignedSetTimeForSelectedDuration() {
@@ -890,6 +895,8 @@ public class DailyStatsAccess {
             long unassignedTimeForDay = getTwentyFourHoursInMillis() - listOfAssignedTimes.get(i);
             listToReturn.add(unassignedTimeForDay);
         }
+
+        Log.i("testTot", "unassigned time list is + " + listToReturn);
 
         return listToReturn;
     }
