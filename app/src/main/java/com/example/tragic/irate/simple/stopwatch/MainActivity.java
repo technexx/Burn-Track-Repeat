@@ -653,9 +653,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Day total will (sometimes) cap @ 23:59 instead of 24:00.
       //Todo: Related to non-rounded millis. Straights adds that are multiples of 1000 are fine.
-      //Todo: Unassigned time returned is rounded down in DailyStatsAccess's setTotalActivityStatsForSelectedDaysToArrayLists();
-
-  //Todo: Editing stats while timer is running b0rks it.
 
   //Todo: Change fonts in food consumed recycler to match activities.
   //Todo: Ghosting cursor may be a global app theme glitch w/ background. Also occurs in add/edit popUp in stats fragment.

@@ -51,6 +51,10 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     int mScreenHeight;
 
+    Typeface openSans;
+    Typeface roboto;
+    Typeface robotoMedium;
+
     public interface caloriesConsumedEdit {
         void editCaloriesConsumedRowSelected(int position);
     }
@@ -74,6 +78,7 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
     public CaloriesConsumedAdapter(Context context, List<String> foodEaten, List<Double> caloriesConsumed) {
         this.mContext = context; this.mFoodEaten = foodEaten; this.mCaloriesConsumed = caloriesConsumed;
         setAnimations();
+        instantiateFonts();
     }
 
     @NonNull
@@ -196,17 +201,30 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
             mMainViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
+            mMainViewHolder.foodEatenTextView.setTypeface(robotoMedium);
+            mMainViewHolder.caloriesConsumedTextView.setTypeface(robotoMedium);
+
+            if (mScreenHeight <= 1920) {
+                mMainViewHolder.foodEatenTextView.setTextSize(17);
+                mMainViewHolder.caloriesConsumedTextView.setTextSize(17);
+            } else {
+                mMainViewHolder.foodEatenTextView.setTextSize(20);
+                mMainViewHolder.caloriesConsumedTextView.setTextSize(20);
+            }
+
             mMainViewHolder.foodEatenTextView.setTextSize(20);
             mMainViewHolder.caloriesConsumedTextView.setTextSize(20);
         } else {
             mMainViewHolder.foodEatenTextView.setText(mFoodEaten.get(position-1));
             mMainViewHolder.caloriesConsumedTextView.setText(formatCalorieString(mCaloriesConsumed.get(position-1)));
 
-            mMainViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT);
-            mMainViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT);
-
-            mMainViewHolder.foodEatenTextView.setTextSize(17);
-            mMainViewHolder.caloriesConsumedTextView.setTextSize(17);
+            if (mScreenHeight <= 1920) {
+                mMainViewHolder.foodEatenTextView.setTextSize(15);
+                mMainViewHolder.caloriesConsumedTextView.setTextSize(17);
+            } else {
+                mMainViewHolder.foodEatenTextView.setTextSize(17);
+                mMainViewHolder.caloriesConsumedTextView.setTextSize(19);
+            }
         }
     }
 
@@ -242,6 +260,12 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
             super(itemView);
             addActivity = itemView.findViewById(R.id.add_food_in_edit_stats);
         }
+    }
+
+    private void instantiateFonts() {
+        openSans = Typeface.createFromAsset(mContext.getAssets(),"fonts/open_sans.ttf");
+        roboto = Typeface.createFromAsset(mContext.getAssets(),"fonts/roboto.ttf");
+        robotoMedium = Typeface.createFromAsset(mContext.getAssets(),"fonts/roboto_medium.ttf");
     }
 
     private String formatCalorieString(double calories) {

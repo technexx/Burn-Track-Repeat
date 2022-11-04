@@ -731,13 +731,14 @@ public class DailyStatsAccess {
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
 
                     long timeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
-                    timeToAdd = roundDownMillisValues(timeToAdd);
+//                    timeToAdd = roundDownMillisValues(timeToAdd);
+//                    timeToAdd = roundUpMillisValues(timeToAdd);
 
                     totalSetTimeListForEachActivityForSelectedDuration.add(timeToAdd);
 
                     double caloriesToAdd = mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity();
-
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.add(caloriesToAdd);
+
                 } else {
                     totalSetTimeListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedSetTimeFromExistingAndRepeatingPositions(i));
                     totalCaloriesBurnedListForEachActivityForSelectedDuration.set(duplicateStringPosition, combinedActivityCaloriesFromExistingAndRepeatingPositions(i));
@@ -746,18 +747,10 @@ public class DailyStatsAccess {
         }
     }
 
+
     private long roundUpMillisValues(long millisToRound) {
         long remainder = millisToRound%1000;
         return millisToRound += (1000-remainder);
-    }
-
-    private long roundUpMillisValuesIfMoreThanZero(long millisToRound) {
-        if (millisToRound > 0) {
-            long remainder = millisToRound%1000;
-            return millisToRound += (1000-remainder);
-        } else {
-            return millisToRound;
-        }
     }
 
     private long roundDownMillisValues(long millisToRound) {
@@ -838,9 +831,11 @@ public class DailyStatsAccess {
     public void setUnassignedDailyTotalTime() {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
 
-        Log.i("testTotal", "aggregate time is " + totalAggregateTimeForSelectedDuration);
-        Log.i("testTotal", "set time is " + totalSetTimeForSelectedDuration);
-        Log.i("testTotal", "total unassigned time is " + totalUnassignedSetTimeForSelectedDuration);
+        totalUnassignedSetTimeForSelectedDuration = roundUpMillisValues(totalUnassignedSetTimeForSelectedDuration);
+
+//        Log.i("testTotal", "aggregate time is " + totalAggregateTimeForSelectedDuration);
+//        Log.i("testTotal", "set time is " + totalSetTimeForSelectedDuration);
+//        Log.i("testTotal", "total unassigned time is " + totalUnassignedSetTimeForSelectedDuration);
     }
 
     public long getUnassignedSetTimeForSelectedDuration() {
@@ -886,17 +881,15 @@ public class DailyStatsAccess {
         return totalAggregateCaloriesForSelectedDuration;
     }
 
-    //Here we iterate through each DAY, in getAggregatedActivityTime...() we iterate through activity times to get an aggregate for each day here.
     public List<Long> getListOfUnassignedTimeForMultipleDays() {
         List<Long> listOfAssignedTimes = getListOfAssignedTimesForMultipleDays();
         List<Long> listToReturn = new ArrayList<>();
 
         for (int i=0; i<listOfAssignedTimes.size(); i++) {
             long unassignedTimeForDay = getTwentyFourHoursInMillis() - listOfAssignedTimes.get(i);
+
             listToReturn.add(unassignedTimeForDay);
         }
-
-        Log.i("testTot", "unassigned time list is + " + listToReturn);
 
         return listToReturn;
     }

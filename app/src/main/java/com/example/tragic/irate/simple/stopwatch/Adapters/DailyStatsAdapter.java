@@ -213,6 +213,8 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
             mMainViewHolder.activityTextView.setTypeface(robotoMedium);
+            mMainViewHolder.setTimeTextView.setTypeface(robotoMedium);
+            mMainViewHolder.caloriesBurnedTextView.setTypeface(robotoMedium);
 
             if (mPhoneHeight <= 1920) {
                 mMainViewHolder.activityTextView.setTextSize(17);
