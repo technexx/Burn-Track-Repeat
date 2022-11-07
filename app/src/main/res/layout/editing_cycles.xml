@@ -107,36 +107,33 @@
         android:id="@+id/pomTimerValueInEditPopUpTextViewOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/pomTimerValueInEditPopUpTextViewTwo"
+        app:layout_constraintStart_toStartOf="@id/firstRoundTypeHeaderInEditPopUp"
+        app:layout_constraintEnd_toEndOf="@id/firstRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="6dp"
-        android:textSize="28sp">
+        android:layout_marginTop="8dp"
+        android:textSize="30sp">
     </TextView>
 
     <TextView
         android:id="@+id/pomTimerValueInEditPopUpTextViewTwo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/secondRoundTypeHeaderInEditPopUp"
+        app:layout_constraintEnd_toEndOf="@id/secondRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewOne"
-        app:layout_constraintEnd_toStartOf="@id/pomTimerValueInEditPopUpTextViewThree"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="2sp"
-        android:textSize="28sp">
+        android:layout_marginTop="8dp"
+        android:textSize="30sp">
     </TextView>
 
     <TextView
         android:id="@+id/pomTimerValueInEditPopUpTextViewThree"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewTwo"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/thirdRoundTypeHeaderInEditPopUp"
+        app:layout_constraintEnd_toEndOf="@id/thirdRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="28dp"
-        android:textSize="28sp">
+        android:layout_marginTop="8dp"
+        android:textSize="30sp">
     </TextView>
 
     <ImageButton
@@ -171,7 +168,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="@id/number_pad_layout"
         android:layout_marginTop="16dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginEnd="0dp"
         android:textSize="15sp"
         android:gravity="center"
         app:cornerRadius="50dp"
@@ -192,7 +189,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintBottom_toBottomOf="@id/number_pad_layout"
         android:layout_marginBottom="88dp"
-        android:layout_marginEnd="4dp"
+        android:layout_marginEnd="0dp"
         android:textSize="15sp"
         android:gravity="center"
         app:cornerRadius="50dp"

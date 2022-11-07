@@ -809,7 +809,6 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
-    //Todo: 0 cals for activities w/ just a few seconds will take a cal off the daily total.
     public void setTotalCaloriesVariableForSelectedDuration() {
         double valueToReturn = 0;
 

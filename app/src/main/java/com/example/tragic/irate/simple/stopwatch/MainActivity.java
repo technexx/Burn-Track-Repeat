@@ -651,11 +651,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Day total will (sometimes) cap @ 23:59 instead of 24:00.
-      //Todo: Related to non-rounded millis. Straights adds that are multiples of 1000 are fine.
-
-  //Todo: Change fonts in food consumed recycler to match activities.
-  //Todo: Ghosting cursor may be a global app theme glitch w/ background. Also occurs in add/edit popUp in stats fragment.
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Test simultaneous timer endings.

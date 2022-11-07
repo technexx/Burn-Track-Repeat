@@ -73,8 +73,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     if (roundCategory==3) WORK_COLOR = color;
     if (roundCategory==4) MINI_BREAK_COLOR = color;
     if (roundCategory==5) FULL_BREAK_COLOR = color;
-
-//    Log.i("testColor", "round category is " + roundCategory + " and " + "set color integer in adapter one is " + settingNumber);
   }
 
   public CycleRoundsAdapter(Context context, ArrayList<String> workoutList, ArrayList<Integer> typeOfRound, ArrayList<String> pomList) {
@@ -92,7 +90,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
       @Override
       public void onAnimationEnd(Animation animation) {
         mOnFadeFinished.subtractionFadeHasFinished();
-        Log.i("testAnim", "end of animOut method executing");
       }
       @Override
       public void onAnimationRepeat(Animation animation) {
