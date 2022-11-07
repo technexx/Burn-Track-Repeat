@@ -809,6 +809,7 @@ public class DailyStatsAccess {
         return valueToReturn;
     }
 
+    //Todo: 0 cals for activities w/ just a few seconds will take a cal off the daily total.
     public void setTotalCaloriesVariableForSelectedDuration() {
         double valueToReturn = 0;
 
@@ -821,14 +822,6 @@ public class DailyStatsAccess {
     }
 
     public double getTotalCaloriesBurnedForSelectedDuration() {
-//        double valueToReturn = 0;
-//
-//        for (int i=0; i<totalCaloriesBurnedListForEachActivityForSelectedDuration.size(); i++) {
-//            valueToReturn += totalCaloriesBurnedListForEachActivityForSelectedDuration.get(i);
-//            valueToReturn = roundDownCalories(valueToReturn);
-//        }
-//
-//        return valueToReturn;
         return totalActivityCaloriesForSelectedDuration;
     }
 
@@ -839,9 +832,6 @@ public class DailyStatsAccess {
     public void setUnassignedDailyTotalTime() {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
 
-//        Log.i("testTotal", "aggregate time is " + totalAggregateTimeForSelectedDuration);
-//        Log.i("testTotal", "set time is " + totalSetTimeForSelectedDuration);
-//        Log.i("testTotal", "total unassigned time is " + totalUnassignedSetTimeForSelectedDuration);
     }
 
     public long getUnassignedSetTimeForSelectedDuration() {

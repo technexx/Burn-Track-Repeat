@@ -894,7 +894,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         return caloriesForEachFoodList;
     }
 
-    //Todo: Value being added is 1000 less than max (when added up).
     private void setTotalActivityStatsFooterTextViews() {
         long totalBmrTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
         double totalBmrCalories = dailyStatsAccess.getUnassignedCaloriesForSelectedDuration();
@@ -1311,18 +1310,21 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             activityTime = modifiedRemainingTime;
         }
 
+        activityTime = roundDownMillisValues(activityTime);
+
         return activityTime;
     }
 
     private long cappedActivityTimeForStatInsertions(long activityTime, long remainingTime) {
         if (remainingTime > 0) {
-            if (activityTime >= (remainingTime - 999)) {
+            if (activityTime > remainingTime) {
                 activityTime = remainingTime;
-                activityTime = roundUpMillisValues(activityTime);
             }
+            activityTime = roundDownMillisValues(activityTime);
         } else {
             activityTime = 0;
         }
+
         return activityTime;
     }
 
