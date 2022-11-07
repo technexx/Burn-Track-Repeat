@@ -51,10 +51,7 @@ public class DailyStatsAccess {
     int mYearSelectedForDurationStartDate;
     int mYearSelectedForDurationEndDate;
     Calendar mCalendarObjectSelectedFromFragment;
-    Calendar mFirstDayOfDurationCalendarObject;
-    Calendar mLastDayOfDurationCalendarObject;
 
-    String mSingleDayAsString;
     String mFirstDayInDurationAsString;
     String mLastDayInDurationAsString;
 
@@ -552,6 +549,8 @@ public class DailyStatsAccess {
     public void insertStatsForEachActivityRow(long daySelected, long setTime, double caloriesBurned) {
         mStatsForEachActivity = new StatsForEachActivity();
 
+        if (checkIfTimeWillCapTotalForDay(setTime, getUnassignedSetTimeForSelectedDuration()))
+
         mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(daySelected);
         mStatsForEachActivity.setActivity(mActivityString);
         mStatsForEachActivity.setMetScore(mMetScore);
@@ -583,6 +582,18 @@ public class DailyStatsAccess {
 
                 cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
             }
+        }
+    }
+
+    private boolean checkIfTimeWillCapTotalForDay(long timeToAddOrReplace, long currentTotal) {
+        return ((timeToAddOrReplace + currentTotal) >= (getTwentyFourHoursInMillis() -999));
+    }
+
+    private void getAssignedTimeForSelectedDay(long dayId) {
+        long valueToReturn = 0;
+
+        for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
+
         }
     }
 
@@ -731,8 +742,6 @@ public class DailyStatsAccess {
                     totalActivitiesListForSelectedDuration.add(mStatsForEachActivityList.get(i).getActivity());
 
                     long timeToAdd = mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
-//                    timeToAdd = roundDownMillisValues(timeToAdd);
-//                    timeToAdd = roundUpMillisValues(timeToAdd);
 
                     totalSetTimeListForEachActivityForSelectedDuration.add(timeToAdd);
 
@@ -785,7 +794,6 @@ public class DailyStatsAccess {
 
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
-            Log.i("testTotal", "time being added is " + totalSetTimeListForEachActivityForSelectedDuration);
         }
 
         totalSetTimeForSelectedDuration = valueToReturn;
@@ -830,8 +838,6 @@ public class DailyStatsAccess {
 
     public void setUnassignedDailyTotalTime() {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
-
-        totalUnassignedSetTimeForSelectedDuration = roundUpMillisValues(totalUnassignedSetTimeForSelectedDuration);
 
 //        Log.i("testTotal", "aggregate time is " + totalAggregateTimeForSelectedDuration);
 //        Log.i("testTotal", "set time is " + totalSetTimeForSelectedDuration);

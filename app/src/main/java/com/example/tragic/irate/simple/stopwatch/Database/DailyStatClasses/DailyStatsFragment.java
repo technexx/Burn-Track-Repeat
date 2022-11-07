@@ -1316,16 +1316,13 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private long cappedActivityTimeForStatInsertions(long activityTime, long remainingTime) {
         if (remainingTime > 0) {
-            if (activityTime > remainingTime) {
+            if (activityTime >= (remainingTime - 999)) {
                 activityTime = remainingTime;
+                activityTime = roundUpMillisValues(activityTime);
             }
         } else {
             activityTime = 0;
         }
-
-        Log.i("testTotal", "activity time to be added is " + activityTime);
-        Log.i("testTotal", "time remaining is " + remainingTime);
-
         return activityTime;
     }
 
@@ -1334,6 +1331,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             activityTime = dailyStatsAccess.getTwentyFourHoursInMillis();
         }
         return activityTime;
+    }
+
+    private long roundUpMillisValues(long millisToRound) {
+        long remainder = millisToRound%1000;
+        return millisToRound += (1000-remainder);
     }
 
     private double retrieveMetScoreFromSubCategoryPosition() {
