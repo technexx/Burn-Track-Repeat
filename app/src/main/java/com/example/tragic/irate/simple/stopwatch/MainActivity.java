@@ -267,8 +267,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortModeForActivities;
   int sortModeForFoodConsumed;
 
-  int positionOfSelectedCycleForModeOne = 0;
-  int positionOfSelectedCycleForModeThree = 0;
+  int positionOfSelectedCycleForModeOne;
+  int positionOfSelectedCycleForModeThree;
   String cycleTitle = "";
   List<Integer> receivedHighlightPositions;
 
@@ -1208,6 +1208,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       positionOfSelectedCycleForModeOne = position;
       savedCycleAdapter.removeCycleAsActive();
       launchTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
+
+      Log.i("testPos", "position in onClick is " + positionOfSelectedCycleForModeOne);
     }
     if (mode == 3) {
       positionOfSelectedCycleForModeThree = position;
@@ -1877,7 +1879,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void groupAllAppStartInstantiations() {
     instantiateGlobalClasses();
-    removeAllTimerSharedPreferences();
 
     instantiateFragmentsAndTheirCallbacks();
     instantiatePopUpViewsAndWindows();
@@ -2661,9 +2662,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           if (!stateOfTimers.isModeOneTimerPaused()) {
             mHandler.postDelayed(globalSaveTotalTimesOnPostDelayRunnableInASyncThread, 2000);
-//            Log.i("testSave", "not paused and saving!");
           } else {
-//            Log.i("testSave", "paused and removing!");
             mHandler.removeCallbacks(globalSaveTotalTimesOnPostDelayRunnableInASyncThread);
           }
         }
@@ -4232,7 +4231,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This is all correct on initial edit/cycle creation
+  //Todo: This is all correct on initial edit/cycle creation. workoutTimeIntegerArray used as var to populate.
   private void populateCycleRoundAndRoundTypeArrayLists() {
     switch (mode) {
       case 1:
@@ -4261,9 +4260,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           Log.i("testLaunch", "position is " + positionOfSelectedCycleForModeOne);
 
           Log.i("testLaunch", "string array from string in populateCycle method is " + workoutCyclesArray);
-
-          Log.i("testLaunch", "fetched array in populateCycle method is " + Arrays.toString(fetchedRounds));
-          Log.i("testLaunch", "integer array in populateCycle method is " + workoutTimeIntegerArray);
+          Log.i("testLaunch", "integer array (single cycle) in populateCycle method is " + workoutTimeIntegerArray);
         }
 
         break;
@@ -4353,6 +4350,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
+
+      Log.i("testPos", "position in timer launch is " + positionOfSelectedCycleForModeOne);
+
 
       if (!trackActivityWithinCycle) {
         setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
@@ -4580,10 +4580,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       Log.i("testSave", "saving at position " + positionOfSelectedCycleForModeOne);
       Log.i("testSave", "integer array being saved is " + workoutTimeIntegerArray);
 
-      for (int i=0; i<cyclesList.size(); i++) {
-        Log.i("testSave", "total array is " + cyclesList.get(i).getWorkoutRounds());
-      }
-
       if (cycleHasActivityAssigned) {
         cycles.setTdeeActivityExists(true);
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
@@ -4618,6 +4614,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
       }
+
+      /////////
+      queryAndSortAllCyclesFromDatabase(false);
+      for (int i=0; i<cyclesList.size(); i++) {
+        Log.i("testSave", "total array post-save is " + cyclesList.get(i).getWorkoutRounds());
+      }
+      ////////////////////
+
     }
     if (mode == 3) {
       if (isNewCycle) {
@@ -6721,22 +6725,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       public void onNothingSelected(AdapterView<?> parent) {
       }
     });
-  }
-
-  private void removeAllTimerSharedPreferences() {
-    prefEdit.remove("savedProgressBarValueForModeOne");
-    prefEdit.remove("timeLeftValueForModeOne");
-    prefEdit.remove("positionOfSelectedCycleForModeOne");
-    prefEdit.remove("modeOneTimerPaused");
-    prefEdit.remove("modeOneTimerEnded");
-    prefEdit.remove("modeOneTimerDisabled");
-    prefEdit.remove("savedProgressBarValueForModeThree");
-    prefEdit.remove("timeLeftValueForModeThree");
-    prefEdit.remove("positionOfSelectedCycleForModeThree");
-    prefEdit.remove("modeThreeTimerPaused");
-    prefEdit.remove("modeThreeTimerEnded");
-    prefEdit.remove("modeThreeTimerDisabled");
-    prefEdit.apply();
   }
 
   private void showToastIfNoneActive(String message) {
