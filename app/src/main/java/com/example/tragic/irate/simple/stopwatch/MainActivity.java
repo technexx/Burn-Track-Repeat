@@ -4213,11 +4213,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
-        Log.i("testLaunch", "rounds being added are " + cyclesList.get(i).getWorkoutRounds());
+//        Log.i("testLaunch", "rounds being added are " + cyclesList.get(i).getWorkoutRounds());
 
       }
 
-      Log.i("testLaunch", "workoutCyclesArray is " + workoutCyclesArray);
+//      Log.i("testLaunch", "workoutCyclesArray is " + workoutCyclesArray);
 
     }
     if (mode == 3 || forAllModes) {
@@ -4256,8 +4256,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
 
-//          Log.i("testLaunch", "position is " + positionOfSelectedCycleForModeOne);
-//          Log.i("testLaunch", "integer array is " + workoutTimeIntegerArray);
+          Log.i("testLaunch", "string array in populateCycle method is " + workoutCyclesArray);
+          Log.i("testLaunch", "fetched array from string in populateCycle method is " + workoutCyclesArray);
+          Log.i("testLaunch", "integer array in populateCycle method is " + workoutTimeIntegerArray);
         }
 
         break;
@@ -4569,9 +4570,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundTypeString = gson.toJson(typeOfRound);
       roundTypeString = friendlyString(roundTypeString);
 
-      Log.i("testLaunch", "workout String being converted is " + workoutString);
-      Log.i("testLaunch", "saving at position " + positionOfSelectedCycleForModeOne);
-      Log.i("testLaunch", "integer array being saved is " + workoutTimeIntegerArray);
+//      Log.i("testLaunch", "workout String being converted is " + workoutString);
+//      Log.i("testLaunch", "saving at position " + positionOfSelectedCycleForModeOne);
+//      Log.i("testLaunch", "integer array being saved is " + workoutTimeIntegerArray);
 
       for (int i=0; i<cyclesList.size(); i++) {
 //        Log.i("testLaunch", "total array is " + cyclesList.get(i).getWorkoutRounds());
