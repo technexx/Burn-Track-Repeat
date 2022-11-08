@@ -120,6 +120,7 @@ import org.w3c.dom.Text;
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -4231,6 +4232,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: This is all correct on initial edit/cycle creation
   private void populateCycleRoundAndRoundTypeArrayLists() {
     switch (mode) {
       case 1:
@@ -4256,8 +4258,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
 
-          Log.i("testLaunch", "string array in populateCycle method is " + workoutCyclesArray);
-          Log.i("testLaunch", "fetched array from string in populateCycle method is " + workoutCyclesArray);
+          Log.i("testLaunch", "position is " + positionOfSelectedCycleForModeOne);
+
+          Log.i("testLaunch", "string array from string in populateCycle method is " + workoutCyclesArray);
+
+          Log.i("testLaunch", "fetched array in populateCycle method is " + Arrays.toString(fetchedRounds));
           Log.i("testLaunch", "integer array in populateCycle method is " + workoutTimeIntegerArray);
         }
 
@@ -4551,6 +4556,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
   //Todo: Likely a save issue.
+  //Todo: Seems to only occur on launch. Save seems okay. Positional?
   //Getting toggle stat from adapter on timer launch and saving that. Retrieve w/ everything else coming back.
   private void saveAddedOrEditedCycleASyncRunnable() {
     Gson gson = new Gson();
@@ -4570,12 +4576,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundTypeString = gson.toJson(typeOfRound);
       roundTypeString = friendlyString(roundTypeString);
 
-//      Log.i("testLaunch", "workout String being converted is " + workoutString);
-//      Log.i("testLaunch", "saving at position " + positionOfSelectedCycleForModeOne);
-//      Log.i("testLaunch", "integer array being saved is " + workoutTimeIntegerArray);
+      Log.i("testSave", "workout String being converted is " + workoutString);
+      Log.i("testSave", "saving at position " + positionOfSelectedCycleForModeOne);
+      Log.i("testSave", "integer array being saved is " + workoutTimeIntegerArray);
 
       for (int i=0; i<cyclesList.size(); i++) {
-//        Log.i("testLaunch", "total array is " + cyclesList.get(i).getWorkoutRounds());
+        Log.i("testSave", "total array is " + cyclesList.get(i).getWorkoutRounds());
       }
 
       if (cycleHasActivityAssigned) {
