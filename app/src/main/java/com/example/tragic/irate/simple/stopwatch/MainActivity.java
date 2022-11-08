@@ -651,6 +651,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Accessing any cycles will use last saved cycle and then save it in that position.
+  //Todo: Edit -> Timer transition different (and could use work) than Fab -> Timer.
+      //Todo: Should probably make recyclerView invisible again.
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Test simultaneous timer endings.
@@ -2858,6 +2861,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
       }
+
+//      Log.i("testLaunch", "cyclesList size is " + cyclesList.size());
     }
 
     if (mode == 3) {
@@ -3851,7 +3856,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void activateResumeOrResetOptionForCycle() {
     if (mode == 1) {
       if (stateOfTimers.isModeOneTimerActive()) {
-        if (isNewCycle) positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
+//        if (isNewCycle) {
+//          positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
+//        }
         savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeOne);
         savedCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeOne - numberOfRoundsLeftForModeOne);
@@ -3862,7 +3869,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode == 3) {
       if (stateOfTimers.isModeThreeTimerActive()) {
-        if (isNewCycle) positionOfSelectedCycleForModeThree = pomArray.size() - 1;
+//        if (isNewCycle) {
+//          positionOfSelectedCycleForModeThree = pomArray.size() - 1;
+//        }
         savedPomCycleAdapter.setCycleAsActive();
         savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeThree);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeThree - numberOfRoundsLeftForModeThree);
@@ -4219,13 +4228,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       for (int i = 0; i < cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
-
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
 
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
+
+//        Log.i("testLaunch", "cyclesList size is " + cyclesList.size());
+//        Log.i("testLaunch", "cycleList holding of integer array is " + cyclesList.get(i).getWorkoutRounds());
+//        Log.i("testLaunch", "integer array being populated is " + workoutTimeIntegerArray);
 
       }
     }
@@ -4264,6 +4276,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dotsAdapter.notifyDataSetChanged();
 
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
+
+//          Log.i("testLaunch", "position is " + positionOfSelectedCycleForModeOne);
+//          Log.i("testLaunch", "integer array is " + workoutTimeIntegerArray);
         }
 
         break;
@@ -4343,20 +4358,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         insertActivityIntoDatabaseAndAssignItsValueToObjects();
       }
 
-      saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase(false);
-      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-
       if (isNewCycle) {
         zeroOutTotalCycleTimes();
         positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
+        Log.i("testLaunch", "workoutCyclesArray pulled during timer launch is " + workoutCyclesArray);
+        Log.i("testLaunch", "position being set at " + positionOfSelectedCycleForModeOne);
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
-      if (!trackActivityWithinCycle) {
-        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
-      }
+      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
+
+//      if (!trackActivityWithinCycle) {
+//        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
+//      }
+
+      saveAddedOrEditedCycleASyncRunnable();
+      queryAndSortAllCyclesFromDatabase(false);
+      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+
+
 
       runOnUiThread(new Runnable() {
         @Override
@@ -4393,16 +4414,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     AsyncTask.execute(() -> {
-      saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase(false);
-      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-
       if (isNewCycle) {
         zeroOutTotalCycleTimes();
         positionOfSelectedCycleForModeThree = pomArray.size() - 1;
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
+
+      saveAddedOrEditedCycleASyncRunnable();
+      queryAndSortAllCyclesFromDatabase(false);
+      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeThree);
 
@@ -4553,6 +4574,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) pomCycles = pomCyclesList.get(position);
   }
 
+  //Todo: Likely a save issue.
   //Getting toggle stat from adapter on timer launch and saving that. Retrieve w/ everything else coming back.
   private void saveAddedOrEditedCycleASyncRunnable() {
     Gson gson = new Gson();
@@ -4572,6 +4594,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       workoutString = friendlyString(workoutString);
       roundTypeString = gson.toJson(typeOfRound);
       roundTypeString = friendlyString(roundTypeString);
+
+      //Todo: Saving @ position 0. workoutCyclesArray is not maintaining size.
+      Log.i("testLaunch", "saving at position " + positionOfSelectedCycleForModeOne);
+//      Log.i("testLaunch", "integer array being saved is " + workoutTimeIntegerArray);
+
+//      for (int i=0; i<cyclesList.size(); i++) {
+//        Log.i("testLaunch", "total array is " + cyclesList.get(i).getWorkoutRounds());
+//      }
 
       if (cycleHasActivityAssigned) {
         cycles.setTdeeActivityExists(true);
