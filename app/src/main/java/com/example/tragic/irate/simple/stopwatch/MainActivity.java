@@ -4358,26 +4358,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         insertActivityIntoDatabaseAndAssignItsValueToObjects();
       }
 
-      if (isNewCycle) {
-        zeroOutTotalCycleTimes();
-        positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
-        Log.i("testLaunch", "workoutCyclesArray pulled during timer launch is " + workoutCyclesArray);
-        Log.i("testLaunch", "position being set at " + positionOfSelectedCycleForModeOne);
-      } else {
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-      }
-
-      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
-
-//      if (!trackActivityWithinCycle) {
-//        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
-//      }
-
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromDatabase(false);
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
+      if (isNewCycle) {
+        zeroOutTotalCycleTimes();
+        positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
+      } else {
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      }
 
+      if (!trackActivityWithinCycle) {
+        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
+      }
 
       runOnUiThread(new Runnable() {
         @Override
@@ -4414,16 +4408,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     AsyncTask.execute(() -> {
+      saveAddedOrEditedCycleASyncRunnable();
+      queryAndSortAllCyclesFromDatabase(false);
+      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+
       if (isNewCycle) {
         zeroOutTotalCycleTimes();
         positionOfSelectedCycleForModeThree = pomArray.size() - 1;
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
-
-      saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase(false);
-      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeThree);
 
