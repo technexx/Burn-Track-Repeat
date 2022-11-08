@@ -1190,6 +1190,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     isNewCycle = false;
 
     if (mode == 1) {
+      positionOfSelectedCycleForModeOne = position;
+    }
+    if (mode == 3) {
+      positionOfSelectedCycleForModeThree = position;
+    }
+
+    if (mode == 1) {
       cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
       trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(position);
     }
@@ -1205,14 +1212,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsAdapter.notifyDataSetChanged();
 
     if (mode == 1) {
-      positionOfSelectedCycleForModeOne = position;
       savedCycleAdapter.removeCycleAsActive();
       launchTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
-
-      Log.i("testPos", "position in onClick is " + positionOfSelectedCycleForModeOne);
     }
     if (mode == 3) {
-      positionOfSelectedCycleForModeThree = position;
       savedPomCycleAdapter.removeCycleAsActive();
       launchPomTimerCycle(CYCLE_LAUNCHED_FROM_RECYCLER_VIEW);
     }
@@ -4195,6 +4198,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
+
   private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
     if (mode == 1 || forAllModes) {
       workoutCyclesArray.clear();
@@ -4206,6 +4210,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       for (int i = 0; i < cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
+
         workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
         typeOfRoundArray.add(cyclesList.get(i).getRoundType());
         workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
@@ -4213,12 +4218,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
-//        Log.i("testLaunch", "rounds being added are " + cyclesList.get(i).getWorkoutRounds());
-
       }
-
-//      Log.i("testLaunch", "workoutCyclesArray is " + workoutCyclesArray);
-
     }
     if (mode == 3 || forAllModes) {
       pomArray.clear();
@@ -4231,7 +4231,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This is all correct on initial edit/cycle creation. workoutTimeIntegerArray used as var to populate.
   private void populateCycleRoundAndRoundTypeArrayLists() {
     switch (mode) {
       case 1:
@@ -4255,12 +4254,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           dotsAdapter.setTypeOfRoundList(typeOfRound);
           dotsAdapter.notifyDataSetChanged();
 
+          Log.i("testLaunch", "string array in populateCycle method is " + workoutCyclesArray);
+          Log.i("testLaunch", "fetched array from string in populateCycle method is " + workoutCyclesArray);
+          Log.i("testLaunch", "integer array in populateCycle method is " + workoutTimeIntegerArray);
+
           cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
-
-          Log.i("testLaunch", "position is " + positionOfSelectedCycleForModeOne);
-
-          Log.i("testLaunch", "string array from string in populateCycle method is " + workoutCyclesArray);
-          Log.i("testLaunch", "integer array (single cycle) in populateCycle method is " + workoutTimeIntegerArray);
         }
 
         break;
@@ -4350,9 +4348,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
-
-      Log.i("testPos", "position in timer launch is " + positionOfSelectedCycleForModeOne);
-
 
       if (!trackActivityWithinCycle) {
         setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
@@ -4450,8 +4445,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (editCyclesPopupWindow.isShowing()) {
       editCyclesPopupWindow.dismiss();
     }
-
-    fadeProgressIn.cancel();
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
   }
@@ -4554,9 +4547,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
   String pomString = "";
 
-
-  //Todo: Likely a save issue.
-  //Todo: Seems to only occur on launch. Save seems okay. Positional?
   //Getting toggle stat from adapter on timer launch and saving that. Retrieve w/ everything else coming back.
   private void saveAddedOrEditedCycleASyncRunnable() {
     Gson gson = new Gson();
