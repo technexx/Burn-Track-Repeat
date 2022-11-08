@@ -651,7 +651,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Accessing any cycles will use last saved cycle and then save it in that position.
   //Todo: Edit -> Timer transition different (and could use work) than Fab -> Timer.
       //Todo: Should probably make recyclerView invisible again.
   //Todo: Okay to release a 1.0.1 version!
@@ -1517,15 +1516,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       removeCycleHighlights();
       editHighlightedCycleLogic();
 
-      cycles = cyclesList.get(positionOfSelectedCycleForModeOne);
-      pomCycles = pomCyclesList.get(positionOfSelectedCycleForModeThree);
+      if (mode == 1) {
+        cycles = cyclesList.get(positionOfSelectedCycleForModeOne);
+      }
+      if (mode == 3) {
+        pomCycles = pomCyclesList.get(positionOfSelectedCycleForModeThree);
+      }
 
       clearRoundAndCycleAdapterArrayLists();
 
       populateCycleRoundAndRoundTypeArrayLists();
       populateRoundAdapterArraysForHighlightedCycle();
 
-      setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
       assignOldCycleValuesToCheckForChanges();
     });
 
@@ -1896,7 +1898,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateLayoutManagers();
     instantiateRoundAdaptersAndTheirCallbacks();
     setRoundRecyclersOnAdaptersAndLayoutManagers();
-    setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
     setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight();
     instantiateLapAdapterAndSetRecyclerOnIt();
 
@@ -3338,8 +3339,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab.setEnabled(true);
     cycleRoundsAdapter.setIsRoundCurrentlySelectedBoolean(false);
     cycleRoundsAdapter.notifyDataSetChanged();
-
-    setSingleColumnRoundRecyclerView();
   }
 
   private void assignOldCycleValuesToCheckForChanges() {
@@ -3856,9 +3855,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void activateResumeOrResetOptionForCycle() {
     if (mode == 1) {
       if (stateOfTimers.isModeOneTimerActive()) {
-//        if (isNewCycle) {
-//          positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
-//        }
+        if (isNewCycle) {
+          positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
+        }
         savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeOne);
         savedCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeOne - numberOfRoundsLeftForModeOne);
@@ -3869,9 +3868,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode == 3) {
       if (stateOfTimers.isModeThreeTimerActive()) {
-//        if (isNewCycle) {
-//          positionOfSelectedCycleForModeThree = pomArray.size() - 1;
-//        }
+        if (isNewCycle) {
+          positionOfSelectedCycleForModeThree = pomArray.size() - 1;
+        }
         savedPomCycleAdapter.setCycleAsActive();
         savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeThree);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeThree - numberOfRoundsLeftForModeThree);
@@ -4141,7 +4140,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         } else {
           showToastIfNoneActive("Full!");
         }
-        setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
       } else {
         workoutTimeIntegerArray.set(roundSelectedPosition, integerValue * 1000);
         convertedWorkoutTimeStringArray.set(roundSelectedPosition, longToStringConverters.convertSecondsToMinutesBasedString(integerValue));
@@ -4175,8 +4173,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           workoutTimeIntegerArray.remove(roundSelectedPosition);
           convertedWorkoutTimeStringArray.remove(roundSelectedPosition);
 
-          setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
-
           subtractedRoundIsFading = false;
         }
         if (roundIsSelected) {
@@ -4189,24 +4185,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         showToastIfNoneActive("Empty!");
       }
     }
-  }
-
-  private void setRoundRecyclerViewsWhenChangingAdapterCount(ArrayList<Integer> adapterList) {
-    if (mode == 1) {
-      if (adapterList.size() <= 8) {
-        setSingleColumnRoundRecyclerView();
-      } else {
-        setDoubleColumnRoundRecyclerView();
-      }
-    }
-  }
-
-  private void setSingleColumnRoundRecyclerView() {
-
-  }
-
-  private void setDoubleColumnRoundRecyclerView() {
-
   }
 
   public String friendlyString(String altString) {
@@ -4235,11 +4213,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
-//        Log.i("testLaunch", "cyclesList size is " + cyclesList.size());
-//        Log.i("testLaunch", "cycleList holding of integer array is " + cyclesList.get(i).getWorkoutRounds());
-//        Log.i("testLaunch", "integer array being populated is " + workoutTimeIntegerArray);
+        Log.i("testLaunch", "rounds being added are " + cyclesList.get(i).getWorkoutRounds());
 
       }
+
+      Log.i("testLaunch", "workoutCyclesArray is " + workoutCyclesArray);
+
     }
     if (mode == 3 || forAllModes) {
       pomArray.clear();
@@ -4567,6 +4546,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) cycles = cyclesList.get(position);
     if (mode == 3) pomCycles = pomCyclesList.get(position);
   }
+  String pomString = "";
+
 
   //Todo: Likely a save issue.
   //Getting toggle stat from adapter on timer launch and saving that. Retrieve w/ everything else coming back.
@@ -4574,8 +4555,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Gson gson = new Gson();
     String workoutString = "";
     String roundTypeString = "";
-    String pomString = "";
-
     int cycleID;
     if (mode == 1) {
       if (isNewCycle) {
@@ -4584,18 +4563,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleID = cyclesList.get(positionOfSelectedCycleForModeOne).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
       }
+
       workoutString = gson.toJson(workoutTimeIntegerArray);
       workoutString = friendlyString(workoutString);
       roundTypeString = gson.toJson(typeOfRound);
       roundTypeString = friendlyString(roundTypeString);
 
-      //Todo: Saving @ position 0. workoutCyclesArray is not maintaining size.
+      Log.i("testLaunch", "workout String being converted is " + workoutString);
       Log.i("testLaunch", "saving at position " + positionOfSelectedCycleForModeOne);
-//      Log.i("testLaunch", "integer array being saved is " + workoutTimeIntegerArray);
+      Log.i("testLaunch", "integer array being saved is " + workoutTimeIntegerArray);
 
-//      for (int i=0; i<cyclesList.size(); i++) {
+      for (int i=0; i<cyclesList.size(); i++) {
 //        Log.i("testLaunch", "total array is " + cyclesList.get(i).getWorkoutRounds());
-//      }
+      }
 
       if (cycleHasActivityAssigned) {
         cycles.setTdeeActivityExists(true);
@@ -6399,8 +6379,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomTimerValueInEditPopUpTextViewOne.setVisibility(View.VISIBLE);
         pomTimerValueInEditPopUpTextViewTwo.setVisibility(View.VISIBLE);
         pomTimerValueInEditPopUpTextViewThree.setVisibility(View.VISIBLE);
-
-        setRoundRecyclerViewsWhenChangingAdapterCount(workoutTimeIntegerArray);
 
         sortHigh.setVisibility(View.GONE);
         sortLow.setVisibility(View.GONE);
