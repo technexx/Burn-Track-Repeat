@@ -107,11 +107,10 @@
         android:id="@+id/pomTimerValueInEditPopUpTextViewOne"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toStartOf="@id/pomTimerValueInEditPopUpTextViewTwo"
+        app:layout_constraintStart_toStartOf="@id/firstRoundTypeHeaderInEditPopUp"
+        app:layout_constraintEnd_toEndOf="@id/firstRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="6dp"
+        android:layout_marginTop="8dp"
         android:textSize="24sp">
     </TextView>
 
@@ -119,11 +118,10 @@
         android:id="@+id/pomTimerValueInEditPopUpTextViewTwo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="@id/secondRoundTypeHeaderInEditPopUp"
+        app:layout_constraintEnd_toEndOf="@id/secondRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewOne"
-        app:layout_constraintEnd_toStartOf="@id/pomTimerValueInEditPopUpTextViewThree"
-        android:layout_marginTop="20dp"
-        android:layout_marginStart="2sp"
+        android:layout_marginTop="8dp"
         android:textSize="24sp">
     </TextView>
 
@@ -131,11 +129,10 @@
         android:id="@+id/pomTimerValueInEditPopUpTextViewThree"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/pomTimerValueInEditPopUpTextViewTwo"
-        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="@id/thirdRoundTypeHeaderInEditPopUp"
+        app:layout_constraintEnd_toEndOf="@id/thirdRoundTypeHeaderInEditPopUp"
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="28dp"
+        android:layout_marginTop="8dp"
         android:textSize="24sp">
     </TextView>
 

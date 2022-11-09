@@ -652,9 +652,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Edit -> Timer transition different (and could use work) than Fab -> Timer.
-      //Todo: Should probably make recyclerView invisible again.
+  //Todo: User settings spinner invisible (tho they work) in <1920h
+  //Todo: Need stats frag tab layout text decision.
+  //Todo: Ghosting in moto appears every click between (and including) "-" and end of round.
   //Todo: Okay to release a 1.0.1 version!
+  //Todo: Change back pom cycle times to original (non-testing).
 
   //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
@@ -1024,7 +1026,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void resumeOrResetCycle(int resumeOrReset) {
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
-
       if (mode == 1) {
         timeLeftForPomCyclesTimer.setVisibility(View.GONE);
         progressBar.setVisibility(View.VISIBLE);
@@ -1191,14 +1192,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode == 1) {
       positionOfSelectedCycleForModeOne = position;
+
+      cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
+      trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(position);
     }
     if (mode == 3) {
       positionOfSelectedCycleForModeThree = position;
-    }
-
-    if (mode == 1) {
-      cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
-      trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(position);
     }
 
     setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(position);
@@ -3651,24 +3650,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleCycleAndPomCycleRecyclerViewVisibilities(boolean launchingPopUp) {
-//    toggleDayAndNightModesForMain(colorThemeMode);
-//
-//    if (launchingPopUp) {
-//      if (mode == 1) {
-//        savedCycleRecycler.setVisibility(View.GONE);
-//      }
-//      if (mode == 3) {
-//        savedPomCycleRecycler.setVisibility(View.GONE);
-//      }
-//      emptyCycleList.setVisibility(View.GONE);
-//    } else {
-//      if (mode == 1) {
-//        savedCycleRecycler.setVisibility(View.VISIBLE);
-//      }
-//      if (mode == 3) {
-//        savedPomCycleRecycler.setVisibility(View.VISIBLE);
-//      }
-//    }
+    toggleDayAndNightModesForMain(colorThemeMode);
+
+    if (launchingPopUp) {
+      if (mode == 1) {
+        savedCycleRecycler.setVisibility(View.GONE);
+      }
+      if (mode == 3) {
+        savedPomCycleRecycler.setVisibility(View.GONE);
+      }
+      emptyCycleList.setVisibility(View.GONE);
+    } else {
+      if (mode == 1) {
+        savedCycleRecycler.setVisibility(View.VISIBLE);
+      }
+      if (mode == 3) {
+        savedPomCycleRecycler.setVisibility(View.VISIBLE);
+      }
+    }
   }
 
   private void instantiateNotifications() {
@@ -4122,7 +4121,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleRoundsAdapter.notifyDataSetChanged();
         subtractRoundFromCycleButton.setClickable(false);
       } else {
-        showToastIfNoneActive("No Pomodoro cycle to clear!");
+        showToastIfNoneActive("Nothing to clear!");
       }
     }
   }
