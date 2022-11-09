@@ -654,10 +654,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: User settings spinner invisible (tho they work) in <1920h
   //Todo: Need stats frag tab layout text decision.
+  //Todo: Closing app briefly display notifications (onStop/onDestroy)
   //Todo: Okay to release a 1.0.1 version!
   //Todo: Change back pom cycle times to original (non-testing).
 
-  //Todo: Test simultaneous timer endings.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -4911,7 +4911,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchTimeTextView.setText(displayTime);
         msTimeTextView.setText(displayMs);
 
-        decreaseTextSizeForTimersForStopWatch(stopWatchTotalTime);
+//        decreaseTextSizeForTimersForStopWatch(stopWatchTotalTime);
 
         if (stopWatchTotalTime < 3600000) {
           mHandler.postDelayed(this, 10);
@@ -5345,7 +5345,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.notifyDataSetChanged();
 
-        decreaseTextSizeForTimers(setMillis);
+        if (mode==1) {
+          decreaseTextSizeForTimers(setMillis);
+        }
 
         if (setMillis > 3600000) {
           setMillis = 3600000;
@@ -5391,7 +5393,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.notifyDataSetChanged();
 
-        decreaseTextSizeForTimers(breakMillis);
+        if (mode == 1) {
+          decreaseTextSizeForTimers(breakMillis);
+        }
 
         if (breakMillis > 3600000) {
           breakMillis = 3600000;
@@ -5449,8 +5453,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void startBreakTimer() {
     long startMillis = breakMillis;
-    setInitialTextSizeForTimers(breakMillis);
     long initialMillisValue = breakMillis;
+
+    if (mode == 1) {
+      setInitialTextSizeForTimers(breakMillis);
+    }
 
     modeOneCountdownTimer = new CountDownTimer(breakMillis, timerRunnableDelay) {
       @Override
@@ -5478,8 +5485,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void startPomTimer() {
     long startMillis = pomMillis;
-    setInitialTextSizeForTimers(pomMillis);
     long initialMillisValue = pomMillis;
+
+    if (mode == 3) {
+      setInitialTextSizeForTimers(pomMillis);
+    }
 
     modeThreeCountDownTimer = new CountDownTimer(pomMillis, timerRunnableDelay) {
       @Override
@@ -5487,13 +5497,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         currentProgressBarValueForModeThree = (int) objectAnimatorPom.getAnimatedValue();
         pomMillis = millisUntilFinished;
+
         timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
+
         if (pomMillis < 500) {
           stateOfTimers.setModeThreeTimerDisabled(true);
         }
-
         if (mode == 3) {
           increaseTextSizeForTimers(startMillis, pomMillis);
+          Log.i("testChange", "changing textSize!");
         }
 
         pomDotsAdapter.notifyDataSetChanged();
@@ -6389,34 +6401,26 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void resetTimerLogicForAllTimers() {
-    vibrator.cancel();
-
-    if (mediaPlayer.isPlaying()) {
-      //      mediaPlayer.release();
-      mediaPlayer.stop();
-      mediaPlayer.reset();
-    }
-
-    mediaPlayer = MediaPlayer.create(this, ringToneUri);
-
-    setHasTextSizeChangedForTimers(false);
-    clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-
-    setCyclesCompletedTextView();
-
-    next_round.setEnabled(true);
-  }
-
   private void resetCyclesTimer() {
     stateOfTimers.setModeOneTimerPaused(true);
     stateOfTimers.setModeOneTimerEnded(false);
     stateOfTimers.setModeOneTimerDisabled(false);
     stateOfTimers.setModeOneTimerActive(false);
 
-    resetTimerLogicForAllTimers();
+    cyclesTextSizeHasChanged = false;
+    vibrator.cancel();
+    next_round.setEnabled(true);
 
     removeActivityOrCycleTimeRunnables(trackActivityWithinCycle);
+
+    if (mediaPlayer.isPlaying()) {
+      mediaPlayer.stop();
+      mediaPlayer.reset();
+    }
+    mediaPlayer = MediaPlayer.create(this, ringToneUri);
+
+    clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+    setCyclesCompletedTextView();
 
     currentProgressBarValueForModeOne = maxProgress;
     progressBar.setProgress(maxProgress);
@@ -6506,9 +6510,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeThreeTimerDisabled(false);
     stateOfTimers.setModeThreeTimerActive(false);
 
-    resetTimerLogicForAllTimers();
+    pomCyclesTextSizeHasChanged = false;
+    next_round.setEnabled(true);
+    vibrator.cancel();
+
+    if (mediaPlayer.isPlaying()) {
+      mediaPlayer.stop();
+      mediaPlayer.reset();
+    }
+    mediaPlayer = MediaPlayer.create(this, ringToneUri);
+
+    clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+    setCyclesCompletedTextView();
 
     removePomCycleTimeRunnable();
+
     mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
 
     currentProgressBarValueForModeThree = maxProgress;
