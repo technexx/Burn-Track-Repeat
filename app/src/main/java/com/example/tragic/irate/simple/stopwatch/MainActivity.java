@@ -652,9 +652,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Resetting Pom via clicking timer after cycle ends b0rks cycles timer.
+      //Todo: Sets a lot of the rounds to "0"
   //Todo: User settings spinner invisible (tho they work) in <1920h
   //Todo: Need stats frag tab layout text decision.
-  //Todo: Ghosting in moto appears every click between (and including) "-" and end of round.
   //Todo: Okay to release a 1.0.1 version!
   //Todo: Change back pom cycle times to original (non-testing).
 
@@ -2527,8 +2528,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTdeePopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     aboutSettingsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
-    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-//    timerPopUpWindow.setAnimationStyle(R.style.SlideFromRightAnimation);
+//    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    timerPopUpWindow.setAnimationStyle(R.style.SlideFromRightAnimation);
   }
 
   private void instantiateArrayLists() {
@@ -5798,10 +5799,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode == 3) {
       timeLeftForPomCyclesTimer.startAnimation(fadeProgressOut);
+      progressBarForPom.startAnimation(fadeProgressOut);
     }
 
     resetButtonForPomCycles.setVisibility(View.GONE);
-    progressBarForPom.startAnimation(fadeProgressOut);
     currentProgressBarValueForModeThree = maxProgress;
 
     mHandler.post(endFadeForModeThree);
@@ -6387,9 +6388,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         addTDEEfirstMainTextView.setVisibility(View.INVISIBLE);
         total_set_header.setText(R.string.total_work);
-
-//        savedCycleRecycler.setVisibility(View.GONE);
-//        savedPomCycleRecycler.setVisibility(View.VISIBLE);
         break;
     }
   }
