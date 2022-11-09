@@ -652,8 +652,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Resetting Pom via clicking timer after cycle ends b0rks cycles timer.
-      //Todo: Sets a lot of the rounds to "0"
   //Todo: User settings spinner invisible (tho they work) in <1920h
   //Todo: Need stats frag tab layout text decision.
   //Todo: Okay to release a 1.0.1 version!
@@ -6147,7 +6145,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       } else {
-        resetCyclesTimer();
         resetPomCyclesTimer();
       }
     }
