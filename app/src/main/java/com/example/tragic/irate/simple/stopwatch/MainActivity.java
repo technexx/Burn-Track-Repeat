@@ -652,8 +652,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: User settings spinner invisible (tho they work) in <1920h
   //Todo: Need stats frag tab layout text decision.
+  //Todo: Soft kb show in popUps only.
   //Todo: Okay to release a 1.0.1 version!
   //Todo: Change back pom cycle times to original (non-testing).
 
@@ -694,13 +694,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat.cancel(1);
     mHandler.removeCallbacks(globalNotficationsRunnable);
 
-    View view = this.getCurrentFocus();
-
-    if (view != null) {
-      InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-      imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
+//    View view = this.getCurrentFocus();
+//
+//    if (view != null) {
+//      InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//      imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+//    }
   }
 
   @Override
