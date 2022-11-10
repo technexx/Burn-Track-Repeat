@@ -7,6 +7,7 @@
     android:theme="@style/StatFragmentThemeDark"
     android:background="@color/night_shadow">
 
+    <!--tabMode:scrollable and tabGravity:center is our alternative for single lines !-->
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/calorie_comparison_tab_layout"
         android:layout_width="match_parent"
@@ -19,8 +20,7 @@
         app:tabTextAppearance="@style/TabLayoutTextStyle_h1920"
         app:tabRippleColor="@android:color/transparent"
         app:tabIndicatorFullWidth="true"
-        app:tabMode="scrollable"
-        app:tabGravity="center"
+        app:tabMode="fixed"
         android:background="@color/alien_black" />
 
     <androidx.constraintlayout.widget.ConstraintLayout

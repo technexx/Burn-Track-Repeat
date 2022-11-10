@@ -652,7 +652,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Need stats frag tab layout text decision.
+  //Todo: Moto colors in stats fragment looks off
   //Todo: Soft kb show in popUps only.
   //Todo: Okay to release a 1.0.1 version!
   //Todo: Change back pom cycle times to original (non-testing).
