@@ -10,7 +10,7 @@
     <com.google.android.material.tabs.TabLayout
         android:id="@+id/calorie_comparison_tab_layout"
         android:layout_width="match_parent"
-        android:layout_height="30dp"
+        android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:tabTextColor="@color/lighter_grey"
@@ -19,7 +19,8 @@
         app:tabTextAppearance="@style/TabLayoutTextStyle_h1920"
         app:tabRippleColor="@android:color/transparent"
         app:tabIndicatorFullWidth="true"
-        app:tabMode="fixed"
+        app:tabMode="scrollable"
+        app:tabGravity="center"
         android:background="@color/alien_black" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
