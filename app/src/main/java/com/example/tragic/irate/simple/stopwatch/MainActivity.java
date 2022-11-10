@@ -654,7 +654,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: User settings spinner invisible (tho they work) in <1920h
   //Todo: Need stats frag tab layout text decision.
-  //Todo: Closing app briefly display notifications (onStop/onDestroy)
   //Todo: Okay to release a 1.0.1 version!
   //Todo: Change back pom cycle times to original (non-testing).
 
@@ -665,6 +664,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
 
+  //Todo: Closing app briefly display notifications (onStop/onDestroy)
   //Todo: Had a bug of timer displaying and iterating +1 second from time listed in edit popUp's round.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had a bug of iterating calories but not time.
@@ -694,7 +694,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     notificationManagerCompat.cancel(1);
     mHandler.removeCallbacks(globalNotficationsRunnable);
 
-//    inputMethodManager.hideSoftInputFromWindow(mainView.getWindowToken(), 0);
+    View view = this.getCurrentFocus();
+
+    if (view != null) {
+      InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+      imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    }
+
   }
 
   @Override
@@ -724,7 +730,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     notificationManagerCompat.cancel(1);
     mHandler.removeCallbacks(globalNotficationsRunnable);
-    Log.i("testNote", "note runnable being removed!");
 
   }
 
