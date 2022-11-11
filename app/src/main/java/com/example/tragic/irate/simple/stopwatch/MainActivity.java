@@ -650,7 +650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Title of cycle + activity can look incongruous.
+  //Todo: FAB / Stopwatch button should not overlap recycler.
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
   //Todo: Sliding animations could be better (longer?).
   //Todo: Edit Cycles hint should change/be removed.

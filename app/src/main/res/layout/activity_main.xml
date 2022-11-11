@@ -74,8 +74,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         android:layout_marginEnd="6dp"
         android:layout_marginBottom="6dp"
-        android:background="@drawable/fab_circle"
-        android:src="@drawable/fab_plus"
+        android:background="@drawable/fab_circle_2"
+        android:src="@drawable/fab_plus_2"
         app:elevation="8dp">
     </ImageButton>
 
@@ -87,8 +87,8 @@
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginStart="6dp"
         android:layout_marginBottom="6dp"
-        android:src="@drawable/ic_black_pointer"
-        android:background="@drawable/stopwatch_circle"
+        android:src="@drawable/stopwatch_icon_2"
+        android:background="@drawable/stopwatch_circle_2"
         app:elevation="8dp">
     </ImageButton>
 
