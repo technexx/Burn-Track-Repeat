@@ -654,7 +654,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
-  //Todo: Edit Cycles hint should change/be removed.
   //Todo: Switching to Breaks in edit popUp recalls last used (as it should once entered, but not for new/edited cycle).
   //Todo: Moto colors in stats fragment looks off.
   //Todo: Change back pom cycle times to original (non-testing).

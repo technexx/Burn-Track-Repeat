@@ -67,7 +67,7 @@
     <string name="cycle_saved">Cycle saved!</string>
     <string name="cycle_exists">Identical cycle already exists!</string>
     <string name="bullet">\u2022</string>s
-    <string name="cycle_name">Title (e.g. Squats, Rows)</string>
+    <string name="cycle_name">Title</string>
     <string name="default_title">My Uber Workout</string>
 
     <string name="tdee_track"><b>Track\nCalories</b></string>
