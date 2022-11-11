@@ -193,10 +193,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   View aboutViewInSettings;
 
   PopupWindow sortPopupWindow;
-  PopupWindow savedCyclePopupWindow;
   PopupWindow deleteCyclePopupWindow;
   PopupWindow editCyclesPopupWindow;
-  PopupWindow settingsPopupWindow;
   PopupWindow aboutSettingsPopUpWindow;
 
   EditText cycleNameEdit;
@@ -656,6 +654,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Soft kb show in popUps only.
   //Todo: Okay to release a 1.0.1 version!
   //Todo: Change back pom cycle times to original (non-testing).
+  //Todo: Deep test of all database stuff.
+
+  //Todo: After adding current app screenshots, update resume on job sites.
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
@@ -687,19 +688,38 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onResume() {
     super.onResume();
-    //Prevents crashing on resime.
+    //Prevents crashing on resume.
     setVisible(true);
 
     dismissNotification = true;
     notificationManagerCompat.cancel(1);
     mHandler.removeCallbacks(globalNotficationsRunnable);
 
-//    View view = this.getCurrentFocus();
-//
-//    if (view != null) {
-//      InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//      imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
-//    }
+    mHandler.postDelayed(() -> {
+      if (editCyclesPopupWindow.isShowing()) {
+        inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+      }
+      if (timerPopUpWindow.isShowing()) {
+        inputMethodManager.hideSoftInputFromWindow(timerPopUpView.getWindowToken(), 0);
+      }
+      if (stopWatchPopUpWindow.isShowing()) {
+        inputMethodManager.hideSoftInputFromWindow(stopWatchPopUpView.getWindowToken(), 0);
+      }
+
+      if (deleteCyclePopupWindow.isShowing()) {
+        inputMethodManager.hideSoftInputFromWindow(deleteCyclePopupView.getWindowToken(), 0);
+      }
+      if (sortPopupWindow.isShowing()) {
+        inputMethodManager.hideSoftInputFromWindow(sortCyclePopupView.getWindowToken(), 0);
+      }
+      if (addTdeePopUpWindow.isShowing()) {
+        inputMethodManager.hideSoftInputFromWindow(addTDEEPopUpView.getWindowToken(), 0);
+      }
+      if (aboutSettingsPopUpWindow.isShowing()) {
+        inputMethodManager.hideSoftInputFromWindow(aboutSettingsPopUpView.getWindowToken(), 0);
+      }
+
+    }, 300);
   }
 
   @Override
@@ -735,8 +755,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Remember, this does not execute if we are dismissing a popUp.
   @Override
   public void onBackPressed() {
-    if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
-      return;
+    if (timerPopUpWindow.isShowing()) {
+      timerPopUpWindow.dismiss();
+      timerPopUpDismissalLogic();
+    }
+
+    if (editCyclesPopupWindow.isShowing()) {
+      editCyclesPopupWindow.dismiss();
+      editCyclesPopUpDismissalLogic();
     }
 
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
@@ -1316,6 +1342,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testDimensions", "height is " + phoneHeight + " and width is " + phoneWidth);
   }
 
+  //Todo: Lack of focus b0rks title edit. Should gain focus when clicked.
   private void setEditCyclesLayoutForDifferentHeights() {
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -1492,7 +1519,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab.setOnClickListener(v -> {
       fabLogic();
       removeCycleHighlights();
-
     });
 
     sortButton.setOnClickListener(v -> {
@@ -1551,7 +1577,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     });
 
-    //Selects all text when long clicking in editText.
     cycleNameEdit.setOnLongClickListener(v -> {
       cycleNameEdit.selectAll();
       return true;
@@ -2510,10 +2535,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEPopUpView = inflater.inflate(R.layout.daily_stats_add_popup_for_main_activity, null);
     aboutSettingsPopUpView = inflater.inflate(R.layout.about_settings_popup_layout, null);
 
-    savedCyclePopupWindow = new PopupWindow(savedCyclePopupView, convertDensityPixelsToScalable(250), convertDensityPixelsToScalable(450), true);
     deleteCyclePopupWindow = new PopupWindow(deleteCyclePopupView, convertDensityPixelsToScalable(300), convertDensityPixelsToScalable(150), true);
     sortPopupWindow = new PopupWindow(sortCyclePopupView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
-    settingsPopupWindow = new PopupWindow(settingsPopupView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
     addTdeePopUpWindow = new PopupWindow(addTDEEPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
     aboutSettingsPopUpWindow = new PopupWindow(aboutSettingsPopUpView, WindowManager.LayoutParams.WRAP_CONTENT, WindowManager.LayoutParams.WRAP_CONTENT, true);
 
@@ -2521,11 +2544,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTimerLayoutForDifferentHeights();
     setStopWatchLayoutForDifferentHeights();
 
-    savedCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimationWithoutAnimatedExit);
     editCyclesPopupWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
-    settingsPopupWindow.setAnimationStyle(R.style.WindowAnimation);
     stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     addTdeePopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     aboutSettingsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);

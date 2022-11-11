@@ -19,6 +19,7 @@ import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
@@ -266,6 +267,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     int phoneHeight;
     int phoneWidth;
 
+    InputMethodManager inputMethodManager;
+
     public interface changeOnOptionsItemSelectedMenu {
         void onChangeOnOptionsMenu(int typeOfSort);
     }
@@ -280,6 +283,27 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public void setSortMenu(changeSortMenu xChangeSortMenu) {
         this.mChangeSortMenu = xChangeSortMenu;
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+
+        mHandler.postDelayed(()-> {
+            if (addTdeePopUpWindow.isShowing()) {
+                inputMethodManager.hideSoftInputFromWindow(addTDEEPopUpView.getWindowToken(), 0);
+            }
+            if (tdeeEditPopUpWindow.isShowing()) {
+                inputMethodManager.hideSoftInputFromWindow(tdeeEditView.getWindowToken(), 0);
+            }
+            if (caloriesConsumedAddAndEditPopUpWindow.isShowing()) {
+                inputMethodManager.hideSoftInputFromWindow(caloriesConsumedAddAndEditView.getWindowToken(), 0);
+            }
+            if (aboutStatsPopUpWindow.isShowing()) {
+                inputMethodManager.hideSoftInputFromWindow(aboutStatsPopUpView.getWindowToken(), 0);
+            }
+        }, 300);
+
     }
 
     @Override
@@ -2235,6 +2259,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void instantiateTextViewsAndMiscClasses() {
+        inputMethodManager = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
         longToStringConverters = new LongToStringConverters();
 
         sharedPref = getContext().getSharedPreferences("pref", 0);
