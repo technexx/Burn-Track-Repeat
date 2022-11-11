@@ -653,8 +653,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
 
+  //Todo: Remove cycle title editText focus when buttons in edit popUp.
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
-  //Todo: Switching to Breaks in edit popUp recalls last used (as it should once entered, but not for new/edited cycle).
   //Todo: Moto colors in stats fragment looks off.
   //Todo: Change back pom cycle times to original (non-testing).
   //Todo: Deep test of all database stuff.
@@ -676,9 +676,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Calendar: Dots on bottom (like Reminders), or Green IF at least one activity added, and Red IF at least one activity added AND one food added.
   //Todo: Stats for Pomodoro for future addition.
-  //Todo: Option for ringtones?
+  //Todo: Option for ringtone selection.
   //Todo: Add Day/Night modes.
-  //Todo: Possibly do green/red for day decorator depending on loss/gain of calories. Or have option to toggle.
   //Todo: storeDailyTimesForCycleResuming() and setStoredDailyTimesForCycleResuming() commented out when using ms for daily stats.
   //Todo: Tablet display needs work.
       //Todo: Can be done later. Not meant for tablets.
@@ -2790,8 +2789,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     assignOldCycleValuesToCheckForChanges();
     resetEditPopUpTimerHeaders();
 
-    editPopUpTimerArray.clear();
-    timerValueInEditPopUpTextView.setText("00:00");
     resetTimerKeypadValues();
 
     setTdeeSpinnersToDefaultValues();
@@ -2802,11 +2799,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetTimerKeypadValues() {
-    setTimeValueEnteredWithKeypad = 0;
-    breakTimeValueEnteredWithKeypad = 0;
-    pomWorkValueEnteredWithKeyPad = 0;
-    pomMiniBreakValueEnteredWithKeyPad = 0;
-    pomFullBreakValueEnteredWithKeyPad = 0;
+    timerValueInEditPopUpTextView.setText("00:00");
+
+    if (mode == 1) {
+      setTimeValueEnteredWithKeypad = 0;
+      breakTimeValueEnteredWithKeypad = 0;
+
+      savedEditPopUpArrayForFirstHeaderModeOne.clear();
+      savedEditPopUpArrayForSecondHeaderModeOne.clear();
+    }
   }
 
   private View.OnClickListener cyclesSortOptionListener() {
@@ -3574,12 +3575,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     changeEditTimerTextViewColorIfNotEmpty();
-  }
-
-  private void convertEditPopUpTimerArrayToStringValues(int chosenMode) {
-    if (chosenMode == 1) {
-
-    }
   }
 
   private String convertedTimerArrayToString(ArrayList<String> arrayToConvert) {
