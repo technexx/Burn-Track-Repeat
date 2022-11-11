@@ -67,6 +67,12 @@
     <color name="night_shadow">#1C1C1C</color>
     <color name="retro_black">#1F201F</color>
 
+    <color name="orange_1">#FF8C00</color>
+    <color name="orange_2">#ff8001</color>
+    <color name="orange_3">#FF8C00</color>
+    <color name="orange_4">#FF8C00</color>
+    <color name="orange_5">#FF8C00</color>
+
     <color name="fade_white_1">#F5F5F5</color>
     <color name="fade_white_2">#EEEEEE</color>
     <color name="fade_white_3">#E0E0E0</color>

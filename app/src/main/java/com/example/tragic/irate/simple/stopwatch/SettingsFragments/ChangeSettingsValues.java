@@ -87,7 +87,7 @@ public class ChangeSettingsValues {
         int color = 0;
 
         if (setting==0) color = Color.GREEN;
-        if (setting==1) color = Color.RED;
+        if (setting==1) color = ContextCompat.getColor(mContext, R.color.orange_2);
         if (setting==2) color = ContextCompat.getColor(mContext, R.color.light_blue);
         if (setting==3) color = Color.YELLOW;
         if (setting==4) color = Color.MAGENTA;

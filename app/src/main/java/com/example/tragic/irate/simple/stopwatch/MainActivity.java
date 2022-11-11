@@ -650,6 +650,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Title of cycle + activity can look incongruous.
+  //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
+  //Todo: Sliding animations could be better (longer?).
+  //Todo: Edit Cycles hint should change/be removed.
+  //Todo: Switching to Breaks in edit popUp recalls last used (as it should once entered, but not for new/edited cycle).
   //Todo: Moto colors in stats fragment looks off
   //Todo: Okay to release a 1.0.1 version!
   //Todo: Change back pom cycle times to original (non-testing).
@@ -1200,7 +1205,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void toggleTdeeMode(int positionToToggle) {
     savedCycleAdapter.modifyActiveTdeeModeToggleList(positionToToggle);
-    savedCycleAdapter.setPositionToToggle(positionToToggle);
     savedCycleAdapter.notifyDataSetChanged();
 
     AsyncTask.execute(()-> {
@@ -1585,6 +1589,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     cycleNameEdit.setOnLongClickListener(v -> {
       cycleNameEdit.selectAll();
+//      inputMethodManager.toggleSoftInput(InputMethodManager.SHOW_FORCED,0);
+      inputMethodManager.showSoftInput(editCyclesPopupView.getRootView(), 0);
       return true;
     });
 

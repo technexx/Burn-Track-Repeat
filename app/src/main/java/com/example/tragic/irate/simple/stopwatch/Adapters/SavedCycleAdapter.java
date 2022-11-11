@@ -75,8 +75,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int SET_COLOR;
   int BREAK_COLOR;
 
-  int mPositionToToggle;
-
   int mScreenHeight;
 
   int mThemeMode;
@@ -84,8 +82,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int NIGHT_MODE = 1;
 
   int fullViewBackgroundColor;
-
-  int colorFadeProgressInteger;
 
   public interface onPauseOrResumeListener {
     void onPauseOrResume(boolean timerIsPaused);
@@ -148,14 +144,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     return mHighlightMode;
   }
 
-  private void iterateColorFadeInteger() {
-    if (colorFadeProgressInteger < 6) {
-      colorFadeProgressInteger++;
-    } else {
-      colorFadeProgressInteger = 0;
-    }
-  }
-
   //Remember, constructor always called first (i.e. can't instantiate anything here based on something like setList's size, etc.).
   public SavedCycleAdapter (Context context, ArrayList<String> workoutList, ArrayList<String> typeOfRound, ArrayList<String> workoutTitle, ArrayList<Boolean> tdeeActivityExistsInCycleList, ArrayList<Boolean> activeTdeeModeBooleanList, ArrayList<String> workOutActivityString) {
     this.mContext = context; mWorkoutList = workoutList; this.mTypeOfRound = typeOfRound; this.mWorkoutTitle = workoutTitle; this.mTdeeActivityExistsInCycleList = tdeeActivityExistsInCycleList; this.mActiveTdeeModeBooleanList = activeTdeeModeBooleanList; this.mWorkoutActivityString = workOutActivityString;
@@ -211,33 +199,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     return mActiveTdeeModeBooleanList.get(position);
   }
 
-  public void setPositionToToggle(int position) {
-    this.mPositionToToggle = position;
-  }
-
-  private int colorFromFadeInteger(int value) {
-    int valueToReturn = 0;
-
-    switch (value) {
-      case 0:
-        valueToReturn = R.color.white; break;
-      case 1:
-        valueToReturn = R.color.fade_white_1; break;
-      case 2:
-        valueToReturn = R.color.fade_white_2; break;
-      case 3:
-        valueToReturn = R.color.fade_white_3; break;
-      case 4:
-        valueToReturn = R.color.fade_white_4; break;
-      case 5:
-        valueToReturn = R.color.fade_white_5; break;
-      case 6:
-        valueToReturn = R.color.fade_white_6; break;
-    }
-
-    return valueToReturn;
-  }
-
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -278,13 +239,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
 
-      workoutHolder.workoutNameLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
-      workoutHolder.workoutCyclesLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
+//      workoutHolder.workoutNameLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
+//      workoutHolder.workoutCyclesLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
 
     } else {
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
-      workoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
-      workoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
+//      workoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
+//      workoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
 
 
@@ -406,7 +367,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else {
           mOnCycleClickListener.onCycleClick(position);
         }
-        workoutHolder.fullView.setBackgroundColor(Color.BLACK);
+        workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
       } else {
         ArrayList<Integer> tempList = new ArrayList<>(mHighlightPositionList);
         for (int i = 0; i < mWorkoutList.size(); i++) {
@@ -551,15 +512,5 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       return (minutes + ":" + df.format(remainingSeconds));
     } else if (totalSeconds >=10) return "0:" + totalSeconds;
     else return "0:0" + totalSeconds;
-  }
-
-  public ImageSpan setColorOnInfinityImageSpan(int color, int drawable) {
-    ImageSpan imageSpan = new ImageSpan(mContext, drawable);
-    Drawable tempDrawable = imageSpan.getDrawable();
-
-    tempDrawable.setColorFilter(color, PorterDuff.Mode.SRC_IN);
-    imageSpan = new ImageSpan(tempDrawable);
-
-    return imageSpan;
   }
 }
