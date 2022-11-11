@@ -302,11 +302,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<Integer> workoutIntegerListOfRoundTypeForFirstAdapter;
   ArrayList<Integer> workoutIntegerListOfRoundTypeForSecondAdapter;
 
-  int setValue;
-  int breakValue;
-  int pomValue1;
-  int pomValue2;
-  int pomValue3;
+  int setTimeValueEnteredWithKeypad;
+  int breakTimeValueEnteredWithKeypad;
+  int pomWorkValueEnteredWithKeyPad;
+  int pomMiniBreakValueEnteredWithKeyPad;
+  int pomFullBreakValueEnteredWithKeyPad;
   int editHeaderSelected = 1;
 
   Handler mHandler;
@@ -651,7 +651,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Moto colors in stats fragment looks off
-  //Todo: Soft kb show in popUps only.
   //Todo: Okay to release a 1.0.1 version!
   //Todo: Change back pom cycle times to original (non-testing).
   //Todo: Deep test of all database stuff.
@@ -755,6 +754,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Remember, this does not execute if we are dismissing a popUp.
   @Override
   public void onBackPressed() {
+    if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
+      return;
+    }
+
     if (timerPopUpWindow.isShowing()) {
       timerPopUpWindow.dismiss();
       timerPopUpDismissalLogic();
@@ -1342,7 +1345,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Log.i("testDimensions", "height is " + phoneHeight + " and width is " + phoneWidth);
   }
 
-  //Todo: Lack of focus b0rks title edit. Should gain focus when clicked.
   private void setEditCyclesLayoutForDifferentHeights() {
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -1563,6 +1565,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       populateRoundAdapterArraysForHighlightedCycle();
 
       assignOldCycleValuesToCheckForChanges();
+
+      editPopUpTimerArray.clear();
+      timerValueInEditPopUpTextView.setText("00:00");
+      resetTimerKeypadValues();
     });
 
     //Turns off our cycle highlight mode from adapter.
@@ -2785,12 +2791,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     editPopUpTimerArray.clear();
     timerValueInEditPopUpTextView.setText("00:00");
+    resetTimerKeypadValues();
 
     setTdeeSpinnersToDefaultValues();
     toggleEditPopUpViewsForAddingActivity(false);
 
     //For some reason, shownAsDropDown vs showAtLocation prevents soft kb displacing layout.
     editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
+  }
+
+  private void resetTimerKeypadValues() {
+    setTimeValueEnteredWithKeypad = 0;
+    breakTimeValueEnteredWithKeypad = 0;
+    pomWorkValueEnteredWithKeyPad = 0;
+    pomMiniBreakValueEnteredWithKeyPad = 0;
+    pomFullBreakValueEnteredWithKeyPad = 0;
   }
 
   private View.OnClickListener cyclesSortOptionListener() {
@@ -3475,7 +3490,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleInfinityRounds.setAlpha(0.4f);
         roundType = 1;
       }
-      setAndCapTimerValues(setValue);
+      setAndCapTimerValues(setTimeValueEnteredWithKeypad);
     }
     if (editHeaderSelected == 2) {
       if (isSavedInfinityOptionActiveForBreaks) {
@@ -3485,7 +3500,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         toggleInfinityRounds.setAlpha(0.4f);
         roundType = 3;
       }
-      setAndCapTimerValues(breakValue);
+      setAndCapTimerValues(breakTimeValueEnteredWithKeypad);
     }
   }
 
@@ -4017,21 +4032,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setAndCapTimerValues(int value) {
     switch (mode) {
       case 1:
-        if (editHeaderSelected == 1) setValue = timerValueBoundsFormula(5, 3600, value);
-        if (editHeaderSelected == 2) breakValue = timerValueBoundsFormula(5, 3600, value);
+        if (editHeaderSelected == 1) setTimeValueEnteredWithKeypad = timerValueBoundsFormula(5, 3600, value);
+        if (editHeaderSelected == 2) breakTimeValueEnteredWithKeypad = timerValueBoundsFormula(5, 3600, value);
         break;
       case 3:
-        pomValue1 = timerValueBoundsFormula(600, 5400, value);
-        pomValue2 = timerValueBoundsFormula(180, 600, value);
-        pomValue3 = timerValueBoundsFormula(900, 3600, value);
+        pomWorkValueEnteredWithKeyPad = timerValueBoundsFormula(600, 5400, value);
+        pomMiniBreakValueEnteredWithKeyPad = timerValueBoundsFormula(180, 600, value);
+        pomFullBreakValueEnteredWithKeyPad = timerValueBoundsFormula(900, 3600, value);
         break;
     }
   }
 
   private void setAndCapPomValuesForEditTimer(int value, int variableToCap) {
-    if (variableToCap == 1) pomValue1 = timerValueBoundsFormula(600, 3600, value);
-    if (variableToCap == 2) pomValue2 = timerValueBoundsFormula(180, 600, value);
-    if (variableToCap == 3) pomValue3 = timerValueBoundsFormula(900, 3600, value);
+    if (variableToCap == 1) pomWorkValueEnteredWithKeyPad = timerValueBoundsFormula(600, 3600, value);
+    if (variableToCap == 2) pomMiniBreakValueEnteredWithKeyPad = timerValueBoundsFormula(180, 600, value);
+    if (variableToCap == 3) pomFullBreakValueEnteredWithKeyPad = timerValueBoundsFormula(900, 3600, value);
   }
 
   public int timerValueBoundsFormula(int min, int max, int value) {
@@ -4083,16 +4098,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       switch (roundType) {
         case 1:
-          addOrReplaceRounds(setValue, roundIsSelected);
-          editPopUpTimerArray = convertIntegerToStringArray(setValue);
+          addOrReplaceRounds(setTimeValueEnteredWithKeypad, roundIsSelected);
+          editPopUpTimerArray = convertIntegerToStringArray(setTimeValueEnteredWithKeypad);
           setEditPopUpTimerStringValues();
           break;
         case 2:
           addOrReplaceRounds(0, roundIsSelected);
           break;
         case 3:
-          addOrReplaceRounds(breakValue, roundIsSelected);
-          editPopUpTimerArray = convertIntegerToStringArray(breakValue);
+          addOrReplaceRounds(breakTimeValueEnteredWithKeypad, roundIsSelected);
+          editPopUpTimerArray = convertIntegerToStringArray(breakTimeValueEnteredWithKeypad);
           setEditPopUpTimerStringValues();
           break;
         case 4:
@@ -4119,19 +4134,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void adjustRoundCountForModeThree(boolean adding) {
     if (adding) {
-      savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomValue1);
-      savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
-      savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
+      savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomWorkValueEnteredWithKeyPad);
+      savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomMiniBreakValueEnteredWithKeyPad);
+      savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomFullBreakValueEnteredWithKeyPad);
 
       setEditPopUpTimerStringValues();
 
       if (pomValuesTime.size() == 0) {
         for (int i = 0; i < 3; i++) {
-          pomValuesTime.add(pomValue1 * 1000);
-          pomValuesTime.add(pomValue2 * 1000);
+          pomValuesTime.add(pomWorkValueEnteredWithKeyPad * 1000);
+          pomValuesTime.add(pomMiniBreakValueEnteredWithKeyPad * 1000);
         }
-        pomValuesTime.add(pomValue1 * 1000);
-        pomValuesTime.add(pomValue3 * 1000);
+        pomValuesTime.add(pomWorkValueEnteredWithKeyPad * 1000);
+        pomValuesTime.add(pomFullBreakValueEnteredWithKeyPad * 1000);
         for (int j = 0; j < pomValuesTime.size(); j++) {
           pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(pomValuesTime.get(j) / 1000));
         }
@@ -6330,18 +6345,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setDefaultTimerValuesAndTheirEditTextViews() {
-    setValue = 30;
-    breakValue = 30;
-    pomValue1 = 1500;
-    pomValue2 = 300;
-    pomValue3 = 1200;
+    setTimeValueEnteredWithKeypad = 30;
+    breakTimeValueEnteredWithKeypad = 30;
+    pomWorkValueEnteredWithKeyPad = 1500;
+    pomMiniBreakValueEnteredWithKeyPad = 300;
+    pomFullBreakValueEnteredWithKeyPad = 1200;
 
     String editPopUpTimerString = convertedTimerArrayToString(editPopUpTimerArray);
     timerValueInEditPopUpTextView.setText(editPopUpTimerString);
 
-    savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomValue1);
-    savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomValue2);
-    savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomValue3);
+    savedEditPopUpArrayForFirstHeaderModeThree = convertIntegerToStringArray(pomWorkValueEnteredWithKeyPad);
+    savedEditPopUpArrayForSecondHeaderModeThree = convertIntegerToStringArray(pomMiniBreakValueEnteredWithKeyPad);
+    savedEditPopUpArrayForThirdHeader = convertIntegerToStringArray(pomFullBreakValueEnteredWithKeyPad);
 
     String convertedStringOne = convertedTimerArrayToString(savedEditPopUpArrayForFirstHeaderModeThree);
     String convertedStringTwo = convertedTimerArrayToString(savedEditPopUpArrayForSecondHeaderModeThree);
