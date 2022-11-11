@@ -650,17 +650,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: After adding current app screenshots, update resume on job sites.
+  //Todo: Okay to release a 1.0.1 version!
+
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
-  //Todo: Sliding animations could be better (longer?).
   //Todo: Edit Cycles hint should change/be removed.
   //Todo: Switching to Breaks in edit popUp recalls last used (as it should once entered, but not for new/edited cycle).
   //Todo: Moto colors in stats fragment looks off.
   //Todo: Change back pom cycle times to original (non-testing).
   //Todo: Deep test of all database stuff.
-
-  //Todo: Okay to release a 1.0.1 version!
-
-  //Todo: After adding current app screenshots, update resume on job sites.
 
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
@@ -1467,9 +1465,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setPhoneDimensions();
     groupAllAppStartInstantiations();
 
-//    prefEdit.putBoolean("disclaimerHasBeenAccepted", false);
-//    prefEdit.putBoolean("hasAppBeenLaunchedBefore", false);
-//    prefEdit.apply();
     launchDisclaimerIfNotPreviouslyAgreedTo();
     setPromptToLaunchUserSettingsOnFirstAppLaunch();
 
@@ -1526,6 +1521,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab.setOnClickListener(v -> {
       fabLogic();
       removeCycleHighlights();
+    });
+
+    stopWatchLaunchButton.setOnClickListener(v -> {
+      stopWatchLaunchLogic();
     });
 
     sortButton.setOnClickListener(v -> {
@@ -1836,10 +1835,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     delete_all_cancel.setOnClickListener(v -> {
       if (deleteCyclePopupWindow.isShowing()) deleteCyclePopupWindow.dismiss();
-    });
-
-    stopWatchLaunchButton.setOnClickListener(v -> {
-      stopWatchLaunchLogic();
     });
 
     stopWatchPauseResumeButton.setOnClickListener(v -> {
@@ -2299,10 +2294,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedCycleAdapter.setScreenHeight(phoneHeight);
     savedCycleAdapter.setDayOrNightMode(colorThemeMode);
 
-//    mHandler.postDelayed(()-> {
-//      savedCycleAdapter.notifyDataSetChanged();
-//    }, 500);
-
     savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
     savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);
     savedPomCycleRecycler.setLayoutManager(pomCyclesRecyclerLayoutManager);
@@ -2564,12 +2555,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
     sortPopupWindow.setAnimationStyle(R.style.SlideTopAnimationWithoutAnimatedExit);
     editCyclesPopupWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
-    stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     addTdeePopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     aboutSettingsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
-//    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-    timerPopUpWindow.setAnimationStyle(R.style.SlideFromRightAnimation);
+    timerPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+    stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+
   }
 
   private void instantiateArrayLists() {
@@ -4375,10 +4366,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycleForModeOne);
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
-
-        runOnUiThread(() -> {
-          savedCycleRecycler.startAnimation(slideOutFromLeftLong);
-        });
       }
 
       if (cycleHasActivityAssigned) {
@@ -4480,7 +4467,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView.setText(cycleTitle);
 
     adjustDotRecyclerLayoutMargins();
-    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
+//    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
     if (mode == 1) {
       changeTextSizeWithoutAnimator(workoutTimeIntegerArray.get(0));
