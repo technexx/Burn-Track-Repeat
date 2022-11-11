@@ -650,7 +650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Stopwatch should remove cycle highlight instantly (seems to occur @ dismissal).
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
   //Todo: Sliding animations could be better (longer?).
   //Todo: Edit Cycles hint should change/be removed.
@@ -1860,7 +1859,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     stopWatchPopUpWindow.setOnDismissListener(() -> {
-      removeCycleHighlights();
+//      removeCycleHighlights();
 
       if (mode == 1) {
         savedCycleRecycler.setVisibility(View.VISIBLE);
@@ -3132,8 +3131,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase.cyclesDao().deleteCycle(cycles);
       }
       runOnUiThread(()-> {
-        savedCycleAdapter.exitHighlightMode();
-        savedCycleAdapter.notifyDataSetChanged();
+        removeCycleHighlights();
       });
     }
     if (mode == 3) {
@@ -3143,8 +3141,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesDatabase.cyclesDao().deletePomCycle(pomCycles);
       }
       runOnUiThread(()-> {
-        savedPomCycleAdapter.exitHighlightMode();
-        savedPomCycleAdapter.notifyDataSetChanged();
+        removeCycleHighlights();
       });
     }
 
