@@ -650,15 +650,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: FAB / Stopwatch button should not overlap recycler.
+  //Todo: Not an activity toggle issue. Layout also changes after launching a cycle. Refresh/notify issue?
+  //Todo: Stopwatch should remove cycle highlight instantly (seems to occur @ dismissal).
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
   //Todo: Sliding animations could be better (longer?).
   //Todo: Edit Cycles hint should change/be removed.
   //Todo: Switching to Breaks in edit popUp recalls last used (as it should once entered, but not for new/edited cycle).
-  //Todo: Moto colors in stats fragment looks off
-  //Todo: Okay to release a 1.0.1 version!
+  //Todo: Moto colors in stats fragment looks off.
   //Todo: Change back pom cycle times to original (non-testing).
   //Todo: Deep test of all database stuff.
+
+  //Todo: Okay to release a 1.0.1 version!
 
   //Todo: After adding current app screenshots, update resume on job sites.
 
@@ -677,6 +679,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
   //Todo: Anim reset at end of cycle when clicking in and out of timer likely due to visibility set to GONE and VISIBLE again.
 
+  //Todo: Calendar: Dots on bottom (like Reminders), or Green IF at least one activity added, and Red IF at least one activity added AND one food added.
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtones?
   //Todo: Add Day/Night modes.
@@ -2297,6 +2300,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     savedCycleAdapter.setScreenHeight(phoneHeight);
     savedCycleAdapter.setDayOrNightMode(colorThemeMode);
+
+//    mHandler.postDelayed(()-> {
+//      savedCycleAdapter.notifyDataSetChanged();
+//    }, 500);
 
     savedPomCycleAdapter = new SavedPomCycleAdapter(getApplicationContext(), pomArray, pomTitleArray);
     savedPomCycleRecycler.setAdapter(savedPomCycleAdapter);

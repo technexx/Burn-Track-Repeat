@@ -223,7 +223,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
     if (mHighlightDeleted) {
-      //Clears highlight list.
       mHighlightPositionList.clear();
       mHighlightMode = false;
     }
@@ -238,50 +237,35 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (mTdeeActivityExistsInCycleList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
-
-//      workoutHolder.workoutNameLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
-//      workoutHolder.workoutCyclesLayoutParams.endToStart = R.id.cycle_and_tdee_text_constraint;
-
     } else {
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
-//      workoutHolder.workoutNameLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
-//      workoutHolder.workoutCyclesLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
 
 
     if (mActiveTdeeModeBooleanList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setAlpha(1.0f);
-      workoutHolder.workoutName.setAlpha(0.3f);
+//      workoutHolder.workoutName.setAlpha(0.3f);
     } else {
-      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.4f);
-      workoutHolder.workoutName.setAlpha(1.0f);
+      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.3f);
+//      workoutHolder.workoutName.setAlpha(1.0f);
     }
 
     workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
-    //Sets String as orange, while round spans are set below to user colors.
     workoutHolder.workOutCycle.setTextColor(ContextCompat.getColor(mContext, R.color.white));
 
-    //Clearing Spannable object, since it will re-populate for every position passed in through this method.
     permSpan = "";
-    //Retrieves the concatenated String of workout TIMES from current position.
-    String tempWorkoutString = convertTime(mWorkoutList).get(position);
-    tempWorkoutString = tempWorkoutString.replace(" ", "");
-    //Retrieves the concatenated String of ROUND TYPES from current position.
-    String tempTypeString = mTypeOfRound.get(position);
-    //Splits concatenated workout String into String Array.
-    String[] tempWorkoutArray = tempWorkoutString.split(mContext.getString(R.string.bullet));
-    //Splits concatenated round type String into String Array.
-    String[] tempTypeArray = tempTypeString.split(" - ");
-
-    //Var used to determine spannable spacing.
-    int tempSpace = 0;
-    //Bullet string. Cleared if on final round.
     String bullet = mContext.getString(R.string.bullet);
 
+    String tempWorkoutString = convertTime(mWorkoutList).get(position);
+    tempWorkoutString = tempWorkoutString.replace(" ", "");
 
-    //Iterates through the length of our split roundType array, which will always correspond to the length of our split workout array.
+    String tempTypeString = mTypeOfRound.get(position);
+    String[] tempWorkoutArray = tempWorkoutString.split(bullet);
+    String[] tempTypeArray = tempTypeString.split(" - ");
+
+    int tempSpace = 0;
+
     for (int j = 0; j < tempTypeArray.length; j++) {
-      //If we are on the last round object, clear our bullet String so the view does not end with one.
       if (j == tempTypeArray.length - 1) {
         bullet = "";
       }
@@ -304,13 +288,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       if (tempTypeArray[j].contains("1") || tempTypeArray[j].contains("2")) {
         span.setSpan(new ForegroundColorSpan(SET_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-      } else
+      } else {
         span.setSpan(new ForegroundColorSpan(BREAK_COLOR), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-      if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
-//        span.setSpan(new AbsoluteSizeSpan(26, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
       }
 
-      //If a cycle is active, change color of completed rounds to "greyed out" version of original color.
       if (mActiveCycle) {
         if (position==mPositionOfActiveCycle) {
           if (j<=mNumberOfRoundsCompleted-1) {
@@ -318,23 +299,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           }
           if (j==mNumberOfRoundsCompleted) {
             span.setSpan(new StyleSpan(Typeface.ITALIC), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-
-            if (tempTypeArray[j].contains("2") || tempTypeArray[j].contains("4")) {
-//              span.setSpan(new AbsoluteSizeSpan(28, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            } else {
-//              span.setSpan(new AbsoluteSizeSpan(22, true), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
-            }
           }
-
         }
       }
-
-      //Within this loop, we update our permSpan charSequence with the new workout Spannable object.
       permSpan = TextUtils.concat(permSpan, span);
     }
 
-    //Adds extra spacing between textView lines if second line has no infinity symbols. These symbols' imageViews create an automatic spacing greater than just text.
     boolean spacingChanged = false;
+
     if (tempTypeArray.length >= 9) {
       for (int k = 0; k < tempTypeArray.length; k++) {
         if (k >= 8) {
@@ -384,9 +356,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             }
           }
         }
-        //If we have not toggled our highlight off above, toggle it on below.
         if (!changed) {
-          //Adds the position at its identical index for easy removal access.
           mHighlightPositionList.add(position);
           workoutHolder.fullView.setBackgroundColor(Color.GRAY);
         }
@@ -416,8 +386,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           workoutHolder.pauseOrResume.setText(R.string.pause);
         }
 
-        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
-        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
+//        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
+//        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
 
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 
