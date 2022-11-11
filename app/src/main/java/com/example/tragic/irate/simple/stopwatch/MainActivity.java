@@ -650,7 +650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Not an activity toggle issue. Layout also changes after launching a cycle. Refresh/notify issue?
   //Todo: Stopwatch should remove cycle highlight instantly (seems to occur @ dismissal).
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
   //Todo: Sliding animations could be better (longer?).

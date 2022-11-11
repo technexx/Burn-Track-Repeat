@@ -218,7 +218,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
-
+//
     workoutHolder.pauseOrResume.setVisibility(View.GONE);
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
@@ -233,15 +233,15 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (mThemeMode == NIGHT_MODE) {
       workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.WHITE);
     }
-
+//
     if (mTdeeActivityExistsInCycleList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
     } else {
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
     }
-
-
+//
+//
     if (mActiveTdeeModeBooleanList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setAlpha(1.0f);
 //      workoutHolder.workoutName.setAlpha(0.3f);
@@ -249,10 +249,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.3f);
 //      workoutHolder.workoutName.setAlpha(1.0f);
     }
-
-    workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
-    workoutHolder.workOutCycle.setTextColor(ContextCompat.getColor(mContext, R.color.white));
-
+//
     permSpan = "";
     String bullet = mContext.getString(R.string.bullet);
 
@@ -305,24 +302,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       permSpan = TextUtils.concat(permSpan, span);
     }
 
-    boolean spacingChanged = false;
-
-    if (tempTypeArray.length >= 9) {
-      for (int k = 0; k < tempTypeArray.length; k++) {
-        if (k >= 8) {
-          if (!spacingChanged) {
-            if (tempTypeArray[k].contains("2") || tempTypeArray[k].contains("4")) {
-              k = tempTypeArray.length;
-            } else {
-              workoutHolder.workOutCycle.setLineSpacing(0, 1.3f);
-              spacingChanged = true;
-            }
-          }
-        }
-      }
-    }
-
+    workoutHolder.workoutName.setText(mWorkoutTitle.get(position));
     workoutHolder.workOutCycle.setText(permSpan);
+    workoutHolder.workOutCycle.setTextColor(ContextCompat.getColor(mContext, R.color.white));
 
     workoutHolder.tdeeActivityStringToggleTextView.setOnClickListener(v-> {
       if (!mActiveCycle && !mHighlightMode) {
@@ -332,7 +314,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     workoutHolder.fullView.setOnClickListener(v -> {
       boolean changed = false;
-      //If not in highlight mode, launch our timer activity from cycle clicked on. Otherwise, clicking on any given cycle highlights it.
       if (!mHighlightMode) {
         if (mActiveCycle) {
           if (position == mPositionOfActiveCycle) {
@@ -386,8 +367,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           workoutHolder.pauseOrResume.setText(R.string.pause);
         }
 
-//        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
-//        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
+        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
+        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
 
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 
