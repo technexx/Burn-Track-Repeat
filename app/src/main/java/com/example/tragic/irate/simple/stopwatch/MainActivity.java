@@ -197,6 +197,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow editCyclesPopupWindow;
   PopupWindow aboutSettingsPopUpWindow;
 
+  ConstraintLayout editPopUpLayout;
   EditText cycleNameEdit;
   TextView firstRoundTypeHeaderInEditPopUp;
   TextView secondRoundTypeHeaderInEditPopUp;
@@ -216,6 +217,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView number_eight;
   TextView number_nine;
   TextView number_zero;
+  ConstraintLayout numberPadLayout;
   ImageButton deleteEditPopUpTimerNumbers;
 
   boolean isSavedInfinityOptionActiveForSets;
@@ -653,7 +655,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
 
-  //Todo: Remove cycle title editText focus when buttons in edit popUp.
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
   //Todo: Moto colors in stats fragment looks off.
   //Todo: Change back pom cycle times to original (non-testing).
@@ -1452,6 +1453,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void clearCycleTitleEditTextFocusAndHideSoftKeyboard() {
+    if (cycleNameEdit.hasFocus()) {
+      cycleNameEdit.clearFocus();
+      inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+    }
+  }
+
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -1502,8 +1510,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTDEEfirstMainTextView.setOnClickListener(v -> {
       inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
 
-//      addTdeePopUpWindow.showAsDropDown(topOfMainActivityView);
       addTdeePopUpWindow.showAsDropDown(bottomEditTitleDividerView);
+
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
     addActivityConfirmButton.setOnClickListener(v -> {
@@ -1537,6 +1546,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleCustomActionBarButtonVisibilities(false);
 
       timerPopUpDismissalLogic();
+    });
+
+    editPopUpLayout.setOnClickListener(v-> {
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
     editCyclesPopupWindow.setOnDismissListener(() -> {
@@ -1594,14 +1607,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     firstRoundTypeHeaderInEditPopUp.setOnClickListener(v -> {
       setEditPopUpTimerHeaders(1);
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
     secondRoundTypeHeaderInEditPopUp.setOnClickListener(v -> {
       setEditPopUpTimerHeaders(2);
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
     thirdRoundTypeHeaderInEditPopUp.setOnClickListener(v -> {
       setEditPopUpTimerHeaders(3);
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
+    });
+
+    numberPadLayout.setOnClickListener(v-> {
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
     View.OnClickListener numberPadListener = view -> {
@@ -1621,6 +1641,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       }
       setEditPopUpTimerStringValues();
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     };
 
     number_one.setOnClickListener(numberPadListener);
@@ -1654,6 +1675,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       setEditPopUpTimerStringValues();
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
     //For moment, using arrows next to sets and breaks to determine which type of round we're adding.
@@ -1662,6 +1684,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) adjustRoundCountForModeOne(true);
         if (mode==3) adjustRoundCountForModeThree(true);
       }, 25);
+
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
     subtractRoundFromCycleButton.setOnClickListener(v -> {
@@ -1669,6 +1693,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (mode==1) adjustRoundCountForModeOne(false);
         if (mode==3) adjustRoundCountForModeThree(false);
         }, 25);
+
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
     toggleInfinityRounds.setOnClickListener(v -> {
@@ -1681,6 +1707,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (editHeaderSelected == 1) isSavedInfinityOptionActiveForSets = true;
         if (editHeaderSelected == 2) isSavedInfinityOptionActiveForBreaks = true;
       }
+      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
     buttonToLaunchTimerFromEditPopUp.setOnClickListener(v -> {
@@ -2147,7 +2174,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_eight = editCyclesPopupView.findViewById(R.id.eight_button);
     number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
     number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
+    numberPadLayout = editCyclesPopupView.findViewById(R.id.number_pad_layout);
 
+    editPopUpLayout = editCyclesPopupView.findViewById(R.id.edit_cycle_layout);
     cycleNameEdit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
     firstRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.firstRoundTypeHeaderInEditPopUp);
     secondRoundTypeHeaderInEditPopUp = editCyclesPopupView.findViewById(R.id.secondRoundTypeHeaderInEditPopUp);
@@ -3435,7 +3464,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         secondRoundTypeHeaderInEditPopUp.setTextColor(breakColor);
 
         Drawable newDraw;
-
         if (phoneHeight <= 1920) {
           newDraw = ContextCompat.getDrawable(getApplicationContext(), R.drawable.infinity_medium_red);
         } else {
