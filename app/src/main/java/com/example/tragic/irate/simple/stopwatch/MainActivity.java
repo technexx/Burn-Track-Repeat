@@ -652,7 +652,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Anim b0rk from edit popUp -> Timer (we removed that timerLaunch anim).
+  //Todo: Centered editText hint.
 
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
@@ -4380,6 +4380,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cycleHasActivityAssigned = true;
           trackActivityWithinCycle = true;
         }
+
+        runOnUiThread(()-> {
+          toggleCycleAndPomCycleRecyclerViewVisibilities(true);
+        });
       }
 
       if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
@@ -4486,7 +4490,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView.setText(cycleTitle);
 
     adjustDotRecyclerLayoutMargins();
-//    toggleCycleAndPomCycleRecyclerViewVisibilities(true);
 
     if (mode == 1) {
       changeTextSizeWithoutAnimator(workoutTimeIntegerArray.get(0));
