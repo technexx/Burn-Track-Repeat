@@ -198,6 +198,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   PopupWindow aboutSettingsPopUpWindow;
 
   ConstraintLayout editPopUpLayout;
+
   EditText cycleNameEdit;
   TextView firstRoundTypeHeaderInEditPopUp;
   TextView secondRoundTypeHeaderInEditPopUp;
@@ -217,7 +218,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView number_eight;
   TextView number_nine;
   TextView number_zero;
-  ConstraintLayout numberPadLayout;
   ImageButton deleteEditPopUpTimerNumbers;
 
   boolean isSavedInfinityOptionActiveForSets;
@@ -653,7 +653,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Anim b0rk from edit popUp -> Timer (we removed that timerLaunch anim).
-  //Todo: Add/Remove round buttons only registering very off-center clicks.
 
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
@@ -1457,10 +1456,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void clearCycleTitleEditTextFocusAndHideSoftKeyboard() {
-//    if (cycleNameEdit.hasFocus()) {
-//      cycleNameEdit.clearFocus();
-//      inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
-//    }
+    if (cycleNameEdit.hasFocus()) {
+      cycleNameEdit.clearFocus();
+      inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
+    }
   }
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
@@ -1623,10 +1622,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
 
-    numberPadLayout.setOnClickListener(v-> {
-      clearCycleTitleEditTextFocusAndHideSoftKeyboard();
-    });
-
     View.OnClickListener numberPadListener = view -> {
       TextView textButton = (TextView) view;
 
@@ -1657,6 +1652,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_eight.setOnClickListener(numberPadListener);
     number_nine.setOnClickListener(numberPadListener);
     number_zero.setOnClickListener(numberPadListener);
+
+    clearCycleTitleEditTextFocusAndHideSoftKeyboard();
 
     deleteEditPopUpTimerNumbers.setOnClickListener(v -> {
       if (mode == 1) {
@@ -1689,7 +1686,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }, 25);
 
       clearCycleTitleEditTextFocusAndHideSoftKeyboard();
-      Log.i("testClick", "addition clicked!");
     });
 
     subtractRoundFromCycleButton.setOnClickListener(v -> {
@@ -1699,7 +1695,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }, 25);
 
       clearCycleTitleEditTextFocusAndHideSoftKeyboard();
-      Log.i("testClick", "subtraction clicked!");
     });
 
     toggleInfinityRounds.setOnClickListener(v -> {
@@ -2180,7 +2175,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     number_eight = editCyclesPopupView.findViewById(R.id.eight_button);
     number_nine = editCyclesPopupView.findViewById(R.id.nine_button);
     number_zero = editCyclesPopupView.findViewById(R.id.zero_button);
-    numberPadLayout = editCyclesPopupView.findViewById(R.id.number_pad_layout);
 
     editPopUpLayout = editCyclesPopupView.findViewById(R.id.edit_cycle_layout);
     cycleNameEdit = editCyclesPopupView.findViewById(R.id.cycle_name_edit);
