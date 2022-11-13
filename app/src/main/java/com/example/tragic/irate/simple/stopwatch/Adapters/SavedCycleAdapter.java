@@ -233,15 +233,20 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (mThemeMode == NIGHT_MODE) {
       workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.WHITE);
     }
-//
+
     if (mTdeeActivityExistsInCycleList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
+
+      workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.activity_string_textView_for_tracking_cycles;
+      workoutHolder.resetButtonLayoutParams.topToBottom = R.id.activity_string_textView_for_tracking_cycles;
     } else {
-      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
+      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.INVISIBLE);
+
+      workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.saved_custom_set_view;
+      workoutHolder.resetButtonLayoutParams.topToBottom = R.id.saved_custom_set_view;
     }
-//
-//
+
     if (mActiveTdeeModeBooleanList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setAlpha(1.0f);
 //      workoutHolder.workoutName.setAlpha(0.3f);
@@ -404,6 +409,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     ConstraintLayout.LayoutParams workoutNameLayoutParams;
     ConstraintLayout.LayoutParams workoutCyclesLayoutParams;
+    ConstraintLayout.LayoutParams pauseOrResumeButtonLayoutParams;
+    ConstraintLayout.LayoutParams resetButtonLayoutParams;
 
     @SuppressLint("ResourceAsColor")
     public WorkoutHolder(@NonNull View itemView) {
@@ -417,6 +424,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       workoutNameLayoutParams = (ConstraintLayout.LayoutParams) workoutName.getLayoutParams();
       workoutCyclesLayoutParams = (ConstraintLayout.LayoutParams) workOutCycle.getLayoutParams();
+      pauseOrResumeButtonLayoutParams = (ConstraintLayout.LayoutParams)  pauseOrResume.getLayoutParams();
+      resetButtonLayoutParams = (ConstraintLayout.LayoutParams) resetCycle.getLayoutParams();
     }
   }
 

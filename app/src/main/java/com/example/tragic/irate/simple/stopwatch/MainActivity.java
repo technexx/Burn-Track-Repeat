@@ -652,6 +652,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: May have an issue w/ adding activities to databae if launching and iterating multiple ones in a row.
+  //Todo: Ghosting at colons in editing activities.
+  //Todo: Aggregate activities in stats frag can be 1 more than total of individuals.
+  //Todo: May want to change updating food for longer durations to adding it for all days instead.
+
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
 
@@ -4049,8 +4054,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setAndCapTimerValues(int value) {
     switch (mode) {
       case 1:
-        if (editHeaderSelected == 1) setTimeValueEnteredWithKeypad = timerValueBoundsFormula(5, 3600, value);
-        if (editHeaderSelected == 2) breakTimeValueEnteredWithKeypad = timerValueBoundsFormula(5, 3600, value);
+        if (editHeaderSelected == 1) setTimeValueEnteredWithKeypad = timerValueBoundsFormula(5, 5400, value);
+        if (editHeaderSelected == 2) breakTimeValueEnteredWithKeypad = timerValueBoundsFormula(5, 5400, value);
         break;
       case 3:
         pomWorkValueEnteredWithKeyPad = timerValueBoundsFormula(600, 5400, value);
@@ -4061,9 +4066,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setAndCapPomValuesForEditTimer(int value, int variableToCap) {
-    if (variableToCap == 1) pomWorkValueEnteredWithKeyPad = timerValueBoundsFormula(600, 3600, value);
-    if (variableToCap == 2) pomMiniBreakValueEnteredWithKeyPad = timerValueBoundsFormula(180, 600, value);
-    if (variableToCap == 3) pomFullBreakValueEnteredWithKeyPad = timerValueBoundsFormula(900, 3600, value);
+    if (variableToCap == 1) pomWorkValueEnteredWithKeyPad = timerValueBoundsFormula(600, 5400, value);
+    if (variableToCap == 2) pomMiniBreakValueEnteredWithKeyPad = timerValueBoundsFormula(180, 900, value);
+    if (variableToCap == 3) pomFullBreakValueEnteredWithKeyPad = timerValueBoundsFormula(900, 5400, value);
   }
 
   public int timerValueBoundsFormula(int min, int max, int value) {
@@ -4144,7 +4149,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         subtractedRoundIsFading = true;
       } else {
-        showToastIfNoneActive("Nothing to clear!");
+//        showToastIfNoneActive("Nothing to clear!");
       }
     }
   }
@@ -4177,7 +4182,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleRoundsAdapter.notifyDataSetChanged();
         subtractRoundFromCycleButton.setClickable(false);
       } else {
-        showToastIfNoneActive("Nothing to clear!");
+//        showToastIfNoneActive("Nothing to clear!");
       }
     }
   }
