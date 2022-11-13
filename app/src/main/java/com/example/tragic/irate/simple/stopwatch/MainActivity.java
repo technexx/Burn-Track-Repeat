@@ -652,19 +652,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: May have an issue w/ adding activities to databae if launching and iterating multiple ones in a row.
-  //Todo: Aggregate activities in stats frag can be 1 more than total of individuals.
+  //Todo: Should add up arrow for Pom notification even tho we only go up right now.
+  //Todo: May have an issue w/ adding activities to databaes if launching and iterating multiple ones in a row.
   //Todo: May want to change updating food for longer durations to adding it for all days instead.
 
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
 
-  //Todo: Ghosting at colons in editing activities. Seems to be only on initial app launches.
+  //Todo: Ghosting at colons in editing activities.
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
   //Todo: Moto colors in stats fragment looks off.
+
   //Todo: Change back pom cycle times to original (non-testing).
   //Todo: Deep test of all database stuff.
-
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
@@ -3797,14 +3797,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyTwo = "";
       String bodyThree = "";
 
+      //Todo: We're mixing it up here! Using sets/breaks for notification body and then infinity/non infinity for arrow.
       if (stateOfTimers.isModeOneTimerActive()) {
+        //Sets
         if ((typeOfRound.get(currentRoundForModeOne) == 1) || (typeOfRound.get(currentRoundForModeOne) == 2)) {
           headerOne = setNotificationHeader("Workout", "Set", stateOfTimers.isModeOneTimerPaused());
-          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, setMillis) + " " + getString(R.string.arrow_down);
+          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, setMillis) + " ";
         }
+        //Breaks
         if ((typeOfRound.get(currentRoundForModeOne) == 3) || (typeOfRound.get(currentRoundForModeOne) == 4)) {
           headerOne = setNotificationHeader("Workout", "Break", stateOfTimers.isModeOneTimerPaused());
-          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, breakMillis) + " " + getString(R.string.arrow_up);
+          bodyOne = setNotificationBody(numberOfRoundsLeftForModeOne, startRoundsForModeOne, breakMillis) + " ";
+        }
+
+        if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 3) {
+          bodyOne = bodyOne + getString(R.string.arrow_down);
+        }
+        if (typeOfRound.get(currentRoundForModeOne) == 2|| typeOfRound.get(currentRoundForModeOne) == 4) {
+          bodyOne = bodyOne + getString(R.string.arrow_up);
         }
       }
 
@@ -4328,15 +4338,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");
 
           /////---------Testing pom round iterations---------------/////////
-          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(2000); else pomValuesTime.add(3000);
+//          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(2000); else pomValuesTime.add(3000);
 
           for (int i = 0; i < fetchedPomCycle.length; i++) {
             int integerValue = Integer.parseInt(fetchedPomCycle[i]);
-//            pomValuesTime.add(integerValue);
+            pomValuesTime.add(integerValue);
             pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue / 1000));
           }
-
-          Log.i("testRound", "string list is " + pomStringListOfRoundValues);
 
           pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
           pomDotsAdapter.updatePomDotCounter(pomDotCounter);
