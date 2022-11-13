@@ -8,15 +8,15 @@ import androidx.recyclerview.widget.RecyclerView;
 
 public class HorizontalSpaceItemDecoration extends RecyclerView.ItemDecoration {
 
-    private final int horizontalSpaceHeight;
+    private final int mHorizontalSpaceHeight;
 
-    public HorizontalSpaceItemDecoration(int verticalSpaceHeight) {
-        this.horizontalSpaceHeight = verticalSpaceHeight;
+    public HorizontalSpaceItemDecoration(int horizontalSpaceHeight) {
+        this.mHorizontalSpaceHeight = horizontalSpaceHeight;
     }
 
     @Override
     public void getItemOffsets(@NonNull Rect outRect, @NonNull View view, @NonNull RecyclerView parent, @NonNull RecyclerView.State state) {
         super.getItemOffsets(outRect, view, parent, state);
-        outRect.right = horizontalSpaceHeight;
+        outRect.right = mHorizontalSpaceHeight;
     }
 }

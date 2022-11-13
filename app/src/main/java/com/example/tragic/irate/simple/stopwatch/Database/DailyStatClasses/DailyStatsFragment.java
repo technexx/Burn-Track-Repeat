@@ -43,8 +43,10 @@ import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CaloriesForEachFood;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayWithActivityDecorator;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CurrentCalendarDateDecorator;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.HorizontalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.R;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
 import com.google.android.material.tabs.TabLayout;
@@ -2322,6 +2324,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsRecyclerView.setAdapter(dailyStatsAdapter);
 
         dailyStatsRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) dailyStatsRecyclerView.getLayoutParams();
+
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycler_view_divider_line));
+
+        dailyStatsRecyclerView.addItemDecoration(itemDecorator);
     }
 
     private void instantiateCalorieConsumptionRecyclerAndItsAdapter() {
@@ -2338,6 +2345,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedRecyclerView.setAdapter(caloriesConsumedAdapter);
 
         caloriesConsumedRecyclerViewLayoutParams = (ConstraintLayout.LayoutParams) caloriesConsumedRecyclerView.getLayoutParams();
+
+        DividerItemDecoration itemDecorator = new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL);
+        itemDecorator.setDrawable(ContextCompat.getDrawable(getContext(), R.drawable.recycler_view_divider_line));
+
+        caloriesConsumedRecyclerView.addItemDecoration(itemDecorator);
     }
 
     private void instantiateCaloriesComparedViews() {
@@ -2420,4 +2432,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         mToast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
         mToast.show();
     }
+
+
+    private int dpConv(float pixels) {
+        return (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, pixels, getResources().getDisplayMetrics());
+    }
+
 }

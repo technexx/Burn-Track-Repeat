@@ -652,8 +652,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: May have an issue w/ adding activities to databae if launching and iterating multiple ones in a row.
+  //Todo: Add spacing between activity/food consumed rows in stats recyclerViews.
+    //Todo: XML divider used at moment. Having trouble w/ divider set in fragment.
+
   //Todo: Ghosting at colons in editing activities.
+  //Todo: May have an issue w/ adding activities to databae if launching and iterating multiple ones in a row.
   //Todo: Aggregate activities in stats frag can be 1 more than total of individuals.
   //Todo: May want to change updating food for longer durations to adding it for all days instead.
 
@@ -2359,8 +2362,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     GridLayoutManager gridLayoutManager2 = new GridLayoutManager(getApplicationContext(), 8);
     gridLayoutManager2.setOrientation(GridLayoutManager.HORIZONTAL);
-
-    HorizontalSpaceItemDecoration horizontalSpaceItemDecoration = new HorizontalSpaceItemDecoration(dpConv(10));
 
     roundRecycler.setLayoutManager(gridLayoutManager);
     roundRecycler.setAdapter(cycleRoundsAdapter);
