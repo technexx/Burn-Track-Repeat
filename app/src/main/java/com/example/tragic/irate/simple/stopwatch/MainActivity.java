@@ -652,9 +652,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Add spacing between activity/food consumed rows in stats recyclerViews.
-    //Todo: XML divider used at moment. Having trouble w/ divider set in fragment.
-
   //Todo: Ghosting at colons in editing activities.
   //Todo: May have an issue w/ adding activities to databae if launching and iterating multiple ones in a row.
   //Todo: Aggregate activities in stats frag can be 1 more than total of individuals.

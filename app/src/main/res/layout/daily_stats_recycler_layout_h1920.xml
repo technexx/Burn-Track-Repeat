@@ -47,7 +47,10 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="@id/activity_stats_recycler_guideline_1"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="8dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="2dp"
         android:textSize="15sp">
     </TextView>
 
@@ -56,6 +59,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/activity_stats_recycler_guideline_2"
         app:layout_constraintEnd_toStartOf="@id/activity_stats_recycler_guideline_3"
         android:gravity="center"
@@ -67,6 +71,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@id/activity_stats_recycler_guideline_4"
         app:layout_constraintEnd_toEndOf="parent"
         android:gravity="center"
