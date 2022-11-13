@@ -652,7 +652,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Ghosting at colons in editing activities.
   //Todo: May have an issue w/ adding activities to databae if launching and iterating multiple ones in a row.
   //Todo: Aggregate activities in stats frag can be 1 more than total of individuals.
   //Todo: May want to change updating food for longer durations to adding it for all days instead.
@@ -660,6 +659,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
 
+  //Todo: Ghosting at colons in editing activities. Seems to be only on initial app launches.
   //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
   //Todo: Moto colors in stats fragment looks off.
   //Todo: Change back pom cycle times to original (non-testing).

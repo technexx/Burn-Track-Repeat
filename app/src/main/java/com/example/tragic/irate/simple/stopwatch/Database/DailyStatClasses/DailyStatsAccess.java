@@ -549,7 +549,8 @@ public class DailyStatsAccess {
     public void insertStatsForEachActivityRow(long daySelected, long setTime, double caloriesBurned) {
         mStatsForEachActivity = new StatsForEachActivity();
 
-        if (checkIfTimeWillCapTotalForDay(setTime, getUnassignedSetTimeForSelectedDuration()))
+//        if (checkIfTimeWillCapTotalForDay(setTime, getUnassignedSetTimeForSelectedDuration())) {
+//        }
 
         mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(daySelected);
         mStatsForEachActivity.setActivity(mActivityString);
@@ -587,14 +588,6 @@ public class DailyStatsAccess {
 
     private boolean checkIfTimeWillCapTotalForDay(long timeToAddOrReplace, long currentTotal) {
         return ((timeToAddOrReplace + currentTotal) >= (getTwentyFourHoursInMillis() -999));
-    }
-
-    private void getAssignedTimeForSelectedDay(long dayId) {
-        long valueToReturn = 0;
-
-        for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
-
-        }
     }
 
     public void deleteTotalTimesAndCaloriesForSelectedActivityForSelectedDays(int position) {
@@ -830,6 +823,10 @@ public class DailyStatsAccess {
 
     public void setUnassignedDailyTotalTime() {
         totalUnassignedSetTimeForSelectedDuration = setZeroLowerBoundsOnLongValue(totalAggregateTimeForSelectedDuration - totalSetTimeForSelectedDuration);
+
+        if (totalUnassignedSetTimeForSelectedDuration <= (getTwentyFourHoursInMillis() - 999)) {
+            totalUnassignedSetTimeForSelectedDuration = roundUpMillisValues(totalUnassignedSetTimeForSelectedDuration);
+        }
 
     }
 
