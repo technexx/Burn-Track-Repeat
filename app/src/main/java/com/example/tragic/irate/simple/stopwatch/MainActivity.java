@@ -652,7 +652,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Should add up arrow for Pom notification even tho we only go up right now.
+  //Todo: When resuming from notifications, we get a partial/jittering animation in popUp window.
   //Todo: May have an issue w/ adding activities to databaes if launching and iterating multiple ones in a row.
   //Todo: May want to change updating food for longer durations to adding it for all days instead.
 
@@ -3825,14 +3825,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           case 4:
           case 6:
             headerTwo = setNotificationHeader("Pomodoro", "Work", stateOfTimers.isModeThreeTimerPaused());
-            bodyTwo = setNotificationBody(numberOfRoundsLeftForModeThree, startRoundsForModeThree, pomMillis);
+            bodyTwo = setNotificationBody(numberOfRoundsLeftForModeThree, startRoundsForModeThree, pomMillis) + " " + getString(R.string.arrow_down);
             break;
           case 1:
           case 3:
           case 5:
           case 7:
             headerTwo = setNotificationHeader("Pomodoro", "Break", stateOfTimers.isModeThreeTimerPaused());
-            bodyTwo = setNotificationBody(numberOfRoundsLeftForModeThree, startRoundsForModeThree, pomMillis);
+            bodyTwo = setNotificationBody(numberOfRoundsLeftForModeThree, startRoundsForModeThree, pomMillis) + " " + getString(R.string.arrow_down);
             break;
         }
       }
