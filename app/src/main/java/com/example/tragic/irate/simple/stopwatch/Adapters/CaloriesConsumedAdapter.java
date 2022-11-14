@@ -205,22 +205,22 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
             mMainViewHolder.caloriesConsumedTextView.setTypeface(robotoMedium);
 
             if (mScreenHeight <= 1920) {
-                mMainViewHolder.foodEatenTextView.setTextSize(19);
-                mMainViewHolder.caloriesConsumedTextView.setTextSize(19);
+                mMainViewHolder.foodEatenTextView.setTextSize(17);
+                mMainViewHolder.caloriesConsumedTextView.setTextSize(17);
             } else {
-                mMainViewHolder.foodEatenTextView.setTextSize(23);
-                mMainViewHolder.caloriesConsumedTextView.setTextSize(23);
+                mMainViewHolder.foodEatenTextView.setTextSize(20);
+                mMainViewHolder.caloriesConsumedTextView.setTextSize(20);
             }
         } else {
             mMainViewHolder.foodEatenTextView.setText(mFoodEaten.get(position-1));
             mMainViewHolder.caloriesConsumedTextView.setText(formatCalorieString(mCaloriesConsumed.get(position-1)));
 
             if (mScreenHeight <= 1920) {
-                mMainViewHolder.foodEatenTextView.setTextSize(15);
+                mMainViewHolder.foodEatenTextView.setTextSize(16);
                 mMainViewHolder.caloriesConsumedTextView.setTextSize(17);
             } else {
-                mMainViewHolder.foodEatenTextView.setTextSize(17);
-                mMainViewHolder.caloriesConsumedTextView.setTextSize(19);
+                mMainViewHolder.foodEatenTextView.setTextSize(19);
+                mMainViewHolder.caloriesConsumedTextView.setTextSize(20);
             }
         }
     }

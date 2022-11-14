@@ -653,6 +653,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: When resuming from notifications, we get a partial/jittering animation in popUp window.
+      //Todo: Changing animations doesn't have effect window is already open (it seems).
   //Todo: May have an issue w/ adding activities to databaes if launching and iterating multiple ones in a row.
   //Todo: May want to change updating food for longer durations to adding it for all days instead.
 
@@ -732,6 +733,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onPause() {
     super.onPause();
+
+//    timerPopUpWindow.setAnimationStyle(android.R.style.Animation);
+//    overridePendingTransition(0, 0);
+
   }
 
   @Override
@@ -767,12 +772,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (timerPopUpWindow.isShowing()) {
-      timerPopUpWindow.dismiss();
       timerPopUpDismissalLogic();
     }
 
     if (editCyclesPopupWindow.isShowing()) {
-      editCyclesPopupWindow.dismiss();
       editCyclesPopUpDismissalLogic();
     }
 
@@ -3397,6 +3400,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void editCyclesPopUpDismissalLogic() {
+    editCyclesPopupWindow.dismiss();
+
     if (currentlyEditingACycle) {
 //      fadeEditCycleButtonsInAndOut(FADE_OUT_EDIT_CYCLE);
       currentlyEditingACycle = false;
@@ -4514,9 +4519,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+
   }
 
   private void timerPopUpDismissalLogic() {
+    timerPopUpWindow.dismiss();
+
     timerPopUpIsVisible = false;
 
     if (mode == 1) {
