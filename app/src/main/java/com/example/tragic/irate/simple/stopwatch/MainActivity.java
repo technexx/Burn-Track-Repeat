@@ -652,8 +652,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: When resuming from notifications, we get a partial/jittering animation in popUp window.
-      //Todo: Changing animations doesn't have effect window is already open (it seems).
+  //Todo: Sort + launch cycle bugged. Launches wrong cycle then re-sorts.
+  //Todo: Break time errantly goes from 0 -> value in all-set cycle after we being timer. May be related to sorting above.
+  //Todo: Should include cycle title w/ daily stats in timer popUp.
+  //Todo: Bolder/bigger text for stats recycler headers
+  //Todo: Title hint alignment in editPopUp
   //Todo: May have an issue w/ adding activities to databaes if launching and iterating multiple ones in a row.
   //Todo: May want to change updating food for longer durations to adding it for all days instead.
 
@@ -674,14 +677,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Backup cloud option.
 
   //Todo: Closing app briefly display notifications (onStop/onDestroy)
-  //Todo: Had a bug of timer displaying and iterating +1 second from time listed in edit popUp's round.
+  //Todo: Had a bug of timer displaying and iterating +1 second from time listed in edit popUp's round.f
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
   //Todo: Anim reset at end of cycle when clicking in and out of timer likely due to visibility set to GONE and VISIBLE again.
 
-  //Todo: Calendar: Dots on bottom (like Reminders), or Green IF at least one activity added, and Red IF at least one activity added AND one food added.
+  //`Todo: Calendar: Dots on bottom (like Reminders), or Green IF at least one activity added, and Red IF at least one activity added AND one food added.
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtone selection.
   //Todo: Add Day/Night modes.
@@ -728,6 +731,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
     }, 300);
+
+
   }
 
   @Override
@@ -753,6 +758,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       globalNotficationsRunnable = notifcationsRunnable();
       mHandler.post(globalNotficationsRunnable);
     }
+
+    mHandler.postDelayed(() -> {
+      if (timerPopUpWindow.isShowing()) {
+//        timerPopUpWindow.dismiss();
+//        timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+//        timerPopUpWindow.setAnimationStyle(android.R.style.Animation);
+//        resumeOrResetCycle(RESUMING_CYCLE_FROM_ADAPTER);
+      }
+    }, 500);
+
   }
 
   @Override
@@ -2589,7 +2604,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTdeePopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     aboutSettingsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
-    timerPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+//    timerPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+    timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
     stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
   }
@@ -2851,8 +2867,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (textButton.getText().toString().equals("Activity Title: A - Z")) sortHolder = 5;
       if (textButton.getText().toString().equals("Activity Title: Z - A")) sortHolder = 6;
 
-      if (mode == 1) sortMode = sortHolder;
-      else if (mode == 3) sortModePom = sortHolder;
+      if (mode == 1) {
+        sortMode = sortHolder;
+      }
+      if (mode == 3) {
+        sortModePom = sortHolder;
+      }
 
       unHighlightSortTextViews();
       highlightSortTextView();
@@ -3802,7 +3822,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       String bodyTwo = "";
       String bodyThree = "";
 
-      //Todo: We're mixing it up here! Using sets/breaks for notification body and then infinity/non infinity for arrow.
       if (stateOfTimers.isModeOneTimerActive()) {
         //Sets
         if ((typeOfRound.get(currentRoundForModeOne) == 1) || (typeOfRound.get(currentRoundForModeOne) == 2)) {
@@ -4072,8 +4091,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 3:
         pomWorkValueEnteredWithKeyPad = timerValueBoundsFormula(600, 5400, value);
-        pomMiniBreakValueEnteredWithKeyPad = timerValueBoundsFormula(180, 600, value);
-        pomFullBreakValueEnteredWithKeyPad = timerValueBoundsFormula(900, 3600, value);
+        pomMiniBreakValueEnteredWithKeyPad = timerValueBoundsFormula(120, 600, value);
+        pomFullBreakValueEnteredWithKeyPad = timerValueBoundsFormula(600, 3600, value);
         break;
     }
   }
