@@ -1098,7 +1098,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
 
-        if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 3) {
+        if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 2) {
           if (numberOfRoundsLeftForModeOne > 0) {
             timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
           }
@@ -5602,6 +5602,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (pomMillis < 500) {
           stateOfTimers.setModeThreeTimerDisabled(true);
         }
+
         if (mode == 3) {
           increaseTextSizeForTimers(startMillis, pomMillis);
           Log.i("testChange", "changing textSize!");
