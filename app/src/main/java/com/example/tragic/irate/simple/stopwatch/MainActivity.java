@@ -652,7 +652,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Break time errantly goes from 0 -> value in all-set cycle after we being timer. May be related to sorting above.
+  //Todo: Timer textSize goes from small - > large (larger than desired) when going in and out of activity cycle.
   //Todo: Should include cycle title w/ daily stats in timer popUp.
   //Todo: Bolder/bigger text for stats recycler headers
   //Todo: Title hint alignment in editPopUp
@@ -2314,8 +2314,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
       queryAndSortAllCyclesFromDatabase();
-//      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-//      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
@@ -4419,7 +4417,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycleForModeOne);
+      }
+
+      if (cycleHasActivityAssigned) {
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
+        Log.i("testTrack", "boolean set from activityIsAssigned and is " + trackActivityWithinCycle);
+      } else {
+        trackActivityWithinCycle = false;
+        Log.i("testTrack", "no activity assigned and set to false");
       }
 
       if (cycleHasActivityAssigned) {
@@ -6017,7 +6022,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 modeOneStartObjectAnimator();
                 startBreakTimer();
               }
-              postSetAndBreakTimeTotalRunnable();
+
+              if (trackActivityWithinCycle) {
+                postSetAndBreakTimeTotalRunnable();
+              }
               break;
             case 4:
               if (mode==1) {
@@ -6025,7 +6033,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               }
               infinityTimerForBreaksRunnable = infinityRunnableForBreakRounds();
               mHandler.post(infinityTimerForBreaksRunnable);
-              postSetAndBreakTimeTotalRunnable();
+
+              if (trackActivityWithinCycle) {
+                postSetAndBreakTimeTotalRunnable();
+              }
               break;
           }
         } else {
