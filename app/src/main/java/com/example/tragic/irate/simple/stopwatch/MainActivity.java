@@ -653,17 +653,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Should include cycle title w/ daily stats in timer popUp.
+  //Todo: For template: Link series of images to new page for each app, and have them pop up there.
+
+  //Todo: Adjust timer popUp margins for <1920h layout.
   //Todo: Bolder/bigger text for stats recycler headers
   //Todo: Title hint alignment in editPopUp
-  //Todo: May have an issue w/ adding activities to databaes if launching and iterating multiple ones in a row.
-  //Todo: May want to change updating food for longer durations to adding it for all days instead.
+  //Todo: May have an issue w/ adding activities to databases if launching and iterating multiple ones in a row.
 
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Ghosting at colons in editing activities.
-  //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
+      //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
   //Todo: Moto colors in stats fragment looks off.
 
   //Todo: Change back pom cycle times to original (non-testing).
@@ -676,7 +677,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Backup cloud option.
 
   //Todo: Closing app briefly display notifications (onStop/onDestroy)
-  //Todo: Had a bug of timer displaying and iterating +1 second from time listed in edit popUp's round.f
+  //Todo: Had a bug of timer displaying and iterating +1 second from time listed in edit popUp's round.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had a bug of iterating calories but not time.
       //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.

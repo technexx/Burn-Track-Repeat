@@ -201,9 +201,6 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
             mMainViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
-            mMainViewHolder.foodEatenTextView.setTypeface(robotoMedium);
-            mMainViewHolder.caloriesConsumedTextView.setTypeface(robotoMedium);
-
             if (mScreenHeight <= 1920) {
                 mMainViewHolder.foodEatenTextView.setTextSize(17);
                 mMainViewHolder.caloriesConsumedTextView.setTextSize(17);
@@ -212,6 +209,9 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
                 mMainViewHolder.caloriesConsumedTextView.setTextSize(20);
             }
         } else {
+            mMainViewHolder.foodEatenTextView.setTypeface(robotoMedium);
+            mMainViewHolder.caloriesConsumedTextView.setTypeface(robotoMedium);
+
             mMainViewHolder.foodEatenTextView.setText(mFoodEaten.get(position-1));
             mMainViewHolder.caloriesConsumedTextView.setText(formatCalorieString(mCaloriesConsumed.get(position-1)));
 

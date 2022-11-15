@@ -204,17 +204,13 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         if (position == 0) {
-            mMainViewHolder.activityTextView.setText(R.string.activity_text_header);
-            mMainViewHolder.setTimeTextView.setText(R.string.set_time_text_header);
-            mMainViewHolder.caloriesBurnedTextView.setText(R.string.calories_burned_text_header);
-
             mMainViewHolder.activityTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
-            mMainViewHolder.activityTextView.setTypeface(robotoMedium);
-            mMainViewHolder.setTimeTextView.setTypeface(robotoMedium);
-            mMainViewHolder.caloriesBurnedTextView.setTypeface(robotoMedium);
+            mMainViewHolder.activityTextView.setText(R.string.activity_text_header);
+            mMainViewHolder.setTimeTextView.setText(R.string.set_time_text_header);
+            mMainViewHolder.caloriesBurnedTextView.setText(R.string.calories_burned_text_header);
 
             if (mPhoneHeight <= 1920) {
                 mMainViewHolder.activityTextView.setTextSize(17);
@@ -226,6 +222,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mMainViewHolder.caloriesBurnedTextView.setTextSize(20);
             }
         } else {
+            mMainViewHolder.activityTextView.setTypeface(robotoMedium);
+            mMainViewHolder.setTimeTextView.setTypeface(robotoMedium);
+            mMainViewHolder.caloriesBurnedTextView.setTypeface(robotoMedium);
+
             mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
             mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
             mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
