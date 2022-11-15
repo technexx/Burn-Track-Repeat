@@ -3,7 +3,6 @@ package com.example.tragic.irate.simple.stopwatch;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -35,7 +34,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.AbsoluteSizeSpan;
-import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -100,7 +98,6 @@ import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.Daily
 import com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses.StatsForEachActivity;
 import com.example.tragic.irate.simple.stopwatch.Database.PomCycles;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalorieIteration;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.HorizontalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TextViewDisplaySync;
@@ -115,12 +112,9 @@ import com.example.tragic.irate.simple.stopwatch.SettingsFragments.tdeeSettingsF
 import com.google.android.material.tabs.TabLayout;
 import com.google.gson.Gson;
 
-import org.w3c.dom.Text;
-
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
@@ -657,6 +651,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Adjust timer popUp margins for <1920h layout.
   //Todo: Title hint alignment in editPopUp
+  //Todo: Total activity time can be 1 more than aggregate.
   //Todo: May have an issue w/ adding activities to databases if launching and iterating multiple ones in a row.
 
   //Todo: After adding current app screenshots, update resume on job sites.

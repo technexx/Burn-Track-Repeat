@@ -2,7 +2,6 @@ package com.example.tragic.irate.simple.stopwatch.Database.DailyStatClasses;
 
 import android.content.Context;
 import android.content.SharedPreferences;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -41,12 +40,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.tragic.irate.simple.stopwatch.Adapters.CaloriesConsumedAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DailyStatsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Database.DailyCalorieClasses.CaloriesForEachFood;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayWithActivityDecorator;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CurrentCalendarDateDecorator;
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.HorizontalSpaceItemDecoration;
+import com.example.tragic.irate.simple.stopwatch.Miscellaneous.CalendarDayDecorators;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.LongToStringConverters;
 
-import com.example.tragic.irate.simple.stopwatch.Miscellaneous.VerticalSpaceItemDecoration;
 import com.example.tragic.irate.simple.stopwatch.R;
 import com.example.tragic.irate.simple.stopwatch.Miscellaneous.TDEEChosenActivitySpinnerValues;
 import com.google.android.material.tabs.TabLayout;
@@ -72,8 +68,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     SharedPreferences.Editor prefEdit;
     Calendar mCalendar;
     com.prolificinteractive.materialcalendarview.MaterialCalendarView calendarView;
-    CalendarDayWithActivityDecorator calendarDayWithActivityDecorator;
-    CurrentCalendarDateDecorator currentCalendarDateDecorator;
+
+    CalendarDayDecorators calendarDayDecorators;
 
     int daySelectedFromCalendar;
     CalendarDay daySelectedAsACalendarDayObject;
@@ -387,8 +383,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             colorDaysWithAtLeastOneActivity();
 
             getActivity().runOnUiThread(()-> {
-                currentCalendarDateDecorator.setCurrentDay(customCalendarDayList);
-                calendarView.addDecorator(currentCalendarDateDecorator);
+                CalendarDayDecorators.DaySelectedDecoration daySelectedDecoration = new CalendarDayDecorators.DaySelectedDecoration(getContext());
+                daySelectedDecoration.setCurrentDay(customCalendarDayList);
+                calendarView.addDecorator(daySelectedDecoration);
                 setStatDurationViews(currentStatDurationMode);
             });
         });
@@ -977,9 +974,14 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         getActivity().runOnUiThread(()->{
-//            calendarDayWithActivityDecorator.setCalendarDayList(calendarDayList);
-//            calendarView.addDecorator(calendarDayWithActivityDecorator);
+            CalendarDayDecorators.ActivityDecoration activityDecoration = new CalendarDayDecorators.ActivityDecoration(getContext());
+            activityDecoration.setCalendarDayList(calendarDayList);
+            calendarView.addDecorator(activityDecoration);
         });
+    }
+
+    public void colorDaysWithAtLeastOneFood() {
+
     }
 
     @Override
@@ -2296,9 +2298,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         simplifiedActivityLevelTextView = mRoot.findViewById(R.id.simplified_activity_level_textView);
         simplifiedCaloriesBurnedTextView = mRoot.findViewById(R.id.simplified_calories_burned_textView);
 
-        calendarDayWithActivityDecorator = new CalendarDayWithActivityDecorator(getContext());
-        currentCalendarDateDecorator = new CurrentCalendarDateDecorator(getContext());
-
+        calendarDayDecorators = new CalendarDayDecorators();
         customCalendarDayList = new ArrayList<>();
 
         statsForEachActivityList = new ArrayList<>();

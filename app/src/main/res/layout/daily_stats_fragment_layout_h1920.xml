@@ -251,49 +251,6 @@
             app:layout_constraintGuide_percent=".75">
         </androidx.constraintlayout.widget.Guideline>
 
-        <TextView
-            android:id="@+id/total_bmr_stats_textView_header"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_1"
-            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
-            android:layout_marginStart="8dp"
-            android:text="@string/metabolic_rate"
-            android:textColor="@color/red"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:alpha="0.8">
-        </TextView>
-
-        <TextView
-            android:id="@+id/total_bmr_stats_time_textView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
-            app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_2"
-            app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_3"
-            android:gravity="center"
-            android:textColor="@color/green"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:alpha="0.8">
-        </TextView>
-
-        <TextView
-            android:id="@+id/total_bmr_stats_calories_textView"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
-            app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_4"
-            app:layout_constraintEnd_toEndOf="parent"
-            android:gravity="center"
-            android:textColor="@color/purple_200"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:alpha="0.8"
-            android:layout_marginEnd="8dp">
-        </TextView>
 
         <TextView
             android:id="@+id/total_activity_stats_textView_header"
@@ -302,7 +259,7 @@
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_1"
-            app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
+            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
             android:layout_marginStart="8dp"
             android:textSize="14sp"
             android:textStyle="bold"
@@ -314,7 +271,7 @@
             android:id="@+id/daily_stats_total_activity_time_textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
+            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
             app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_2"
             app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_3"
             android:gravity="center"
@@ -328,7 +285,7 @@
             android:id="@+id/daily_stats_total_activity_calories_burned_textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
+            app:layout_constraintTop_toBottomOf="@id/recycler_and_total_stats_divider"
             app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_4"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp"
@@ -340,13 +297,57 @@
         </TextView>
 
         <TextView
+            android:id="@+id/total_bmr_stats_textView_header"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_1"
+            app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header"
+            android:layout_marginStart="8dp"
+            android:text="@string/metabolic_rate"
+            android:textColor="@color/red"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:alpha="0.8">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_bmr_stats_time_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header"
+            app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_2"
+            app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_3"
+            android:gravity="center"
+            android:textColor="@color/green"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:alpha="0.8">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_bmr_stats_calories_textView"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header"
+            app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_4"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:gravity="center"
+            android:textColor="@color/purple_200"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:alpha="0.8"
+            android:layout_marginEnd="8dp">
+        </TextView>
+
+        <TextView
             android:id="@+id/total_calories_expended_stats_header_textView"
             android:text="@string/total_assigned_stats"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_1"
-            app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header"
+            app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
             android:layout_marginStart="8dp"
             android:textColor="@color/red"
             android:textStyle="bold"
@@ -357,7 +358,7 @@
             android:id="@+id/total_expended_stats_time_elapsed_textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header"            app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_2"
+            app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"            app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_2"
             app:layout_constraintEnd_toEndOf="@id/activity_stats_total_guideline_3"
             android:gravity="center"
             android:textColor="@color/green"
@@ -369,7 +370,7 @@
             android:id="@+id/total_expended_stats_calories_burned_textView"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@id/total_activity_stats_textView_header"
+            app:layout_constraintTop_toBottomOf="@id/total_bmr_stats_textView_header"
             app:layout_constraintStart_toStartOf="@id/activity_stats_total_guideline_4"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginEnd="8dp"
