@@ -371,6 +371,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   TextView tracking_daily_stats_header_textView;
   TextView cycle_title_textView;
+  TextView cycle_title_textView_with_activity;
   TextView cycles_completed_textView;
 
   TextView laps_completed_textView;
@@ -652,7 +653,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Timer textSize goes from small - > large (larger than desired) when going in and out of activity cycle.
   //Todo: Should include cycle title w/ daily stats in timer popUp.
   //Todo: Bolder/bigger text for stats recycler headers
   //Todo: Title hint alignment in editPopUp
@@ -2232,6 +2232,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     trackingHeaderLayoutParams = (ConstraintLayout.LayoutParams) trackingTimerHeaderLayout.getLayoutParams();
 
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
+    cycle_title_textView_with_activity = timerPopUpView.findViewById(R.id.cycle_title_textView_with_activity);
     cycles_completed_textView = timerPopUpView.findViewById(R.id.cycles_completed_textView);
 
     total_set_header = timerPopUpView.findViewById(R.id.total_set_header);
@@ -4526,6 +4527,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTimerLaunchViews(int typeOfLaunch) {
     timerPopUpIsVisible = true;
     cycle_title_textView.setText(cycleTitle);
+    cycle_title_textView_with_activity.setText(cycleTitle);
 
     adjustDotRecyclerLayoutMargins();
 
@@ -6706,8 +6708,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void toggleViewsForTotalDailyAndCycleTimes(boolean trackingCycle) {
     if (!trackingCycle) {
-      cycle_title_textView.setVisibility(View.VISIBLE);
       tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
+
+      cycle_title_textView.setVisibility(View.VISIBLE);
+      cycle_title_textView_with_activity.setVisibility(View.INVISIBLE);
+
       cycles_completed_textView.setVisibility(View.VISIBLE);
       reset_total_cycle_times.setVisibility(View.VISIBLE);
 
@@ -6727,8 +6732,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalCaloriesForSingleActivityTextViewHeader.setVisibility(View.INVISIBLE);
       dailyTotalCaloriesForSingleActivityTextView.setVisibility(View.INVISIBLE);
     } else {
+      tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
+
       cycle_title_textView.setVisibility(View.GONE);
-      tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
+      cycle_title_textView_with_activity.setVisibility(View.VISIBLE);
+
       cycles_completed_textView.setVisibility(View.INVISIBLE);
       reset_total_cycle_times.setVisibility(View.INVISIBLE);
 

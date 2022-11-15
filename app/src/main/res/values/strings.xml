@@ -63,7 +63,7 @@
     <string name="sort_cycles">Sort</string>
     <string name="saved_cycle_list">Saved Cycles</string>
 
-    <string name="tracking_daily_stats">Daily Stats For %1$s</string>
+    <string name="tracking_daily_stats">%1$s</string>
     <string name="cycle_saved">Cycle saved!</string>
     <string name="cycle_exists">Identical cycle already exists!</string>
     <string name="bullet">\u2022</string>s
