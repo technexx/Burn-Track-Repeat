@@ -128,6 +128,12 @@ CyclesDao {
     @Query("SELECT * from PomCycles")
     List<PomCycles> loadAllPomCycles();
 
+    @Query("SELECT * from Cycles ORDER by timeAdded DESC")
+    List<Cycles> loadCyclesByMostRecent();
+
+    @Query("SELECT * from Cycles ORDER by timeAdded ASC")
+    List<Cycles> loadCyclesByLeastRecent();
+
     @Query("SELECT * from Cycles ORDER by title ASC")
     List<Cycles> loadCyclesTitleAToZ();
 

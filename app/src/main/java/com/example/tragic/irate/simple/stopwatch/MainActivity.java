@@ -652,7 +652,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Sort + launch cycle bugged. Launches wrong cycle then re-sorts.
   //Todo: Break time errantly goes from 0 -> value in all-set cycle after we being timer. May be related to sorting above.
   //Todo: Should include cycle title w/ daily stats in timer popUp.
   //Todo: Bolder/bigger text for stats recycler headers
@@ -1980,6 +1979,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     instantiateLayoutParameterObjects();
     instantiateArrayLists();
 
+    retrieveAndImplementCycleSorting();
     instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents();
 
     instantiateLayoutManagers();
@@ -1988,7 +1988,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setVerticalSpaceDecorationForCycleRecyclerViewBasedOnScreenHeight();
     instantiateLapAdapterAndSetRecyclerOnIt();
 
-    retrieveAndImplementCycleSorting();
     instantiateAnimationAndColorMethods();
 
     instantiateNotifications();
@@ -2314,8 +2313,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents() {
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+      queryAndSortAllCyclesFromDatabase();
+//      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+//      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
@@ -2878,7 +2878,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       highlightSortTextView();
 
       AsyncTask.execute(() -> {
-        queryAndSortAllCyclesFromDatabase(true);
+        queryAndSortAllCyclesFromDatabase();
 
         runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
@@ -2929,54 +2929,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityTitleZToA.setBackgroundColor(noHighlight);
   }
 
-  private void queryAndSortAllCyclesFromDatabase(boolean useSortMode) {
+  private void queryAndSortAllCyclesFromDatabase() {
     if (mode == 1) {
-      if (useSortMode) {
-        switch (sortMode) {
-          case 1:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ();
-            break;
-          case 2:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA();
-            break;
-          case 3:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
-            break;
-          case 4:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
-            break;
-          case 5:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ();
-            break;
-          case 6:
-            cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA();
-            break;
-        }
-      } else {
-        cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+      switch (sortMode) {
+        case 0:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesByLeastRecent();
+          break;
+        case 1:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ();
+          break;
+        case 2:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA();
+          break;
+        case 3:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
+          break;
+        case 4:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
+          break;
+        case 5:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ();
+          break;
+        case 6:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA();
+          break;
       }
-
-//      Log.i("testLaunch", "cyclesList size is " + cyclesList.size());
     }
 
     if (mode == 3) {
-      if (useSortMode) {
-        switch (sortModePom) {
-          case 1:
-            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
-            break;
-          case 2:
-            pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
-            break;
-          case 3:
-            pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart();
-            break;
-          case 4:
-            pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd();
-            break;
-        }
-      } else {
-        pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+      switch (sortModePom) {
+        case 1:
+          pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
+          break;
+        case 2:
+          pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
+          break;
+        case 3:
+          pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart();
+          break;
+        case 4:
+          pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd();
+          break;
       }
     }
   }
@@ -3188,7 +3181,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     receivedHighlightPositions.clear();
 
-    queryAndSortAllCyclesFromDatabase(false);
+    queryAndSortAllCyclesFromDatabase();
 
     runOnUiThread(() -> {
       delete_highlighted_cycle.setEnabled(false);
@@ -3205,8 +3198,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void deleteAllCycles() {
     if (mode == 1) {
       if (cyclesList.size() > 0) {
+
         cyclesDatabase.cyclesDao().deleteAllCycles();
-        queryAndSortAllCyclesFromDatabase(false);
+        queryAndSortAllCyclesFromDatabase();
+
+        sortMode = 0;
 
         runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
@@ -3217,7 +3213,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) {
       if (pomCyclesList.size() > 0) {
         cyclesDatabase.cyclesDao().deleteAllPomCycles();
-        queryAndSortAllCyclesFromDatabase(false);
+        queryAndSortAllCyclesFromDatabase();
+
+        sortModePom = 0;
 
         runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
@@ -4429,7 +4427,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase(false);
+      queryAndSortAllCyclesFromDatabase();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (isNewCycle) {
@@ -4481,7 +4479,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     AsyncTask.execute(() -> {
       saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase(false);
+      queryAndSortAllCyclesFromDatabase();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (isNewCycle) {
@@ -4700,7 +4698,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       /////////
-      queryAndSortAllCyclesFromDatabase(false);
+      queryAndSortAllCyclesFromDatabase();
       for (int i=0; i<cyclesList.size(); i++) {
         Log.i("testSave", "total array post-save is " + cyclesList.get(i).getWorkoutRounds());
       }
