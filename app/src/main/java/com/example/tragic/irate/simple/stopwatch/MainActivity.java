@@ -650,7 +650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: For template: Link series of images to new page for each app, and have them pop up there.
 
   //Todo: Adjust timer popUp margins for <1920h layout.
-  //Todo: Title hint alignment in editPopUp
   //Todo: Total activity time can be 1 more than aggregate.
   //Todo: May have an issue w/ adding activities to databases if launching and iterating multiple ones in a row.
 
