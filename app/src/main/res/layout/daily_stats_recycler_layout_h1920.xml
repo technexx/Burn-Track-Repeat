@@ -4,8 +4,7 @@
     android:layout_height="wrap_content"
     android:minHeight="40dp"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:layout_gravity="center"
-    android:theme="@style/StatRecyclerViewsTheme">
+    android:layout_gravity="center">
 
     <androidx.constraintlayout.widget.Guideline
         android:id="@+id/activity_stats_recycler_guideline_1"
