@@ -2308,7 +2308,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents() {
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-      queryCyclesWithNoSorting();
+      queryAndSortAllCyclesFromMenu();
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
@@ -3183,7 +3183,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     receivedHighlightPositions.clear();
 
-    queryCyclesWithNoSorting();
+    queryAndSortAllCyclesFromMenu();
 
     runOnUiThread(() -> {
       delete_highlighted_cycle.setEnabled(false);
@@ -3202,7 +3202,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (cyclesList.size() > 0) {
 
         cyclesDatabase.cyclesDao().deleteAllCycles();
-        queryCyclesWithNoSorting();
+        queryAndSortAllCyclesFromMenu();
 
         sortMode = 0;
 
@@ -3215,7 +3215,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) {
       if (pomCyclesList.size() > 0) {
         cyclesDatabase.cyclesDao().deleteAllPomCycles();
-        queryCyclesWithNoSorting();
+        queryAndSortAllCyclesFromMenu();
 
         sortModePom = 0;
 
@@ -4296,18 +4296,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
-    progressBar.setVisibility(View.VISIBLE);
-    resetButtonForCycles.setVisibility(View.VISIBLE);
-
-    Calendar calendar = Calendar.getInstance(Locale.getDefault());
-    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
-    if (savedCycleAdapter.isCycleActive()) {
-      savedCycleAdapter.removeCycleAsActive();
-      savedCycleAdapter.notifyDataSetChanged();
-    }
-
     AsyncTask.execute(() -> {
       if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
         if (cycleNameEdit.getText().toString().isEmpty()) {
@@ -4334,16 +4322,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       if (cycleHasActivityAssigned) {
+        insertActivityIntoDatabaseAndAssignItsValueToObjects();
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
       } else {
         trackActivityWithinCycle = false;
       }
 
-      if (cycleHasActivityAssigned) {
-        insertActivityIntoDatabaseAndAssignItsValueToObjects();
-      }
-
       saveAddedOrEditedCycleASyncRunnable();
+      //Todo: Will show errors on either a new addition or an edit.
       queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
@@ -4367,6 +4353,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
+
+    timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
+    progressBar.setVisibility(View.VISIBLE);
+    resetButtonForCycles.setVisibility(View.VISIBLE);
+
+    Calendar calendar = Calendar.getInstance(Locale.getDefault());
+    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+
+    if (savedCycleAdapter.isCycleActive()) {
+      savedCycleAdapter.removeCycleAsActive();
+      savedCycleAdapter.notifyDataSetChanged();
+    }
   }
 
   private void launchPomTimerCycle(int typeOfLaunch) {
