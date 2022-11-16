@@ -647,14 +647,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: For template: Link series of images to new page for each app, and have them pop up there.
+  //Todo: After adding current app screenshots, update resume on job sites.
+  //Todo: Okay to release a 1.0.1 version!
 
+  //Todo: Constrained width on cycles w/ no activity.
+  //Todo: Sort launch positions error when new edit changes sort order.
   //Todo: Adjust timer popUp margins for <1920h layout.
   //Todo: Total activity time can be 1 more than aggregate.
   //Todo: May have an issue w/ adding activities to databases if launching and iterating multiple ones in a row.
-
-  //Todo: After adding current app screenshots, update resume on job sites.
-  //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Ghosting at colons in editing activities.
       //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
@@ -677,7 +677,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
   //Todo: Anim reset at end of cycle when clicking in and out of timer likely due to visibility set to GONE and VISIBLE again.
 
-  //`Todo: Calendar: Dots on bottom (like Reminders), or Green IF at least one activity added, and Red IF at least one activity added AND one food added.
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtone selection.
   //Todo: Add Day/Night modes.
@@ -2308,7 +2307,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents() {
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
-      queryAndSortAllCyclesFromDatabase();
+      queryCyclesWithNoSorting();
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
@@ -2871,7 +2870,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       highlightSortTextView();
 
       AsyncTask.execute(() -> {
-        queryAndSortAllCyclesFromDatabase();
+        queryAndSortAllCyclesFromMenu();
 
         runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
@@ -2922,7 +2921,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityTitleZToA.setBackgroundColor(noHighlight);
   }
 
-  private void queryAndSortAllCyclesFromDatabase() {
+  private void queryCyclesWithNoSorting() {
+    if (mode == 1) {
+      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
+    }
+    if (mode == 3) {
+      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
+    }
+  }
+
+  private void queryAndSortAllCyclesFromMenu() {
     if (mode == 1) {
       switch (sortMode) {
         case 0:
@@ -3174,7 +3182,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     receivedHighlightPositions.clear();
 
-    queryAndSortAllCyclesFromDatabase();
+    queryCyclesWithNoSorting();
 
     runOnUiThread(() -> {
       delete_highlighted_cycle.setEnabled(false);
@@ -3193,7 +3201,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (cyclesList.size() > 0) {
 
         cyclesDatabase.cyclesDao().deleteAllCycles();
-        queryAndSortAllCyclesFromDatabase();
+        queryCyclesWithNoSorting();
 
         sortMode = 0;
 
@@ -3206,7 +3214,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) {
       if (pomCyclesList.size() > 0) {
         cyclesDatabase.cyclesDao().deleteAllPomCycles();
-        queryAndSortAllCyclesFromDatabase();
+        queryCyclesWithNoSorting();
 
         sortModePom = 0;
 
@@ -4301,6 +4309,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
+        Log.i("testList", "activity exists list is " + tdeeActivityExistsInCycleList);
       }
     }
     if (mode == 3 || forAllModes) {
@@ -4377,19 +4386,24 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
-    progressBar.setVisibility(View.VISIBLE);
-    resetButtonForCycles.setVisibility(View.VISIBLE);
-
-    Calendar calendar = Calendar.getInstance(Locale.getDefault());
-    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
-    if (savedCycleAdapter.isCycleActive()) {
-      savedCycleAdapter.removeCycleAsActive();
-      savedCycleAdapter.notifyDataSetChanged();
-    }
-
     AsyncTask.execute(() -> {
+      saveAddedOrEditedCycleASyncRunnable();
+      queryCyclesWithNoSorting();
+      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+
+      if (isNewCycle) {
+        zeroOutTotalCycleTimes();
+        positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
+      } else {
+        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
+      }
+
+      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
+
+      if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
+        cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycleForModeOne);
+      }
+
       if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
         if (cycleNameEdit.getText().toString().isEmpty()) {
           cycleTitle = getCurrentDateAsFullTextString();
@@ -4410,35 +4424,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
       }
 
-      if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
-        cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycleForModeOne);
-      }
-
       if (cycleHasActivityAssigned) {
         trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
-        Log.i("testTrack", "boolean set from activityIsAssigned and is " + trackActivityWithinCycle);
       } else {
         trackActivityWithinCycle = false;
-        Log.i("testTrack", "no activity assigned and set to false");
       }
 
       if (cycleHasActivityAssigned) {
         insertActivityIntoDatabaseAndAssignItsValueToObjects();
-      }
-
-      saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase();
-      clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-
-      if (isNewCycle) {
-        zeroOutTotalCycleTimes();
-        positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
-      } else {
-        retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-      }
-
-      if (!trackActivityWithinCycle) {
-        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
       }
 
       runOnUiThread(new Runnable() {
@@ -4450,6 +4443,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
+
+    timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
+    progressBar.setVisibility(View.VISIBLE);
+    resetButtonForCycles.setVisibility(View.VISIBLE);
+
+    Calendar calendar = Calendar.getInstance(Locale.getDefault());
+    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+
+    if (savedCycleAdapter.isCycleActive()) {
+      savedCycleAdapter.removeCycleAsActive();
+      savedCycleAdapter.notifyDataSetChanged();
+    }
   }
 
   private void launchPomTimerCycle(int typeOfLaunch) {
@@ -4458,28 +4463,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    timeLeftForPomCyclesTimer.setVisibility(View.VISIBLE);
-    progressBarForPom.setVisibility(View.VISIBLE);
-    resetButtonForPomCycles.setVisibility(View.VISIBLE);
-
-    if (savedPomCycleAdapter.isCycleActive()) {
-      savedPomCycleAdapter.removeCycleAsActive();
-      savedPomCycleAdapter.notifyDataSetChanged();
-    }
-
-    if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
-      if (cycleNameEdit.getText().toString().isEmpty()) {
-        cycleTitle = getCurrentDateAsFullTextString();
-      } else {
-        cycleTitle = cycleNameEdit.getText().toString();
-      }
-
-      toggleCycleAndPomCycleRecyclerViewVisibilities(true);
-    }
-
     AsyncTask.execute(() -> {
       saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromDatabase();
+      queryCyclesWithNoSorting();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (isNewCycle) {
@@ -4500,6 +4486,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
+
+    timeLeftForPomCyclesTimer.setVisibility(View.VISIBLE);
+    progressBarForPom.setVisibility(View.VISIBLE);
+    resetButtonForPomCycles.setVisibility(View.VISIBLE);
+
+    if (savedPomCycleAdapter.isCycleActive()) {
+      savedPomCycleAdapter.removeCycleAsActive();
+      savedPomCycleAdapter.notifyDataSetChanged();
+    }
+
+    if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
+      if (cycleNameEdit.getText().toString().isEmpty()) {
+        cycleTitle = getCurrentDateAsFullTextString();
+      } else {
+        cycleTitle = cycleNameEdit.getText().toString();
+      }
+
+      toggleCycleAndPomCycleRecyclerViewVisibilities(true);
+    }
+
+
   }
 
   private void setTimerLaunchLogic(boolean trackingActivity) {
@@ -4697,14 +4704,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           cyclesDatabase.cyclesDao().updateCycles(cycles);
         }
       }
-
-      /////////
-      queryAndSortAllCyclesFromDatabase();
-      for (int i=0; i<cyclesList.size(); i++) {
-        Log.i("testSave", "total array post-save is " + cyclesList.get(i).getWorkoutRounds());
-      }
-      ////////////////////
-
     }
     if (mode == 3) {
       if (isNewCycle) {

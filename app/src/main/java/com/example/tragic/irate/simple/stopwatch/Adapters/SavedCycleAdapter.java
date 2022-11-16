@@ -234,6 +234,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.WHITE);
     }
 
+
     if (mTdeeActivityExistsInCycleList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
@@ -241,7 +242,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.activity_string_textView_for_tracking_cycles;
       workoutHolder.resetButtonLayoutParams.topToBottom = R.id.activity_string_textView_for_tracking_cycles;
     } else {
-      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.INVISIBLE);
+      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
 
       workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.saved_custom_set_view;
       workoutHolder.resetButtonLayoutParams.topToBottom = R.id.saved_custom_set_view;
