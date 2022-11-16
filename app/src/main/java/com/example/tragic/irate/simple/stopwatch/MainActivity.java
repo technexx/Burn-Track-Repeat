@@ -4290,97 +4290,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return altString;
   }
 
-
-  private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
-    if (mode == 1 || forAllModes) {
-      workoutCyclesArray.clear();
-      typeOfRoundArray.clear();
-      workoutTitleArray.clear();
-      workoutActivityStringArray.clear();
-      tdeeActivityExistsInCycleList.clear();
-      tdeeIsBeingTrackedInCycleList.clear();
-
-      for (int i = 0; i < cyclesList.size(); i++) {
-        workoutTitleArray.add(cyclesList.get(i).getTitle());
-
-        workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
-        typeOfRoundArray.add(cyclesList.get(i).getRoundType());
-        workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
-        tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
-
-        tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
-
-        Log.i("testList", "activity exists list is " + tdeeActivityExistsInCycleList);
-      }
-    }
-    if (mode == 3 || forAllModes) {
-      pomArray.clear();
-      pomTitleArray.clear();
-
-      for (int i = 0; i < pomCyclesList.size(); i++) {
-        pomArray.add(pomCyclesList.get(i).getFullCycle());
-        pomTitleArray.add(pomCyclesList.get(i).getTitle());
-      }
-    }
-  }
-
-  private void populateCycleRoundAndRoundTypeArrayLists() {
-    switch (mode) {
-      case 1:
-        workoutTimeIntegerArray.clear();
-        typeOfRound.clear();
-        if (workoutCyclesArray.size() - 1 >= positionOfSelectedCycleForModeOne) {
-          String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycleForModeOne).split(" - ");
-          String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycleForModeOne).split(" - ");
-
-          for (int i = 0; i < fetchedRounds.length; i++) {
-            workoutTimeIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
-          }
-          for (int j = 0; j < fetchedRoundType.length; j++) {
-            typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
-          }
-
-          ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
-
-          adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
-          dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
-          dotsAdapter.setTypeOfRoundList(typeOfRound);
-          dotsAdapter.notifyDataSetChanged();
-
-          Log.i("testLaunch", "string array in populateCycle method is " + workoutCyclesArray);
-          Log.i("testLaunch", "fetched array from string in populateCycle method is " + workoutCyclesArray);
-          Log.i("testLaunch", "integer array in populateCycle method is " + workoutTimeIntegerArray);
-
-          cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
-        }
-
-        break;
-      case 3:
-        pomValuesTime.clear();
-        pomStringListOfRoundValues.clear();
-
-        if (pomArray.size() - 1 >= positionOfSelectedCycleForModeThree) {
-          String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");
-
-          /////---------Testing pom round iterations---------------/////////
-//          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(2000); else pomValuesTime.add(3000);
-
-          for (int i = 0; i < fetchedPomCycle.length; i++) {
-            int integerValue = Integer.parseInt(fetchedPomCycle[i]);
-            pomValuesTime.add(integerValue);
-            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue / 1000));
-          }
-
-          pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
-          pomDotsAdapter.updatePomDotCounter(pomDotCounter);
-          pomDotsAdapter.notifyDataSetChanged();
-
-          cycleTitle = pomTitleArray.get(positionOfSelectedCycleForModeThree);
-        }
-        break;
-    }
-  }
-
   private void launchTimerCycle(int typeOfLaunch) {
     if (workoutTimeIntegerArray.size() == 0) {
       showToastIfNoneActive("Cycle cannot be empty!");
@@ -4389,7 +4298,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     AsyncTask.execute(() -> {
       saveAddedOrEditedCycleASyncRunnable();
-      queryCyclesWithNoSorting();
+//      queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (isNewCycle) {
@@ -4648,7 +4557,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
   String pomString = "";
 
-  //Getting toggle stat from adapter on timer launch and saving that. Retrieve w/ everything else coming back.
   private void saveAddedOrEditedCycleASyncRunnable() {
     Gson gson = new Gson();
     String workoutString = "";
@@ -4734,6 +4642,96 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     runOnUiThread(() -> {
       cycle_title_textView.setText(cycleTitle);
     });
+  }
+
+  private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
+    if (mode == 1 || forAllModes) {
+      workoutCyclesArray.clear();
+      typeOfRoundArray.clear();
+      workoutTitleArray.clear();
+      workoutActivityStringArray.clear();
+      tdeeActivityExistsInCycleList.clear();
+      tdeeIsBeingTrackedInCycleList.clear();
+
+      for (int i = 0; i < cyclesList.size(); i++) {
+        workoutTitleArray.add(cyclesList.get(i).getTitle());
+
+        workoutCyclesArray.add(cyclesList.get(i).getWorkoutRounds());
+        typeOfRoundArray.add(cyclesList.get(i).getRoundType());
+        workoutActivityStringArray.add(cyclesList.get(i).getActivityString());
+        tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
+
+        tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
+
+        Log.i("testList", "activity exists list is " + tdeeActivityExistsInCycleList);
+      }
+    }
+    if (mode == 3 || forAllModes) {
+      pomArray.clear();
+      pomTitleArray.clear();
+
+      for (int i = 0; i < pomCyclesList.size(); i++) {
+        pomArray.add(pomCyclesList.get(i).getFullCycle());
+        pomTitleArray.add(pomCyclesList.get(i).getTitle());
+      }
+    }
+  }
+
+  private void populateCycleRoundAndRoundTypeArrayLists() {
+    switch (mode) {
+      case 1:
+        workoutTimeIntegerArray.clear();
+        typeOfRound.clear();
+        if (workoutCyclesArray.size() - 1 >= positionOfSelectedCycleForModeOne) {
+          String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycleForModeOne).split(" - ");
+          String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycleForModeOne).split(" - ");
+
+          for (int i = 0; i < fetchedRounds.length; i++) {
+            workoutTimeIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
+          }
+          for (int j = 0; j < fetchedRoundType.length; j++) {
+            typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
+          }
+
+          ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
+
+          adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
+          dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
+          dotsAdapter.setTypeOfRoundList(typeOfRound);
+          dotsAdapter.notifyDataSetChanged();
+
+          Log.i("testLaunch", "string array in populateCycle method is " + workoutCyclesArray);
+          Log.i("testLaunch", "fetched array from string in populateCycle method is " + workoutCyclesArray);
+          Log.i("testLaunch", "integer array in populateCycle method is " + workoutTimeIntegerArray);
+
+          cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
+        }
+
+        break;
+      case 3:
+        pomValuesTime.clear();
+        pomStringListOfRoundValues.clear();
+
+        if (pomArray.size() - 1 >= positionOfSelectedCycleForModeThree) {
+          String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");
+
+          /////---------Testing pom round iterations---------------/////////
+//          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(2000); else pomValuesTime.add(3000);
+
+          for (int i = 0; i < fetchedPomCycle.length; i++) {
+            int integerValue = Integer.parseInt(fetchedPomCycle[i]);
+            pomValuesTime.add(integerValue);
+            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue / 1000));
+          }
+
+          pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
+          pomDotsAdapter.updatePomDotCounter(pomDotCounter);
+          pomDotsAdapter.notifyDataSetChanged();
+
+          cycleTitle = pomTitleArray.get(positionOfSelectedCycleForModeThree);
+        }
+        break;
+    }
   }
 
   private double calculateCaloriesBurnedPerMinute(double metValue) {
