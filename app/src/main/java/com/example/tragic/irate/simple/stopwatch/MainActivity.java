@@ -650,8 +650,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
 
-  //Todo: Constrained width on cycles w/ no activity.
-  //Todo: Sort launch positions error when new edit changes sort order.
+  //Todo: Anim stuff when resuming app.
+  //Todo: Sort launch positions error when sorting, now.
+      //Todo: Sort puts list in X order, but all other queries use default order.
   //Todo: Adjust timer popUp margins for <1920h layout.
   //Todo: Total activity time can be 1 more than aggregate.
   //Todo: May have an issue w/ adding activities to databases if launching and iterating multiple ones in a row.
