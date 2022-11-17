@@ -7,8 +7,7 @@
     app:layout_constraintStart_toStartOf="parent"
     app:layout_constraintEnd_toEndOf="parent"
     android:layout_marginStart="8dp"
-    android:backgroundTint="@color/test_black"
-    android:id="@+id/workout_recycler_layout">
+    android:backgroundTint="@color/test_black">
 
     <TextView
         android:id="@+id/round_count"

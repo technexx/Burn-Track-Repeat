@@ -650,8 +650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Ierations of time in our cycles recyclerView may need their position changed.
-      //Todo: Width of recyclerView getting changed - this may be due to the above iterations, tho we did just change those.
+  //Todo: workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE) causes layout issues.
   //Todo: Total daily time/cals not super clear w/ out date as header.
   //Todo: Cycle can default to not tracking right after editing one to add activity.
   //Todo: Should vertically center title + round string in cycles recycler - looks too wide w/ few rounds + longer activity String.
@@ -3910,9 +3909,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void activateResumeOrResetOptionForCycle() {
     if (mode == 1) {
       if (stateOfTimers.isModeOneTimerActive()) {
-        if (isNewCycle) {
-//          positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
-        }
         savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeOne);
         savedCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeOne - numberOfRoundsLeftForModeOne);
@@ -3923,9 +3919,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode == 3) {
       if (stateOfTimers.isModeThreeTimerActive()) {
-        if (isNewCycle) {
-//          positionOfSelectedCycleForModeThree = pomArray.size() - 1;
-        }
         savedPomCycleAdapter.setCycleAsActive();
         savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeThree);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeThree - numberOfRoundsLeftForModeThree);

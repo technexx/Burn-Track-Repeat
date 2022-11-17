@@ -18,10 +18,12 @@ import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
 import android.text.style.TextAppearanceSpan;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.AlphaAnimation;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -238,13 +240,28 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
 
+      if (!mActiveCycle) {
+        workoutHolder.activityStringLayoutParams.topToTop = R.id.workout_recycler_layout;
+        workoutHolder.activityStringLayoutParams.bottomToBottom = R.id.workout_recycler_layout;
+      } else {
+        workoutHolder.activityStringLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+      }
+
       workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.activity_string_textView_for_tracking_cycles;
       workoutHolder.resetButtonLayoutParams.topToBottom = R.id.activity_string_textView_for_tracking_cycles;
-    } else {
-      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.INVISIBLE);
 
-      workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.saved_custom_set_view;
-      workoutHolder.resetButtonLayoutParams.topToBottom = R.id.saved_custom_set_view;
+//      workoutHolder.titleAndRoundsLayoutParams.bottomToBottom = R.id.pause_or_resume_cycle_button_for_mode_1;
+      workoutHolder.titleAndRoundsLayoutParams.endToStart = R.id.activity_string_textView_for_tracking_cycles;
+    } else {
+      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
+
+      workoutHolder.activityStringLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+
+      workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.cycle_title_and_rounds_layout;
+      workoutHolder.resetButtonLayoutParams.topToBottom = R.id.cycle_title_and_rounds_layout;
+
+      workoutHolder.titleAndRoundsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+      workoutHolder.titleAndRoundsLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
 
     if (mActiveTdeeModeBooleanList.get(position)) {
@@ -252,7 +269,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     } else {
       workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.3f);
     }
-//
+
     permSpan = "";
     String bullet = mContext.getString(R.string.bullet);
 
@@ -399,31 +416,38 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
   public class WorkoutHolder extends RecyclerView.ViewHolder {
     public View fullView;
+    public ConstraintLayout titleAndRoundsLayout;
     public TextView workoutName;
     public TextView workOutCycle;
     public TextView pauseOrResume;
     public TextView resetCycle;
     public TextView tdeeActivityStringToggleTextView;
 
+    ConstraintLayout.LayoutParams titleAndRoundsLayoutParams;
     ConstraintLayout.LayoutParams workoutNameLayoutParams;
     ConstraintLayout.LayoutParams workoutCyclesLayoutParams;
     ConstraintLayout.LayoutParams pauseOrResumeButtonLayoutParams;
     ConstraintLayout.LayoutParams resetButtonLayoutParams;
+    ConstraintLayout.LayoutParams activityStringLayoutParams;
 
     @SuppressLint("ResourceAsColor")
     public WorkoutHolder(@NonNull View itemView) {
       super(itemView);
       fullView = itemView;
+
+      titleAndRoundsLayout = itemView.findViewById(R.id.cycle_title_and_rounds_layout);
       workoutName = itemView.findViewById(R.id.custom_name_header);
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
       pauseOrResume = itemView.findViewById(R.id.pause_or_resume_cycle_button_for_mode_1);
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
       tdeeActivityStringToggleTextView = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
 
+      titleAndRoundsLayoutParams = (ConstraintLayout.LayoutParams) titleAndRoundsLayout.getLayoutParams();
       workoutNameLayoutParams = (ConstraintLayout.LayoutParams) workoutName.getLayoutParams();
       workoutCyclesLayoutParams = (ConstraintLayout.LayoutParams) workOutCycle.getLayoutParams();
       pauseOrResumeButtonLayoutParams = (ConstraintLayout.LayoutParams)  pauseOrResume.getLayoutParams();
       resetButtonLayoutParams = (ConstraintLayout.LayoutParams) resetCycle.getLayoutParams();
+      activityStringLayoutParams = (ConstraintLayout.LayoutParams) tdeeActivityStringToggleTextView.getLayoutParams();
     }
   }
 
