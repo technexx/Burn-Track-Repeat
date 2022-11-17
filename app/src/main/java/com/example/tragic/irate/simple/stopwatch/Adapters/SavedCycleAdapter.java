@@ -218,7 +218,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   @Override
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
-//
+
     workoutHolder.pauseOrResume.setVisibility(View.GONE);
     workoutHolder.resetCycle.setVisibility(View.GONE);
 
@@ -249,10 +249,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     if (mActiveTdeeModeBooleanList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setAlpha(1.0f);
-//      workoutHolder.workoutName.setAlpha(0.3f);
     } else {
       workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.3f);
-//      workoutHolder.workoutName.setAlpha(1.0f);
     }
 //
     permSpan = "";

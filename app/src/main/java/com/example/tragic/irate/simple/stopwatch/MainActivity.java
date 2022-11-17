@@ -3914,7 +3914,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //          positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
         }
         savedCycleAdapter.setCycleAsActive();
-        savedCycleAdapter.setActiveCyclePosition(sortedPositionOfSelectedCycleForModeOne);
+        savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeOne);
         savedCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeOne - numberOfRoundsLeftForModeOne);
 
         savedCycleAdapter.notifyDataSetChanged();
@@ -3927,7 +3927,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 //          positionOfSelectedCycleForModeThree = pomArray.size() - 1;
         }
         savedPomCycleAdapter.setCycleAsActive();
-        savedPomCycleAdapter.setActiveCyclePosition(sortedPositionOfSelectedCycleForModeThree);
+        savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeThree);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeThree - numberOfRoundsLeftForModeThree);
 
         savedPomCycleAdapter.notifyDataSetChanged();
@@ -4438,7 +4438,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         storeSetAndBreakTimeForCycleResuming();
       }
 
-      deleteLastAccessedActivityCycleIfItHasZeroTime(sortedPositionOfSelectedCycleForModeOne);
+      deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycleForModeOne);
 
     } else if (mode == 3) {
       stateOfTimers.setModeThreeTimerDisabled(false);
@@ -4714,6 +4714,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTimeIntegerArray.clear();
         typeOfRound.clear();
 
+        //Todo: Here, we set the old var to the new var, so we shouldn't need the new one set anywhere else.
         //Sets our "old" global positional variable to the new, sorted one if necessary.
         if (executingFromTimerLaunch) {
           positionOfSelectedCycleForModeOne = sortedPositionOfSelectedCycleForModeOne;
@@ -5275,7 +5276,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<Integer> integerCycleArray = integerArrayList;
 
     int fetchedRoundType = typeOfRound.get(currentRoundForModeOne);
-    workoutCyclesArray.set(sortedPositionOfSelectedCycleForModeOne, newRoundStringForModeOne(fetchedRoundType));
+    workoutCyclesArray.set(positionOfSelectedCycleForModeOne, newRoundStringForModeOne(fetchedRoundType));
   }
 
   private String newRoundStringForModeOne(int typeOfRound) {
@@ -5326,8 +5327,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String[] fetchedRounds = {};
     ArrayList<Integer> newIntegerArray = new ArrayList<>();
 
-    if (workoutCyclesArray.size() - 1  >= sortedPositionOfSelectedCycleForModeOne) {
-      fetchedRounds = workoutCyclesArray.get(sortedPositionOfSelectedCycleForModeOne).split(" - ");
+    if (workoutCyclesArray.size() - 1  >= positionOfSelectedCycleForModeOne) {
+      fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycleForModeOne).split(" - ");
     }
 
     for (int i = 0; i<fetchedRounds.length; i++) {
