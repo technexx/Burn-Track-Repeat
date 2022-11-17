@@ -263,6 +263,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int positionOfSelectedCycleForModeOne;
   int positionOfSelectedCycleForModeThree;
+  int primaryIdOfCycleRowSelected;
+  int primaryIdOfPomCycleRowSelected;
+
+  int sortedPositionOfSelectedCycleForModeOne;
+  int sortedPositionOfSelectedCycleForModeThree;
+
   String cycleTitle = "";
   List<Integer> receivedHighlightPositions;
 
@@ -646,6 +652,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar settingsActionBar;
 
   boolean resetCycleTimeVarsWithinRunnable;
+
+  //Todo: Total daily time/cals not super clear w/ out date as header.
+  //Todo: Cycle can default to not tracking right after editing one to add activity.
+  //Todo: Should vertically center title + round string in cycles recycler - looks too wide w/ few rounds + longer activity String.
 
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
@@ -1236,6 +1246,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cyclesDatabase.cyclesDao().updateCycles(cyclesToUpdate);
   }
 
+  private void setPrimaryIdsForSelectedCycleEntity() {
+    if (mode == 1) primaryIdOfCycleRowSelected = cycles.getId();
+    if (mode == 3) primaryIdOfPomCycleRowSelected = pomCycles.getId();
+  }
+
   @Override
   public void onCycleClick(int position) {
     isNewCycle = false;
@@ -1251,12 +1266,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(position);
+    setPrimaryIdsForSelectedCycleEntity();
+
 
     if (cycleHasActivityAssigned) {
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
-    populateCycleRoundAndRoundTypeArrayLists();
+    populateCycleRoundAndRoundTypeArrayLists(false);
 
     dotsAdapter.notifyDataSetChanged();
 
@@ -1592,7 +1609,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       clearRoundAndCycleAdapterArrayLists();
 
-      populateCycleRoundAndRoundTypeArrayLists();
+      populateCycleRoundAndRoundTypeArrayLists(false);
       populateRoundAdapterArraysForHighlightedCycle();
 
       assignOldCycleValuesToCheckForChanges();
@@ -2922,60 +2939,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityTitleZToA.setBackgroundColor(noHighlight);
   }
 
-  private void queryCyclesWithNoSorting() {
-    if (mode == 1) {
-      cyclesList = cyclesDatabase.cyclesDao().loadAllCycles();
-    }
-    if (mode == 3) {
-      pomCyclesList = cyclesDatabase.cyclesDao().loadAllPomCycles();
-    }
-  }
-
-  private void queryAndSortAllCyclesFromMenu() {
-    if (mode == 1) {
-      switch (sortMode) {
-        case 0:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesByLeastRecent();
-          break;
-        case 1:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ();
-          break;
-        case 2:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA();
-          break;
-        case 3:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
-          break;
-        case 4:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
-          break;
-        case 5:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ();
-          break;
-        case 6:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA();
-          break;
-      }
-    }
-
-    if (mode == 3) {
-      switch (sortModePom) {
-        case 1:
-          pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
-          break;
-        case 2:
-          pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
-          break;
-        case 3:
-          pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart();
-          break;
-        case 4:
-          pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd();
-          break;
-      }
-    }
-  }
-
   private View.OnClickListener activitySortOptionListener() {
     return view -> {
       TextView textView = (TextView) view;
@@ -3110,8 +3073,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycleHasActivityAssigned = tdeeActivityExistsInCycleList.get(positionOfSelectedCycleForModeOne);
       toggleEditPopUpViewsForAddingActivity(cycleHasActivityAssigned);
 
+      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
+      setPrimaryIdsForSelectedCycleEntity();
+
       if (cycleHasActivityAssigned) {
-        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
         retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
 
@@ -4329,7 +4294,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       saveAddedOrEditedCycleASyncRunnable();
-      //Todo: Will show errors on either a new addition or an edit.
       queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
@@ -4424,7 +4388,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
 
     clearRoundAndCycleAdapterArrayLists();
-    populateCycleRoundAndRoundTypeArrayLists();
+    populateCycleRoundAndRoundTypeArrayLists(true);
 
     if (trackingActivity) {
       setAllActivityTimesAndCaloriesToTextViews();
@@ -4560,6 +4524,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String workoutString = "";
     String roundTypeString = "";
     int cycleID;
+
     if (mode == 1) {
       if (isNewCycle) {
         cycles = new Cycles();
@@ -4642,6 +4607,52 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
   }
 
+  private void queryAndSortAllCyclesFromMenu() {
+    if (mode == 1) {
+      switch (sortMode) {
+        case 0:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesByLeastRecent();
+          break;
+        case 1:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ();
+          break;
+        case 2:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA();
+          break;
+        case 3:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
+          break;
+        case 4:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
+          break;
+        case 5:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ();
+          break;
+        case 6:
+          cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA();
+          break;
+      }
+    }
+
+    if (mode == 3) {
+      switch (sortModePom) {
+        case 1:
+          pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
+          break;
+        case 2:
+          pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
+          break;
+        case 3:
+          pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart();
+          break;
+        case 4:
+          pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd();
+          break;
+      }
+    }
+  }
+
+//When database sort order changes, our arrays are in a different order than the one we've set our position to fetch.
   private void clearAndRepopulateCycleAdapterListsFromDatabaseList(boolean forAllModes) {
     if (mode == 1 || forAllModes) {
       workoutCyclesArray.clear();
@@ -4650,6 +4661,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       workoutActivityStringArray.clear();
       tdeeActivityExistsInCycleList.clear();
       tdeeIsBeingTrackedInCycleList.clear();
+
+      int cycleIdFromPreSortedPosition = primaryIdOfCycleRowSelected;
+
+      //Fetches an updated position of our sorted rows by retrieving the position of our old position's primaryId.
+      for (int i = 0; i<cyclesList.size(); i++) {
+        if (cyclesList.get(i).getId() == cycleIdFromPreSortedPosition) {
+          sortedPositionOfSelectedCycleForModeOne = i;
+        }
+      }
 
       for (int i = 0; i < cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
@@ -4660,13 +4680,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
 
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
-
-        Log.i("testList", "activity exists list is " + tdeeActivityExistsInCycleList);
       }
     }
     if (mode == 3 || forAllModes) {
       pomArray.clear();
       pomTitleArray.clear();
+
+      int cycleIdFromPreSortedPosition = primaryIdOfPomCycleRowSelected;
+
+      for (int i = 0; i<pomCyclesList.size(); i++) {
+        if (pomCyclesList.get(i).getId() == cycleIdFromPreSortedPosition) {
+          sortedPositionOfSelectedCycleForModeThree = i;
+        }
+      }
 
       for (int i = 0; i < pomCyclesList.size(); i++) {
         pomArray.add(pomCyclesList.get(i).getFullCycle());
@@ -4675,41 +4701,48 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: This is where it gets b0rked.
-  private void populateCycleRoundAndRoundTypeArrayLists() {
+//From the new order of our arrays, the original fetched position is incorrect.
+  private void populateCycleRoundAndRoundTypeArrayLists(boolean addedOrEditedRow) {
     switch (mode) {
       case 1:
         workoutTimeIntegerArray.clear();
         typeOfRound.clear();
-        if (workoutCyclesArray.size() - 1 >= positionOfSelectedCycleForModeOne) {
-          String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycleForModeOne).split(" - ");
-          String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycleForModeOne).split(" - ");
 
-          for (int i = 0; i < fetchedRounds.length; i++) {
-            workoutTimeIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
-          }
-          for (int j = 0; j < fetchedRoundType.length; j++) {
-            typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
-          }
-
-          ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
-
-          adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
-          dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
-          dotsAdapter.setTypeOfRoundList(typeOfRound);
-          dotsAdapter.notifyDataSetChanged();
-
-          Log.i("testLaunch", "string array in populateCycle method is " + workoutCyclesArray);
-          Log.i("testLaunch", "fetched array from string in populateCycle method is " + workoutCyclesArray);
-          Log.i("testLaunch", "integer array in populateCycle method is " + workoutTimeIntegerArray);
-
-          cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
+        //Sets our "old" global positional variable to the new, sorted one if necessary.
+        if (addedOrEditedRow) {
+          positionOfSelectedCycleForModeOne = sortedPositionOfSelectedCycleForModeOne;
         }
 
+        String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycleForModeOne).split(" - ");
+        String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycleForModeOne).split(" - ");
+
+        for (int i = 0; i < fetchedRounds.length; i++) {
+          workoutTimeIntegerArray.add(Integer.parseInt(fetchedRounds[i]));
+        }
+        for (int j = 0; j < fetchedRoundType.length; j++) {
+          typeOfRound.add(Integer.parseInt(fetchedRoundType[j]));
+        }
+
+        ArrayList<String> convertedWorkoutRoundList = convertMillisIntegerListToTimerStringList(workoutTimeIntegerArray);
+
+        adjustDotRecyclerViewSize(convertedWorkoutRoundList.size());
+        dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
+        dotsAdapter.setTypeOfRoundList(typeOfRound);
+        dotsAdapter.notifyDataSetChanged();
+
+        Log.i("testLaunch", "string array in populateCycle method is " + workoutCyclesArray);
+        Log.i("testLaunch", "fetched array from string in populateCycle method is " + workoutCyclesArray);
+        Log.i("testLaunch", "integer array in populateCycle method is " + workoutTimeIntegerArray);
+
+        cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
         break;
       case 3:
         pomValuesTime.clear();
         pomStringListOfRoundValues.clear();
+
+        if (addedOrEditedRow) {
+          positionOfSelectedCycleForModeThree = sortedPositionOfSelectedCycleForModeThree;
+        }
 
         if (pomArray.size() - 1 >= positionOfSelectedCycleForModeThree) {
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");

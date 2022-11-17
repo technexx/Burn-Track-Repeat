@@ -28,7 +28,6 @@ public class Cycles {
     public int tdeeValuePosition;
     public boolean currentlyTrackingCycle;
 
-//    //Used for ease of viewing database entries.
     public String activityString;
 
     public Cycles() {
