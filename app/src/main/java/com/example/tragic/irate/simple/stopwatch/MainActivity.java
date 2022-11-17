@@ -300,9 +300,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> typeOfRoundArray;
   int roundType;
   ArrayList<String> workoutStringListOfRoundValuesForFirstAdapter;
-  ArrayList<String> workoutStringListOfRoundValuesForSecondAdapter;
   ArrayList<Integer> workoutIntegerListOfRoundTypeForFirstAdapter;
-  ArrayList<Integer> workoutIntegerListOfRoundTypeForSecondAdapter;
 
   int setTimeValueEnteredWithKeypad;
   int breakTimeValueEnteredWithKeypad;
@@ -525,7 +523,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   String oldCycleTitleString;
   ArrayList<String> oldCycleRoundListOne;
-  ArrayList<String> oldCycleRoundListTwo;
   ArrayList<String> oldPomRoundList;
   Vibrator vibrator;
 
@@ -653,9 +650,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: New cycle b0rks position.
   //Todo: Total daily time/cals not super clear w/ out date as header.
   //Todo: Cycle can default to not tracking right after editing one to add activity.
   //Todo: Should vertically center title + round string in cycles recycler - looks too wide w/ few rounds + longer activity String.
+  //Todo: Test fresh install add/sub cycles etc.
 
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
@@ -1327,8 +1326,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (workoutTimeIntegerArray.size() >= 8) {
       workoutStringListOfRoundValuesForFirstAdapter.clear();
       workoutIntegerListOfRoundTypeForFirstAdapter.clear();
-      workoutStringListOfRoundValuesForSecondAdapter.clear();
-      workoutIntegerListOfRoundTypeForSecondAdapter.clear();
 
       for (int i = 0; i < convertedWorkoutTimeStringArray.size(); i++) {
         Log.i("testAnim", "list size is " + convertedWorkoutTimeStringArray.size());
@@ -2629,9 +2626,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomArray = new ArrayList<>();
 
     workoutStringListOfRoundValuesForFirstAdapter = new ArrayList<>();
-    workoutStringListOfRoundValuesForSecondAdapter = new ArrayList<>();
     workoutIntegerListOfRoundTypeForFirstAdapter = new ArrayList<>();
-    workoutIntegerListOfRoundTypeForSecondAdapter = new ArrayList<>();
 
     currentLapList = new ArrayList<>();
     savedLapList = new ArrayList<>();
@@ -3403,7 +3398,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     oldCycleTitleString = cycleTitle;
     if (mode == 1) {
       oldCycleRoundListOne = new ArrayList<>(workoutStringListOfRoundValuesForFirstAdapter);
-      oldCycleRoundListTwo = new ArrayList<>(workoutStringListOfRoundValuesForSecondAdapter);
     }
     if (mode == 3) {
       oldPomRoundList = new ArrayList<>(pomArray);
@@ -4032,9 +4026,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       convertedWorkoutTimeStringArray.clear();
       workoutStringListOfRoundValuesForFirstAdapter.clear();
-      workoutStringListOfRoundValuesForSecondAdapter.clear();
       workoutIntegerListOfRoundTypeForFirstAdapter.clear();
-      workoutIntegerListOfRoundTypeForSecondAdapter.clear();
 
       workoutTimeIntegerArray.clear();
       typeOfRound.clear();
@@ -4293,19 +4285,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         trackActivityWithinCycle = false;
       }
 
+      //Todo: setPrimaryIdsForSelectedCycleEntity() only gets launched in cycle click and editing a cycle.
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+
+      if (!trackActivityWithinCycle) {
+        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
+      }
 
       if (isNewCycle) {
         zeroOutTotalCycleTimes();
         positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
-      }
-
-      if (!trackActivityWithinCycle) {
-        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
       }
 
       runOnUiThread(new Runnable() {
@@ -4662,6 +4655,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       tdeeActivityExistsInCycleList.clear();
       tdeeIsBeingTrackedInCycleList.clear();
 
+      if (isNewCycle) {
+        int max = 0;
+
+        for(int i=0; i<cyclesList.size(); i++) {
+          if (cyclesList.get(i).getId() > max) {
+            max = cyclesList.get(i).getId();
+          }
+        }
+
+        primaryIdOfCycleRowSelected = max;
+      }
+
       int cycleIdFromPreSortedPosition = primaryIdOfCycleRowSelected;
 
       //Fetches an updated position of our sorted rows by retrieving the position of our old position's primaryId.
@@ -4670,6 +4675,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           sortedPositionOfSelectedCycleForModeOne = i;
         }
       }
+
 
       for (int i = 0; i < cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
@@ -4702,14 +4708,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
 //From the new order of our arrays, the original fetched position is incorrect.
-  private void populateCycleRoundAndRoundTypeArrayLists(boolean addedOrEditedRow) {
+  private void populateCycleRoundAndRoundTypeArrayLists(boolean executingFromTimerLaunch) {
     switch (mode) {
       case 1:
         workoutTimeIntegerArray.clear();
         typeOfRound.clear();
 
         //Sets our "old" global positional variable to the new, sorted one if necessary.
-        if (addedOrEditedRow) {
+        if (executingFromTimerLaunch) {
           positionOfSelectedCycleForModeOne = sortedPositionOfSelectedCycleForModeOne;
         }
 
@@ -4740,7 +4746,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         pomValuesTime.clear();
         pomStringListOfRoundValues.clear();
 
-        if (addedOrEditedRow) {
+        if (executingFromTimerLaunch) {
           positionOfSelectedCycleForModeThree = sortedPositionOfSelectedCycleForModeThree;
         }
 
