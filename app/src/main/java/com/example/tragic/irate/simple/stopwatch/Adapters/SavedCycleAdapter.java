@@ -236,31 +236,34 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.WHITE);
     }
 
+    Log.i("testActive", "list is " + mTdeeActivityExistsInCycleList);
+
+    if (mActiveCycle) {
+      if (position == mPositionOfActiveCycle) {
+        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
+        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
+        workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.cycle_title_and_rounds_layout;
+        workoutHolder.resetButtonLayoutParams.topToBottom = R.id.cycle_title_and_rounds_layout;
+      }
+    }
+
     if (mTdeeActivityExistsInCycleList.get(position)) {
       workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
 
-      if (!mActiveCycle) {
+      if (mActiveCycle) {
+        workoutHolder.activityStringLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
+      } else {
         workoutHolder.activityStringLayoutParams.topToTop = R.id.workout_recycler_layout;
         workoutHolder.activityStringLayoutParams.bottomToBottom = R.id.workout_recycler_layout;
-      } else {
-        workoutHolder.activityStringLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
       }
 
-      workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.activity_string_textView_for_tracking_cycles;
-      workoutHolder.resetButtonLayoutParams.topToBottom = R.id.activity_string_textView_for_tracking_cycles;
-
-//      workoutHolder.titleAndRoundsLayoutParams.bottomToBottom = R.id.pause_or_resume_cycle_button_for_mode_1;
       workoutHolder.titleAndRoundsLayoutParams.endToStart = R.id.activity_string_textView_for_tracking_cycles;
     } else {
+      workoutHolder.tdeeActivityStringToggleTextView.setText("");
       workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
 
       workoutHolder.activityStringLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-
-      workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.cycle_title_and_rounds_layout;
-      workoutHolder.resetButtonLayoutParams.topToBottom = R.id.cycle_title_and_rounds_layout;
-
-      workoutHolder.titleAndRoundsLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
       workoutHolder.titleAndRoundsLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
 
@@ -387,8 +390,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           workoutHolder.pauseOrResume.setText(R.string.pause);
         }
 
-        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
-        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
+        //Todo: Here.
+//        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
+//        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
 
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 

@@ -40,7 +40,6 @@
             android:layout_marginBottom="4dp"
             android:textStyle="bold">
         </TextView>
-
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <TextView
@@ -49,9 +48,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toStartOf="@id/workout_recycler_center_horizontal_guideline"
-        app:layout_constraintTop_toBottomOf="@id/cycle_title_and_rounds_layout"
-        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginStart="30dp"
+        android:layout_marginTop="20dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:textStyle="bold"
@@ -64,9 +63,9 @@
         android:layout_height="wrap_content"
         app:layout_constraintStart_toEndOf="@id/workout_recycler_center_horizontal_guideline"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/cycle_title_and_rounds_layout"
-        android:layout_marginTop="24dp"
+        app:layout_constraintBottom_toBottomOf="parent"
         android:layout_marginEnd="30dp"
+        android:layout_marginTop="20dp"
         android:paddingTop="5dp"
         android:paddingBottom="5dp"
         android:textStyle="bold"
