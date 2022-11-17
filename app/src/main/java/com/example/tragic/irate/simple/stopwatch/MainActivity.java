@@ -650,11 +650,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: New cycle b0rks position.
+  //Todo: Ierations of time in our cycles recyclerView may need their position changed.
+      //Todo: Width of recyclerView getting changed - this may be due to the above iterations, tho we did just change those.
   //Todo: Total daily time/cals not super clear w/ out date as header.
   //Todo: Cycle can default to not tracking right after editing one to add activity.
   //Todo: Should vertically center title + round string in cycles recycler - looks too wide w/ few rounds + longer activity String.
-  //Todo: Test fresh install add/sub cycles etc.
+  //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
   //Todo: Okay to release a 1.0.1 version!
@@ -3910,10 +3911,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       if (stateOfTimers.isModeOneTimerActive()) {
         if (isNewCycle) {
-          positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
+//          positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
         }
         savedCycleAdapter.setCycleAsActive();
-        savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeOne);
+        savedCycleAdapter.setActiveCyclePosition(sortedPositionOfSelectedCycleForModeOne);
         savedCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeOne - numberOfRoundsLeftForModeOne);
 
         savedCycleAdapter.notifyDataSetChanged();
@@ -3923,10 +3924,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) {
       if (stateOfTimers.isModeThreeTimerActive()) {
         if (isNewCycle) {
-          positionOfSelectedCycleForModeThree = pomArray.size() - 1;
+//          positionOfSelectedCycleForModeThree = pomArray.size() - 1;
         }
         savedPomCycleAdapter.setCycleAsActive();
-        savedPomCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeThree);
+        savedPomCycleAdapter.setActiveCyclePosition(sortedPositionOfSelectedCycleForModeThree);
         savedPomCycleAdapter.setNumberOfRoundsCompleted(startRoundsForModeThree - numberOfRoundsLeftForModeThree);
 
         savedPomCycleAdapter.notifyDataSetChanged();
@@ -4285,7 +4286,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         trackActivityWithinCycle = false;
       }
 
-      //Todo: setPrimaryIdsForSelectedCycleEntity() only gets launched in cycle click and editing a cycle.
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
@@ -4296,7 +4296,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (isNewCycle) {
         zeroOutTotalCycleTimes();
-        positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
+//        positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
@@ -4438,7 +4438,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         storeSetAndBreakTimeForCycleResuming();
       }
 
-      deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycleForModeOne);
+      deleteLastAccessedActivityCycleIfItHasZeroTime(sortedPositionOfSelectedCycleForModeOne);
 
     } else if (mode == 3) {
       stateOfTimers.setModeThreeTimerDisabled(false);
@@ -5275,7 +5275,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     ArrayList<Integer> integerCycleArray = integerArrayList;
 
     int fetchedRoundType = typeOfRound.get(currentRoundForModeOne);
-    workoutCyclesArray.set(positionOfSelectedCycleForModeOne, newRoundStringForModeOne(fetchedRoundType));
+    workoutCyclesArray.set(sortedPositionOfSelectedCycleForModeOne, newRoundStringForModeOne(fetchedRoundType));
   }
 
   private String newRoundStringForModeOne(int typeOfRound) {
@@ -5326,8 +5326,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     String[] fetchedRounds = {};
     ArrayList<Integer> newIntegerArray = new ArrayList<>();
 
-    if (workoutCyclesArray.size() - 1  >= positionOfSelectedCycleForModeOne) {
-      fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycleForModeOne).split(" - ");
+    if (workoutCyclesArray.size() - 1  >= sortedPositionOfSelectedCycleForModeOne) {
+      fetchedRounds = workoutCyclesArray.get(sortedPositionOfSelectedCycleForModeOne).split(" - ");
     }
 
     for (int i = 0; i<fetchedRounds.length; i++) {
