@@ -652,7 +652,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Activity saving issues. Newer ones overwrites older ones.
       //Todo: Issue revolves around exiting/re-entering timer popUp. If we just iterate, reset, exit, seems to work fine.
-      //Todo: Pause/reset after accessing stats frag during active cycle seems to not pause/reset and keeps iterating.
+  //Todo: Pause not always stopping stats runnable + neither does resetting.
   //Todo: Cycle recycler rounds push into activity string.
   //Todo: Resetting set/break time within timer will begin iteration from 0->2.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
@@ -4549,9 +4549,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
 
+        //Todo: This is always being set from an array position, not our database!
+        //Todo: This worked at a point before we decided to reset array list.
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
-        Log.i("testAdd", "activity being saved is " + getTdeeActivityStringFromArrayPosition());
+        Log.i("testAdd", "activity being set in Cycles is " + getTdeeActivityStringFromArrayPosition());
 
         cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
 

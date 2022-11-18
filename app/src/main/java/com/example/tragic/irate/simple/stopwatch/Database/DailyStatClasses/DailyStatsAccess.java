@@ -527,7 +527,10 @@ public class DailyStatsAccess {
     }
 
     public boolean doesActivityExistsForSpecificDay() {
+        Log.i("testInsert", "mStatsList size is " + mStatsForEachActivityList.size());
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+            Log.i("testInsert", "mStats activity list in doesExist check is " + mStatsForEachActivityList.get(i).getActivity());
+
             if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
                 return true;
             }
@@ -640,6 +643,8 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
         mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
+
+        Log.i("testInsert", "activity inserted is " + mActivityString);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
     }
