@@ -378,7 +378,7 @@
             android:layout_width="match_parent"
             android:layout_height="1.5dp"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintBottom_toTopOf="@id/total_bmr_stats_textView_header"
+            app:layout_constraintBottom_toTopOf="@id/total_activity_stats_textView_header"
             app:layout_constraintTop_toTopOf="parent"
             android:background="@color/black">
         </View>

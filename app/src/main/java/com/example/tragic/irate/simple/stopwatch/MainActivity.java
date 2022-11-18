@@ -650,10 +650,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Starting @ 1.04 seconds for an activity on new day, but re-entry into timer puts it at 0. Nothing in stats.
   //Todo: Resetting set/break time within timer will begin iteration from 0->2.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
+      //Todo: Some updated screenshots for current app + rename it!
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Anim stuff when resuming app.
