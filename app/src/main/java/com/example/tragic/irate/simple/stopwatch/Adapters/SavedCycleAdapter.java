@@ -250,8 +250,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       workoutHolder.titleAndRoundsLayoutParams.endToStart = R.id.activity_string_textView_for_tracking_cycles;
     } else {
-      workoutHolder.titleAndRoundsLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
-
       workoutHolder.activityStringTextView.setVisibility(View.GONE);
     }
 
