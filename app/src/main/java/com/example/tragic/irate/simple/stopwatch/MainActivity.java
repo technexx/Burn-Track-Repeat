@@ -650,10 +650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-
-  //Todo: Deleting highlighted cycles errors.
-  //Todo: Cycle can default to not tracking right after add/edit.
-  //Todo: Adding a cycle while in edit mode retains edit mode buttons in app bar afterwards.
   //Todo: Resetting set/break time within timer will begin iteration from 0->2.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
@@ -4322,6 +4318,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
+          Log.i("testTrack", "track in launch is " + trackActivityWithinCycle);
           setTimerLaunchLogic(trackActivityWithinCycle);
           setTimerLaunchViews(typeOfLaunch);
           resetCyclesTimer();
@@ -4557,14 +4554,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
-        if (!isNewCycle) {
-          trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
+//        if (!isNewCycle) {
+////          trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
+//
+//        } else {
+//          trackActivityWithinCycle = false;
+//          cycles.setCurrentlyTrackingCycle(true);
+//        }
 
-          cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
-        } else {
-          trackActivityWithinCycle = false;
-          cycles.setCurrentlyTrackingCycle(true);
-        }
+        cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
 
       } else {
         cycles.setTdeeActivityExists(false);
@@ -4706,7 +4704,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
 
-        Log.i("testTrack", "list of tracked is " + tdeeIsBeingTrackedInCycleList);
+//        Log.i("testTrack", "list of tracked is " + tdeeIsBeingTrackedInCycleList);
       }
     }
     if (mode == 3 || forAllModes) {
