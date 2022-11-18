@@ -6538,6 +6538,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetCyclesTimer() {
+    positionOfSelectedCycleForModeOne = 0;
+    sortedPositionOfSelectedCycleForModeOne = 0;
+
     stateOfTimers.setModeOneTimerPaused(true);
     stateOfTimers.setModeOneTimerEnded(false);
     stateOfTimers.setModeOneTimerDisabled(false);
@@ -6637,6 +6640,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetPomCyclesTimer() {
+    positionOfSelectedCycleForModeThree = 0;
+    sortedPositionOfSelectedCycleForModeThree = 0;
+
     startRoundsForModeThree = 8;
     currentRoundForModeThree = 0;
     numberOfRoundsLeftForModeThree = startRoundsForModeThree;
