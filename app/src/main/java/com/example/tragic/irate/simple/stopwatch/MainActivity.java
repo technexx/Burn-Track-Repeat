@@ -4273,13 +4273,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (typeOfLaunch == CYCLE_LAUNCHED_FROM_RECYCLER_VIEW) {
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycleForModeOne);
-      }
 
-      if (cycleHasActivityAssigned) {
-        insertActivityIntoDatabaseAndAssignItsValueToObjects();
-        trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
-      } else {
-        trackActivityWithinCycle = false;
+        if (cycleHasActivityAssigned) {
+          insertActivityIntoDatabaseAndAssignItsValueToObjects();
+          trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
+        } else {
+          trackActivityWithinCycle = false;
+        }
       }
 
       saveAddedOrEditedCycleASyncRunnable();
