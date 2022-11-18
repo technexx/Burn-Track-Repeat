@@ -258,11 +258,11 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
       workoutHolder.titleAndRoundsLayoutParams.endToStart = R.id.activity_string_textView_for_tracking_cycles;
     } else {
-      workoutHolder.tdeeActivityStringToggleTextView.setText("");
-      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
-
       workoutHolder.activityStringLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
       workoutHolder.titleAndRoundsLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
+
+      workoutHolder.tdeeActivityStringToggleTextView.setText("");
+      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
     }
 
     if (mActiveTdeeModeBooleanList.get(position)) {

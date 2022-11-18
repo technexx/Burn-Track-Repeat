@@ -650,12 +650,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: FAB click during active cycle b0rks resume.
   //Todo: Cycles recycler layout.
       //Todo: Activity String should also be centered against title/cycle layout.
       //Todo: Copy cycle layout to /1920h
-  //Todo: Resetting set/break time within timer will begin iteration from 0->2.
   //Todo: Cycle can default to not tracking right after add/edit.
+  //Todo: Adding a cycle while in edit mode retains edit mode buttons in app bar afterwards.
+  //Todo: Resetting set/break time within timer will begin iteration from 0->2.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -1259,8 +1259,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       positionOfSelectedCycleForModeOne = position;
 
-//      cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
-//      trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(position);
     }
     if (mode == 3) {
       positionOfSelectedCycleForModeThree = position;
@@ -1560,6 +1558,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     fab.setOnClickListener(v -> {
       fabLogic();
       removeCycleHighlights();
+      toggleCustomActionBarButtonVisibilities(false);
     });
 
     stopWatchLaunchButton.setOnClickListener(v -> {
@@ -1575,9 +1574,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       toggleCycleAndPomCycleRecyclerViewVisibilities(false);
 
+      timerPopUpDismissalLogic();
+
       toggleCustomActionBarButtonVisibilities(false);
 
-      timerPopUpDismissalLogic();
     });
 
     editPopUpLayout.setOnClickListener(v-> {
@@ -2667,12 +2667,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     secondEditHeaderParams = (ConstraintLayout.LayoutParams) secondRoundTypeHeaderInEditPopUp.getLayoutParams();
     deleteEditTimerNumbersParams = (ConstraintLayout.LayoutParams) deleteEditPopUpTimerNumbers.getLayoutParams();
-  }
-
-  private void setCustomActionBarDefaultViews() {
-    edit_highlighted_cycle.setVisibility(View.INVISIBLE);
-    delete_highlighted_cycle.setVisibility(View.INVISIBLE);
-    cancelHighlight.setVisibility(View.INVISIBLE);
   }
 
   private void setDefaultLayoutVisibilities() {
@@ -4003,6 +3997,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void toggleCustomActionBarButtonVisibilities(boolean highlightMode) {
+    appHeader.clearAnimation();
+    sortButton.clearAnimation();
+    edit_highlighted_cycle.clearAnimation();
+    delete_highlighted_cycle.clearAnimation();
+    cancelHighlight.clearAnimation();
+
     if (highlightMode) {
       appHeader.setVisibility(View.GONE);
       sortButton.setVisibility(View.GONE);
