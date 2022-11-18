@@ -650,8 +650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Activity saving issues.
-      //Todo: First row defaulting to "mountain biking - general" when clicked, tho cycle title activity is fine.
+  //Todo: First cycle launch has 0 activity stats
   //Todo: Pause not always stopping stats runnable + neither does resetting.
   //Todo: Cycle recycler rounds push into activity string.
   //Todo: Resetting set/break time within timer will begin iteration from 0->2.
@@ -4468,25 +4467,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
-    dailyStatsAccess.setOldDayHolderId(dayOfYear);
+    int currentDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-//    dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
+    dailyStatsAccess.setOldDayHolderId(currentDayOfYear);
 
     //We have a new instance of cycles called from setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(...).
     String activityToInsert = cycles.getActivityString();
     dailyStatsAccess.setActivityString(activityToInsert);
 
     dailyStatsAccess.setMetScoreFromSpinner(metScore);
-    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(currentDayOfYear);
 
     if (dailyStatsAccess.doesActivityExistsForSpecificDay()) {
-      Log.i("testAdd", "activity exists during insertion");
+      //mStats list.
       dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
-      //We get an updated mStats entity here.
+      //mStats entity from list.
       dailyStatsAccess.assignPositionOfActivityListForRetrieveActivityToStatsEntity();
     } else {
-      Log.i("testAdd", "activity does not exists during insertion");
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+      //mStats list.
       dailyStatsAccess.loadAllActivitiesToStatsListForSpecificDay(dayOfYear);
       dailyStatsAccess.assignPositionOfRecentlyAddedRowToStatsEntity();
       dailyStatsAccess.setActivityPositionInListForCurrentDayForNewActivity();

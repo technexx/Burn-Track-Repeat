@@ -527,10 +527,7 @@ public class DailyStatsAccess {
     }
 
     public boolean doesActivityExistsForSpecificDay() {
-        Log.i("testInsert", "mStatsList size is " + mStatsForEachActivityList.size());
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-            Log.i("testInsert", "mStats activity list in doesExist check is " + mStatsForEachActivityList.get(i).getActivity());
-
             if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {
                 return true;
             }
@@ -551,9 +548,6 @@ public class DailyStatsAccess {
 
     public void insertStatsForEachActivityRow(long daySelected, long setTime, double caloriesBurned) {
         mStatsForEachActivity = new StatsForEachActivity();
-
-//        if (checkIfTimeWillCapTotalForDay(setTime, getUnassignedSetTimeForSelectedDuration())) {
-//        }
 
         mStatsForEachActivity.setUniqueIdTiedToTheSelectedActivity(daySelected);
         mStatsForEachActivity.setActivity(mActivityString);
@@ -644,7 +638,7 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
-        Log.i("testInsert", "activity inserted is " + mActivityString);
+        Log.i("testInsert", "activity inserted in a new mStats instance is " + mActivityString);
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
     }
@@ -670,6 +664,7 @@ public class DailyStatsAccess {
         }
     }
 
+    //Todo: On first retrieval, mStatsList has only 1 item (first row/cycle clicked), with 0 set on times. Second click fine.
     public void assignPositionOfActivityListForRetrieveActivityToStatsEntity() {
         mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
     }
