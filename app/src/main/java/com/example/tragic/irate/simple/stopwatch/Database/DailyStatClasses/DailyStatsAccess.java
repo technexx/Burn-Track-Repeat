@@ -664,7 +664,6 @@ public class DailyStatsAccess {
         }
     }
 
-    //Todo: On first retrieval, mStatsList has only 1 item (first row/cycle clicked), with 0 set on times. Second click fine.
     public void assignPositionOfActivityListForRetrieveActivityToStatsEntity() {
         mStatsForEachActivity = mStatsForEachActivityList.get(activityPositionInListForCurrentDay);
     }

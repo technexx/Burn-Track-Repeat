@@ -650,9 +650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: First cycle launch has 0 activity stats
-  //Todo: Pause not always stopping stats runnable + neither does resetting.
-  //Todo: Cycle recycler rounds push into activity string.
   //Todo: Resetting set/break time within timer will begin iteration from 0->2.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
@@ -1094,7 +1091,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setAllActivityTimesAndCaloriesToTextViews();
         } else {
           setTotalCycleTimeValuesToTextView();
-//          setStoredSetAndBreakTimeOnCycleResume();
         }
 
         toggleViewsForTotalDailyAndCycleTimes(trackActivityWithinCycle);
@@ -1186,31 +1182,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     }
-    Log.i("testSort", "button is " + sortButton.isEnabled());
-  }
-
-  private void storeSetAndBreakTimeForCycleResuming() {
-    if (mode==1) {
-      savedTotalSetTime = (String) total_set_time.getText();
-      savedTotalBreakTime = (String) total_break_time.getText();
-    }
-  }
-
-  private void setStoredSetAndBreakTimeOnCycleResume() {
-    if (mode==1) {
-      total_set_time.setText(savedTotalSetTime);
-      total_break_time.setText(savedTotalBreakTime);
-    }
-  }
-
-  private void storeSetAndBreakTimeForPomCycleResuming() {
-    savedTotalWorkTime = (String) total_set_time.getText();
-    savedTotalRestTime = (String) total_break_time.getText();
-  }
-
-  private void setStoredSetAndBreakTimeOnPomCycleResume() {
-    total_set_time.setText(savedTotalWorkTime);
-    total_break_time.setText(savedTotalRestTime);
   }
 
   @Override
@@ -4440,8 +4411,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         AsyncTask.execute(()-> {
           setAndUpdateActivityTimeAndCaloriesInDatabase();
         });
-      }  else {
-        storeSetAndBreakTimeForCycleResuming();
       }
 
       deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycleForModeOne);
@@ -4458,7 +4427,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       progressBarForPom.setVisibility(View.GONE);
       resetButtonForPomCycles.setVisibility(View.GONE);
 
-      storeSetAndBreakTimeForPomCycleResuming();
       savedPomCycleAdapter.notifyDataSetChanged();
     }
 
