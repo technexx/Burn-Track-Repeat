@@ -650,10 +650,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Copy cycle layout to /1920h
-  //Todo: Total daily time/cals not super clear w/ out date as header.
+  //Todo: First entry into cycle w/ activity can show "0" on app launch. Starting timer seems to reset our database time, but entering/exiting same cycle will show correct time. Fragment also shows it as correct.
+      //Todo: Also starts two iterations of daily total if we start timer w/ reset not stopping one.
+  //Todo: Cycles recycler layout.
+      //Todo: Activity String should also be centered against title/cycle layout.
+      //Todo: Copy cycle layout to /1920h
+  //Todo: Resetting set/break time within timer will begin iteration from 0->2.
   //Todo: Cycle can default to not tracking right after editing one to add activity.
-  //Todo: Should vertically center title + round string in cycles recycler - looks too wide w/ few rounds + longer activity String.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -1257,8 +1260,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       positionOfSelectedCycleForModeOne = position;
 
-      cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
-      trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(position);
+//      cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(position);
+//      trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(position);
     }
     if (mode == 3) {
       positionOfSelectedCycleForModeThree = position;
@@ -1272,7 +1275,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
-    populateCycleRoundAndRoundTypeArrayLists(false);
+//    populateCycleRoundAndRoundTypeArrayLists(false);
 
     dotsAdapter.notifyDataSetChanged();
 
@@ -4242,7 +4245,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchTimerCycle(int typeOfLaunch) {
-    if (workoutTimeIntegerArray.size() == 0) {
+    if (workoutCyclesArray.size() == 0) {
       showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
@@ -4274,22 +4277,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (cycleHasActivityAssigned) {
         insertActivityIntoDatabaseAndAssignItsValueToObjects();
-        trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
-      } else {
-        trackActivityWithinCycle = false;
       }
 
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
-      if (!trackActivityWithinCycle) {
-        setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
-      }
+      setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
 
       if (isNewCycle) {
         zeroOutTotalCycleTimes();
-//        positionOfSelectedCycleForModeOne = workoutCyclesArray.size() - 1;
       } else {
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
@@ -4386,7 +4383,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTimerLaunchViews(int typeOfLaunch) {
     timerPopUpIsVisible = true;
     cycle_title_textView.setText(cycleTitle);
-    cycle_title_textView_with_activity.setText(cycleTitle);
+    cycle_title_textView_with_activity.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
+//    cycle_title_textView_with_activity.setText(cycleTitle);
 
     adjustDotRecyclerLayoutMargins();
 
@@ -4535,8 +4533,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
         if (!isNewCycle) {
+          trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
+
           cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
         } else {
+          trackActivityWithinCycle = false;
           cycles.setCurrentlyTrackingCycle(true);
         }
 
@@ -4666,6 +4667,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       for (int i = 0; i<cyclesList.size(); i++) {
         if (cyclesList.get(i).getId() == cycleIdFromPreSortedPosition) {
           sortedPositionOfSelectedCycleForModeOne = i;
+        } else {
+          sortedPositionOfSelectedCycleForModeOne = 0;
         }
       }
 
@@ -4690,6 +4693,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       for (int i = 0; i<pomCyclesList.size(); i++) {
         if (pomCyclesList.get(i).getId() == cycleIdFromPreSortedPosition) {
           sortedPositionOfSelectedCycleForModeThree = i;
+        } else {
+          sortedPositionOfSelectedCycleForModeThree = 0;
         }
       }
 
@@ -4707,7 +4712,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         workoutTimeIntegerArray.clear();
         typeOfRound.clear();
 
-        //Todo: Here, we set the old var to the new var, so we shouldn't need the new one set anywhere else.
         //Sets our "old" global positional variable to the new, sorted one if necessary.
         if (executingFromTimerLaunch) {
           positionOfSelectedCycleForModeOne = sortedPositionOfSelectedCycleForModeOne;

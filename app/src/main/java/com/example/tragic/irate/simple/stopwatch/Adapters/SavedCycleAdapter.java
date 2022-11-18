@@ -196,7 +196,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     return mTdeeActivityExistsInCycleList.get(position);
   }
 
-  //This is accessed by Main when launching timer to determine whether we are tracking.
   public boolean getBooleanDeterminingIfWeAreTrackingActivity(int position) {
     return mActiveTdeeModeBooleanList.get(position);
   }
@@ -236,10 +235,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.WHITE);
     }
 
-    Log.i("testActive", "list is " + mTdeeActivityExistsInCycleList);
-
     if (mActiveCycle) {
       if (position == mPositionOfActiveCycle) {
+        //Todo: These visibilities causing the layout issue.
         workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
         workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.cycle_title_and_rounds_layout;
@@ -389,10 +387,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else {
           workoutHolder.pauseOrResume.setText(R.string.pause);
         }
-
-        //Todo: Here.
-//        workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
-//        workoutHolder.resetCycle.setVisibility(View.VISIBLE);
 
         workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
 
