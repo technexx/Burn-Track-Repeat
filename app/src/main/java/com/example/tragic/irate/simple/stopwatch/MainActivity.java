@@ -650,13 +650,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: First entry into cycle w/ activity can show "0" on app launch. Starting timer seems to reset our database time, but entering/exiting same cycle will show correct time. Fragment also shows it as correct.
-      //Todo: Also starts two iterations of daily total if we start timer w/ reset not stopping one.
+  //Todo: FAB click during active cycle b0rks resume.
   //Todo: Cycles recycler layout.
       //Todo: Activity String should also be centered against title/cycle layout.
       //Todo: Copy cycle layout to /1920h
   //Todo: Resetting set/break time within timer will begin iteration from 0->2.
-  //Todo: Cycle can default to not tracking right after editing one to add activity.
+  //Todo: Cycle can default to not tracking right after add/edit.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -4294,6 +4293,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         retrieveTotalSetAndBreakAndCompletedCycleValuesFromCycleList();
       }
 
+      timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
+      progressBar.setVisibility(View.VISIBLE);
+      resetButtonForCycles.setVisibility(View.VISIBLE);
+
+      Calendar calendar = Calendar.getInstance(Locale.getDefault());
+      dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+
+      if (savedCycleAdapter.isCycleActive()) {
+        savedCycleAdapter.removeCycleAsActive();
+        savedCycleAdapter.notifyDataSetChanged();
+      }
+
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
@@ -4303,18 +4314,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
-
-    timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
-    progressBar.setVisibility(View.VISIBLE);
-    resetButtonForCycles.setVisibility(View.VISIBLE);
-
-    Calendar calendar = Calendar.getInstance(Locale.getDefault());
-    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
-    if (savedCycleAdapter.isCycleActive()) {
-      savedCycleAdapter.removeCycleAsActive();
-      savedCycleAdapter.notifyDataSetChanged();
-    }
   }
 
   private void launchPomTimerCycle(int typeOfLaunch) {
@@ -4387,7 +4386,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = true;
     cycle_title_textView.setText(cycleTitle);
     cycle_title_textView_with_activity.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
-//    cycle_title_textView_with_activity.setText(cycleTitle);
 
     adjustDotRecyclerLayoutMargins();
 
@@ -4408,10 +4406,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void timerPopUpDismissalLogic() {
     timerPopUpWindow.dismiss();
-
     timerPopUpIsVisible = false;
 
     if (mode == 1) {
+      if (stateOfTimers.isModeOneTimerActive()) {
+        fab.setAlpha(0.3f);
+        fab.setEnabled(false);
+      }
+
       stateOfTimers.setModeOneTimerDisabled(false);
 
       timeLeftForCyclesTimer.setVisibility(View.GONE);
@@ -4435,6 +4437,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycleForModeOne);
 
     } else if (mode == 3) {
+      if (stateOfTimers.isModeThreeTimerActive()) {
+        fab.setAlpha(0.3f);
+        fab.setEnabled(false);
+      }
+
       stateOfTimers.setModeThreeTimerDisabled(false);
 
       timeLeftForPomCyclesTimer.setVisibility(View.GONE);
@@ -6538,6 +6545,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetCyclesTimer() {
+    fab.setAlpha(1.0f);
+    fab.setEnabled(true);
+
     positionOfSelectedCycleForModeOne = 0;
     sortedPositionOfSelectedCycleForModeOne = 0;
 
@@ -6640,6 +6650,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void resetPomCyclesTimer() {
+    fab.setAlpha(1.0f);
+    fab.setEnabled(true);
+
     positionOfSelectedCycleForModeThree = 0;
     sortedPositionOfSelectedCycleForModeThree = 0;
 
