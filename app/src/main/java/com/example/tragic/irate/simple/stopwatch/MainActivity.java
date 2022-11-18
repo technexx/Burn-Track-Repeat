@@ -651,7 +651,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
 
-      //Todo: Copy cycle layout to /1920h
+  //Todo: Deleting highlighted cycles errors.
   //Todo: Cycle can default to not tracking right after add/edit.
   //Todo: Adding a cycle while in edit mode retains edit mode buttons in app bar afterwards.
   //Todo: Resetting set/break time within timer will begin iteration from 0->2.
@@ -3108,7 +3108,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteHighlightedCycles() {
-
     if ((mode == 1 && cyclesList.size() == 0 || (mode == 3 && pomCyclesList.size() == 0))) {
       runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
       return;
@@ -3117,9 +3116,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int cycleID = 0;
 
     if (mode == 1) {
-      positionOfSelectedCycleForModeOne = 0;
-      sortedPositionOfSelectedCycleForModeOne = 0;
-
       for (int i = 0; i < receivedHighlightPositions.size(); i++) {
         cycleID = cyclesList.get(receivedHighlightPositions.get(i)).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
@@ -3130,9 +3126,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     }
     if (mode == 3) {
-      positionOfSelectedCycleForModeThree = 0;
-      sortedPositionOfSelectedCycleForModeThree = 0;
-
       for (int i = 0; i < receivedHighlightPositions.size(); i++) {
         cycleID = pomCyclesList.get(receivedHighlightPositions.get(i)).getId();
         pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
@@ -3155,15 +3148,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
 
+      if (mode == 1) {
+        positionOfSelectedCycleForModeOne = 0;
+        sortedPositionOfSelectedCycleForModeOne = 0;
+      }
+      if (mode == 3) {
+        positionOfSelectedCycleForModeThree = 0;
+        sortedPositionOfSelectedCycleForModeThree = 0;
+      }
+
       showToastIfNoneActive("Deleted!");
     });
   }
 
   private void deleteAllCycles() {
     if (mode == 1) {
-      positionOfSelectedCycleForModeOne = 0;
-      sortedPositionOfSelectedCycleForModeOne = 0;
-
       if (cyclesList.size() > 0) {
 
         cyclesDatabase.cyclesDao().deleteAllCycles();
@@ -3174,13 +3173,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
           savedCycleAdapter.notifyDataSetChanged();
+
+          positionOfSelectedCycleForModeOne = 0;
+          sortedPositionOfSelectedCycleForModeOne = 0;
         });
       }
     }
     if (mode == 3) {
-      positionOfSelectedCycleForModeThree = 0;
-      sortedPositionOfSelectedCycleForModeThree = 0;
-
       if (pomCyclesList.size() > 0) {
         cyclesDatabase.cyclesDao().deleteAllPomCycles();
         queryAndSortAllCyclesFromMenu();
@@ -3190,6 +3189,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
           savedPomCycleAdapter.notifyDataSetChanged();
+
+          positionOfSelectedCycleForModeThree = 0;
+          sortedPositionOfSelectedCycleForModeThree = 0;
         });
       }
     }
@@ -4703,6 +4705,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         tdeeActivityExistsInCycleList.add(cyclesList.get(i).getTdeeActivityExists());
 
         tdeeIsBeingTrackedInCycleList.add(cyclesList.get(i).getCurrentlyTrackingCycle());
+
+        Log.i("testTrack", "list of tracked is " + tdeeIsBeingTrackedInCycleList);
       }
     }
     if (mode == 3 || forAllModes) {
