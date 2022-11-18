@@ -650,7 +650,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Resetting set/break time within timer will begin iteration from 0->2.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -5218,7 +5217,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           long remainder = timerIteration.getNewTotal() % 1000;
           long roundedRemainder = roundToNearestFullThousandth(remainder);
-          timerIteration.setPreviousTotal(1000);
+          //Set to 500 so first second iterates properly.
+          timerIteration.setPreviousTotal(500);
 
           resetCycleTimeVarsWithinRunnable = false;
         }
@@ -5229,6 +5229,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
           totalCycleSetTimeInMillis = timerIteration.getNewTotal();
+          Log.i("testSetTime", "total set time in runnable is " + totalCycleSetTimeInMillis);
         }
         if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
           totalCycleBreakTimeInMillis = timerIteration.getNewTotal();
@@ -5408,7 +5409,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           long remainder = timerIteration.getNewTotal() % 1000;
           long roundedRemainder = roundToNearestFullThousandth(remainder);
-          timerIteration.setPreviousTotal(1000);
+          timerIteration.setPreviousTotal(500);
 
           resetCycleTimeVarsWithinRunnable = false;
         }
