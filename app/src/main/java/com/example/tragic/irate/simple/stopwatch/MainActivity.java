@@ -650,7 +650,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Starting @ 1.04 seconds for an activity on new day, but re-entry into timer puts it at 0. Nothing in stats.
+  //Todo: Activity saving issues. Newer ones overwrites older ones.
+      //Todo: Issue revolves around exiting/re-entering timer popUp. If we just iterate, reset, exit, seems to work fine.
+      //Todo: Pause/reset after accessing stats frag during active cycle seems to not pause/reset and keeps iterating.
+  //Todo: Cycle recycler rounds push into activity string.
   //Todo: Resetting set/break time within timer will begin iteration from 0->2.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
@@ -658,9 +661,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Some updated screenshots for current app + rename it!
   //Todo: Okay to release a 1.0.1 version!
 
-  //Todo: Anim stuff when resuming app.
-  //Todo: Sort launch positions error when sorting, now.
-      //Todo: Sort puts list in X order, but all other queries use default order.
   //Todo: Adjust timer popUp margins for <1920h layout.
   //Todo: Total activity time can be 1 more than aggregate.
   //Todo: May have an issue w/ adding activities to databases if launching and iterating multiple ones in a row.
@@ -678,6 +678,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
 
+  //Todo: Starting @ 1.04 seconds for an activity on new day, but re-entry into timer puts it at 0. Nothing in stats.
   //Todo: Closing app briefly display notifications (onStop/onDestroy)
   //Todo: Had a bug of timer displaying and iterating +1 second from time listed in edit popUp's round.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
@@ -689,7 +690,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtone selection.
   //Todo: Add Day/Night modes.
-  //Todo: storeDailyTimesForCycleResuming() and setStoredDailyTimesForCycleResuming() commented out when using ms for daily stats.
   //Todo: Tablet display needs work.
       //Todo: Can be done later. Not meant for tablets.
 
@@ -1189,16 +1189,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     Log.i("testSort", "button is " + sortButton.isEnabled());
   }
-
-//  private void storeDailyTimesForCycleResuming() {
-//    savedTotalDailyTimeString = (String) dailyTotalTimeTextView.getText();
-//    savedSingleActivityString = (String) dailyTotalTimeForSingleActivityTextView.getText();
-//  }
-//
-//  private void setStoredDailyTimesOnCycleResume() {
-//    dailyTotalTimeTextView.setText(savedTotalDailyTimeString);
-//    dailyTotalTimeForSingleActivityTextView.setText(savedSingleActivityString);
-//  }
 
   private void storeSetAndBreakTimeForCycleResuming() {
     if (mode==1) {
@@ -3193,6 +3183,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         });
       }
     }
+
+    toggleCustomActionBarButtonVisibilities(false);
+    fab.setAlpha(0.3f);
+    fab.setEnabled(false);
   }
 
   private void deleteTotalCycleTimesFromDatabaseAndZeroOutVars() {
@@ -4286,11 +4280,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycleHasActivityAssigned = savedCycleAdapter.getBooleanDeterminingIfCycleHasActivity(positionOfSelectedCycleForModeOne);
 
         if (cycleHasActivityAssigned) {
-          insertActivityIntoDatabaseAndAssignItsValueToObjects();
           trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
         } else {
           trackActivityWithinCycle = false;
         }
+      }
+
+      if (cycleHasActivityAssigned) {
+        insertActivityIntoDatabaseAndAssignItsValueToObjects();
       }
 
       saveAddedOrEditedCycleASyncRunnable();
@@ -4422,7 +4419,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = false;
 
     if (mode == 1) {
-      Log.i("testFab", "state is " + stateOfTimers.isModeOneTimerActive());
       if (stateOfTimers.isModeOneTimerActive()) {
         fab.setAlpha(0.3f);
         fab.setEnabled(false);
@@ -4436,13 +4432,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       savedCycleAdapter.notifyDataSetChanged();
 
+//      Log.i("testAdd", "tracking within timer dismissal is " + trackActivityWithinCycle);
       if (trackActivityWithinCycle) {
-//        storeDailyTimesForCycleResuming();
         AsyncTask.execute(()-> {
           setAndUpdateActivityTimeAndCaloriesInDatabase();
-
-          //This is used if we're converting our Strings in timer popUp to millis. Needed if we go back to rounding instead of using milliseconds when dismissing timer.
-//          setAndUpdateActivityTimeAndCaloriesInDatabaseFromConvertedString();
         });
       }  else {
         storeSetAndBreakTimeForCycleResuming();
@@ -4479,10 +4472,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
 
     if (dailyStatsAccess.doesActivityExistsForSpecificDay()) {
+      Log.i("testAdd", "activity exists during insertion");
       dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
       //We get an updated mStats entity here.
       dailyStatsAccess.assignPositionOfActivityListForRetrieveActivityToStatsEntity();
     } else {
+      Log.i("testAdd", "activity does not exists during insertion");
       dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
       dailyStatsAccess.loadAllActivitiesToStatsListForSpecificDay(dayOfYear);
       dailyStatsAccess.assignPositionOfRecentlyAddedRowToStatsEntity();
@@ -4554,15 +4549,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeActivityExists(true);
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
-        cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
-//        if (!isNewCycle) {
-////          trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
-//
-//        } else {
-//          trackActivityWithinCycle = false;
-//          cycles.setCurrentlyTrackingCycle(true);
-//        }
+        cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
 
         cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
 
@@ -6561,7 +6549,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  //Todo: Positions reset which b0rks activateResumeOrReset.
   private void resetCyclesTimer() {
     fab.setAlpha(1.0f);
     fab.setEnabled(true);
