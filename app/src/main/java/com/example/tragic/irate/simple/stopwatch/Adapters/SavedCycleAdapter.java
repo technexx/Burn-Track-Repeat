@@ -238,7 +238,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     if (mActiveCycle) {
       if (position == mPositionOfActiveCycle) {
-        //Todo: These visibilities causing the layout issue.
+        //Todo: These visibilities causing the shifting round string issue.
         workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
       }
@@ -248,17 +248,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.activityStringTextView.setVisibility(View.VISIBLE);
       workoutHolder.activityStringTextView.setText(mWorkoutActivityString.get(position));
 
-      workoutHolder.activityStringLayoutParams.topToTop = R.id.workout_recycler_layout;
-      workoutHolder.activityStringLayoutParams.bottomToBottom = R.id.workout_recycler_layout;
-
-      if (mActiveCycle) {
-        workoutHolder.activityStringLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
-      } else {
-      }
-
       workoutHolder.titleAndRoundsLayoutParams.endToStart = R.id.activity_string_textView_for_tracking_cycles;
     } else {
-      workoutHolder.activityStringLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
       workoutHolder.titleAndRoundsLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
 
       workoutHolder.activityStringTextView.setVisibility(View.GONE);
