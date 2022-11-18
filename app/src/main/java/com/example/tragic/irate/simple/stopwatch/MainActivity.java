@@ -3186,8 +3186,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     runOnUiThread(() -> {
       toggleCustomActionBarButtonVisibilities(false);
-      fab.setAlpha(0.3f);
-      fab.setEnabled(false);
+      fab.setAlpha(1.0f);
+      fab.setEnabled(true);
     });
   }
 
@@ -4551,9 +4551,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         //Todo: This is always being set from an array position, not our database!
         //Todo: This worked at a point before we decided to reset array list.
-        cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
+        if (isNewCycle) {
+          cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
+        } else {
+          ///Cycles already has activity String retrieved above.
+        }
 
-        Log.i("testAdd", "activity being set in Cycles is " + getTdeeActivityStringFromArrayPosition());
+        Log.i("testAdd", "activity in retrieved Cycles instance is " + cycles.getActivityString());
 
         cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
 
