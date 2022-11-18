@@ -3184,9 +3184,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
 
-    toggleCustomActionBarButtonVisibilities(false);
-    fab.setAlpha(0.3f);
-    fab.setEnabled(false);
+    runOnUiThread(() -> {
+      toggleCustomActionBarButtonVisibilities(false);
+      fab.setAlpha(0.3f);
+      fab.setEnabled(false);
+    });
   }
 
   private void deleteTotalCycleTimesFromDatabaseAndZeroOutVars() {
@@ -3910,6 +3912,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void activateResumeOrResetOptionForCycle() {
     if (mode == 1) {
+      Log.i("testAdd", "position of cycle in reset/resume is " + positionOfSelectedCycleForModeOne);
       if (stateOfTimers.isModeOneTimerActive()) {
         savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeOne);
@@ -4541,16 +4544,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundTypeString = gson.toJson(typeOfRound);
       roundTypeString = friendlyString(roundTypeString);
 
-      Log.i("testSave", "workout String being converted is " + workoutString);
-      Log.i("testSave", "saving at position " + positionOfSelectedCycleForModeOne);
-      Log.i("testSave", "integer array being saved is " + workoutTimeIntegerArray);
-
       if (cycleHasActivityAssigned) {
         cycles.setTdeeActivityExists(true);
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
 
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
+
+        Log.i("testAdd", "activity being saved is " + getTdeeActivityStringFromArrayPosition());
 
         cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
 
