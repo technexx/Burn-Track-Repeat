@@ -222,6 +222,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     workoutHolder.pauseOrResume.setVisibility(View.GONE);
     workoutHolder.resetCycle.setVisibility(View.GONE);
+    workoutHolder.activityStringTextView.setVisibility(View.GONE);
 
     if (mHighlightDeleted) {
       mHighlightPositionList.clear();
@@ -229,10 +230,10 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     }
 
     if (mThemeMode == DAY_MODE) {
-      workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.BLACK);
+      workoutHolder.activityStringTextView.setTextColor(Color.BLACK);
     }
     if (mThemeMode == NIGHT_MODE) {
-      workoutHolder.tdeeActivityStringToggleTextView.setTextColor(Color.WHITE);
+      workoutHolder.activityStringTextView.setTextColor(Color.WHITE);
     }
 
     if (mActiveCycle) {
@@ -240,14 +241,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         //Todo: These visibilities causing the layout issue.
         workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
-        workoutHolder.pauseOrResumeButtonLayoutParams.topToBottom = R.id.cycle_title_and_rounds_layout;
-        workoutHolder.resetButtonLayoutParams.topToBottom = R.id.cycle_title_and_rounds_layout;
       }
     }
 
     if (mTdeeActivityExistsInCycleList.get(position)) {
-      workoutHolder.tdeeActivityStringToggleTextView.setText(mWorkoutActivityString.get(position));
-      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.VISIBLE);
+      workoutHolder.activityStringTextView.setVisibility(View.VISIBLE);
+      workoutHolder.activityStringTextView.setText(mWorkoutActivityString.get(position));
 
       workoutHolder.activityStringLayoutParams.topToTop = R.id.workout_recycler_layout;
       workoutHolder.activityStringLayoutParams.bottomToBottom = R.id.workout_recycler_layout;
@@ -262,14 +261,13 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.activityStringLayoutParams.bottomToBottom = ConstraintLayout.LayoutParams.UNSET;
       workoutHolder.titleAndRoundsLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
 
-      workoutHolder.tdeeActivityStringToggleTextView.setText("");
-      workoutHolder.tdeeActivityStringToggleTextView.setVisibility(View.GONE);
+      workoutHolder.activityStringTextView.setVisibility(View.GONE);
     }
 
     if (mActiveTdeeModeBooleanList.get(position)) {
-      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(1.0f);
+      workoutHolder.activityStringTextView.setAlpha(1.0f);
     } else {
-      workoutHolder.tdeeActivityStringToggleTextView.setAlpha(0.3f);
+      workoutHolder.activityStringTextView.setAlpha(0.3f);
     }
 
     permSpan = "";
@@ -328,7 +326,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     workoutHolder.workOutCycle.setText(permSpan);
     workoutHolder.workOutCycle.setTextColor(ContextCompat.getColor(mContext, R.color.white));
 
-    workoutHolder.tdeeActivityStringToggleTextView.setOnClickListener(v-> {
+    workoutHolder.activityStringTextView.setOnClickListener(v-> {
       if (!mActiveCycle && !mHighlightMode) {
         mOnTdeeModeToggle.toggleTdeeMode(position);
       }
@@ -420,7 +418,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     public TextView workOutCycle;
     public TextView pauseOrResume;
     public TextView resetCycle;
-    public TextView tdeeActivityStringToggleTextView;
+    public TextView activityStringTextView;
 
     ConstraintLayout.LayoutParams titleAndRoundsLayoutParams;
     ConstraintLayout.LayoutParams workoutNameLayoutParams;
@@ -439,14 +437,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workOutCycle = itemView.findViewById(R.id.saved_custom_set_view);
       pauseOrResume = itemView.findViewById(R.id.pause_or_resume_cycle_button_for_mode_1);
       resetCycle = itemView.findViewById(R.id.reset_active_cycle_button_for_mode_1);
-      tdeeActivityStringToggleTextView = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
+      activityStringTextView = itemView.findViewById(R.id.activity_string_textView_for_tracking_cycles);
 
       titleAndRoundsLayoutParams = (ConstraintLayout.LayoutParams) titleAndRoundsLayout.getLayoutParams();
       workoutNameLayoutParams = (ConstraintLayout.LayoutParams) workoutName.getLayoutParams();
       workoutCyclesLayoutParams = (ConstraintLayout.LayoutParams) workOutCycle.getLayoutParams();
       pauseOrResumeButtonLayoutParams = (ConstraintLayout.LayoutParams)  pauseOrResume.getLayoutParams();
       resetButtonLayoutParams = (ConstraintLayout.LayoutParams) resetCycle.getLayoutParams();
-      activityStringLayoutParams = (ConstraintLayout.LayoutParams) tdeeActivityStringToggleTextView.getLayoutParams();
+      activityStringLayoutParams = (ConstraintLayout.LayoutParams) activityStringTextView.getLayoutParams();
     }
   }
 

@@ -4422,6 +4422,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = false;
 
     if (mode == 1) {
+      Log.i("testFab", "state is " + stateOfTimers.isModeOneTimerActive());
       if (stateOfTimers.isModeOneTimerActive()) {
         fab.setAlpha(0.3f);
         fab.setEnabled(false);
