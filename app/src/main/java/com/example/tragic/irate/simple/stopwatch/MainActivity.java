@@ -650,8 +650,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Activity saving issues. Newer ones overwrites older ones.
-      //Todo: Issue revolves around exiting/re-entering timer popUp. If we just iterate, reset, exit, seems to work fine.
+  //Todo: Activity saving issues.
+      //Todo: First row defaulting to "mountain biking - general" when clicked, tho cycle title activity is fine.
   //Todo: Pause not always stopping stats runnable + neither does resetting.
   //Todo: Cycle recycler rounds push into activity string.
   //Todo: Resetting set/break time within timer will begin iteration from 0->2.
@@ -4289,15 +4289,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
 
-      if (cycleHasActivityAssigned) {
-        insertActivityIntoDatabaseAndAssignItsValueToObjects();
-      }
-
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
+
+      //Moved this below other save/queries so we have an updated instance of cycles to retrieve activity from.
+      if (cycleHasActivityAssigned) {
+        insertActivityIntoDatabaseAndAssignItsValueToObjects();
+      }
 
       if (isNewCycle) {
         zeroOutTotalCycleTimes();
@@ -4469,9 +4470,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
     dailyStatsAccess.setOldDayHolderId(dayOfYear);
 
-    dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
-    dailyStatsAccess.setMetScoreFromSpinner(metScore);
+//    dailyStatsAccess.setActivityString(getTdeeActivityStringFromArrayPosition());
 
+    //We have a new instance of cycles called from setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(...).
+    String activityToInsert = cycles.getActivityString();
+    dailyStatsAccess.setActivityString(activityToInsert);
+
+    dailyStatsAccess.setMetScoreFromSpinner(metScore);
     dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
 
     if (dailyStatsAccess.doesActivityExistsForSpecificDay()) {
@@ -4549,10 +4554,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
 
-        //Todo: This is always being set from an array position, not our database!
-        //Todo: This worked at a point before we decided to reset array list.
         if (isNewCycle) {
           cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
+          Log.i("testAdd", "setting activity in cycles from array for new cycles");
         } else {
           ///Cycles already has activity String retrieved above.
         }
@@ -4840,7 +4844,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setTotalDailyCaloriesToTextView();
     setTotalSingleActivityTimeToTextView();
     setTotalSingleActivityCaloriesToTextView();
-    dailySingleActivityStringHeader.setText(getTdeeActivityStringFromArrayPosition());
+
+    dailySingleActivityStringHeader.setText(cycles.getActivityString());
   }
 
   private void setTotalDailyActivityTimeToTextView() {
