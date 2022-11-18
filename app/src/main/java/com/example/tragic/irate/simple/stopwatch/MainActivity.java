@@ -650,8 +650,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Cycles recycler layout.
-      //Todo: Activity String should also be centered against title/cycle layout.
+
       //Todo: Copy cycle layout to /1920h
   //Todo: Cycle can default to not tracking right after add/edit.
   //Todo: Adding a cycle while in edit mode retains edit mode buttons in app bar afterwards.
