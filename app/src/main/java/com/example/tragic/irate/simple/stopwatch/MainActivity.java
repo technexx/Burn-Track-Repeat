@@ -3109,6 +3109,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteHighlightedCycles() {
+
     if ((mode == 1 && cyclesList.size() == 0 || (mode == 3 && pomCyclesList.size() == 0))) {
       runOnUiThread(() -> Toast.makeText(getApplicationContext(), "Nothing saved!", Toast.LENGTH_SHORT).show());
       return;
@@ -3117,6 +3118,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int cycleID = 0;
 
     if (mode == 1) {
+      positionOfSelectedCycleForModeOne = 0;
+      sortedPositionOfSelectedCycleForModeOne = 0;
+
       for (int i = 0; i < receivedHighlightPositions.size(); i++) {
         cycleID = cyclesList.get(receivedHighlightPositions.get(i)).getId();
         cycles = cyclesDatabase.cyclesDao().loadSingleCycle(cycleID).get(0);
@@ -3127,6 +3131,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       });
     }
     if (mode == 3) {
+      positionOfSelectedCycleForModeThree = 0;
+      sortedPositionOfSelectedCycleForModeThree = 0;
+
       for (int i = 0; i < receivedHighlightPositions.size(); i++) {
         cycleID = pomCyclesList.get(receivedHighlightPositions.get(i)).getId();
         pomCycles = cyclesDatabase.cyclesDao().loadSinglePomCycle(cycleID).get(0);
@@ -3155,6 +3162,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void deleteAllCycles() {
     if (mode == 1) {
+      positionOfSelectedCycleForModeOne = 0;
+      sortedPositionOfSelectedCycleForModeOne = 0;
+
       if (cyclesList.size() > 0) {
 
         cyclesDatabase.cyclesDao().deleteAllCycles();
@@ -3169,6 +3179,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
     }
     if (mode == 3) {
+      positionOfSelectedCycleForModeThree = 0;
+      sortedPositionOfSelectedCycleForModeThree = 0;
+
       if (pomCyclesList.size() > 0) {
         cyclesDatabase.cyclesDao().deleteAllPomCycles();
         queryAndSortAllCyclesFromMenu();
@@ -6544,12 +6557,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Todo: Positions reset which b0rks activateResumeOrReset.
   private void resetCyclesTimer() {
     fab.setAlpha(1.0f);
     fab.setEnabled(true);
 
-    positionOfSelectedCycleForModeOne = 0;
-    sortedPositionOfSelectedCycleForModeOne = 0;
+//    positionOfSelectedCycleForModeOne = 0;
+//    sortedPositionOfSelectedCycleForModeOne = 0;
 
     stateOfTimers.setModeOneTimerPaused(true);
     stateOfTimers.setModeOneTimerEnded(false);
@@ -6652,9 +6666,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void resetPomCyclesTimer() {
     fab.setAlpha(1.0f);
     fab.setEnabled(true);
-
-    positionOfSelectedCycleForModeThree = 0;
-    sortedPositionOfSelectedCycleForModeThree = 0;
 
     startRoundsForModeThree = 8;
     currentRoundForModeThree = 0;
