@@ -1275,7 +1275,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       retrieveCycleActivityPositionAndMetScoreFromCycleList();
     }
 
-//    populateCycleRoundAndRoundTypeArrayLists(false);
+    populateCycleRoundAndRoundTypeArrayLists(false);
 
     dotsAdapter.notifyDataSetChanged();
 
@@ -4667,11 +4667,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       for (int i = 0; i<cyclesList.size(); i++) {
         if (cyclesList.get(i).getId() == cycleIdFromPreSortedPosition) {
           sortedPositionOfSelectedCycleForModeOne = i;
-        } else {
-          sortedPositionOfSelectedCycleForModeOne = 0;
         }
       }
-
 
       for (int i = 0; i < cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
@@ -4693,8 +4690,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       for (int i = 0; i<pomCyclesList.size(); i++) {
         if (pomCyclesList.get(i).getId() == cycleIdFromPreSortedPosition) {
           sortedPositionOfSelectedCycleForModeThree = i;
-        } else {
-          sortedPositionOfSelectedCycleForModeThree = 0;
         }
       }
 
