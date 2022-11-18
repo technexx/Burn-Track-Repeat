@@ -4245,7 +4245,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void launchTimerCycle(int typeOfLaunch) {
-    if (workoutCyclesArray.size() == 0) {
+    if (workoutTimeIntegerArray.size() == 0) {
       showToastIfNoneActive("Cycle cannot be empty!");
       return;
     }
@@ -4277,6 +4277,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (cycleHasActivityAssigned) {
         insertActivityIntoDatabaseAndAssignItsValueToObjects();
+        trackActivityWithinCycle = savedCycleAdapter.getBooleanDeterminingIfWeAreTrackingActivity(positionOfSelectedCycleForModeOne);
+      } else {
+        trackActivityWithinCycle = false;
       }
 
       saveAddedOrEditedCycleASyncRunnable();
@@ -4662,6 +4665,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       int cycleIdFromPreSortedPosition = primaryIdOfCycleRowSelected;
+      sortedPositionOfSelectedCycleForModeOne = 0;
 
       //Fetches an updated position of our sorted rows by retrieving the position of our old position's primaryId.
       for (int i = 0; i<cyclesList.size(); i++) {
@@ -4686,6 +4690,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       pomTitleArray.clear();
 
       int cycleIdFromPreSortedPosition = primaryIdOfPomCycleRowSelected;
+      sortedPositionOfSelectedCycleForModeThree = 0;
 
       for (int i = 0; i<pomCyclesList.size(); i++) {
         if (pomCyclesList.get(i).getId() == cycleIdFromPreSortedPosition) {
