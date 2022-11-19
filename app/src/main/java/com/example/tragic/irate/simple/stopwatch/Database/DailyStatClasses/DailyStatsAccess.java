@@ -752,8 +752,9 @@ public class DailyStatsAccess {
 
 
     private long roundUpMillisValues(long millisToRound) {
-        long remainder = millisToRound%1000;
-        return millisToRound += (1000-remainder);
+//        long remainder = millisToRound%1000;
+//        return millisToRound += (1000-remainder);
+        return (long) Math.ceil(millisToRound);
     }
 
     private long roundDownMillisValues(long millisToRound) {

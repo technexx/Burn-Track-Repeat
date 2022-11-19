@@ -643,6 +643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Total activity time can be 1 more than aggregate (stats frag).
+  //Todo: Metabolic rate is +1 after adding an activity manually.
   //Todo: Adjust timer popUp margins for <1920h layout.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 

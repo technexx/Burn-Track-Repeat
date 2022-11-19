@@ -918,17 +918,18 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void setTotalActivityStatsFooterTextViews() {
+        long totalActivityTime = dailyStatsAccess.getTotalActivityTimeForSelectedDuration();
+        totalActivityTime = roundDownMillisValues(totalActivityTime);
+        double totalActivityCalories = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
+
+        String activityTimeString = longToStringConverters.convertMillisToHourBasedString(totalActivityTime);
+        String activityCalorieString = formatDoubleToStringWithoutDecimals(totalActivityCalories);
+
         long totalBmrTime = dailyStatsAccess.getUnassignedSetTimeForSelectedDuration();
         double totalBmrCalories = dailyStatsAccess.getUnassignedCaloriesForSelectedDuration();
 
         String bmrTimeString = longToStringConverters.convertMillisToHourBasedString(totalBmrTime);
         String bmrCaloriesString = formatDoubleToStringWithoutDecimals(totalBmrCalories);
-
-        long totalActivityTime = dailyStatsAccess.getTotalActivityTimeForSelectedDuration();
-        double totalActivityCalories = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
-
-        String activityTimeString = longToStringConverters.convertMillisToHourBasedString(totalActivityTime);
-        String activityCalorieString = formatDoubleToStringWithoutDecimals(totalActivityCalories);
 
         long totalExpendedTime = dailyStatsAccess.getAggregateTimeForSelectedDuration();
         double totalExpendedCalories = dailyStatsAccess.getAggregateCaloriesForSelectedDuration();
@@ -936,11 +937,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         String expendedTimeString = longToStringConverters.convertMillisToHourBasedString(totalExpendedTime);
         String expendedCaloriesString = formatDoubleToStringWithoutDecimals(totalExpendedCalories);
 
-        dailyStatsBmrTimeTextView.setText(bmrTimeString);
-        dailyStatsBmrCaloriesTextView.setText(bmrCaloriesString);
-
         dailyStatsTotalActivityTimeTextView.setText(activityTimeString);
         dailyStatsTotalActivityCaloriesBurnedTextView.setText(activityCalorieString);
+
+        dailyStatsBmrTimeTextView.setText(bmrTimeString);
+        dailyStatsBmrCaloriesTextView.setText(bmrCaloriesString);
 
         dailyTotalExpendedTimeElapsedTextView.setText(expendedTimeString);
         dailyTotalExpendedCaloriesBurnedTextView.setText(expendedCaloriesString);
