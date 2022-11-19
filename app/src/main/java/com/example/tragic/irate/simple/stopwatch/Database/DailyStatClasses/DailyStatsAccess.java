@@ -568,8 +568,15 @@ public class DailyStatsAccess {
 
         cyclesDatabase.cyclesDao().updateStatsForEachActivity(mStatsForEachActivity);
 
+        //Todo: List size will begin correctly, then be 1 less (something deleting row).
         Log.i("testUpdate", "msStats activity string is " + mStatsForEachActivity.getActivity());
         Log.i("testUpdate", "msStats activity time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
+
+//        List<StatsForEachActivity> statsForEachActivityList = cyclesDatabase.cyclesDao().loadAllStatsForEachActivityRows();
+
+//        Log.i("testUpdate", "stats list from db size is " + statsForEachActivityList.size());
+
+
     }
 
     public void updateTotalTimesAndCaloriesForEachActivityFromDayId(long day, long setTime, double caloriesBurned) {
@@ -641,8 +648,6 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
 
-        Log.i("testInsert", "activity inserted in a new mStats instance is " + mActivityString);
-
         cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
     }
 
@@ -680,6 +685,8 @@ public class DailyStatsAccess {
     }
 
     public long getTotalSetTimeForSelectedActivity() {
+        Log.i("testUpdate", "total set time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
+
         return mStatsForEachActivity.getTotalSetTimeForEachActivity();
     }
 

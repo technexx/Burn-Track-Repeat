@@ -649,11 +649,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Stats in access update methods seem to update fine.
 
-  //Todo: Test fresh install add/sub cycles etc. and for Pom.
+  //Todo: Add a bit of separation between round string and activity string in cyclesRecycler.
   //Todo: Total activity time can be 1 more than aggregate.
   //Todo: Adjust timer popUp margins for <1920h layout.
+
+  //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
       //Todo: Some updated screenshots for current app + rename it!
@@ -672,6 +673,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
 
+  //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
   //Todo: Closing app briefly display notifications (onStop/onDestroy)
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
@@ -1154,10 +1156,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteLastAccessedActivityCycleIfItHasZeroTime(int positionOfCycle) {
-    if (dailyStatsAccess.getTotalSetTimeForSelectedActivity() == 0) {
-      AsyncTask.execute(() -> {
-        dailyStatsAccess.deleteTotalTimesAndCaloriesFromCurrentEntity();
-      });
+    if (!stateOfTimers.isModeOneTimerActive()) {
+      if (dailyStatsAccess.getTotalSetTimeForSelectedActivity() == 0) {
+        AsyncTask.execute(() -> {
+          dailyStatsAccess.deleteTotalTimesAndCaloriesFromCurrentEntity();
+        });
+      }
     }
   }
 
