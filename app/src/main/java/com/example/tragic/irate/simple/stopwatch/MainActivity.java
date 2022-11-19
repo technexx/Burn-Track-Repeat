@@ -649,18 +649,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Total activity time can be 1 more than aggregate.
+  //Todo: Total activity time can be 1 more than aggregate (stats frag).
   //Todo: Adjust timer popUp margins for <1920h layout.
-
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
       //Todo: Some updated screenshots for current app + rename it!
   //Todo: Okay to release a 1.0.1 version!
-
-  //Todo: Ghosting at colons in editing activities.
-      //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
-  //Todo: Moto colors in stats fragment looks off.
 
   //Todo: Change back pom cycle times to original (non-testing).
   //Todo: Deep test of all database stuff.
@@ -670,8 +665,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
+  //Todo: Subscription model instead of buy once?
 
+  //Todo: Moto colors in stats fragment looks off.
   //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
+  //Todo: Crash from updateActiveTimerPopUpStatsIfEdited() in globalSaveTotalTimesAndCaloriesInDatabaseRunnable() that we haven't replicated.
   //Todo: Closing app briefly display notifications (onStop/onDestroy)
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
@@ -1835,6 +1833,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           deleteActivityStatsForSelectedDays();
         }
         if (delete_all_text.getText().equals(getString(R.string.delete_all_activities))) {
+          dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(true);
           deleteActivityStatsForAllDays();
         }
         if (delete_all_text.getText().equals(getString(R.string.delete_food_from_single_day))) {
@@ -2700,6 +2699,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             setCycleValuesAndUpdateInDatabase();
           } else {
             if (!isDailyActivityTimeMaxed()) {
+              updateActiveTimerPopUpStatsIfEdited();
               setAndUpdateActivityTimeAndCaloriesInDatabase();
             }
           }
@@ -2728,6 +2728,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  private void updateActiveTimerPopUpStatsIfEdited() {
+    if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
+      insertActivityIntoDatabaseAndAssignItsValueToObjects();
+      dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
+
+      runOnUiThread(()-> {
+        retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+        setAllActivityTimesAndCaloriesToTextViews();
+
+        mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
+        infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
+        mHandler.post(infinityRunnableForDailyActivityTimer);
+      });
+    }
+  }
+
+  private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
+    globalSaveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
+      @Override
+      public void run() {
+        AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
+      }
+    };
+  }
+
   private void setCycleValuesAndUpdateInDatabase() {
     cycles.setTotalSetTime(totalCycleSetTimeInMillis);
     cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
@@ -2742,17 +2767,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
   }
 
-  private void instantiateSaveTotalTimesOnPostDelayRunnableInASyncThread() {
-    globalSaveTotalTimesOnPostDelayRunnableInASyncThread = new Runnable() {
-      @Override
-      public void run() {
-        AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
-      }
-    };
-  }
-
   private void createNewListOfActivitiesIfDayHasChanged() {
-
     int currentDayOfYear = getCurrentDayOfYear();
 
     if ((dailyStatsAccess.getOldDayHolderId() != currentDayOfYear)) {
@@ -5160,22 +5175,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
     };
-  }
-
-  private void updateActiveTimerPopUpStatsIfEdited() {
-    if (trackActivityWithinCycle && dailyStatsFragment.getHaveStatsBeenEditedForCurrentDay()) {
-      insertActivityIntoDatabaseAndAssignItsValueToObjects();
-      dailyStatsFragment.setStatsHaveBeenEditedForCurrentDay(false);
-
-      runOnUiThread(()-> {
-        retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-        setAllActivityTimesAndCaloriesToTextViews();
-
-        mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
-        infinityRunnableForDailyActivityTimer = infinityRunnableForDailyActivityTime();
-        mHandler.post(infinityRunnableForDailyActivityTimer);
-      });
-    }
   }
 
   private TimerIteration newTimerIterationInstance() {
