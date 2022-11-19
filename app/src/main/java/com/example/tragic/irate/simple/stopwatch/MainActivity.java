@@ -651,7 +651,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 
   //Todo: Add a bit of separation between round string and activity string in cyclesRecycler.
-  //Todo: Total activity time can be 1 more than aggregate.
   //Todo: Adjust timer popUp margins for <1920h layout.
 
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
