@@ -649,8 +649,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-
-  //Todo: Add a bit of separation between round string and activity string in cyclesRecycler.
+  //Todo: Total activity time can be 1 more than aggregate.
   //Todo: Adjust timer popUp margins for <1920h layout.
 
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
@@ -1092,12 +1091,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 2) {
           if (numberOfRoundsLeftForModeOne > 0) {
-            timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
+            if (typeOfRound.get(currentRoundForModeOne) == 1) {
+              timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(setMillis)));
+            }
+            if (typeOfRound.get(currentRoundForModeOne) == 2) {
+              timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(setMillis/1000));
+            }
+
           }
           changeTextSizeWithoutAnimator(setMillis);
-        } else {
+        }
+
+        if (typeOfRound.get(currentRoundForModeOne) == 3 || typeOfRound.get(currentRoundForModeOne) == 4) {
           if (numberOfRoundsLeftForModeOne > 0) {
-            timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
+            if (typeOfRound.get(currentRoundForModeOne) == 3) {
+              timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(breakMillis)));
+            }
+            if (typeOfRound.get(currentRoundForModeOne) == 4) {
+              timeLeftForCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(breakMillis/1000));
+            }
           }
           changeTextSizeWithoutAnimator(breakMillis);
         }
@@ -6118,6 +6130,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!stateOfTimers.isModeOneTimerDisabled()) {
       if (!stateOfTimers.isModeOneTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
+          Log.i("testPause", "textView in pause method is " + timeLeftForCyclesTimer.getText().toString());
           stateOfTimers.setModeOneTimerPaused(true);
           savedCycleAdapter.setTimerIsPaused(true);
 
