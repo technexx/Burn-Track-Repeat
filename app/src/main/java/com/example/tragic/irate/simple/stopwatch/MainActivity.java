@@ -602,7 +602,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double metScore;
   boolean cycleHasActivityAssigned;
   boolean trackActivityWithinCycle;
-  int dayOfYear;
 
   int timerRunnableDelay = 50;
   String timerTextViewStringOne = "";
@@ -2738,19 +2737,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void createNewListOfActivitiesIfDayHasChanged() {
-    Calendar calendar = Calendar.getInstance(Locale.getDefault());
-    dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
-    if ((dailyStatsAccess.getOldDayHolderId() != dayOfYear)) {
-      dailyStatsAccess.setOldDayHolderId(dayOfYear);
-      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+    int currentDayOfYear = getCurrentDayOfYear();
+
+    if ((dailyStatsAccess.getOldDayHolderId() != currentDayOfYear)) {
+      dailyStatsAccess.setOldDayHolderId(currentDayOfYear);
+      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(currentDayOfYear);
 
       if (!dailyStatsAccess.doesActivityExistsForSpecificDay()) {
-        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+        dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(currentDayOfYear);
       }
 
       zeroOutDailyActivityTimeAndCalories();
-      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(dayOfYear);
+      dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(currentDayOfYear);
       dailyStatsAccess.setStatsForEachActivityEntityFromPosition(0);
 
       tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
@@ -4259,7 +4258,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
-      //Todo: Grabs wrong position, which is used to get the activity String attached to cycle in Timer.
       setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
 
       //Moved this below other save/queries so we have an updated instance of cycles to retrieve activity from.
@@ -4276,9 +4274,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
       progressBar.setVisibility(View.VISIBLE);
       resetButtonForCycles.setVisibility(View.VISIBLE);
-
-      Calendar calendar = Calendar.getInstance(Locale.getDefault());
-      dayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
 
       if (savedCycleAdapter.isCycleActive()) {
         savedCycleAdapter.removeCycleAsActive();
@@ -4298,7 +4293,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
-    int currentDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+    int currentDayOfYear = getCurrentDayOfYear();
 
     dailyStatsAccess.setOldDayHolderId(currentDayOfYear);
 
@@ -4315,9 +4310,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //mStats entity from list.
       dailyStatsAccess.assignPositionOfActivityListForRetrieveActivityToStatsEntity();
     } else {
-      dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+      dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(currentDayOfYear);
       //mStats list.
-      dailyStatsAccess.loadAllActivitiesToStatsListForSpecificDay(dayOfYear);
+      dailyStatsAccess.loadAllActivitiesToStatsListForSpecificDay(currentDayOfYear);
       dailyStatsAccess.assignPositionOfRecentlyAddedRowToStatsEntity();
       dailyStatsAccess.setActivityPositionInListForCurrentDayForNewActivity();
     }
@@ -4462,8 +4457,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void retrieveTotalDailySetAndBreakTimes() {
     if (mode == 1) {
-      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
-      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(dayOfYear);
+      int currentDayOfYear =  calendar.get(Calendar.DAY_OF_YEAR);
+      totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(currentDayOfYear);
+      totalCaloriesBurnedForCurrentDay = dailyStatsAccess.getTotalCaloriesBurnedForAllActivitiesOnASingleDay(currentDayOfYear);
     }
   }
 
@@ -4658,7 +4654,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           sortedPositionOfSelectedCycleForModeOne = i;
         }
       }
-
       positionOfSelectedCycleForModeOne = sortedPositionOfSelectedCycleForModeOne;
 
       for (int i = 0; i < cyclesList.size(); i++) {
@@ -6713,6 +6708,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private String getCurrentDateAsFullTextString() {
     calendar = Calendar.getInstance(Locale.getDefault());
     return (String.valueOf(calendar.getTime()));
+  }
+
+  private int getCurrentDayOfYear() {
+    Calendar calendar =  Calendar.getInstance(Locale.getDefault());
+    return calendar.get(Calendar.DAY_OF_YEAR);
   }
 
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
