@@ -621,6 +621,9 @@ public class DailyStatsAccess {
     public void setStatForEachActivityListForForSingleDayFromDatabase(int dayToRetrieve) {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
+        for (int i = 0; i<mStatsForEachActivityList.size(); i++) {
+            Log.i("testUpdate", "mStats list times retrieved are " + mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+        }
     }
 
     //Used by Main only.
@@ -675,8 +678,6 @@ public class DailyStatsAccess {
     }
 
     public long getTotalSetTimeForSelectedActivity() {
-        Log.i("testUpdate", "total set time is " + mStatsForEachActivity.getTotalSetTimeForEachActivity());
-
         return mStatsForEachActivity.getTotalSetTimeForEachActivity();
     }
 
@@ -701,6 +702,7 @@ public class DailyStatsAccess {
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day) {
+//                Log.i("testUpdate", "mStats list times are " + mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
                 valueToReturn += mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
             }
         }

@@ -637,13 +637,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int NIGHT_MODE = 1;
   int colorThemeMode = NIGHT_MODE;
 
-  String savedTotalSetTime;
-  String savedTotalBreakTime;
-  String savedTotalWorkTime;
-  String savedTotalRestTime;
-  String savedTotalDailyTimeString;
-  String savedSingleActivityString;
-
   ActionBar mainActionBar;
   ActionBar settingsActionBar;
 
@@ -2735,6 +2728,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       runOnUiThread(()-> {
         retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
+        retrieveTotalDailySetAndBreakTimes();
         setAllActivityTimesAndCaloriesToTextViews();
 
         mHandler.removeCallbacks(infinityRunnableForDailyActivityTimer);
@@ -5126,6 +5120,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
   }
+
   private Runnable infinityRunnableForDailyActivityTime() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
