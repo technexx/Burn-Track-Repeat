@@ -650,15 +650,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Stats in access update methods seem to update fine.
+
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
+  //Todo: Total activity time can be 1 more than aggregate.
+  //Todo: Adjust timer popUp margins for <1920h layout.
 
   //Todo: After adding current app screenshots, update resume on job sites.
       //Todo: Some updated screenshots for current app + rename it!
   //Todo: Okay to release a 1.0.1 version!
-
-  //Todo: Adjust timer popUp margins for <1920h layout.
-  //Todo: Total activity time can be 1 more than aggregate.
-  //Todo: May have an issue w/ adding activities to databases if launching and iterating multiple ones in a row.
 
   //Todo: Ghosting at colons in editing activities.
       //Todo: Round list ghosting appears at end of round only on Pixel (as opposed to between "-" and end on Moto).
@@ -673,12 +673,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Rename app, of course.
   //Todo: Backup cloud option.
 
-  //Todo: Starting @ 1.04 seconds for an activity on new day, but re-entry into timer puts it at 0. Nothing in stats.
   //Todo: Closing app briefly display notifications (onStop/onDestroy)
-  //Todo: Had a bug of timer displaying and iterating +1 second from time listed in edit popUp's round.
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
-  //Todo: Had a bug of iterating calories but not time.
-      //Todo: Check updateDailyStatTextViewsIfTimerHasAlsoUpdated() if it happens again.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
   //Todo: Anim reset at end of cycle when clicking in and out of timer likely due to visibility set to GONE and VISIBLE again.
 
@@ -3881,7 +3877,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void activateResumeOrResetOptionForCycle() {
     if (mode == 1) {
-      Log.i("testAdd", "position of cycle in reset/resume is " + positionOfSelectedCycleForModeOne);
       if (stateOfTimers.isModeOneTimerActive()) {
         savedCycleAdapter.setCycleAsActive();
         savedCycleAdapter.setActiveCyclePosition(positionOfSelectedCycleForModeOne);
@@ -4258,10 +4253,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
 
+      /////////////////////////////////////////////////////
+
       saveAddedOrEditedCycleASyncRunnable();
       queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
+      //Todo: Grabs wrong position, which is used to get the activity String attached to cycle in Timer.
       setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(positionOfSelectedCycleForModeOne);
 
       //Moved this below other save/queries so we have an updated instance of cycles to retrieve activity from.
@@ -4297,6 +4295,35 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       });
     });
+  }
+
+  private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
+    int currentDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
+
+    dailyStatsAccess.setOldDayHolderId(currentDayOfYear);
+
+    //We have a new instance of cycles called from setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(...).
+    String activityToInsert = cycles.getActivityString();
+    dailyStatsAccess.setActivityString(activityToInsert);
+
+    dailyStatsAccess.setMetScoreFromSpinner(metScore);
+    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(currentDayOfYear);
+
+    if (dailyStatsAccess.doesActivityExistsForSpecificDay()) {
+      //mStats list.
+      dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
+      //mStats entity from list.
+      dailyStatsAccess.assignPositionOfActivityListForRetrieveActivityToStatsEntity();
+    } else {
+      dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
+      //mStats list.
+      dailyStatsAccess.loadAllActivitiesToStatsListForSpecificDay(dayOfYear);
+      dailyStatsAccess.assignPositionOfRecentlyAddedRowToStatsEntity();
+      dailyStatsAccess.setActivityPositionInListForCurrentDayForNewActivity();
+    }
+
+    retrieveTotalDailySetAndBreakTimes();
+    retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
   }
 
   private void launchPomTimerCycle(int typeOfLaunch) {
@@ -4433,35 +4460,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   }
 
-  private void insertActivityIntoDatabaseAndAssignItsValueToObjects() {
-    int currentDayOfYear = calendar.get(Calendar.DAY_OF_YEAR);
-
-    dailyStatsAccess.setOldDayHolderId(currentDayOfYear);
-
-    //We have a new instance of cycles called from setCyclesOrPomCyclesEntityInstanceToSelectedListPosition(...).
-    String activityToInsert = cycles.getActivityString();
-    dailyStatsAccess.setActivityString(activityToInsert);
-
-    dailyStatsAccess.setMetScoreFromSpinner(metScore);
-    dailyStatsAccess.setStatForEachActivityListForForSingleDayFromDatabase(currentDayOfYear);
-
-    if (dailyStatsAccess.doesActivityExistsForSpecificDay()) {
-      //mStats list.
-      dailyStatsAccess.setActivityPositionInListForCurrentDayForExistingActivity();
-      //mStats entity from list.
-      dailyStatsAccess.assignPositionOfActivityListForRetrieveActivityToStatsEntity();
-    } else {
-      dailyStatsAccess.insertTotalTimesAndCaloriesForEachActivityWithinASpecificDayWithZeroedOutTimesAndCalories(dayOfYear);
-      //mStats list.
-      dailyStatsAccess.loadAllActivitiesToStatsListForSpecificDay(dayOfYear);
-      dailyStatsAccess.assignPositionOfRecentlyAddedRowToStatsEntity();
-      dailyStatsAccess.setActivityPositionInListForCurrentDayForNewActivity();
-    }
-
-    retrieveTotalDailySetAndBreakTimes();
-    retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
-  }
-
   private void retrieveTotalDailySetAndBreakTimes() {
     if (mode == 1) {
       totalSetTimeForCurrentDayInMillis = dailyStatsAccess.getTotalActivityTimeForAllActivitiesOnASelectedDay(dayOfYear);
@@ -4535,7 +4533,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeSubCatPosition(0);
-        cycles.setActivityString(getString(R.string.add_activity));
+        cycles.setActivityString("");
         cycles.setCurrentlyTrackingCycle(false);
       }
 
@@ -4661,6 +4659,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
 
+      positionOfSelectedCycleForModeOne = sortedPositionOfSelectedCycleForModeOne;
+
       for (int i = 0; i < cyclesList.size(); i++) {
         workoutTitleArray.add(cyclesList.get(i).getTitle());
 
@@ -4700,11 +4700,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 1:
         workoutTimeIntegerArray.clear();
         typeOfRound.clear();
-
-        //Sets our "old" global positional variable to the new, sorted one if necessary.
-        if (executingFromTimerLaunch) {
-          positionOfSelectedCycleForModeOne = sortedPositionOfSelectedCycleForModeOne;
-        }
 
         String[] fetchedRounds = workoutCyclesArray.get(positionOfSelectedCycleForModeOne).split(" - ");
         String[] fetchedRoundType = typeOfRoundArray.get(positionOfSelectedCycleForModeOne).split(" - ");
