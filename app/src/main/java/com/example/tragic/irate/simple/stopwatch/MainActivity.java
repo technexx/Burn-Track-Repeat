@@ -651,14 +651,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Change back pom cycle times to original (non-testing).
+  //Todo: Test end of rounds/simultaneous endings/vibs and ringtones.
   //Todo: Deep test of all database stuff.
   //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
   //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
-  //Todo: Backup cloud option.
-  //Todo: Subscription model instead of buy once?
 
   //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
   //Todo: Crash from updateActiveTimerPopUpStatsIfEdited() in globalSaveTotalTimesAndCaloriesInDatabaseRunnable() that we haven't replicated.
@@ -672,11 +671,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Option for ringtone selection.
   //Todo: Add Day/Night modes.
   //Todo: Tablet display needs work.
-      //Todo: Can be done later. Not meant for tablets.
+   //Todo: Can be done later. Not meant for tablets.
+  //Todo: Backup cloud option.
+  //Todo: Subscription model instead of buy once?
 
-  //Timers and Activities and Calories, Oh My!
+  //****Maximize keywords.
+  //Timers and Workouts and Calories, Oh My!
   //Timers And Calories: A (Sorta) Love Story
-  //
+  //Track Yo Self Before You Snack Yoself
+  //Track, Burn, Repeat:
+  //TWERK: Timer Workout for Energy Release of Kilocalories
+  //TimeCal: A Timer and Calorie Tracking App
 
   //Drawable height may sync w/ textView height for alignment.
   //We can also commit just specific files, remember!
@@ -4238,7 +4243,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void launchTimerCycle(int typeOfLaunch) {
     if (workoutTimeIntegerArray.size() == 0) {
-      showToastIfNoneActive("Cycle cannot be empty!");
+      showToastIfNoneActive("Rounds cannot be empty!");
       return;
     }
 
@@ -4344,7 +4349,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void launchPomTimerCycle(int typeOfLaunch) {
     if (pomValuesTime.size() == 0) {
-      showToastIfNoneActive("Cycle cannot be empty!");
+      showToastIfNoneActive("Rounds cannot be empty!");
       return;
     }
 
