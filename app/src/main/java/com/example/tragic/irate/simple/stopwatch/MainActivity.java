@@ -642,8 +642,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Total activity time can be 1 more than aggregate (stats frag).
-  //Todo: Metabolic rate is +1 after adding an activity manually.
+  //Todo: 8:00/80:00 and round movement bug.
+  //Todo: Metabolic rate 1 less than needed for 24hr total when adding to activities.
   //Todo: Adjust timer popUp margins for <1920h layout.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
@@ -740,17 +740,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Runnable to display in sync w/ timer change.
       globalNotficationsRunnable = notifcationsRunnable();
       mHandler.post(globalNotficationsRunnable);
+    } else {
+      notificationManagerCompat.cancel(1);
+      mHandler.removeCallbacks(globalNotficationsRunnable);
     }
-
-    mHandler.postDelayed(() -> {
-      if (timerPopUpWindow.isShowing()) {
-//        timerPopUpWindow.dismiss();
-//        timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-//        timerPopUpWindow.setAnimationStyle(android.R.style.Animation);
-//        resumeOrResetCycle(RESUMING_CYCLE_FROM_ADAPTER);
-      }
-    }, 500);
-
   }
 
   @Override
