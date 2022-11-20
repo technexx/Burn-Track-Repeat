@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".3">
+        app:layout_constraintGuide_percent=".32">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".3">
+        app:layout_constraintGuide_percent=".35">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".5">
+        app:layout_constraintGuide_percent=".58">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".6">
+        app:layout_constraintGuide_percent=".62">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -46,7 +46,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".95">
+        app:layout_constraintGuide_percent=".100">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -293,46 +293,45 @@
         </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/dots_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:paddingEnd="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
-        app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
-        android:orientation="horizontal"
-        android:layout_marginTop="6dp"
-        android:layout_marginBottom="0dp"
-        android:paddingStart="4dp"
-        android:background="@drawable/recycler_border_without_divider"
-        app:layout_constraintVertical_weight="3">
-    </androidx.recyclerview.widget.RecyclerView>
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/pom_dots_recyclerView"
-        android:layout_width="match_parent"
-        android:layout_height="90dp"
-        android:paddingEnd="4dp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/tracking_timer_header_layout"
-        app:layout_constraintBottom_toTopOf="@id/timer_progress_bar_layout"
-        android:orientation="horizontal"
-        android:layout_marginTop="0dp"
-        android:layout_marginBottom="0dp"
-        android:paddingStart="4dp"
-        android:background="@drawable/recycler_border_without_divider"
-        app:layout_constraintVertical_weight="3">
-    </androidx.recyclerview.widget.RecyclerView>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/dots_recycler_layout"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="0dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/timer_guideline_2"
         app:layout_constraintBottom_toTopOf="@id/timer_guideline_3">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/dots_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:background="@drawable/recycler_border_without_divider">
+        </androidx.recyclerview.widget.RecyclerView>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pom_dots_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:background="@drawable/recycler_border_without_divider">
+        </androidx.recyclerview.widget.RecyclerView>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -343,7 +342,7 @@
         app:layout_constraintEnd_toEndOf="@id/vertical_guideline_right"
         app:layout_constraintTop_toBottomOf="@id/timer_guideline_4"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="20dp">
+        android:layout_marginBottom="00dp">
 
         <TextView
             android:id="@+id/timeLeftForCyclesTimerTextView"

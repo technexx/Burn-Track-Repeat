@@ -644,6 +644,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Adjust timer popUp margins for <1920h layout. 2 row dots w/ activity string obscured vertically on Moto (but not pixel).
   //Todo: Title cutting off a bit against activity string in /1920
+  //Todo: Weekly/Monthly duration MBR showing at 1 less than 24 hour total.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
