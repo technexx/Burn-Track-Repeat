@@ -642,9 +642,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: 8:00/80:00 and round movement bug.
-  //Todo: Metabolic rate 1 less than needed for 24hr total when adding to activities.
   //Todo: Adjust timer popUp margins for <1920h layout.
+  //Todo: Moto colors in stats fragment looks off.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -661,9 +660,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Backup cloud option.
   //Todo: Subscription model instead of buy once?
 
-  //Todo: Moto colors in stats fragment looks off.
   //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
   //Todo: Crash from updateActiveTimerPopUpStatsIfEdited() in globalSaveTotalTimesAndCaloriesInDatabaseRunnable() that we haven't replicated.
+  //Todo: Bug of notifications and timer textView showing 2nd round numbers, while still iterating first. Happened after prolonged minimization. Unable to replicate.
   //Todo: Closing app briefly display notifications (onStop/onDestroy)
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
@@ -674,6 +673,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Add Day/Night modes.
   //Todo: Tablet display needs work.
       //Todo: Can be done later. Not meant for tablets.
+
+  //Timers and Activities and Calories, Oh My!
+  //Timers And Calories: A (Sorta) Love Story
+  //
 
   //Drawable height may sync w/ textView height for alignment.
   //We can also commit just specific files, remember!

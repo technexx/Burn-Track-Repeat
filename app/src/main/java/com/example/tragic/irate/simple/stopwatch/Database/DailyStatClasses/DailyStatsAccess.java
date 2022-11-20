@@ -752,9 +752,13 @@ public class DailyStatsAccess {
 
 
     private long roundUpMillisValues(long millisToRound) {
-//        long remainder = millisToRound%1000;
-//        return millisToRound += (1000-remainder);
-        return (long) Math.ceil(millisToRound);
+        long remainder = millisToRound%1000;
+
+        if (remainder != 0) {
+            return millisToRound += (1000-remainder);
+        } else {
+            return millisToRound;
+        }
     }
 
     private long roundDownMillisValues(long millisToRound) {
@@ -829,7 +833,6 @@ public class DailyStatsAccess {
         if (totalUnassignedSetTimeForSelectedDuration <= (getTwentyFourHoursInMillis() - 999)) {
             totalUnassignedSetTimeForSelectedDuration = roundUpMillisValues(totalUnassignedSetTimeForSelectedDuration);
         }
-
     }
 
     public long getUnassignedSetTimeForSelectedDuration() {
