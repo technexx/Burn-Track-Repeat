@@ -20,7 +20,6 @@
         app:tabTextAppearance="@style/TabLayoutTextStyle_h1920"
         app:tabRippleColor="@android:color/transparent"
         app:tabIndicatorFullWidth="true"
-        app:tabMode="fixed"
         android:background="@color/alien_black" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -44,7 +43,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="8dp"
-            android:textSize="16sp">
+            android:textSize="18sp">
         </TextView>
 
         <ImageButton

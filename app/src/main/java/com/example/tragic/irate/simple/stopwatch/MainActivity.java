@@ -642,8 +642,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Adjust timer popUp margins for <1920h layout.
-  //Todo: Moto colors in stats fragment looks off.
+  //Todo: Adjust timer popUp margins for <1920h layout. 2 row dots w/ activity string obscured vertically on Moto (but not pixel).
+  //Todo: Title cutting off a bit against activity string in /1920
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -1353,8 +1353,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (phoneHeight <= 1920) {
       timerPopUpView = inflater.inflate(R.layout.timer_popup_h1920, null);
+      Log.i("testDimensions", "inflating lower res!");
+
     } else {
       timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
+      Log.i("testDimensions", "inflating higher res!");
+
     }
 
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
