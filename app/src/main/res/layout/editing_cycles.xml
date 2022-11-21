@@ -140,14 +140,13 @@
         android:id="@+id/deleteEditPopUpTimerNumbers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintStart_toEndOf="@id/timerValueInEditPopUpTextView"
-        app:layout_constraintTop_toTopOf="@id/timerValueInEditPopUpTextView"
-        app:layout_constraintBottom_toBottomOf="@id/timerValueInEditPopUpTextView"
-        app:layout_constraintBottom_toTopOf="@id/number_pad_layout"
-        android:layout_marginStart="16dp"
+        app:layout_constraintTop_toTopOf="@id/pomTimerValueInEditPopUpTextViewThree"
+        app:layout_constraintBottom_toBottomOf="@id/pomTimerValueInEditPopUpTextViewThree"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginEnd="6dp"
         android:src="@drawable/cancel_x_black"
         android:backgroundTint="@color/light_grey"
-        android:layout_marginBottom="22dp"
+        android:layout_marginBottom="0dp"
         android:background="@drawable/ripple_effect_2">
     </ImageButton>
 

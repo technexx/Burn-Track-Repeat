@@ -642,10 +642,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Adjust timer popUp margins for <1920h layout. 2 row dots w/ activity string obscured vertically on Moto (but not pixel).
+  //Todo: Disable Main layout when launching timer. Slow phones allow button clicks during animation sequence which b0rks stuff.
+  //Todo: Active cycle in mode 1 disables FAB in mode 3.
   //Todo: Title cutting off a bit against activity string in /1920
-  //Todo: "X" in edit popUp could use a consistent position throughout layouts.
   //Todo: Weekly/Monthly duration MBR showing at 1 less than 24 hour total.
+  //Todo: Test high-res device on emulator.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -6480,8 +6481,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         firstRoundTypeHeaderInEditPopUp.setText(R.string.set_time);
 
         secondEditHeaderParams.rightMargin = 20;
-        deleteEditTimerNumbersParams.rightMargin = convertDensityPixelsToScalable(76);
-        deleteEditTimerNumbersParams.topMargin = convertDensityPixelsToScalable(12);
+
+        deleteEditTimerNumbersParams.startToEnd = R.id.timerValueInEditPopUpTextView;
+        deleteEditTimerNumbersParams.endToEnd = R.id.toggle_infinity_rounds;
+        deleteEditTimerNumbersParams.topToTop = R.id.timerValueInEditPopUpTextView;
+        deleteEditTimerNumbersParams.bottomToBottom = R.id.timerValueInEditPopUpTextView;
+        deleteEditTimerNumbersParams.rightMargin = dpConv(45);
 
         thirdRoundTypeHeaderInEditPopUp.setVisibility(View.GONE);
         toggleInfinityRounds.setVisibility(View.VISIBLE);
@@ -6503,8 +6508,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
 
         secondEditHeaderParams.rightMargin = 0;
-        deleteEditTimerNumbersParams.rightMargin = convertDensityPixelsToScalable(8);
-        deleteEditTimerNumbersParams.topMargin = convertDensityPixelsToScalable(8);
+
+        deleteEditTimerNumbersParams.startToEnd = (ConstraintLayout.LayoutParams.UNSET);
+        deleteEditTimerNumbersParams.endToEnd = R.id.edit_cycle_layout;
+        deleteEditTimerNumbersParams.topToTop = R.id.pomTimerValueInEditPopUpTextViewThree;
+        deleteEditTimerNumbersParams.bottomToBottom = R.id.pomTimerValueInEditPopUpTextViewThree;
+        deleteEditTimerNumbersParams.rightMargin = 0;
 
         firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
         firstRoundHeaderParams.endToStart = R.id.secondRoundTypeHeaderInEditPopUp;

@@ -412,31 +412,34 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
         </View>
+
+        <TextView
+            android:id="@+id/resetButtonForCycles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/timeLeftForCyclesTimerTextView"
+            android:layout_marginTop="6dp"
+            android:text="Reset"
+            android:textColor="@color/white"
+            android:textSize="20sp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/resetButtonForPomCycles"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/timeLeftForPomCyclesTimerTextView"
+            android:layout_marginTop="6dp"
+            android:text="Reset"
+            android:textColor="@color/white"
+            android:textSize="20sp">
+        </TextView>
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-    <TextView
-        android:id="@+id/resetButtonForCycles"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:text="Reset"
-        android:textColor="@color/white"
-        android:textSize="20sp">
-    </TextView>
-
-    <TextView
-        android:id="@+id/resetButtonForPomCycles"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:text="Reset"
-        android:textColor="@color/white"
-        android:textSize="20sp">
-    </TextView>
 
     <ImageButton
         android:id="@+id/next_round"
