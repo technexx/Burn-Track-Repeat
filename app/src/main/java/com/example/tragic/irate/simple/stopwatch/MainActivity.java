@@ -643,8 +643,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Disable Main layout when launching timer. Slow phones allow button clicks during animation sequence which b0rks stuff.
-  //Todo: Active cycle in mode 1 disables FAB in mode 3.
-  //Todo: Title cutting off a bit against activity string in /1920
   //Todo: Weekly/Monthly duration MBR showing at 1 less than 24 hour total.
   //Todo: Test high-res device on emulator.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
@@ -2041,6 +2039,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             pomRoundRecycler.setVisibility(View.GONE);
             savedPomCycleRecycler.setVisibility(View.GONE);
             pomDotsRecycler.setVisibility(View.GONE);
+
+            if (stateOfTimers.isModeOneTimerActive()) {
+              fab.setAlpha(0.3f);
+              fab.setEnabled(false);
+            } else {
+              fab.setAlpha(1.0f);
+              fab.setEnabled(true);
+            }
+
             break;
           case 1:
             mode = 3;
@@ -2053,6 +2060,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedPomCycleRecycler.setVisibility(View.VISIBLE);
             pomDotsRecycler.setVisibility(View.VISIBLE);
             pomRoundRecycler.setVisibility(View.VISIBLE);
+
+            if (stateOfTimers.isModeThreeTimerActive()) {
+              fab.setAlpha(0.3f);
+              fab.setEnabled(false);
+            } else {
+              fab.setAlpha(1.0f);
+              fab.setEnabled(true);
+            }
 
             break;
         }
