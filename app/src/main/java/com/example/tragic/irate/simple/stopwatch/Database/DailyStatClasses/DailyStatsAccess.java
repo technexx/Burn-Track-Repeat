@@ -798,6 +798,7 @@ public class DailyStatsAccess {
 
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
+            valueToReturn = roundDownMillisValues(valueToReturn);
         }
 
         totalSetTimeForSelectedDuration = valueToReturn;
@@ -808,6 +809,7 @@ public class DailyStatsAccess {
 
         for (int i=0; i<totalSetTimeListForEachActivityForSelectedDuration.size(); i++) {
             valueToReturn += totalSetTimeListForEachActivityForSelectedDuration.get(i);
+            valueToReturn = roundDownMillisValues(valueToReturn);
         }
 
         return valueToReturn;

@@ -919,7 +919,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void setTotalActivityStatsFooterTextViews() {
         long totalActivityTime = dailyStatsAccess.getTotalActivityTimeForSelectedDuration();
-        totalActivityTime = roundDownMillisValues(totalActivityTime);
         double totalActivityCalories = dailyStatsAccess.getTotalCaloriesBurnedForSelectedDuration();
 
         String activityTimeString = longToStringConverters.convertMillisToHourBasedString(totalActivityTime);
