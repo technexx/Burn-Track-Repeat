@@ -4607,7 +4607,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeSubCatPosition(0);
-        cycles.setActivityString("");
+//        cycles.setActivityString("");
         cycles.setCurrentlyTrackingCycle(false);
       }
 

@@ -18,6 +18,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.Stack;
 
 public class DailyStatsAccess {
     Context mContext;
@@ -649,11 +650,15 @@ public class DailyStatsAccess {
     }
 
     public void assignPositionOfRecentlyAddedRowToStatsEntity() {
-        mStatsForEachActivity = mStatsForEachActivityList.get(mStatsForEachActivityList.size()-1);
+        if (mStatsForEachActivityList.size() > 0) {
+            mStatsForEachActivity = mStatsForEachActivityList.get(mStatsForEachActivityList.size()-1);
+        }
     }
 
     public void setActivityPositionInListForCurrentDayForNewActivity() {
-        activityPositionInListForCurrentDay = mStatsForEachActivityList.size()-1;
+        if (mStatsForEachActivityList.size() > 0) {
+            activityPositionInListForCurrentDay = mStatsForEachActivityList.size()-1;
+        }
     }
 
     public void setActivityPositionInListForCurrentDayForExistingActivity() {

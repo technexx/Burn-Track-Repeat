@@ -2115,10 +2115,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesComparisonTabLayout = mRoot.findViewById(R.id.calorie_comparison_tab_layout);
 
         if (phoneHeight <= 1920) {
-//            tabOne = caloriesComparisonTabLayout.newTab().setText("Cals Burned");
-//            tabTwo = caloriesComparisonTabLayout.newTab().setText("Cals Consumed");
-//            tabThree = caloriesComparisonTabLayout.newTab().setText("Cals Compared");
-
             tabOne = caloriesComparisonTabLayout.newTab().setText("Calories Burned");
             tabTwo = caloriesComparisonTabLayout.newTab().setText("Calories Consumed");
             tabThree = caloriesComparisonTabLayout.newTab().setText("Calories Compared");
