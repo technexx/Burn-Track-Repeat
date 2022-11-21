@@ -642,7 +642,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Weekly/Monthly duration MBR showing at 1 less than 24 hour total.
+  //Todo: Weekly duration MBR showing at 1 less than 24 hour total. Monthly has activities total at +1 and MBR as -2 from ideal.
   //Todo: Test high-res device on emulator.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 

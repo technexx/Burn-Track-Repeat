@@ -159,6 +159,13 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     @Override
     public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
         PomHolder pomHolder = (PomHolder) holder;
+
+        if (mRowClickingIsDisabled) {
+            pomHolder.fullView.setEnabled(false);
+        } else {
+            pomHolder.fullView.setEnabled(true);
+        }
+
         pomHolder.pauseOrResume.setVisibility(View.GONE);
         pomHolder.resetCycle.setVisibility(View.GONE);
 
