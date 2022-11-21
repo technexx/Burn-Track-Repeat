@@ -84,6 +84,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int NIGHT_MODE = 1;
 
   int fullViewBackgroundColor;
+  boolean mRowClickingIsDisabled;
 
   public interface onPauseOrResumeListener {
     void onPauseOrResume(boolean timerIsPaused);
@@ -200,6 +201,14 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     return mActiveTdeeModeBooleanList.get(position);
   }
 
+  public void disableRowClicking() {
+    this.mRowClickingIsDisabled = true;
+  }
+
+  public void enableRowClicking() {
+    this.mRowClickingIsDisabled = false;
+  }
+
   @NonNull
   @Override
   public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -220,6 +229,12 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
     WorkoutHolder workoutHolder = (WorkoutHolder) holder;
 
+    if (mRowClickingIsDisabled) {
+      workoutHolder.fullView.setEnabled(false);
+    } else {
+      workoutHolder.fullView.setEnabled(true);
+    }
+
     workoutHolder.pauseOrResume.setVisibility(View.GONE);
     workoutHolder.resetCycle.setVisibility(View.GONE);
     workoutHolder.activityStringTextView.setVisibility(View.GONE);
@@ -238,7 +253,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     if (mActiveCycle) {
       if (position == mPositionOfActiveCycle) {
-        //Todo: These visibilities causing the shifting round string issue.
         workoutHolder.pauseOrResume.setVisibility(View.VISIBLE);
         workoutHolder.resetCycle.setVisibility(View.VISIBLE);
       }
@@ -322,6 +336,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     });
 
     workoutHolder.fullView.setOnClickListener(v -> {
+//      Log.i("testClick", "fullView click registered!");
+      Log.i("testClick", "disable boolean is " + mRowClickingIsDisabled);
+
       boolean changed = false;
       if (!mHighlightMode) {
         if (mActiveCycle) {

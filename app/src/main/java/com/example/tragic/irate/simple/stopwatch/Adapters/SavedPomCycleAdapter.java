@@ -57,6 +57,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int REST_COLOR;
 
     int fullViewBackGroundColor;
+    boolean mRowClickingIsDisabled;
 
     public interface onPauseOrResumeListener {
         void onPauseOrResume(boolean timerIsPaused);
@@ -137,6 +138,14 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     public boolean isHighlightModeActive() {
         return mHighlightMode;
+    }
+
+    public void disableRowClicking() {
+        this.mRowClickingIsDisabled = true;
+    }
+
+    public void enableRowClicking() {
+        this.mRowClickingIsDisabled = false;
     }
 
     @NonNull

@@ -642,7 +642,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Disable Main layout when launching timer. Slow phones allow button clicks during animation sequence which b0rks stuff.
   //Todo: Weekly/Monthly duration MBR showing at 1 less than 24 hour total.
   //Todo: Test high-res device on emulator.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
@@ -1454,6 +1453,28 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  private void disableMainViewClicks() {
+    fab.setEnabled(false);
+    stopWatchLaunchButton.setEnabled(false);
+    sortButton.setEnabled(false);
+
+    savedCycleAdapter.disableRowClicking();
+    savedCycleAdapter.notifyDataSetChanged();
+    savedPomCycleAdapter.disableRowClicking();
+    savedPomCycleAdapter.notifyDataSetChanged();
+  }
+
+  private void enableMainViewClicks() {
+    fab.setEnabled(true);
+    stopWatchLaunchButton.setEnabled(true);
+    sortButton.setEnabled(true);
+
+    savedCycleAdapter.enableRowClicking();
+    savedCycleAdapter.notifyDataSetChanged();
+    savedPomCycleAdapter.enableRowClicking();
+    savedPomCycleAdapter.notifyDataSetChanged();
+  }
+
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
@@ -1469,6 +1490,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setPromptToLaunchUserSettingsOnFirstAppLaunch();
 
     mainView = findViewById(R.id.main_layout);
+
     topOfMainActivityView = findViewById(R.id.top_of_main_activity_view);
     bottomEditTitleDividerView = editCyclesPopupView.findViewById(R.id.bottom_edit_title_divider);
 
@@ -1541,6 +1563,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerPopUpDismissalLogic();
 
       toggleCustomActionBarButtonVisibilities(false);
+      enableMainViewClicks();
 
     });
 
@@ -1553,6 +1576,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       setDefaultEditRoundViews();
 
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+      enableMainViewClicks();
+
+      Log.i("testClick", "enabling clicks from edit dismissal");
     });
 
     edit_highlighted_cycle.setOnClickListener(v -> {
@@ -2839,6 +2865,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setTdeeSpinnersToDefaultValues();
     toggleEditPopUpViewsForAddingActivity(false);
+
+    disableMainViewClicks();
 
     //For some reason, shownAsDropDown vs showAtLocation prevents soft kb displacing layout.
     editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
@@ -4433,6 +4461,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       setTotalCycleTimeValuesToTextView();
     }
+
+    disableMainViewClicks();
   }
 
   private void setTimerLaunchViews(int typeOfLaunch) {
