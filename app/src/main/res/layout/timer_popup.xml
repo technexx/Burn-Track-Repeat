@@ -180,8 +180,6 @@
             android:textColor="@color/light_blue"
             android:textSize="21sp">
         </TextView>
-
-
         <TextView
             android:id="@+id/daily_total_time_textView_header"
             android:layout_width="wrap_content"
