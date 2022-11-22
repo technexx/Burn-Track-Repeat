@@ -168,7 +168,7 @@
             app:layout_constraintStart_toStartOf="@id/daily_total_time_textView_header"
             app:layout_constraintEnd_toEndOf="@id/daily_total_time_textView"
             app:layout_constraintTop_toBottomOf="@id/cycle_title_textView_with_activity"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="8dp"
             android:gravity="center_horizontal"
             android:textColor="@color/light_blue"
             android:textSize="21sp">

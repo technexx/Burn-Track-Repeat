@@ -657,7 +657,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
-  //Todo: Re-added "" activity for non-activity Cycles entries instead of leaving it blank because we need to be able to iterate through entire list during checks. We had an issue of a "" activity saving tho.
   //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
   //Todo: Crash from updateActiveTimerPopUpStatsIfEdited() in globalSaveTotalTimesAndCaloriesInDatabaseRunnable() that we haven't replicated.
   //Todo: Bug of notifications and timer textView showing 2nd round numbers, while still iterating first. Happened after prolonged minimization. Unable to replicate.
@@ -1572,8 +1571,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       enableMainViewClicks();
-
-      Log.i("testClick", "enabling clicks from edit dismissal");
     });
 
     edit_highlighted_cycle.setOnClickListener(v -> {
@@ -3075,7 +3072,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     currentlyEditingACycle = true;
     isNewCycle = false;
 
-
     if (mode==1) {
       positionOfSelectedCycleForModeOne = (receivedHighlightPositions.get(0));
 
@@ -3089,6 +3085,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
 
+      //Array populated after cycle insertion.
       String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycleForModeOne);
 
       if (!tdeeString.equals("")) {
@@ -4587,14 +4584,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
 
+        //On edits of cycle, default String is "" (as instantiated at start of method). Since we only call this method from our launch methods, it's safe to always assign the activity String from our spinner positions.
+        cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
+
         if (isNewCycle) {
-          cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
-          Log.i("testAdd", "setting activity in cycles from array for new cycles");
+//          cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
         } else {
           ///Cycles already has activity String retrieved above.
         }
-
-        Log.i("testAdd", "activity in retrieved Cycles instance is " + cycles.getActivityString());
 
         cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
 
@@ -5069,7 +5066,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
     timerIteration.setPreviousTotal(stopWatchTotalTime);
-
 
     return new Runnable() {
       @Override
