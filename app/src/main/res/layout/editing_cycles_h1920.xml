@@ -37,7 +37,6 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:gravity="center_horizontal"
         android:layout_marginTop="8dp"
         android:textColorHint="@color/circular_progress_default_subtitle"
         android:textColor="@color/white"
