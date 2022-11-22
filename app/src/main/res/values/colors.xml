@@ -70,9 +70,8 @@
 
     <color name="orange_1">#FF8C00</color>
     <color name="orange_2">#ff8001</color>
-    <color name="orange_3">#FF8C00</color>
-    <color name="orange_4">#FF8C00</color>
-    <color name="orange_5">#FF8C00</color>
+    <color name="test_orange_1">#CE93D8</color>
+    <color name="dark_orange">#F57C00</color>
 
     <color name="fade_white_1">#F5F5F5</color>
     <color name="fade_white_2">#EEEEEE</color>

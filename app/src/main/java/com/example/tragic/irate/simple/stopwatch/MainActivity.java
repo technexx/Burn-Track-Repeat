@@ -643,8 +643,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Adding 24hr activity w/ another activity present leaves -1 activity and +1 mbr.
-  //Todo: Custom of full year+ cause total time to bleed and ghost over itself.
-  //Todo: Greyed out calendar days are obscured when selected (via custom overlap) w/ current day highlight.
 
   //Todo: Test massive time/calorie numbers in stats frag (if they fit in layout).
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
