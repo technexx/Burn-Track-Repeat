@@ -173,6 +173,7 @@
             android:textColor="@color/light_blue"
             android:textSize="21sp">
         </TextView>
+
         <TextView
             android:id="@+id/daily_total_time_textView_header"
             android:layout_width="wrap_content"
@@ -180,7 +181,7 @@
             app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="4dp"
-            android:layout_marginStart="100dp"
+            android:layout_marginStart="80dp"
             android:textColor="@color/white"
             android:textSize="21sp">
         </TextView>
@@ -204,7 +205,7 @@
             app:layout_constraintTop_toBottomOf="@+id/daily_total_time_textView_header"
             app:layout_constraintStart_toStartOf="parent"
             android:layout_marginTop="4dp"
-            android:layout_marginStart="100dp"
+            android:layout_marginStart="80dp"
             android:textSize="21sp">
         </TextView>
 

@@ -642,9 +642,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: App bar cutting off icons w/ custom style
+  //Todo: "Add an activity" doesn't appear in editing cycles.
+      //Todo: Likely set to "" w/ out activity there
   //Todo: Timer stats could use better centering. Longer time string hang it right. May just need single Strings/layout for each line.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
-  //Todo: Action bar color could be lighter.
 
   //Todo: After adding current app screenshots, update resume on job sites.
       //Todo: Some updated screenshots for current app + rename it!
@@ -3089,9 +3091,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
 
-      String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycleForModeOne);
       setTdeeSpinnersToDefaultValues();
-      addTDEEfirstMainTextView.setText(tdeeString);
+
+      String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycleForModeOne);
+
+      if (tdeeString != null) {
+        addTDEEfirstMainTextView.setText(tdeeString);
+      } else {
+        addTDEEfirstMainTextView.setText(R.string.add_activity);
+      }
 
       cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
     }
