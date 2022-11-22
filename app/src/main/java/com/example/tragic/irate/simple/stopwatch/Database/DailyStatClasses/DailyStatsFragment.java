@@ -1336,9 +1336,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         if (activityTime > modifiedRemainingTime) {
             activityTime = modifiedRemainingTime;
+            activityTime = roundUpMillisValues(activityTime);
         }
-
-        activityTime = roundDownMillisValues(activityTime);
 
         return activityTime;
     }
@@ -1347,8 +1346,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         if (remainingTime > 0) {
             if (activityTime > remainingTime) {
                 activityTime = remainingTime;
+                activityTime = roundUpMillisValues(activityTime);
             }
-            activityTime = roundDownMillisValues(activityTime);
         } else {
             activityTime = 0;
         }
