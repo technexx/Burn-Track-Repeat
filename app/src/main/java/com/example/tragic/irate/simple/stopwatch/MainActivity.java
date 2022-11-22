@@ -660,6 +660,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
+  //Todo: Re-added "" activity for non-activity Cycles entries instead of leaving it blank because we need to be able to iterate through entire list during checks. We had an issue of a "" activity saving tho.
   //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
   //Todo: Crash from updateActiveTimerPopUpStatsIfEdited() in globalSaveTotalTimesAndCaloriesInDatabaseRunnable() that we haven't replicated.
   //Todo: Bug of notifications and timer textView showing 2nd round numbers, while still iterating first. Happened after prolonged minimization. Unable to replicate.
@@ -3091,8 +3092,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
 
-      String tdeeString = "";
-      tdeeString = workoutActivityStringArray.get(positionOfSelectedCycleForModeOne);
+      String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycleForModeOne);
 
       if (!tdeeString.equals("")) {
         addTDEEfirstMainTextView.setText(tdeeString);
@@ -4605,7 +4605,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeActivityExists(false);
         cycles.setTdeeCatPosition(0);
         cycles.setTdeeSubCatPosition(0);
-//        cycles.setActivityString("");
+        cycles.setActivityString("");
         cycles.setCurrentlyTrackingCycle(false);
       }
 
