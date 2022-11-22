@@ -642,7 +642,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Test high-res device on emulator.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -652,8 +651,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Change back pom cycle times to original (non-testing).
   //Todo: Test end of rounds/simultaneous endings/vibs and ringtones.
   //Todo: Deep test of all database stuff.
-  //Todo: Test db saves/deletions/etc. on different years. Include food overwrites add/updates.
-  //Todo: Test Moto G5 + low res nexus emulator.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
@@ -669,18 +666,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtone selection.
   //Todo: Add Day/Night modes.
-  //Todo: Tablet display needs work.
-   //Todo: Can be done later. Not meant for tablets.
+  //Todo: Add XML for tablets.
   //Todo: Backup cloud option.
   //Todo: Subscription model instead of buy once?
 
   //****Maximize keywords.
-  //Timers and Workouts and Calories, Oh My!
-  //Timers And Calories: A (Sorta) Love Story
   //Track Yo Self Before You Snack Yoself
   //Track, Burn, Repeat:
   //TWERK: Timer Workout for Energy Release of Kilocalories
-  //TimeCal: A Timer and Calorie Tracking App
+  //A Timer and Calorie Tracking App
 
   //Drawable height may sync w/ textView height for alignment.
   //We can also commit just specific files, remember!
