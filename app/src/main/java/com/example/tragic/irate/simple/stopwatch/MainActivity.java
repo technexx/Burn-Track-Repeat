@@ -642,7 +642,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Black may be too severe for timer background.
   //Todo: Test massive time/calorie numbers in stats frag (if they fit in layout).
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
@@ -665,6 +664,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
   //Todo: Anim reset at end of cycle when clicking in and out of timer likely due to visibility set to GONE and VISIBLE again.
 
+  //Todo: Twitter/FB/Insta "Brag" links.
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtone selection.
   //Todo: Add Day/Night modes.
@@ -673,10 +673,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Subscription model instead of buy once?
 
   //****Maximize keywords.
-  //Track Yo Self Before You Snack Yoself
   //Track, Burn, Repeat:
   //TWERK: Timer Workout for Energy Release of Kilocalories
-  //A Timer and Calorie Tracking App
 
   //Drawable height may sync w/ textView height for alignment.
   //We can also commit just specific files, remember!

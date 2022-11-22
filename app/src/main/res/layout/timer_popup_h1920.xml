@@ -41,14 +41,6 @@
         app:layout_constraintGuide_percent=".62">
     </androidx.constraintlayout.widget.Guideline>
 
-    <androidx.constraintlayout.widget.Guideline
-        android:id="@+id/timer_guideline_5"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".100">
-    </androidx.constraintlayout.widget.Guideline>
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/non_tracking_timer_stat_headers_layout"
         android:layout_width="match_parent"

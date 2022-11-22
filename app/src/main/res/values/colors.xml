@@ -54,7 +54,6 @@
     <color name="darker_red">#C51162</color>
     <color name="light_black">#2f2f2f</color>
     <color name="grey_2">#424949</color>
-    <color name="test_bg"> #212f3c </color>
     <color name="darkest_gray"> #201d1d </color>
 
     <color name="onyx">#353935</color>
@@ -65,8 +64,9 @@
     <color name="iron_black">#343432</color>
     <color name="alien_black">#1A2228</color>
     <color name="retro_black">#1F201F</color>
-
     <color name="night_shadow">#1C1C1C</color>
+
+    <color name="eerie_black">#1b1b1b </color>
 
     <color name="orange_1">#FF8C00</color>
     <color name="orange_2">#ff8001</color>
