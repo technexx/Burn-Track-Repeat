@@ -153,42 +153,42 @@
         app:layout_constraintStart_toStartOf="parent">
 
         <TextView
-            android:id="@+id/tracking_daily_stats_header_textView"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
+            android:id="@+id/cycle_title_textView_with_activity"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="0dp"
-            android:layout_marginStart="0dp"
             android:gravity="center_horizontal"
-            android:textColor="@color/mid_grey"
-            android:textSize="16sp"
+            android:fontFamily="@font/open_sans"
+            android:textColor="@color/teal_200"
+            android:textSize="21sp"
+            android:maxLines="1"
+            android:maxLength="50"
             android:textStyle="bold">
         </TextView>
 
         <TextView
-            android:id="@+id/cycle_title_textView_with_activity"
+            android:id="@+id/tracking_daily_stats_header_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             app:layout_constraintStart_toStartOf="@id/daily_total_time_textView_header"
             app:layout_constraintEnd_toEndOf="@id/daily_total_time_textView"
-            app:layout_constraintTop_toBottomOf="@id/tracking_daily_stats_header_textView"
+            app:layout_constraintTop_toBottomOf="@id/cycle_title_textView_with_activity"
+            android:layout_marginTop="6dp"
             android:gravity="center_horizontal"
-            android:fontFamily="@font/open_sans"
-            android:textColor="@color/teal_200"
-            android:textSize="23sp"
-            android:maxLines="1"
-            android:maxLength="50">
+            android:textColor="@color/light_blue"
+            android:textSize="21sp">
         </TextView>
+
 
         <TextView
             android:id="@+id/daily_total_time_textView_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/cycle_title_textView_with_activity"
+            app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:layout_marginStart="100dp"
             android:textColor="@color/white"
             android:textSize="21sp">
@@ -198,10 +198,10 @@
             android:id="@+id/daily_total_time_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/cycle_title_textView_with_activity"
+            app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toEndOf="@id/daily_total_time_textView_header"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:textColor="@color/green"
             android:textSize="21sp">
         </TextView>
@@ -253,7 +253,7 @@
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header"
             android:textSize="21sp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:layout_marginStart="100dp">
         </TextView>
 
@@ -264,7 +264,7 @@
             app:layout_constraintStart_toEndOf="@id/daily_total_time_for_single_activity_textView_header"
             app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header"
             android:layout_marginStart="8dp"
-            android:layout_marginTop="6dp"
+            android:layout_marginTop="4dp"
             android:textSize="21sp"
             android:textColor="@color/green">
         </TextView>

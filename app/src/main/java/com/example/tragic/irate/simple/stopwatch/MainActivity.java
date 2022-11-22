@@ -643,6 +643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Should add title to activity timers.
+  //Todo: Black may be too severe for timer background.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -2694,17 +2695,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addActivityConfirmButton.setText(R.string.okay);
     cancelActivityConfirmButton.setText(R.string.cancel);
     timerValueInEditPopUpTextView.setText("00:00");
-    setTrackingDailyStatsHeaderTextView();
+    tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
 
     total_set_header.setText(R.string.total_sets);
     total_break_header.setText(R.string.total_breaks);
     total_set_time.setText("0");
     total_break_time.setText("0");
     cycles_completed_textView.setText(R.string.cycles_done);
-  }
-
-  private void setTrackingDailyStatsHeaderTextView() {
-    tracking_daily_stats_header_textView.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
   }
 
   private void retrieveAndImplementCycleSorting() {
@@ -4462,7 +4459,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setTimerLaunchViews(int typeOfLaunch) {
     timerPopUpIsVisible = true;
     cycle_title_textView.setText(cycleTitle);
-    cycle_title_textView_with_activity.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
+    cycle_title_textView_with_activity.setText(cycleTitle);
+//    cycle_title_textView_with_activity.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
 
     adjustDotRecyclerLayoutMargins();
 
@@ -6822,7 +6820,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       dailyTotalCaloriesForSingleActivityTextViewHeader.setVisibility(View.INVISIBLE);
       dailyTotalCaloriesForSingleActivityTextView.setVisibility(View.INVISIBLE);
     } else {
-      tracking_daily_stats_header_textView.setVisibility(View.INVISIBLE);
+      tracking_daily_stats_header_textView.setVisibility(View.VISIBLE);
 
       cycle_title_textView.setVisibility(View.GONE);
       cycle_title_textView_with_activity.setVisibility(View.VISIBLE);
