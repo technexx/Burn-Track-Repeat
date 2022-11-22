@@ -17,6 +17,11 @@
         <item name="colorPrimary">@color/black</item>
         <item name="android:itemBackground">@color/dark_grey</item>
         <item name="alertDialogTheme">@style/AlertDialogCustom</item>
+        <item name="actionBarStyle">@style/ActionBarStyling</item>
+    </style>
+
+    <style name="ActionBarStyling" parent="Theme.MaterialComponents.Light.DarkActionBar">
+        <item name="background">@color/night_shadow</item>
     </style>
 
     <style name="AlertDialogCustom" parent="Theme.AppCompat.DayNight.Dialog">

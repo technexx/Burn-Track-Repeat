@@ -642,6 +642,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Timer stats could use better centering. Longer time string hang it right. May just need single Strings/layout for each line.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
   //Todo: Action bar color could be lighter.
 
