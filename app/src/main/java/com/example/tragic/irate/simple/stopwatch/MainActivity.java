@@ -642,9 +642,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: App bar cutting off icons w/ custom style
-  //Todo: "Add an activity" doesn't appear in editing cycles.
-      //Todo: Likely set to "" w/ out activity there
   //Todo: Timer stats could use better centering. Longer time string hang it right. May just need single Strings/layout for each line.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
