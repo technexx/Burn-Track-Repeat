@@ -642,6 +642,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Should add title to activity timers.
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
