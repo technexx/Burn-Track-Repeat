@@ -643,6 +643,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Black may be too severe for timer background.
+  //Todo: Test massive time/calorie numbers in stats frag (if they fit in layout).
   //Todo: Test fresh install add/sub cycles etc. and for Pom.
 
   //Todo: After adding current app screenshots, update resume on job sites.
