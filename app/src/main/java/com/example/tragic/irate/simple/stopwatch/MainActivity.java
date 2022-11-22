@@ -647,7 +647,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: After adding current app screenshots, update resume on job sites.
       //Todo: Some updated screenshots for current app + rename it!
-      //Todo: Rounded icon could use optimizing.
+      //Todo: Rounded verision of app icon could use optimizing.
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Change back pom cycle times to original (non-testing).
@@ -4496,7 +4496,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       savedCycleAdapter.notifyDataSetChanged();
 
-//      Log.i("testAdd", "tracking within timer dismissal is " + trackActivityWithinCycle);
       if (trackActivityWithinCycle) {
         AsyncTask.execute(()-> {
           setAndUpdateActivityTimeAndCaloriesInDatabase();
