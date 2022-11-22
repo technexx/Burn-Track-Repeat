@@ -527,6 +527,8 @@ public class DailyStatsAccess {
         return mListOfActivityDaysSelected;
     }
 
+    //Todo: Likely due to not adding an activity String during Insert, having removed the "" addition for non-activity rows because it we'd had an issue.
+    //Todo: Either we enter a blank placeholder, or every iteration through mStats list that touches the activity column must have a !=null check.
     public boolean doesActivityExistsForSpecificDay() {
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mActivityString.equalsIgnoreCase(mStatsForEachActivityList.get(i).getActivity())) {

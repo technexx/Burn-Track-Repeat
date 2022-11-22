@@ -3091,11 +3091,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         retrieveCycleActivityPositionAndMetScoreFromCycleList();
       }
 
-      setTdeeSpinnersToDefaultValues();
+      String tdeeString = "";
+      tdeeString = workoutActivityStringArray.get(positionOfSelectedCycleForModeOne);
 
-      String tdeeString = workoutActivityStringArray.get(positionOfSelectedCycleForModeOne);
-
-      if (tdeeString != null) {
+      if (!tdeeString.equals("")) {
         addTDEEfirstMainTextView.setText(tdeeString);
       } else {
         addTDEEfirstMainTextView.setText(R.string.add_activity);
