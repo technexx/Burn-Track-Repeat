@@ -643,7 +643,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Test total set/break time saves.
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test Stopwatch.
@@ -680,7 +679,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Subscription model instead of buy once?
 
   //****Maximize keywords.
-  //Track, Burn, Repeat:
   //TWERK: Timer Workout for Energy Release of Kilocalories
 
   //Drawable height may sync w/ textView height for alignment.
@@ -2808,6 +2806,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
     cycles.setCyclesCompleted(cyclesCompleted);
     cyclesDatabase.cyclesDao().updateCycles(cycles);
+
+    Log.i("testDel", "set time updated in setCycleValues method at " + totalCycleSetTimeInMillis);
   }
 
   private void setPomCyclesValuesAndUpdateInDatabase() {
@@ -3246,8 +3246,18 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void deleteTotalCycleTimesFromDatabaseAndZeroOutVars() {
-    if (mode == 1) cyclesDatabase.cyclesDao().deleteTotalTimesCycle();
-    if (mode == 3) cyclesDatabase.cyclesDao().deleteTotalTimesPom();
+    if (mode == 1) {
+      cycles.setTotalSetTime(0);
+      cycles.setTotalBreakTime(0);
+      cycles.setCyclesCompleted(0);
+      cyclesDatabase.cyclesDao().updateCycles(cycles);;
+    }
+    if (mode == 3) {
+      pomCycles.setTotalWorkTime(0);
+      pomCycles.setTotalRestTime(0);
+      pomCycles.setCyclesCompleted(0);
+      cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+    }
 
     runOnUiThread(() -> {
       deleteCyclePopupWindow.dismiss();
@@ -5290,11 +5300,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
           totalCycleSetTimeInMillis = timerIteration.getNewTotal();
-          Log.i("testSetTime", "total set time in runnable is " + totalCycleSetTimeInMillis);
         }
         if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
           totalCycleBreakTimeInMillis = timerIteration.getNewTotal();
         }
+
+//        Log.i("testDel", "set time updated in runnable at " + totalCycleSetTimeInMillis);
 
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
@@ -6186,7 +6197,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!stateOfTimers.isModeOneTimerDisabled()) {
       if (!stateOfTimers.isModeOneTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
-          Log.i("testPause", "textView in pause method is " + timeLeftForCyclesTimer.getText().toString());
           stateOfTimers.setModeOneTimerPaused(true);
           savedCycleAdapter.setTimerIsPaused(true);
 
