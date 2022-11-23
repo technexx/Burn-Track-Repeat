@@ -1248,12 +1248,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       fadeEditCycleButtonsInAndOut(FADE_IN_HIGHLIGHT_MODE);
     }
 
-    if (edit_highlighted_cycle.getAlpha() != 1 && receivedHighlightPositions.size() == 1) {
+    if (receivedHighlightPositions.size() == 1) {
       edit_highlighted_cycle.setEnabled(true);
       edit_highlighted_cycle.setAlpha(1.0f);
-    } else if (edit_highlighted_cycle.getAlpha() == 1 && receivedHighlightPositions.size() != 1) {
+    } else {
       edit_highlighted_cycle.setEnabled(false);
       edit_highlighted_cycle.setAlpha(0.4f);
+    }
+
+    if (receivedHighlightPositions.size() == 0) {
+      delete_highlighted_cycle.setEnabled(false);
+      delete_highlighted_cycle.setAlpha(0.4f);
+    } else {
+      delete_highlighted_cycle.setEnabled(true);
+      delete_highlighted_cycle.setAlpha(1.0f);
     }
   }
 
