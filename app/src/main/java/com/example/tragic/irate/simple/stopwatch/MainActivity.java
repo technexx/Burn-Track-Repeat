@@ -3183,10 +3183,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode == 1) {
         positionOfSelectedCycleForModeOne = 0;
         sortedPositionOfSelectedCycleForModeOne = 0;
+        savedCycleAdapter.notifyDataSetChanged();
       }
       if (mode == 3) {
         positionOfSelectedCycleForModeThree = 0;
         sortedPositionOfSelectedCycleForModeThree = 0;
+        savedPomCycleAdapter.notifyDataSetChanged();
       }
 
       showToastIfNoneActive("Deleted!");
