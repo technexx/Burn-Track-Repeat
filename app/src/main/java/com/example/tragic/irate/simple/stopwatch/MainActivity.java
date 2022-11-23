@@ -643,8 +643,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Timer stats could use better centering. Longer time string hang it right. May just need single Strings/layout for each line.
-  //Todo: Sorting is changing on first cycle launch after app launch. Likely a saved sort var issue.
   //Todo: Test fresh install add/sub cycles etc. and for Pom. Row clicks/sorting/orders of cycles.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -659,6 +657,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
+  //Todo: saveAddedOrEditedCycleASyncRunnable() now only executes in timer launch if from edit cycle. Should be fine but keep it in mind.
   //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
   //Todo: Crash from updateActiveTimerPopUpStatsIfEdited() in globalSaveTotalTimesAndCaloriesInDatabaseRunnable() that we haven't replicated.
   //Todo: Bug of notifications and timer textView showing 2nd round numbers, while still iterating first. Happened after prolonged minimization. Unable to replicate.
@@ -2328,6 +2327,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void instantiateDatabaseClassesViaASyncThreadAndFollowWithUIPopulationOfTheirComponents() {
     AsyncTask.execute(() -> {
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
+
       queryAndSortAllCyclesFromMenu();
 
       runOnUiThread(() -> {
@@ -4325,8 +4325,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
       /////////////////////////////////////////////////////
-
-      saveAddedOrEditedCycleASyncRunnable();
+      if (typeOfLaunch == CYCLES_LAUNCHED_FROM_EDIT_POPUP) {
+        saveAddedOrEditedCycleASyncRunnable();
+      }
       queryAndSortAllCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
@@ -4588,14 +4589,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cycles.setTdeeCatPosition(selectedTdeeCategoryPosition);
         cycles.setTdeeSubCatPosition(selectedTdeeSubCategoryPosition);
 
-        //On edits of cycle, default String is "" (as instantiated at start of method). Since we only call this method from our launch methods, it's safe to always assign the activity String from our spinner positions.
+        //We only use this method if launching from edit popUp, so this works.
         cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
-
-        if (isNewCycle) {
-//          cycles.setActivityString(getTdeeActivityStringFromArrayPosition());
-        } else {
-          ///Cycles already has activity String retrieved above.
-        }
 
         cycles.setCurrentlyTrackingCycle(trackActivityWithinCycle);
 
