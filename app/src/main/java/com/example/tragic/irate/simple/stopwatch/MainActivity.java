@@ -644,6 +644,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Timer stats could use better centering. Longer time string hang it right. May just need single Strings/layout for each line.
+  //Todo: Sorting is changing on first cycle launch after app launch. Likely a saved sort var issue.
   //Todo: Test fresh install add/sub cycles etc. and for Pom. Row clicks/sorting/orders of cycles.
 
   //Todo: After adding current app screenshots, update resume on job sites.
