@@ -57,6 +57,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
     int REST_COLOR;
 
     int fullViewBackGroundColor;
+    int completedRoundColor;
+    int highlightColor;
     boolean mRowClickingIsDisabled;
 
     public interface onPauseOrResumeListener {
@@ -98,6 +100,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         changeSettingsValues = new ChangeSettingsValues(mContext);
 
         fullViewBackGroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
+        highlightColor = ContextCompat.getColor(mContext, R.color.onyx);
+        completedRoundColor = ContextCompat.getColor(mContext, R.color.dark_grey);
     }
 
     public void setTimerIsPaused(boolean paused) {
@@ -215,7 +219,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
             if (mActiveCycle) {
                 if (position == mPositionOfActiveCycle) {
                     if (i <= mNumberOfRoundsCompleted - 1) {
-                        pomSpan.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.test_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+                        pomSpan.setSpan(new ForegroundColorSpan(completedRoundColor), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
                     }
 
                     if (i == mNumberOfRoundsCompleted) {
@@ -256,7 +260,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 if (!changed) {
                     //Adds the position at its identical index for easy removal access.
                     mHighlightPositionList.add(position);
-                    pomHolder.fullView.setBackgroundColor(Color.GRAY);
+                    pomHolder.fullView.setBackgroundColor(highlightColor);
 
                 }
                 //Callback to send position list (Using Strings to make removing values easier) back to Main.
@@ -267,7 +271,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         pomHolder.fullView.setOnLongClickListener(v-> {
             if (!mHighlightMode && !mActiveCycle) {
                 mHighlightPositionList.add(position);
-                pomHolder.fullView.setBackgroundColor(Color.GRAY);
+                pomHolder.fullView.setBackgroundColor(highlightColor);
                 mHighlightMode = true;
                 //Calls back for initial highlighted position, Also to set actionBar views for highlight mode.
                 mOnHighlightListener.onCycleHighlight(mHighlightPositionList, true);

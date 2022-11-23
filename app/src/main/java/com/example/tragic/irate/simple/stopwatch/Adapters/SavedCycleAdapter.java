@@ -84,6 +84,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
   int NIGHT_MODE = 1;
 
   int fullViewBackgroundColor;
+  int completedRoundColor;
+  int highlightColor;
   boolean mRowClickingIsDisabled;
 
   public interface onPauseOrResumeListener {
@@ -158,6 +160,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     changeSettingsValues = new ChangeSettingsValues(mContext);
 
     fullViewBackgroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
+    highlightColor = ContextCompat.getColor(mContext, R.color.onyx);
+    completedRoundColor = ContextCompat.getColor(mContext, R.color.dark_grey);
   }
 
   public void setTimerIsPaused(boolean paused) {
@@ -315,7 +319,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (mActiveCycle) {
         if (position==mPositionOfActiveCycle) {
           if (j<=mNumberOfRoundsCompleted-1) {
-            span.setSpan(new ForegroundColorSpan(ContextCompat.getColor(mContext, R.color.mid_grey)), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
+            span.setSpan(new ForegroundColorSpan(completedRoundColor), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
           }
           if (j==mNumberOfRoundsCompleted) {
             span.setSpan(new StyleSpan(Typeface.ITALIC), 0, tempSpace, Spanned.SPAN_INCLUSIVE_INCLUSIVE);
@@ -365,7 +369,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
         if (!changed) {
           mHighlightPositionList.add(position);
-          workoutHolder.fullView.setBackgroundColor(Color.GRAY);
+          workoutHolder.fullView.setBackgroundColor(highlightColor);
         }
         mOnHighlightListener.onCycleHighlight(mHighlightPositionList, false);
       }
@@ -375,7 +379,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       if (!mHighlightMode && !mActiveCycle) {
         //Adds position of clicked item to position list.
         mHighlightPositionList.add(position);
-        workoutHolder.fullView.setBackgroundColor(Color.GRAY);
+        workoutHolder.fullView.setBackgroundColor(highlightColor);
 
         mHighlightMode = true;
         mOnHighlightListener.onCycleHighlight(mHighlightPositionList, true);
