@@ -16,6 +16,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.media.AudioAttributes;
@@ -643,7 +644,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Timer stats could use better centering. Longer time string hang it right. May just need single Strings/layout for each line.
-  //Todo: Test fresh install add/sub cycles etc. and for Pom.
+  //Todo: Test fresh install add/sub cycles etc. and for Pom. Row clicks/sorting/orders of cycles.
 
   //Todo: After adding current app screenshots, update resume on job sites.
       //Todo: Some updated screenshots for current app + rename it!
@@ -2144,6 +2145,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     } else {
       mainActionBar.setCustomView(R.layout.custom_bar);
     }
+
+    mainActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#1C1C1C")));
 
     fab = findViewById(R.id.fab);
     stopWatchLaunchButton = findViewById(R.id.stopwatch_launch_button);
