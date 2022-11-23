@@ -22,9 +22,10 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@id/delete_highlighted_cycles"
-        android:backgroundTint="@color/night_shadow"
-        android:layout_marginEnd="15dp"
+        android:background="@color/night_shadow"
+        android:layout_marginEnd="36dp"
         android:src="@drawable/edit_icon_2">
     </ImageButton>
 
@@ -35,7 +36,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:backgroundTint="@color/night_shadow"
+        android:background="@color/night_shadow"
         android:layout_marginEnd="25dp"
         android:src="@drawable/trash_can_one">
     </ImageButton>
@@ -45,13 +46,12 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
         android:src="@drawable/back_arrow_32"
-        android:backgroundTint="@color/night_shadow"
+        android:background="@color/night_shadow"
         android:paddingStart="-5dp">
     </ImageButton>
-
     <TextView
         android:id="@+id/sortButton"
         android:text="Sort"

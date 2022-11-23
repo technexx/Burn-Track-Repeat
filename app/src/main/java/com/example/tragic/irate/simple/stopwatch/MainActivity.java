@@ -643,9 +643,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Had a bit off round string cut off by activity.
   //Todo: Test total set/break time saves.
-  //Todo: Test fresh install add/sub cycles etc. and for Pom. Row clicks/sorting/orders of cycles.
+  //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
+      //Todo: Test for Pom, too
+      //Todo: Test Stopwatch.
+      //Todo: Test all concurrent timers + notifications + notification dismissals.
+  //Todo: Test Moto again because we changed some layout stuff.
 
   //Todo: After adding current app screenshots, update resume on job sites.
       //Todo: Some updated screenshots for current app + rename it!
@@ -3438,15 +3441,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     editCyclesPopupWindow.dismiss();
 
     if (currentlyEditingACycle) {
-//      fadeEditCycleButtonsInAndOut(FADE_OUT_EDIT_CYCLE);
       currentlyEditingACycle = false;
-
       removeCycleHighlights();
     }
 
     fab.setEnabled(true);
     cycleRoundsAdapter.setIsRoundCurrentlySelectedBoolean(false);
     cycleRoundsAdapter.notifyDataSetChanged();
+
+    toggleCustomActionBarButtonVisibilities(false);
   }
 
   private void assignOldCycleValuesToCheckForChanges() {
