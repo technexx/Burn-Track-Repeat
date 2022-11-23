@@ -3191,6 +3191,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.notifyDataSetChanged();
       }
 
+      toggleCustomActionBarButtonVisibilities(false);
+
       showToastIfNoneActive("Deleted!");
     });
   }
