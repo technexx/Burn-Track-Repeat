@@ -643,7 +643,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Clicking "next round" before beginning timer b0rks our position
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test Stopwatch.
@@ -6080,6 +6079,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         breakMillis = 0;
 
         if (numberOfRoundsLeftForModeOne > 0) {
+          stateOfTimers.setModeOneTimerActive(true);
+
           switch (typeOfRound.get(currentRoundForModeOne)) {
             case 1:
               setMillis = workoutTimeIntegerArray.get(workoutTimeIntegerArray.size() - numberOfRoundsLeftForModeOne);
@@ -6165,6 +6166,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         if (numberOfRoundsLeftForModeThree > 0) {
+          stateOfTimers.setModeThreeTimerActive(true);
+
           pomMillis = pomValuesTime.get(currentRoundForModeThree);
 
           timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
@@ -6613,9 +6616,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void resetCyclesTimer() {
     fab.setAlpha(1.0f);
     fab.setEnabled(true);
-
-//    positionOfSelectedCycleForModeOne = 0;
-//    sortedPositionOfSelectedCycleForModeOne = 0;
 
     stateOfTimers.setModeOneTimerPaused(true);
     stateOfTimers.setModeOneTimerEnded(false);

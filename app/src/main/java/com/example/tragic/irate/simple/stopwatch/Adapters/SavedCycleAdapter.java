@@ -340,9 +340,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     });
 
     workoutHolder.fullView.setOnClickListener(v -> {
-//      Log.i("testClick", "fullView click registered!");
-      Log.i("testClick", "disable boolean is " + mRowClickingIsDisabled);
-
       boolean changed = false;
       if (!mHighlightMode) {
         if (mActiveCycle) {
