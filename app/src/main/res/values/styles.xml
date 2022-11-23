@@ -142,10 +142,7 @@
         <item name="android:textSize">17sp</item>
     </style>
 
-    <style name="CalendarDateTextAppearance" parent="TextAppearance.MaterialCalendarWidget.Date">
-        <item name="android:textColor">@drawable/calendar_date_text_color_white</item>
-        <item name="android:textSize">15sp</item>
-    </style>
+
 
     <style name="CalendarHeader_h1920">
         <item name="android:textSize">17sp</item>
@@ -154,6 +151,11 @@
     </style>
 
     <style name="CalendarWeekDayHeader_h1920">
+        <item name="android:textSize">15sp</item>
+    </style>
+
+    <style name="CalendarDateTextAppearance" parent="TextAppearance.MaterialCalendarWidget.Date">
+        <item name="android:textColor">@drawable/calendar_date_text_color_white</item>
         <item name="android:textSize">15sp</item>
     </style>
 

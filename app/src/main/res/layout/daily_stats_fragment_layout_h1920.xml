@@ -411,7 +411,7 @@
         app:mcv_tileHeight="24dp"
         app:mcv_tileWidth="48sp"
         app:mcv_showOtherDates="other_months"
-        app:mcv_selectionColor="@color/dark_orange"
+        app:mcv_selectionColor="@color/blue"
         app:mcv_dateTextAppearance="@style/CalendarDateTextAppearance_h1920"
         app:mcv_headerTextAppearance="@style/CalendarHeader_h1920"
         app:mcv_weekDayTextAppearance="@style/CalendarWeekDayHeader_h1920"
