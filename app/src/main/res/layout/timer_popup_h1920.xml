@@ -144,7 +144,6 @@
         app:layout_constraintBottom_toTopOf="@id/timer_guideline_1"
         app:layout_constraintStart_toStartOf="parent">
 
-
         <TextView
             android:id="@+id/cycle_title_textView_with_activity"
             android:layout_width="wrap_content"
@@ -165,69 +164,77 @@
             android:id="@+id/tracking_daily_stats_header_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@id/daily_total_time_textView_header"
-            app:layout_constraintEnd_toEndOf="@id/daily_total_time_textView"
             app:layout_constraintTop_toBottomOf="@id/cycle_title_textView_with_activity"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
             android:layout_marginTop="4dp"
             android:gravity="center_horizontal"
             android:textColor="@color/light_blue"
             android:textSize="17sp">
         </TextView>
 
-        <TextView
-            android:id="@+id/daily_total_time_textView_header"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/daily_total_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
+            app:layout_constraintTop_toBottomOf="@id/tracking_daily_stats_header_textView"
             app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="100dp"
-            android:textColor="@color/white"
-            android:textSize="17sp">
-        </TextView>
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/daily_total_time_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/tracking_daily_stats_header_textView"
-            app:layout_constraintStart_toEndOf="@id/daily_total_time_textView_header"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/green"
-            android:textSize="17sp">
-        </TextView>
+            <TextView
+                android:id="@+id/daily_total_time_textView_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/white"
+                android:textSize="17sp">
+            </TextView>
 
-        <TextView
-            android:id="@+id/daily_total_calories_textView_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/daily_total_time_textView_header"
-            app:layout_constraintStart_toStartOf="parent"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="100dp"
-            android:textSize="17sp">
-        </TextView>
+            <TextView
+                android:id="@+id/daily_total_time_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/daily_total_time_textView_header"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/green"
+                android:textSize="17sp">
+            </TextView>
 
-        <TextView
-            android:id="@+id/daily_total_calories_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="8dp"
-            app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
-            app:layout_constraintStart_toEndOf="@id/daily_total_calories_textView_header"
-            android:layout_marginTop="4dp"
-            android:textSize="17sp"
-            android:textColor="@color/purple_200">
-        </TextView>
+            <TextView
+                android:id="@+id/daily_total_calories_textView_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/daily_total_time_textView_header"
+                app:layout_constraintStart_toStartOf="parent"
+                android:layout_marginTop="4dp"
+                android:textSize="17sp">
+            </TextView>
+
+            <TextView
+                android:id="@+id/daily_total_calories_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                app:layout_constraintTop_toBottomOf="@id/daily_total_time_textView_header"
+                app:layout_constraintStart_toEndOf="@id/daily_total_calories_textView_header"
+                android:layout_marginTop="4dp"
+                android:textSize="17sp"
+                android:textColor="@color/purple_200">
+            </TextView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
 
         <TextView
             android:id="@+id/daily_single_activity_string_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="@id/daily_total_time_for_single_activity_textView_header"
-            app:layout_constraintEnd_toEndOf="@id/daily_total_time_for_single_activity_textView"
-            app:layout_constraintTop_toBottomOf="@id/daily_total_calories_textView_header"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/daily_total_layout"
             android:gravity="center_horizontal"
             android:layout_marginTop="12dp"
             android:layout_marginStart="4dp"
@@ -238,51 +245,59 @@
             android:maxLines="2">
         </TextView>
 
-        <TextView
-            android:id="@+id/daily_total_time_for_single_activity_textView_header"
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/single_activity_layout"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            app:layout_constraintTop_toBottomOf="@id/daily_single_activity_string_header"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header"
-            android:textSize="17sp"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="100dp">
-        </TextView>
+            app:layout_constraintEnd_toEndOf="parent">
 
-        <TextView
-            android:id="@+id/daily_total_time_for_single_activity_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/daily_total_time_for_single_activity_textView_header"
-            app:layout_constraintTop_toBottomOf="@+id/daily_single_activity_string_header"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:textSize="17sp"
-            android:textColor="@color/green">
-        </TextView>
+            <TextView
+                android:id="@+id/daily_total_time_for_single_activity_textView_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                android:textSize="17sp"
+                android:layout_marginTop="4dp">
+            </TextView>
 
-        <TextView
-            android:id="@+id/daily_total_calories_for_single_activity_textView_header"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView"
-            android:layout_marginTop="4dp"
-            android:layout_marginStart="100dp"
-            android:textSize="17sp">
-        </TextView>
+            <TextView
+                android:id="@+id/daily_total_time_for_single_activity_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toEndOf="@id/daily_total_time_for_single_activity_textView_header"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:textSize="17sp"
+                android:textColor="@color/green">
+            </TextView>
 
-        <TextView
-            android:id="@+id/daily_total_calories_for_single_activity_textView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintStart_toEndOf="@id/daily_total_calories_for_single_activity_textView_header"
-            app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView"
-            android:layout_marginStart="8dp"
-            android:layout_marginTop="4dp"
-            android:textColor="@color/purple_200"
-            android:textSize="17sp">
-        </TextView>
+            <TextView
+                android:id="@+id/daily_total_calories_for_single_activity_textView_header"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView"
+                android:layout_marginTop="4dp"
+                android:textSize="17sp">
+            </TextView>
+
+            <TextView
+                android:id="@+id/daily_total_calories_for_single_activity_textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintStart_toEndOf="@id/daily_total_calories_for_single_activity_textView_header"
+                app:layout_constraintTop_toBottomOf="@id/daily_total_time_for_single_activity_textView"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/purple_200"
+                android:textSize="17sp">
+            </TextView>
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
 
     <androidx.constraintlayout.widget.ConstraintLayout
