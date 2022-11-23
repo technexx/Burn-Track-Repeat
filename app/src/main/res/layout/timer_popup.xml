@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".35">
+        app:layout_constraintGuide_percent=".37">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -30,7 +30,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".55">
+        app:layout_constraintGuide_percent=".57">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -236,7 +236,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toBottomOf="@id/daily_total_layout"
             android:gravity="center_horizontal"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="12dp"
             android:layout_marginStart="4dp"
             android:layout_marginEnd="4dp"
             android:textColor="@color/light_blue"

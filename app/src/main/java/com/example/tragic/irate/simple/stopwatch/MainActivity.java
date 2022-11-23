@@ -643,6 +643,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Had a bit off round string cut off by activity.
+  //Todo: Test total set/break time saves.
   //Todo: Test fresh install add/sub cycles etc. and for Pom. Row clicks/sorting/orders of cycles.
 
   //Todo: After adding current app screenshots, update resume on job sites.
@@ -1530,6 +1532,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       inputMethodManager.hideSoftInputFromWindow(editCyclesPopupView.getWindowToken(), 0);
 
       addTdeePopUpWindow.showAsDropDown(bottomEditTitleDividerView);
+//      addTdeePopUpWindow.showAsDropDown(topOfMainActivityView);
 
       clearCycleTitleEditTextFocusAndHideSoftKeyboard();
     });
