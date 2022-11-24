@@ -643,8 +643,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Green color for days w/ activities may want to change. Looks like a "loss" calorie day.
-      //Todo: Add a "3 average meals" default to food?
+  //Todo: Pom adapter not refreshing on first app launch/tab switch.
+  //Todo: Mode 1 time was showing/overlapping in Mode 3. After than, couldn't click into a Mode 3 cycle and its title was gone.
+      //Todo: Sep. popUp layouts?
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test Stopwatch.
@@ -4830,12 +4831,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");
 
           /////---------Testing pom round iterations---------------/////////
-//          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(2000); else pomValuesTime.add(3000);
+          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(2000); else pomValuesTime.add(3000);
 
           for (int i = 0; i < fetchedPomCycle.length; i++) {
             int integerValue = Integer.parseInt(fetchedPomCycle[i]);
-            pomValuesTime.add(integerValue);
-            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue / 1000));
+
+            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(pomValuesTime.get(i) / 1000));
+
+//            pomValuesTime.add(integerValue);
+//            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue / 1000));
           }
 
           pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
@@ -5069,28 +5073,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void setCycleTimeToIterate() {
-    if (mode == 1) {
-      if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 2) {
-        CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
-      }
-      if (typeOfRound.get(currentRoundForModeOne) == 3 || typeOfRound.get(currentRoundForModeOne) == 4) {
-        CYCLE_TIME_TO_ITERATE = CYCLE_BREAKS;
-      }
-    }
-
-    if (mode == 3) {
-      switch (pomDotCounter) {
-        case 0: case 2: case 4: case 6:
-          POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
-          break;
-        case 1: case 3: case 5: case 7:
-          POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
-          break;
-      }
-    }
-  }
-
   private Runnable stopWatchRunnable() {
     TimerIteration timerIteration = new TimerIteration();
     timerIteration.setStableTime(System.currentTimeMillis());
@@ -5270,7 +5252,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable runnableForSetAndBreakTotalTimes() {
-    setCycleTimeToIterate();
+    if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 2) {
+      CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
+    }
+    if (typeOfRound.get(currentRoundForModeOne) == 3 || typeOfRound.get(currentRoundForModeOne) == 4) {
+      CYCLE_TIME_TO_ITERATE = CYCLE_BREAKS;
+    }
 
     TimerIteration timerIteration = newTimerIterationInstance();
     TextViewDisplaySync textViewDisplaySync = textViewDisplaySyncForModeOne();
@@ -5463,7 +5450,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable runnableForWorkAndRestTotalTimes() {
-    setCycleTimeToIterate();
+    switch (pomDotCounter) {
+      case 0: case 2: case 4: case 6:
+        POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
+        break;
+      case 1: case 3: case 5: case 7:
+        POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
+        break;
+    }
 
     TimerIteration timerIteration = newTimerIterationInstance();
     TextViewDisplaySync textViewDisplaySync = textViewDisplaySyncForModeThree();
