@@ -2307,8 +2307,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView_with_activity = timerPopUpView.findViewById(R.id.cycle_title_textView_with_activity);
     cycles_completed_textView = timerPopUpView.findViewById(R.id.cycles_completed_textView);
 
-    pom_cycle_title_textView = pomTimerPopUpView.findViewById(R.id.cycle_title_textView);
-    pom_cycles_completed_textView = pomTimerPopUpView.findViewById(R.id.cycles_completed_textView);
+    pom_cycle_title_textView = pomTimerPopUpView.findViewById(R.id.pom_cycle_title_textView);
+    pom_cycles_completed_textView = pomTimerPopUpView.findViewById(R.id.pom_cycles_completed_textView);
 
     total_set_header = timerPopUpView.findViewById(R.id.total_set_header);
     total_break_header = timerPopUpView.findViewById(R.id.total_break_header);

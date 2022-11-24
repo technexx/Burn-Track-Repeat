@@ -1,6 +1,261 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android" android:layout_width="match_parent"
-    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity"
+    android:id="@+id/pom_main_timer_layout"
+    android:theme="@style/TimerTheme"
+    android:backgroundTint="@color/eerie_black">
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/pom_timer_guideline_1"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".25">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/pom_timer_guideline_2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".28">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/pom_timer_guideline_3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".57">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/pom_timer_guideline_4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        app:layout_constraintGuide_percent=".6">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/pom_timer_header_layout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/pom_timer_guideline_1">
+
+        <TextView
+            android:id="@+id/pom_cycle_title_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/open_sans"
+            android:textColor="@color/teal_200"
+            android:textSize="20sp"
+            android:maxLines="1"
+            android:maxLength="50"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="2dp">
+        </TextView>
+
+        <TextView
+            android:id="@+id/pom_cycles_completed_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:textColor="@color/white"
+            android:textSize="20sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pom_cycle_title_textView">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_set_header_for_pom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
+            android:layout_marginEnd="20dp"
+            app:layout_constraintEnd_toStartOf="@id/reset_total_cycle_times_for_pom"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/pom_cycles_completed_textView">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_break_header_for_pom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp"
+            android:textSize="20sp"
+            android:layout_marginStart="20dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@id/reset_total_cycle_times_for_pom"
+            app:layout_constraintTop_toBottomOf="@id/pom_cycles_completed_textView">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_set_time_for_pom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="22sp"
+            app:layout_constraintEnd_toEndOf="@id/total_set_header_for_pom"
+            app:layout_constraintStart_toStartOf="@id/total_set_header_for_pom"
+            app:layout_constraintTop_toBottomOf="@id/total_set_header_for_pom">
+        </TextView>
+
+        <TextView
+            android:id="@+id/total_break_time_for_pom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textSize="22sp"
+            app:layout_constraintEnd_toEndOf="@id/total_break_header_for_pom"
+            app:layout_constraintStart_toStartOf="@id/total_break_header_for_pom"
+            app:layout_constraintTop_toBottomOf="@id/total_break_header_for_pom">
+        </TextView>
+
+        <ImageButton
+            android:id="@+id/reset_total_cycle_times_for_pom"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="24dp"
+            android:backgroundTint="@color/eerie_black"
+            app:layout_constraintBottom_toBottomOf="@id/total_set_time_for_pom"
+            app:layout_constraintEnd_toStartOf="@id/total_break_header_for_pom"
+            app:layout_constraintStart_toEndOf="@id/total_set_header_for_pom"
+            app:layout_constraintTop_toTopOf="@id/total_set_header_for_pom">
+        </ImageButton>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/pom_dots_recycler_layout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/pom_timer_guideline_2"
+        app:layout_constraintBottom_toTopOf="@id/pom_timer_guideline_3">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/pom_dots_recyclerView"
+            android:layout_width="match_parent"
+            android:layout_height="95dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            android:layout_marginTop="0dp"
+            android:layout_marginBottom="0dp"
+            android:orientation="horizontal"
+            android:paddingStart="4dp"
+            android:paddingEnd="4dp"
+            android:background="@drawable/recycler_border_without_divider">
+        </androidx.recyclerview.widget.RecyclerView>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/timer_progress_bar_layout"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        app:layout_constraintStart_toStartOf="@id/vertical_guideline_left"
+        app:layout_constraintEnd_toEndOf="@id/vertical_guideline_right"
+        app:layout_constraintTop_toBottomOf="@id/pom_timer_guideline_4"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="20dp">
+
+        <TextView
+            android:id="@+id/timeLeftForPomCyclesTimerTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:textSize="80sp"
+            app:layout_constraintBottom_toBottomOf="@id/progressBarForPom"
+            app:layout_constraintEnd_toEndOf="@id/progressBarForPom"
+            app:layout_constraintStart_toStartOf="@id/progressBarForPom"
+            app:layout_constraintTop_toTopOf="@id/progressBarForPom">
+        </TextView>
+
+        <ProgressBar
+            android:id="@+id/progressBarForPom"
+            style="?android:attr/progressBarStyleHorizontal"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginBottom="12dp"
+            android:background="@drawable/circle_shape"
+            android:max="10000"
+            android:progressDrawable="@drawable/circle_progress"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent">
+        </ProgressBar>
+
+        <View
+            android:id="@+id/pauseResumeButtonForPom"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:layout_marginTop="40dp"
+            android:layout_marginBottom="40dp"
+            android:layout_marginStart="30dp"
+            android:layout_marginEnd="30dp"
+            app:cornerRadius="90dp"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent">
+        </View>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <TextView
+        android:id="@+id/resetButtonForPomCycles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:layout_marginBottom="6dp"
+        android:text="Reset"
+        android:textColor="@color/white"
+        android:textSize="20sp">
+    </TextView>
+
+    <ImageButton
+        android:id="@+id/next_round_for_pom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="6dp"
+        android:layout_marginBottom="16dp"
+        android:backgroundTint="@color/eerie_black"
+        android:src="@drawable/double_arrow_large"
+        app:elevation="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+    </ImageButton>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical_guideline_left"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".12">
+    </androidx.constraintlayout.widget.Guideline>
+
+    <androidx.constraintlayout.widget.Guideline
+        android:id="@+id/vertical_guideline_right"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        app:layout_constraintGuide_percent=".88">
+    </androidx.constraintlayout.widget.Guideline>
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
+
