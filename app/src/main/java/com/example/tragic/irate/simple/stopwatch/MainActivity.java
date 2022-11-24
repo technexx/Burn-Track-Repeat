@@ -351,6 +351,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   PopupWindow timerPopUpWindow;
   View timerPopUpView;
+  PopupWindow pomTimerPopUpWindow;
+  View pomTimerPopUpView;
   PopupWindow stopWatchPopUpWindow;
   View stopWatchPopUpView;
 
@@ -372,6 +374,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView cycle_title_textView;
   TextView cycle_title_textView_with_activity;
   TextView cycles_completed_textView;
+
+  TextView pom_cycle_title_textView;
+  TextView pom_cycles_completed_textView;
 
   TextView laps_completed_textView;
   LapListCanvas lapListCanvas;
@@ -400,6 +405,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   ImageButton next_round;
   ImageButton reset_total_cycle_times;
+  View pauseResumeButton;
+
+  ImageButton next_pom_round;
+  ImageButton reset_total_pom_cycle_times;
+  View pauseResumeButtonForPom;
 
   int typeOfTotalTimeToDisplay;
   int TOTAL_CYCLE_TIMES = 0;
@@ -488,7 +498,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //  int receivedAlpha;
   float receivedDotAlpha;
   float receivedPomDotAlpha;
-  View pauseResumeButton;
 
   Runnable infinityTimerForSetsRunnable;
   Runnable infinityTimerForBreaksRunnable;
@@ -624,6 +633,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   GridView dotsGridView;
 
   RecyclerView pomDotsRecycler;
+  ConstraintLayout pomDotsRecyclerLayout;
   PomDotsAdapter pomDotsAdapter;
   List<String> roundListForDots;
 
@@ -1116,6 +1126,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             runOnUiThread(()-> {
               retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
               setAllActivityTimesAndCaloriesToTextViews();
+              timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
             });
           }
         });
@@ -1136,9 +1147,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         changeTextSizeWithoutAnimator(pomMillis);
 
         savedPomCycleAdapter.setIsConfirmStringVisible(false);
-      }
 
-      timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+        pomTimerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+
+      }
 
     } else if (resumeOrReset == RESETTING_CYCLE_FROM_ADAPTER) {
       if (mode == 1) {
@@ -1373,6 +1385,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
   }
 
+  private void setPomTimerLayoutForDifferentHeights() {
+    LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+
+    if (phoneHeight <= 1920) {
+      pomTimerPopUpView = inflater.inflate(R.layout.pom_timer_popup_h1920, null);
+    } else {
+      pomTimerPopUpView = inflater.inflate(R.layout.pom_timer_popup, null);
+
+    }
+
+    pomTimerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+  }
+
   private void setStopWatchLayoutForDifferentHeights() {
     LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
 
@@ -1575,6 +1600,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       toggleCustomActionBarButtonVisibilities(false);
       enableMainViewClicks();
 
+    });
+
+    pomTimerPopUpWindow.setOnDismissListener(() -> {
+      activateResumeOrResetOptionForCycle();
+      replaceCycleListWithEmptyTextViewIfNoCyclesExist();
+      toggleCycleAndPomCycleRecyclerViewVisibilities(false);
+
+      timerPopUpDismissalLogic();
+
+      toggleCustomActionBarButtonVisibilities(false);
+      enableMainViewClicks();
     });
 
     editPopUpLayout.setOnClickListener(v-> {
@@ -1806,12 +1842,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
 
     next_round.setOnClickListener(v -> {
-      if (mode == 1) {
-        nextRound(true);
-      }
-      if (mode == 3) {
-        nextPomRound(true);
-      }
+      nextRound(true);
+    });
+
+    next_pom_round.setOnClickListener(v-> {
+      nextPomRound(true);
     });
 
     resetButtonForCycles.setOnClickListener(v -> {
@@ -1828,23 +1863,27 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     });
 
     pauseResumeButton.setOnClickListener(v -> {
-      if (mode == 1) {
-        if (!stateOfTimers.isModeOneTimerPaused()) {
-          pauseAndResumeTimer(PAUSING_TIMER);
-        } else {
-          pauseAndResumeTimer(RESUMING_TIMER);
-        }
+      if (!stateOfTimers.isModeOneTimerPaused()) {
+        pauseAndResumeTimer(PAUSING_TIMER);
+      } else {
+        pauseAndResumeTimer(RESUMING_TIMER);
       }
-      if (mode == 3) {
-        if (!stateOfTimers.isModeThreeTimerPaused()) {
-          pauseAndResumePomodoroTimer(PAUSING_TIMER);
-        } else {
-          pauseAndResumePomodoroTimer(RESUMING_TIMER);
-        }
+    });
+
+    pauseResumeButtonForPom.setOnClickListener(v-> {
+      if (!stateOfTimers.isModeThreeTimerPaused()) {
+        pauseAndResumePomodoroTimer(PAUSING_TIMER);
+      } else {
+        pauseAndResumePomodoroTimer(RESUMING_TIMER);
       }
     });
 
     reset_total_cycle_times.setOnClickListener(v -> {
+      delete_all_text.setText(R.string.delete_cycles_times_and_completed_cycles);
+      deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER_HORIZONTAL, 0, -100);
+    });
+
+    reset_total_pom_cycle_times.setOnClickListener(v-> {
       delete_all_text.setText(R.string.delete_cycles_times_and_completed_cycles);
       deleteCyclePopupWindow.showAtLocation(mainView, Gravity.CENTER_HORIZONTAL, 0, -100);
     });
@@ -2067,12 +2106,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleRoundsAdapter.setMode(1);
             dotsAdapter.setModeOneAlpha();
 
-            roundRecycler.setVisibility(View.VISIBLE);
             savedCycleRecycler.setVisibility(View.VISIBLE);
-            dotsRecycler.setVisibility(View.VISIBLE);
-            pomRoundRecycler.setVisibility(View.GONE);
+            roundRecycler.setVisibility(View.VISIBLE);
             savedPomCycleRecycler.setVisibility(View.GONE);
-            pomDotsRecycler.setVisibility(View.GONE);
+            pomRoundRecycler.setVisibility(View.GONE);
 
             if (stateOfTimers.isModeOneTimerActive()) {
               fab.setAlpha(0.3f);
@@ -2088,12 +2125,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleRoundsAdapter.setMode(3);
             pomDotsAdapter.setModeThreeAlpha();
 
-            roundRecycler.setVisibility(View.GONE);
-            savedCycleRecycler.setVisibility(View.GONE);
-            dotsRecycler.setVisibility(View.GONE);
             savedPomCycleRecycler.setVisibility(View.VISIBLE);
-            pomDotsRecycler.setVisibility(View.VISIBLE);
             pomRoundRecycler.setVisibility(View.VISIBLE);
+            savedCycleRecycler.setVisibility(View.GONE);
+            roundRecycler.setVisibility(View.GONE);
 
             if (stateOfTimers.isModeThreeTimerActive()) {
               fab.setAlpha(0.3f);
@@ -2119,13 +2154,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             savedCycleAdapter.notifyDataSetChanged();
             fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
           }
+          savedCycleAdapter.notifyDataSetChanged();
           dotsAdapter.saveModeOneAlpha();
         }
         if (savedCyclesTab.getPosition() == 1) {
           if (savedPomCycleAdapter.isHighlightModeActive()) {
-            savedPomCycleAdapter.notifyDataSetChanged();
             fadeEditCycleButtonsInAndOut(FADE_OUT_HIGHLIGHT_MODE);
           }
+          savedPomCycleAdapter.notifyDataSetChanged();
           pomDotsAdapter.saveModeThreeAlpha();
         }
 
@@ -2249,7 +2285,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerView = timerPopUpView.findViewById(R.id.main_timer_layout);
 
     resetButtonForCycles = timerPopUpView.findViewById(R.id.resetButtonForCycles);
-    resetButtonForPomCycles = timerPopUpView.findViewById(R.id.resetButtonForPomCycles);
+    resetButtonForPomCycles = pomTimerPopUpView.findViewById(R.id.resetButtonForPomCycles);
 
     nonTrackingTimerHeaderLayout = timerPopUpView.findViewById(R.id.non_tracking_timer_stat_headers_layout);
     nonTrackingHeaderLayoutParams = (ConstraintLayout.LayoutParams) nonTrackingTimerHeaderLayout.getLayoutParams();
@@ -2262,6 +2298,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycle_title_textView = timerPopUpView.findViewById(R.id.cycle_title_textView);
     cycle_title_textView_with_activity = timerPopUpView.findViewById(R.id.cycle_title_textView_with_activity);
     cycles_completed_textView = timerPopUpView.findViewById(R.id.cycles_completed_textView);
+
+    pom_cycle_title_textView = pomTimerPopUpView.findViewById(R.id.cycle_title_textView);
+    pom_cycles_completed_textView = pomTimerPopUpView.findViewById(R.id.cycles_completed_textView);
 
     total_set_header = timerPopUpView.findViewById(R.id.total_set_header);
     total_break_header = timerPopUpView.findViewById(R.id.total_break_header);
@@ -2302,13 +2341,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopwatchReset = stopWatchPopUpView.findViewById(R.id.stopwatch_reset);
 
     progressBar = timerPopUpView.findViewById(R.id.progressBar);
-    progressBarForPom = timerPopUpView.findViewById(R.id.progressBarForPom);
     timeLeftForCyclesTimer = timerPopUpView.findViewById(R.id.timeLeftForCyclesTimerTextView);
-    timeLeftForPomCyclesTimer = timerPopUpView.findViewById(R.id.timeLeftForPomCyclesTimerTextView);
     reset_total_cycle_times = timerPopUpView.findViewById(R.id.reset_total_cycle_times);
-//    reset_total_cycle_times.setVisibility(View.GONE);
     pauseResumeButton = timerPopUpView.findViewById(R.id.pauseResumeButton);
     next_round = timerPopUpView.findViewById(R.id.next_round);
+
+    progressBarForPom = pomTimerPopUpView.findViewById(R.id.progressBarForPom);
+    timeLeftForPomCyclesTimer = pomTimerPopUpView.findViewById(R.id.timeLeftForPomCyclesTimerTextView);
+    reset_total_pom_cycle_times = pomTimerPopUpView.findViewById(R.id.reset_total_cycle_times_for_pom);
+    pauseResumeButtonForPom = pomTimerPopUpView.findViewById(R.id.pauseResumeButtonForPom);
+    next_pom_round = pomTimerPopUpView.findViewById(R.id.next_round_for_pom);
 
   }
 
@@ -2466,6 +2508,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
     dotsRecyclerLayout = timerPopUpView.findViewById(R.id.dots_recycler_layout);
 
+    pomDotsRecycler = pomTimerPopUpView.findViewById(R.id.pom_dots_recyclerView);
+    pomDotsRecyclerLayout = pomTimerPopUpView.findViewById(R.id.pom_dots_recycler_layout);
+
     dotsRecyclerConstraintLayout_LayoutParams = (ConstraintLayout.LayoutParams) dotsRecyclerLayout.getLayoutParams();
     dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
 
@@ -2484,7 +2529,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomDotsAdapter = new PomDotsAdapter(getApplicationContext(), pomStringListOfRoundValues);
     pomDotsAdapter.setScreenHeight(phoneHeight);
 
-    pomDotsRecycler = timerPopUpView.findViewById(R.id.pom_dots_recyclerView);
+    pomDotsRecycler = pomTimerPopUpView.findViewById(R.id.pom_dots_recyclerView);
     pomDotsRecycler.setAdapter(pomDotsAdapter);
     pomDotsRecycler.setLayoutManager(gridLayoutManagerTwo);
 
@@ -2624,6 +2669,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setEditCyclesLayoutForDifferentHeights();
     setTimerLayoutForDifferentHeights();
+    setPomTimerLayoutForDifferentHeights();
     setStopWatchLayoutForDifferentHeights();
 
     deleteCyclePopupWindow.setAnimationStyle(R.style.WindowAnimation);
@@ -2695,16 +2741,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stopwatchReset.setVisibility(View.INVISIBLE);
     new_lap.setAlpha(0.3f);
 
-    pomRoundRecycler.setVisibility(View.GONE);
     savedPomCycleRecycler.setVisibility(View.GONE);
-    pomDotsRecycler.setVisibility(View.GONE);
 
-    timeLeftForCyclesTimer.setVisibility(View.GONE);
-    timeLeftForPomCyclesTimer.setVisibility(View.GONE);
-    progressBar.setVisibility(View.GONE);
-    progressBarForPom.setVisibility(View.GONE);
-    resetButtonForCycles.setVisibility(View.GONE);
-    resetButtonForPomCycles.setVisibility(View.GONE);
+//    timeLeftForCyclesTimer.setVisibility(View.GONE);
+//    timeLeftForPomCyclesTimer.setVisibility(View.GONE);
+//    progressBar.setVisibility(View.GONE);
+//    progressBarForPom.setVisibility(View.GONE);
+//    resetButtonForCycles.setVisibility(View.GONE);
+//    resetButtonForPomCycles.setVisibility(View.GONE);
   }
 
   private void setDefaultLayoutTexts() {
@@ -4390,6 +4434,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           Log.i("testTrack", "track in launch is " + trackActivityWithinCycle);
           setTimerLaunchLogic(trackActivityWithinCycle);
           setTimerLaunchViews(typeOfLaunch);
+          timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
           resetCyclesTimer();
         }
       });
@@ -4469,6 +4514,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         public void run() {
           setTimerLaunchViews(typeOfLaunch);
           setTimerLaunchLogic(false);
+          pomTimerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
           resetPomCyclesTimer();
         }
       });
@@ -4497,7 +4543,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     timerPopUpIsVisible = true;
     cycle_title_textView.setText(cycleTitle);
     cycle_title_textView_with_activity.setText(cycleTitle);
-//    cycle_title_textView_with_activity.setText(getString(R.string.tracking_daily_stats, getCurrentDateAsSlashFormattedString()));
 
     adjustDotRecyclerLayoutMargins();
 
@@ -4511,9 +4556,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (editCyclesPopupWindow.isShowing()) {
       editCyclesPopupWindow.dismiss();
     }
-
-    timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-
   }
 
   private void timerPopUpDismissalLogic() {
@@ -4550,9 +4592,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       stateOfTimers.setModeThreeTimerDisabled(false);
 
-      timeLeftForPomCyclesTimer.setVisibility(View.GONE);
-      progressBarForPom.setVisibility(View.GONE);
-      resetButtonForPomCycles.setVisibility(View.GONE);
+//      timeLeftForPomCyclesTimer.setVisibility(View.GONE);
+//      progressBarForPom.setVisibility(View.GONE);
+//      resetButtonForPomCycles.setVisibility(View.GONE);
 
       savedPomCycleAdapter.notifyDataSetChanged();
     }
@@ -4674,7 +4716,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     runOnUiThread(() -> {
-      cycle_title_textView.setText(cycleTitle);
+      pom_cycle_title_textView.setText(cycleTitle);
     });
   }
 
@@ -5007,7 +5049,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setCyclesCompletedTextView() {
-    cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
+    if (mode == 1) {
+      cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
+    }
+    if (mode == 3) {
+      pom_cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
+    }
   }
 
   private void setTotalCycleTimeValuesToTextView() {
