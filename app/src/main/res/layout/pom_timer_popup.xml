@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:id="@+id/pom_main_timer_theme"
+    android:id="@+id/pom_main_timer_layout"
     android:theme="@style/TimerTheme"
     android:backgroundTint="@color/eerie_black">
 

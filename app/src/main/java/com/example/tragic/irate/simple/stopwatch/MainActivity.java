@@ -142,6 +142,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TabLayout.Tab savedCyclesTab;
 
   View timerView;
+  View pomTimerView;
   View mainView;
   View topOfMainActivityView;
   View bottomEditTitleDividerView;
@@ -783,7 +784,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Remember, this does not execute if we are dismissing a popUp.
   @Override
   public void onBackPressed() {
-    if (!timerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
+    if (!timerPopUpIsVisible && !pomTimerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
       return;
     }
 
@@ -2289,6 +2290,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void assignTimerPopUpLayoutClassesToTheirIds() {
     timerView = timerPopUpView.findViewById(R.id.main_timer_layout);
+    pomTimerView = pomTimerPopUpView.findViewById(R.id.pom_main_timer_layout);
 
     resetButtonForCycles = timerPopUpView.findViewById(R.id.resetButtonForCycles);
     resetButtonForPomCycles = pomTimerPopUpView.findViewById(R.id.resetButtonForPomCycles);
@@ -2755,13 +2757,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     new_lap.setAlpha(0.3f);
 
     savedPomCycleRecycler.setVisibility(View.GONE);
-
-//    timeLeftForCyclesTimer.setVisibility(View.GONE);
-//    timeLeftForPomCyclesTimer.setVisibility(View.GONE);
-//    progressBar.setVisibility(View.GONE);
-//    progressBarForPom.setVisibility(View.GONE);
-//    resetButtonForCycles.setVisibility(View.GONE);
-//    resetButtonForPomCycles.setVisibility(View.GONE);
   }
 
   private void setDefaultLayoutTexts() {
@@ -7060,33 +7055,47 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (themeMode == DAY_MODE) {
       timerView.setBackgroundColor(getColor(R.color.white));
-      cycles_completed_textView.setTextColor(getColor(R.color.black));
-      total_set_header.setTextColor(getColor(R.color.black));
-      total_set_time.setTextColor(getColor(R.color.black));
-      total_break_header.setTextColor(getColor(R.color.black));
-      total_break_time.setTextColor(getColor(R.color.black));
+      pomTimerView.setBackgroundColor(getColor(R.color.white));
+      cycles_completed_textView.setTextColor(getColor(R.color.eerie_black));
+      total_set_header.setTextColor(getColor(R.color.eerie_black));
+      total_set_time.setTextColor(getColor(R.color.eerie_black));
+      total_break_header.setTextColor(getColor(R.color.eerie_black));
+      total_break_time.setTextColor(getColor(R.color.eerie_black));
 
-      dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.black));
-      dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.black));
-      dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
-      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.black));
+      pom_cycles_completed_textView.setTextColor(getColor(R.color.eerie_black));
+      total_set_header_for_pom.setTextColor(getColor(R.color.eerie_black));
+      total_set_time_for_pom.setTextColor(getColor(R.color.eerie_black));
+      total_break_header_for_pom.setTextColor(getColor(R.color.eerie_black));
+      total_break_time_For_pom.setTextColor(getColor(R.color.eerie_black));
 
-      timeLeftForCyclesTimer.setTextColor(getColor(R.color.black));
-      timeLeftForPomCyclesTimer.setTextColor(getColor(R.color.black));
+      dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.eerie_black));
+      dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.eerie_black));
+      dailyTotalTimeForSingleActivityTextViewHeader.setTextColor(getColor(R.color.eerie_black));
+      dailyTotalCaloriesForSingleActivityTextViewHeader.setTextColor(getColor(R.color.eerie_black));
 
-      DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.BLACK);
-      reset_total_cycle_times.setBackgroundColor(Color.WHITE);
+      timeLeftForCyclesTimer.setTextColor(getColor(R.color.eerie_black));
+      timeLeftForPomCyclesTimer.setTextColor(getColor(R.color.eerie_black));
+
+      DrawableCompat.setTint(resetCyclesDrawableWrapped, ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
+      reset_total_cycle_times.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
       DrawableCompat.setTint(nextRoundDrawableWrapped, Color.BLACK);
       next_round.setBackgroundColor(Color.WHITE);
     }
 
     if (themeMode == NIGHT_MODE){
       timerView.setBackgroundColor(getColor(R.color.black));
+      pomTimerView.setBackgroundColor(getColor(R.color.black));
       cycles_completed_textView.setTextColor(getColor(R.color.white));
       total_set_header.setTextColor(getColor(R.color.white));
       total_set_time.setTextColor(getColor(R.color.white));
       total_break_header.setTextColor(getColor(R.color.white));
       total_break_time.setTextColor(getColor(R.color.white));
+
+      pom_cycles_completed_textView.setTextColor(getColor(R.color.white));
+      total_set_header_for_pom.setTextColor(getColor(R.color.white));
+      total_set_time_for_pom.setTextColor(getColor(R.color.white));
+      total_break_header_for_pom.setTextColor(getColor(R.color.white));
+      total_break_time_For_pom.setTextColor(getColor(R.color.white));
 
       dailyTotalTimeTextViewHeader.setTextColor(getColor(R.color.white));
       dailyTotalCaloriesTextViewHeader.setTextColor(getColor(R.color.white));
@@ -7096,10 +7105,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeLeftForCyclesTimer.setTextColor(getColor(R.color.white));
       timeLeftForPomCyclesTimer.setTextColor(getColor(R.color.white));
 
-      DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.WHITE);
-      reset_total_cycle_times.setBackgroundColor(Color.BLACK);
+      DrawableCompat.setTint(resetCyclesDrawableWrapped, ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
+      reset_total_cycle_times.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
       DrawableCompat.setTint(nextRoundDrawableWrapped, Color.WHITE);
-      next_round.setBackgroundColor(Color.BLACK);
+      next_round.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
     }
 
     reset_total_cycle_times.setImageDrawable(resetCyclesDrawableWrapped);
