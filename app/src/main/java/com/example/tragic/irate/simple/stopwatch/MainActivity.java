@@ -5990,10 +5990,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       progressBar.startAnimation(fadeProgressOut);
     }
 
-    globalNextRoundLogic();
-
+    setHasTextSizeChangedForTimers(false);
+    next_round.setEnabled(false);
     resetButtonForCycles.setVisibility(View.GONE);
     currentProgressBarValueForModeOne = maxProgress;
+
+    AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
     mHandler.post(endFadeForModeOne);
 
@@ -6068,9 +6070,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     mHandler.post(endFadeForModeThree);
 
-    globalNextRoundLogic();
+    setHasTextSizeChangedForTimers(false);
+    next_pom_round.setEnabled(false);
     setTotalCycleTimeValuesToTextView();
     removePomCycleTimeRunnable();
+
+    AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
 
     if (endingEarly) {
       if (modeThreeCountDownTimer != null) modeThreeCountDownTimer.cancel();
@@ -6109,12 +6114,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     mHandler.postDelayed(postRoundRunnableForThirdMode(), 750);
 
-  }
-
-  private void globalNextRoundLogic() {
-    setHasTextSizeChangedForTimers(false);
-    next_round.setEnabled(false);
-    AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
   }
 
   private Runnable postRoundRunnableForFirstMode() {
@@ -6246,7 +6245,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
 
         stateOfTimers.setModeThreeTimerDisabled(false);
-        next_round.setEnabled(true);
+        next_pom_round.setEnabled(true);
       }
     };
   }
@@ -6786,7 +6785,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeThreeTimerActive(false);
 
     pomCyclesTextSizeHasChanged = false;
-    next_round.setEnabled(true);
+    next_pom_round.setEnabled(true);
     vibrator.cancel();
 
     if (mediaPlayer.isPlaying()) {
