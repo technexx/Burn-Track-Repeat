@@ -660,9 +660,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Pom adapter not refreshing on first app launch/tab switch.
-  //Todo: Mode 1 time was showing/overlapping in Mode 3. After than, couldn't click into a Mode 3 cycle and its title was gone.
-      //Todo: Sep. popUp layouts?
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test Stopwatch.

@@ -349,7 +349,6 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         } else {
           mOnCycleClickListener.onCycleClick(position);
         }
-        workoutHolder.fullView.setBackgroundColor(fullViewBackgroundColor);
       } else {
         ArrayList<Integer> tempList = new ArrayList<>(mHighlightPositionList);
         for (int i = 0; i < mWorkoutList.size(); i++) {

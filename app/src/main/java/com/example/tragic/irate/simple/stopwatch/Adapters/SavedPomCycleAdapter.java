@@ -241,7 +241,6 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 } else {
                     mOnCycleClickListener.onCycleClick(position);
                 }
-                pomHolder.fullView.setBackgroundColor(Color.BLACK);
             } else {
                 ArrayList<Integer> tempList = new ArrayList<>(mHighlightPositionList);
                 //Iterate through every cycle in list.
