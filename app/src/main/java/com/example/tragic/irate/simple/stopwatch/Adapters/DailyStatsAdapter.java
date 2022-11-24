@@ -223,6 +223,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.activityTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.setTimeTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(Typeface.DEFAULT_BOLD);
+
+            mMainViewHolder.activityTextView.setTextColor(ContextCompat.getColor(mContext, R.color.circular_progress_default_subtitle));
+            mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.circular_progress_default_subtitle));
+            mMainViewHolder.caloriesBurnedTextView.setTextColor(ContextCompat.getColor(mContext, R.color.circular_progress_default_subtitle));
         } else {
             if (mPhoneHeight <= 1920 ) {
                 mMainViewHolder.activityTextView.setTextSize(15);

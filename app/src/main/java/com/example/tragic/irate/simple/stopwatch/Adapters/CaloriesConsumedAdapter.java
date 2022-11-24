@@ -201,6 +201,9 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
             mMainViewHolder.foodEatenTextView.setTypeface(Typeface.DEFAULT_BOLD);
             mMainViewHolder.caloriesConsumedTextView.setTypeface(Typeface.DEFAULT_BOLD);
 
+            mMainViewHolder.foodEatenTextView.setTextColor(ContextCompat.getColor(mContext, R.color.circular_progress_default_subtitle));
+            mMainViewHolder.caloriesConsumedTextView.setTextColor(ContextCompat.getColor(mContext, R.color.circular_progress_default_subtitle));
+
             if (mScreenHeight <= 1920) {
                 mMainViewHolder.foodEatenTextView.setTextSize(17);
                 mMainViewHolder.caloriesConsumedTextView.setTextSize(17);
