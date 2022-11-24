@@ -5967,11 +5967,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeOneTimerPaused(false);
     stateOfTimers.setModeOneTimerDisabled(true);
 
+    savedCycleAdapter.setCycleAsActive();
+    savedCycleAdapter.setTimerIsPaused(false);
+
     if (endingEarly) {
       if (modeOneCountdownTimer != null) modeOneCountdownTimer.cancel();
       if (objectAnimator != null) objectAnimator.cancel();
       progressBar.setProgress(0);
-      savedCycleAdapter.setCycleAsActive();
 
       if (!trackActivityWithinCycle) {
         roundDownCycleTimeValues();
@@ -6052,6 +6054,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeThreeTimerPaused(false);
     stateOfTimers.setModeThreeTimerDisabled(true);
 
+    savedPomCycleAdapter.setCycleAsActive();
+    savedPomCycleAdapter.setTimerIsPaused(false);
+
     if (endingEarly) {
       roundDownPomCycleTimeValues();
     } else {
@@ -6081,7 +6086,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (modeThreeCountDownTimer != null) modeThreeCountDownTimer.cancel();
       if (objectAnimatorPom != null) objectAnimatorPom.cancel();
       progressBarForPom.setProgress(0);
-      savedPomCycleAdapter.setCycleAsActive();
     }
 
     switch (pomDotCounter) {
