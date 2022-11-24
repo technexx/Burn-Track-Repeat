@@ -2386,6 +2386,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cyclesDatabase = CyclesDatabase.getDatabase(getApplicationContext());
 
       queryAndSortAllCyclesFromMenu();
+      queryAndSortAllPomCyclesFromMenu();
 
       runOnUiThread(() -> {
         instantiateCycleAdaptersAndTheirCallbacks();
@@ -2959,7 +2960,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       highlightSortTextView();
 
       AsyncTask.execute(() -> {
-        queryAndSortAllCyclesFromMenu();
+        if (mode == 1) queryAndSortAllCyclesFromMenu();
+        if (mode == 3) queryAndSortAllPomCyclesFromMenu();
 
         runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
@@ -3223,7 +3225,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     receivedHighlightPositions.clear();
 
-    queryAndSortAllCyclesFromMenu();
+    if (mode == 1) queryAndSortAllCyclesFromMenu();
+    if (mode == 3) queryAndSortAllPomCyclesFromMenu();
 
     runOnUiThread(() -> {
       delete_highlighted_cycle.setEnabled(false);
@@ -3271,7 +3274,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 3) {
       if (pomCyclesList.size() > 0) {
         cyclesDatabase.cyclesDao().deleteAllPomCycles();
-        queryAndSortAllCyclesFromMenu();
+        queryAndSortAllPomCyclesFromMenu();
 
         sortModePom = 0;
 
@@ -4497,7 +4500,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     AsyncTask.execute(() -> {
       saveAddedOrEditedCycleASyncRunnable();
-      queryAndSortAllCyclesFromMenu();
+      queryAndSortAllPomCyclesFromMenu();
       clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
 
       if (isNewCycle) {
@@ -4721,47 +4724,45 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void queryAndSortAllCyclesFromMenu() {
-    if (mode == 1) {
-      switch (sortMode) {
-        case 0:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesByLeastRecent();
-          break;
-        case 1:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ();
-          break;
-        case 2:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA();
-          break;
-        case 3:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
-          break;
-        case 4:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
-          break;
-        case 5:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ();
-          break;
-        case 6:
-          cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA();
-          break;
-      }
+    switch (sortMode) {
+      case 0:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesByLeastRecent();
+        break;
+      case 1:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ();
+        break;
+      case 2:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA();
+        break;
+      case 3:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
+        break;
+      case 4:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
+        break;
+      case 5:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ();
+        break;
+      case 6:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA();
+        break;
     }
+  }
 
-    if (mode == 3) {
-      switch (sortModePom) {
-        case 1:
-          pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
-          break;
-        case 2:
-          pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
-          break;
-        case 3:
-          pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart();
-          break;
-        case 4:
-          pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd();
-          break;
-      }
+  private void queryAndSortAllPomCyclesFromMenu() {
+    switch (sortModePom) {
+      case 1:
+        pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesLeastRecent();
+        break;
+      case 2:
+        pomCyclesList = cyclesDatabase.cyclesDao().loadPomCyclesMostRecent();
+        break;
+      case 3:
+        pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaStart();
+        break;
+      case 4:
+        pomCyclesList = cyclesDatabase.cyclesDao().loadPomAlphaEnd();
+        break;
     }
   }
 
@@ -6241,6 +6242,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumeTimer(int pausing) {
+    Log.i("testPause", "mode one pause/resume");
     if (!stateOfTimers.isModeOneTimerDisabled()) {
       if (!stateOfTimers.isModeOneTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
@@ -6366,6 +6368,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
+    Log.i("testPause", "mode three pause/resume");
+
     if (!stateOfTimers.isModeThreeTimerDisabled()) {
       if (!stateOfTimers.isModeThreeTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
