@@ -660,6 +660,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Pom work/rest time not iterating.
+
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test Stopwatch.
@@ -1146,8 +1148,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (mode == 3) {
         progressBarForPom.setProgress(currentProgressBarValueForModeThree);
         setTotalCycleTimeValuesToTextView();
-
-        toggleViewsForTotalDailyAndCycleTimes(false);
 
         if (numberOfRoundsLeftForModeThree > 0) {
           timeLeftForPomCyclesTimer.setText(longToStringConverters.convertSecondsToMinutesBasedString(dividedMillisForTimerDisplay(pomMillis)));
@@ -4448,8 +4448,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setTimerLaunchViews(typeOfLaunch);
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
           resetCyclesTimer();
-
-          Log.i("testPom", "timer popUp launched");
         }
       });
     });
@@ -4882,7 +4880,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");
 
           /////---------Testing pom round iterations---------------/////////
-          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(2000); else pomValuesTime.add(3000);
+          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(8000);
 
           for (int i = 0; i < fetchedPomCycle.length; i++) {
             int integerValue = Integer.parseInt(fetchedPomCycle[i]);
@@ -6250,7 +6248,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumeTimer(int pausing) {
-    Log.i("testPom", "mode one pause/resume");
     if (!stateOfTimers.isModeOneTimerDisabled()) {
       if (!stateOfTimers.isModeOneTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
@@ -6376,8 +6373,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
-    Log.i("testPom", "mode three pause/resume");
-
     if (!stateOfTimers.isModeThreeTimerDisabled()) {
       if (!stateOfTimers.isModeThreeTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
@@ -7073,8 +7068,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       DrawableCompat.setTint(resetCyclesDrawableWrapped, ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
       reset_total_cycle_times.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
-      DrawableCompat.setTint(nextRoundDrawableWrapped, Color.BLACK);
+      DrawableCompat.setTint(nextRoundDrawableWrapped, ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
       next_round.setBackgroundColor(Color.WHITE);
+
+      reset_total_pom_cycle_times.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
+      next_pom_round.setBackgroundColor(Color.WHITE);
     }
 
     if (themeMode == NIGHT_MODE){
@@ -7100,14 +7098,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timeLeftForCyclesTimer.setTextColor(getColor(R.color.white));
       timeLeftForPomCyclesTimer.setTextColor(getColor(R.color.white));
 
-      DrawableCompat.setTint(resetCyclesDrawableWrapped, ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
+      DrawableCompat.setTint(resetCyclesDrawableWrapped, Color.WHITE);
       reset_total_cycle_times.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
       DrawableCompat.setTint(nextRoundDrawableWrapped, Color.WHITE);
       next_round.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
+
+      reset_total_pom_cycle_times.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
+      next_pom_round.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.eerie_black));
     }
+
 
     reset_total_cycle_times.setImageDrawable(resetCyclesDrawableWrapped);
     next_round.setImageDrawable(nextRoundDrawableWrapped);
+    reset_total_pom_cycle_times.setImageDrawable(resetCyclesDrawableWrapped);
+    next_pom_round.setImageDrawable(nextRoundDrawableWrapped);
 
     dotsAdapter.setDayOrNightMode(themeMode);
     pomDotsAdapter.setDayOrNightMode(themeMode);
