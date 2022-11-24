@@ -1379,12 +1379,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (phoneHeight <= 1920) {
       timerPopUpView = inflater.inflate(R.layout.timer_popup_h1920, null);
-      Log.i("testDimensions", "inflating lower res!");
-
     } else {
       timerPopUpView = inflater.inflate(R.layout.timer_popup, null);
-      Log.i("testDimensions", "inflating higher res!");
-
     }
 
     timerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
@@ -1400,7 +1396,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     }
 
-    pomTimerPopUpWindow = new PopupWindow(timerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
+    pomTimerPopUpWindow = new PopupWindow(pomTimerPopUpView, WindowManager.LayoutParams.MATCH_PARENT, WindowManager.LayoutParams.MATCH_PARENT, true);
   }
 
   private void setStopWatchLayoutForDifferentHeights() {
@@ -2552,17 +2548,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Weight on layout that contains recyclerView is not the same as weight on view itself.
   private void adjustDotRecyclerViewSize(int numberOfRows) {
-    if (phoneHeight <= 1920) {
-      if (numberOfRows <= 8) {
-        dotsRecyclerLayoutParams.height = dpConv(80);
+    if (mode == 1) {
+      if (phoneHeight <= 1920) {
+        if (numberOfRows <= 8) {
+          dotsRecyclerLayoutParams.height = dpConv(80);
+        } else {
+          dotsRecyclerLayoutParams.height = dpConv(140);
+        }
       } else {
-        dotsRecyclerLayoutParams.height = dpConv(140);
-      }
-    } else {
-      if (numberOfRows <= 8) {
-        dotsRecyclerLayoutParams.height = dpConv(95);
-      } else {
-        dotsRecyclerLayoutParams.height = dpConv(160);
+        if (numberOfRows <= 8) {
+          dotsRecyclerLayoutParams.height = dpConv(95);
+        } else {
+          dotsRecyclerLayoutParams.height = dpConv(160);
+        }
       }
     }
   }
@@ -6245,7 +6243,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumeTimer(int pausing) {
-    Log.i("testPause", "mode one pause/resume");
+    Log.i("testPom", "mode one pause/resume");
     if (!stateOfTimers.isModeOneTimerDisabled()) {
       if (!stateOfTimers.isModeOneTimerEnded()) {
         if (pausing == PAUSING_TIMER) {
@@ -6371,7 +6369,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void pauseAndResumePomodoroTimer(int pausing) {
-    Log.i("testPause", "mode three pause/resume");
+    Log.i("testPom", "mode three pause/resume");
 
     if (!stateOfTimers.isModeThreeTimerDisabled()) {
       if (!stateOfTimers.isModeThreeTimerEnded()) {
