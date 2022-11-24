@@ -526,6 +526,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   long countUpMillisHolder;
   boolean makeCycleAdapterVisible;
   boolean timerPopUpIsVisible;
+  boolean pomTimerPopUpIsVisible;
 
   NotificationManagerCompat notificationManagerCompat;
   NotificationCompat.Builder notificationManagerBuilder;
@@ -783,6 +784,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (timerPopUpWindow.isShowing()) {
       timerPopUpDismissalLogic();
+    }
+
+    if (pomTimerPopUpWindow.isShowing()) {
+      pomTimerPopUpDismissalLogic();
     }
 
     if (editCyclesPopupWindow.isShowing()) {
@@ -1607,7 +1612,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       replaceCycleListWithEmptyTextViewIfNoCyclesExist();
       toggleCycleAndPomCycleRecyclerViewVisibilities(false);
 
-      timerPopUpDismissalLogic();
+      pomTimerPopUpDismissalLogic();
 
       toggleCustomActionBarButtonVisibilities(false);
       enableMainViewClicks();
@@ -2509,9 +2514,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dotsRecycler = timerPopUpView.findViewById(R.id.dots_recyclerView);
     dotsRecyclerLayout = timerPopUpView.findViewById(R.id.dots_recycler_layout);
 
-    pomDotsRecycler = pomTimerPopUpView.findViewById(R.id.pom_dots_recyclerView);
-    pomDotsRecyclerLayout = pomTimerPopUpView.findViewById(R.id.pom_dots_recycler_layout);
-
     dotsRecyclerConstraintLayout_LayoutParams = (ConstraintLayout.LayoutParams) dotsRecyclerLayout.getLayoutParams();
     dotsRecyclerLayoutParams = (ConstraintLayout.LayoutParams) dotsRecycler.getLayoutParams();
 
@@ -2531,8 +2533,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomDotsAdapter.setScreenHeight(phoneHeight);
 
     pomDotsRecycler = pomTimerPopUpView.findViewById(R.id.pom_dots_recyclerView);
+
     pomDotsRecycler.setAdapter(pomDotsAdapter);
     pomDotsRecycler.setLayoutManager(gridLayoutManagerTwo);
+
 
     pomDotsRecycler.setOnTouchListener(new View.OnTouchListener() {
       @Override
@@ -4434,11 +4438,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       runOnUiThread(new Runnable() {
         @Override
         public void run() {
-          Log.i("testTrack", "track in launch is " + trackActivityWithinCycle);
           setTimerLaunchLogic(trackActivityWithinCycle);
           setTimerLaunchViews(typeOfLaunch);
           timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
           resetCyclesTimer();
+
+          Log.i("testPom", "timer popUp launched");
         }
       });
     });
@@ -4518,6 +4523,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setTimerLaunchViews(typeOfLaunch);
           setTimerLaunchLogic(false);
           pomTimerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
+          Log.i("testPom", "pom timer popUp launched");
+
           resetPomCyclesTimer();
         }
       });
@@ -4543,7 +4550,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void setTimerLaunchViews(int typeOfLaunch) {
-    timerPopUpIsVisible = true;
+
     cycle_title_textView.setText(cycleTitle);
     cycle_title_textView_with_activity.setText(cycleTitle);
 
@@ -4551,9 +4558,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     if (mode == 1) {
       changeTextSizeWithoutAnimator(workoutTimeIntegerArray.get(0));
+      timerPopUpIsVisible = true;
     }
     if (mode == 3) {
       changeTextSizeWithoutAnimator(pomValuesTime.get(0));
+      pomTimerPopUpIsVisible = true;
     }
 
     if (editCyclesPopupWindow.isShowing()) {
@@ -4562,48 +4571,42 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void timerPopUpDismissalLogic() {
-    timerPopUpWindow.dismiss();
     timerPopUpIsVisible = false;
 
-    if (mode == 1) {
-      if (stateOfTimers.isModeOneTimerActive()) {
-        fab.setAlpha(0.3f);
-        fab.setEnabled(false);
-      }
-
-      stateOfTimers.setModeOneTimerDisabled(false);
-
-      timeLeftForCyclesTimer.setVisibility(View.GONE);
-      progressBar.setVisibility(View.GONE);
-      resetButtonForCycles.setVisibility(View.GONE);
-
-      savedCycleAdapter.notifyDataSetChanged();
-
-      if (trackActivityWithinCycle) {
-        AsyncTask.execute(()-> {
-          setAndUpdateActivityTimeAndCaloriesInDatabase();
-        });
-      }
-
-      deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycleForModeOne);
-
-    } else if (mode == 3) {
-      if (stateOfTimers.isModeThreeTimerActive()) {
-        fab.setAlpha(0.3f);
-        fab.setEnabled(false);
-      }
-
-      stateOfTimers.setModeThreeTimerDisabled(false);
-
-//      timeLeftForPomCyclesTimer.setVisibility(View.GONE);
-//      progressBarForPom.setVisibility(View.GONE);
-//      resetButtonForPomCycles.setVisibility(View.GONE);
-
-      savedPomCycleAdapter.notifyDataSetChanged();
+    if (stateOfTimers.isModeOneTimerActive()) {
+      fab.setAlpha(0.3f);
+      fab.setEnabled(false);
     }
+
+    stateOfTimers.setModeOneTimerDisabled(false);
+
+    savedCycleAdapter.notifyDataSetChanged();
+
+    if (trackActivityWithinCycle) {
+      AsyncTask.execute(()-> {
+        setAndUpdateActivityTimeAndCaloriesInDatabase();
+      });
+    }
+
+    deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycleForModeOne);
 
     toggleSortButtonBasedOnIfCycleIsActive();
 
+  }
+
+  private void pomTimerPopUpDismissalLogic() {
+    pomTimerPopUpIsVisible = true;
+
+    if (stateOfTimers.isModeThreeTimerActive()) {
+      fab.setAlpha(0.3f);
+      fab.setEnabled(false);
+    }
+
+    stateOfTimers.setModeThreeTimerDisabled(false);
+
+    savedPomCycleAdapter.notifyDataSetChanged();
+
+    toggleSortButtonBasedOnIfCycleIsActive();
   }
 
   private void retrieveTotalDailySetAndBreakTimes() {
