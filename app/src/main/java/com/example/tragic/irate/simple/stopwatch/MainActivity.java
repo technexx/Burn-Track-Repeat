@@ -420,6 +420,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView total_set_time;
   TextView total_break_time;
 
+  TextView total_set_header_for_pom;
+  TextView total_break_header_for_pom;
+  TextView total_set_time_for_pom;
+  TextView total_break_time_For_pom;
+
   int PAUSING_TIMER = 1;
   int RESUMING_TIMER = 2;
 
@@ -2308,6 +2313,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     total_set_time = timerPopUpView.findViewById(R.id.total_set_time);
     total_break_time = timerPopUpView.findViewById(R.id.total_break_time);
 
+    total_set_header_for_pom = pomTimerPopUpView.findViewById(R.id.total_set_header_for_pom);
+    total_break_header_for_pom = pomTimerPopUpView.findViewById(R.id.total_break_header_for_pom);
+    total_set_time_for_pom = pomTimerPopUpView.findViewById(R.id.total_set_time_for_pom);
+    total_break_time_For_pom = pomTimerPopUpView.findViewById(R.id.total_break_time_for_pom);
+
     dailySingleActivityStringHeader = timerPopUpView.findViewById(R.id.daily_single_activity_string_header);
     dailyTotalTimeTextViewHeader = timerPopUpView.findViewById(R.id.daily_total_time_textView_header);
     dailyTotalTimeTextView = timerPopUpView.findViewById(R.id.daily_total_time_textView);
@@ -2533,7 +2543,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     pomDotsRecycler.setAdapter(pomDotsAdapter);
     pomDotsRecycler.setLayoutManager(gridLayoutManagerTwo);
 
-
     pomDotsRecycler.setOnTouchListener(new View.OnTouchListener() {
       @Override
       public boolean onTouch(View v, MotionEvent event) {
@@ -2683,6 +2692,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
 //    timerPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
+    pomTimerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
     stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
   }
@@ -2762,9 +2772,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     total_set_header.setText(R.string.total_sets);
     total_break_header.setText(R.string.total_breaks);
+    total_set_header_for_pom.setText(R.string.total_work);
+    total_break_header_for_pom.setText(R.string.total_breaks);
+
     total_set_time.setText("0");
     total_break_time.setText("0");
+
+    total_set_time_for_pom.setText("0");
+    total_break_time_For_pom.setText("0");
+
     cycles_completed_textView.setText(R.string.cycles_done);
+    pom_cycles_completed_textView.setText(R.string.cycles_done);
   }
 
   private void retrieveAndImplementCycleSorting() {
@@ -4521,7 +4539,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           setTimerLaunchViews(typeOfLaunch);
           setTimerLaunchLogic(false);
           pomTimerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-          Log.i("testPom", "pom timer popUp launched");
 
           resetPomCyclesTimer();
         }
@@ -6656,7 +6673,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortActivityTitleZToA.setVisibility(View.GONE);
 
         addTDEEfirstMainTextView.setVisibility(View.INVISIBLE);
-        total_set_header.setText(R.string.total_work);
         break;
     }
   }

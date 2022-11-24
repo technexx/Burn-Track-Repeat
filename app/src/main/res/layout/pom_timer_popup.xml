@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity"
-    android:id="@+id/main_timer_layout"
+    android:id="@+id/pom_main_timer_theme"
     android:theme="@style/TimerTheme"
     android:backgroundTint="@color/eerie_black">
 
@@ -78,7 +78,7 @@
         </TextView>
 
         <TextView
-            android:id="@+id/total_set_header"
+            android:id="@+id/total_set_header_for_pom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -90,7 +90,7 @@
         </TextView>
 
         <TextView
-            android:id="@+id/total_break_header"
+            android:id="@+id/total_break_header_for_pom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
@@ -102,7 +102,7 @@
         </TextView>
 
         <TextView
-            android:id="@+id/total_set_time"
+            android:id="@+id/total_set_time_for_pom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
@@ -113,7 +113,7 @@
         </TextView>
 
         <TextView
-            android:id="@+id/total_break_time"
+            android:id="@+id/total_break_time_for_pom"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="2dp"
