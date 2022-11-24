@@ -69,7 +69,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     Calendar mCalendar;
     com.prolificinteractive.materialcalendarview.MaterialCalendarView calendarView;
 
-    CalendarDayDecorators calendarDayDecorators;
 
     int daySelectedFromCalendar;
     CalendarDay daySelectedAsACalendarDayObject;
@@ -267,6 +266,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     InputMethodManager inputMethodManager;
 
+    CalendarDayDecorators.ActivityDecoration activityDecoration;
+    CalendarDayDecorators.DaySelectedDecoration daySelectedDecoration;
+
     public interface changeOnOptionsItemSelectedMenu {
         void onChangeOnOptionsMenu(int typeOfSort);
     }
@@ -342,6 +344,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsExpandedButton = mRoot.findViewById(R.id.daily_stats_expanded_button);
         editTdeeStatsButton = mRoot.findViewById(R.id.edit_tdee_stats_button);
 
+        activityDecoration = new CalendarDayDecorators.ActivityDecoration(getContext());
+        daySelectedDecoration = new CalendarDayDecorators.DaySelectedDecoration(getContext());
+
         instantiateCalendarObjects();
         instantiateTextViewsAndMiscClasses();
         instantiateTabLayout();
@@ -383,7 +388,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             colorDaysWithAtLeastOneActivity();
 
             getActivity().runOnUiThread(()-> {
-                CalendarDayDecorators.DaySelectedDecoration daySelectedDecoration = new CalendarDayDecorators.DaySelectedDecoration(getContext());
                 daySelectedDecoration.setCurrentDay(customCalendarDayList);
                 calendarView.addDecorator(daySelectedDecoration);
                 setStatDurationViews(currentStatDurationMode);
@@ -868,6 +872,27 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    public void colorDaysWithAtLeastOneActivity() {
+        List<Integer> daysWithAtLeastOneActivityList = dailyStatsAccess.getListOfDaysWithAtLeastOneActivity();
+        List<CalendarDay> calendarDayList = new ArrayList<>();
+        Calendar calendarColoringObject = Calendar.getInstance(Locale.getDefault());
+
+        for (int i=0; i<daysWithAtLeastOneActivityList.size(); i++) {
+            calendarColoringObject.set(Calendar.DAY_OF_YEAR, daysWithAtLeastOneActivityList.get(i));
+
+            calendarDayList.add(CalendarDay.from(calendarColoringObject.get(Calendar.YEAR), calendarColoringObject.get(Calendar.MONTH) + 1, calendarColoringObject.get(Calendar.DAY_OF_MONTH)));
+        }
+
+        getActivity().runOnUiThread(()->{
+            activityDecoration.setCalendarDayList(calendarDayList);
+            calendarView.addDecorator(activityDecoration);
+        });
+    }
+
+    public void colorDaysWithAtLeastOneFood() {
+
+    }
+
     private void setSingleDateStringOnTextView() {
         String dayToSet = dailyStatsAccess.getFirstDayInDurationAsString();
         activityStatsDurationRangeTextView.setText(dayToSet);
@@ -960,28 +985,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
 
         return additionModifier;
-    }
-
-    public void colorDaysWithAtLeastOneActivity() {
-        List<Integer> daysWithAtLeastOneActivityList = dailyStatsAccess.getListOfDaysWithAtLeastOneActivity();
-        List<CalendarDay> calendarDayList = new ArrayList<>();
-        Calendar calendarColoringObject = Calendar.getInstance(Locale.getDefault());
-
-        for (int i=0; i<daysWithAtLeastOneActivityList.size(); i++) {
-            calendarColoringObject.set(Calendar.DAY_OF_YEAR, daysWithAtLeastOneActivityList.get(i));
-
-            calendarDayList.add(CalendarDay.from(calendarColoringObject.get(Calendar.YEAR), calendarColoringObject.get(Calendar.MONTH) + 1, calendarColoringObject.get(Calendar.DAY_OF_MONTH)));
-        }
-
-        getActivity().runOnUiThread(()->{
-            CalendarDayDecorators.ActivityDecoration activityDecoration = new CalendarDayDecorators.ActivityDecoration(getContext());
-            activityDecoration.setCalendarDayList(calendarDayList);
-            calendarView.addDecorator(activityDecoration);
-        });
-    }
-
-    public void colorDaysWithAtLeastOneFood() {
-
     }
 
     @Override
@@ -2293,7 +2296,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         simplifiedActivityLevelTextView = mRoot.findViewById(R.id.simplified_activity_level_textView);
         simplifiedCaloriesBurnedTextView = mRoot.findViewById(R.id.simplified_calories_burned_textView);
 
-        calendarDayDecorators = new CalendarDayDecorators();
         customCalendarDayList = new ArrayList<>();
 
         statsForEachActivityList = new ArrayList<>();
