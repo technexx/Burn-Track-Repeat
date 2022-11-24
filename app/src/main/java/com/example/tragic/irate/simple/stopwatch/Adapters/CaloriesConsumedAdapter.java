@@ -226,6 +226,9 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
                 mMainViewHolder.caloriesConsumedTextView.setTextSize(20);
             }
         }
+
+        mMainViewHolder.foodEatenTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
+        mMainViewHolder.caloriesConsumedTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
     }
 
     private void setAnimations() {

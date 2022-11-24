@@ -460,7 +460,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintBottom_toBottomOf="parent"
-            android:textColor="@color/green"
+            android:textColor="@color/purple_200"
             android:textStyle="bold">
         </TextView>
 

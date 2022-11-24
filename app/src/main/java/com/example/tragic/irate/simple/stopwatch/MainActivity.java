@@ -643,6 +643,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Green color for days w/ activities may want to change. Looks like a "loss" calorie day.
+      //Todo: Add a "3 average meals" default to food?
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test Stopwatch.
