@@ -722,6 +722,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (timerPopUpWindow.isShowing()) {
         inputMethodManager.hideSoftInputFromWindow(timerPopUpView.getWindowToken(), 0);
       }
+
+      if (pomTimerPopUpWindow.isShowing()) {
+        inputMethodManager.hideSoftInputFromWindow(pomTimerPopUpView.getWindowToken(), 0);
+      }
+
       if (stopWatchPopUpWindow.isShowing()) {
         inputMethodManager.hideSoftInputFromWindow(stopWatchPopUpView.getWindowToken(), 0);
       }
@@ -1091,9 +1096,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void resumeOrResetCycle(int resumeOrReset) {
     if (resumeOrReset == RESUMING_CYCLE_FROM_ADAPTER) {
       if (mode == 1) {
-        timeLeftForPomCyclesTimer.setVisibility(View.GONE);
-        progressBar.setVisibility(View.VISIBLE);
-        timeLeftForCyclesTimer.setVisibility(View.VISIBLE);
         progressBar.setProgress(currentProgressBarValueForModeOne);
 
         if (trackActivityWithinCycle) {
@@ -1137,18 +1139,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             runOnUiThread(()-> {
               retrieveTotalTimesAndCaloriesForSpecificActivityOnCurrentDayVariables();
               setAllActivityTimesAndCaloriesToTextViews();
-              timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
             });
           }
         });
+
+        timerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
       }
 
       if (mode == 3) {
-        progressBarForPom.setVisibility(View.VISIBLE);
         progressBarForPom.setProgress(currentProgressBarValueForModeThree);
-        timeLeftForPomCyclesTimer.setVisibility(View.VISIBLE);
         setTotalCycleTimeValuesToTextView();
-        // setStoredSetAndBreakTimeOnPomCycleResume();
 
         toggleViewsForTotalDailyAndCycleTimes(false);
 
@@ -1160,9 +1160,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         savedPomCycleAdapter.setIsConfirmStringVisible(false);
 
         pomTimerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
-
       }
-
     } else if (resumeOrReset == RESETTING_CYCLE_FROM_ADAPTER) {
       if (mode == 1) {
         mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeOne);
