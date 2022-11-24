@@ -478,6 +478,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ArrayList<String> savedLapList;
 
   int cyclesCompleted;
+  int pomCyclesCompleted;
   int lapsNumber;
 
   int startRoundsForModeOne;
@@ -659,8 +660,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   ActionBar settingsActionBar;
 
   boolean resetCycleTimeVarsWithinRunnable;
-
-  //Todo: Pom work/rest time not iterating.
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
@@ -2871,7 +2870,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void setPomCyclesValuesAndUpdateInDatabase() {
     pomCycles.setTotalWorkTime(totalCycleWorkTimeInMillis);
     pomCycles.setTotalRestTime(totalCycleRestTimeInMillis);
-    pomCycles.setCyclesCompleted(cyclesCompleted);
+    pomCycles.setCyclesCompleted(pomCyclesCompleted);
     cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
   }
 
@@ -3310,23 +3309,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycles.setTotalSetTime(0);
       cycles.setTotalBreakTime(0);
       cycles.setCyclesCompleted(0);
-      cyclesDatabase.cyclesDao().updateCycles(cycles);;
+      cyclesDatabase.cyclesDao().updateCycles(cycles);
+
+      runOnUiThread(()-> {
+        cyclesCompleted = 0;
+        total_set_time.setText("0");
+        total_break_time.setText("0");
+      });
+
     }
     if (mode == 3) {
       pomCycles.setTotalWorkTime(0);
       pomCycles.setTotalRestTime(0);
       pomCycles.setCyclesCompleted(0);
       cyclesDatabase.cyclesDao().updatePomCycles(pomCycles);
+
+      runOnUiThread(()-> {
+        pomCyclesCompleted = 0;
+        total_set_time_for_pom.setText("0");
+        total_break_time_For_pom.setText("0");
+      });
     }
 
     runOnUiThread(() -> {
       deleteCyclePopupWindow.dismiss();
-
       zeroOutTotalCycleTimes();
-      cyclesCompleted = 0;
-
-      total_set_time.setText("0");
-      total_break_time.setText("0");
       setCyclesCompletedTextView();
     });
   }
@@ -4637,7 +4644,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       totalCycleWorkTimeInMillis = pomCycles.getTotalWorkTime();
       totalCycleRestTimeInMillis = pomCycles.getTotalRestTime();
 
-      cyclesCompleted = pomCycles.getCyclesCompleted();
+      pomCyclesCompleted = pomCycles.getCyclesCompleted();
     }
   }
 
@@ -5060,7 +5067,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
     }
     if (mode == 3) {
-      pom_cycles_completed_textView.setText(getString(R.string.cycles_done, cyclesCompleted));
+      pom_cycles_completed_textView.setText(getString(R.string.cycles_done, pomCyclesCompleted));
     }
   }
 
@@ -5070,8 +5077,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleBreakTimeInMillis));
     }
     if (mode == 3) {
-      total_set_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleWorkTimeInMillis));
-      total_break_time.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleRestTimeInMillis));
+      total_set_time_for_pom.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleWorkTimeInMillis));
+      total_break_time_For_pom.setText(longToStringConverters.convertMillisToHourBasedStringForCycleTimes(totalCycleRestTimeInMillis));
     }
   }
 
@@ -6234,6 +6241,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           loopProgressBarAnimationAtEndOfCycle();
           setCyclesCompletedTextView();
 
+          pomCyclesCompleted ++;
           stateOfTimers.setModeThreeTimerEnded(true);
         }
 
