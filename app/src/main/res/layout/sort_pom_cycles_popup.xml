@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="@drawable/rounded_corners"
+    android:backgroundTint="@color/dark_grey"
+    android:paddingTop="3dp"
+    android:paddingBottom="12dp"
+    android:paddingStart="5dp"
+    android:paddingEnd="5dp"
+    android:id="@+id/sort_layout"
+    android:theme="@style/MenuTheme">
+
+    <TextView
+        android:text="Task Title: A - Z"
+        android:id="@+id/sort_title_start_pom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp">
+    </TextView>
+
+    <TextView
+        android:text="Task Title: Z - A"
+        android:id="@+id/sort_title_end_pom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_title_start_pom"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="10dp">
+    </TextView>
+
+    <TextView
+        android:text="Added: Most Recent"
+        android:id="@+id/sort_most_recent_pom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_title_end_pom"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp">
+    </TextView>
+
+    <TextView
+        android:text="Added: Least Recent"
+        android:id="@+id/sort_least_recent_pom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_most_recent_pom"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp">
+    </TextView>
+
+
+</androidx.constraintlayout.widget.ConstraintLayout>

@@ -251,8 +251,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     int mActivitySortMode;
     int mFoodConsumedSortMode;
-    int SORTING_ACTIVITIES = 1;
-    int SORTING_FOOD_CONSUMED = 2;
+    int SORTING_ACTIVITIES = 2;
+    int SORTING_FOOD_CONSUMED = 3;
     int DISABLE_SORTING = -1;
 
     View aboutStatsPopUpView;
