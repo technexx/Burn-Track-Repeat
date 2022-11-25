@@ -2751,6 +2751,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     new_lap.setAlpha(0.3f);
 
     savedPomCycleRecycler.setVisibility(View.GONE);
+    pomRoundRecycler.setVisibility(View.GONE);
   }
 
   private void setDefaultLayoutTexts() {
