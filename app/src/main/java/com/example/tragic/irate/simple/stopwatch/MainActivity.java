@@ -5313,16 +5313,31 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return textViewDisplaySync;
   }
 
-  private Runnable runnableForSetAndBreakTotalTimes() {
+  private void setTypeOfCycleTimeToIterate() {
     if (typeOfRound.get(currentRoundForModeOne) == 1 || typeOfRound.get(currentRoundForModeOne) == 2) {
       CYCLE_TIME_TO_ITERATE = CYCLE_SETS;
     }
     if (typeOfRound.get(currentRoundForModeOne) == 3 || typeOfRound.get(currentRoundForModeOne) == 4) {
       CYCLE_TIME_TO_ITERATE = CYCLE_BREAKS;
     }
+  }
 
+  private void setTypeOfPomCycleTimeToIterate() {
+    switch (pomDotCounter) {
+      case 0: case 2: case 4: case 6:
+        POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
+        break;
+      case 1: case 3: case 5: case 7:
+        POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
+        break;
+    }
+  }
+
+  private Runnable runnableForSetAndBreakTotalTimes() {
     TimerIteration timerIteration = newTimerIterationInstance();
     TextViewDisplaySync textViewDisplaySync = textViewDisplaySyncForModeOne();
+
+    setTypeOfCycleTimeToIterate();
 
     if (CYCLE_TIME_TO_ITERATE == CYCLE_SETS) {
       timerIteration.setPreviousTotal(totalCycleSetTimeInMillis);
@@ -5355,8 +5370,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         if (CYCLE_TIME_TO_ITERATE == CYCLE_BREAKS) {
           totalCycleBreakTimeInMillis = timerIteration.getNewTotal();
         }
-
-//        Log.i("testDel", "set time updated in runnable at " + totalCycleSetTimeInMillis);
 
         updateCycleTimesTextViewsIfTimerHasAlsoUpdated(textViewDisplaySync);
 
@@ -5512,15 +5525,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private Runnable runnableForWorkAndRestTotalTimes() {
-    switch (pomDotCounter) {
-      case 0: case 2: case 4: case 6:
-        POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_WORK;
-        break;
-      case 1: case 3: case 5: case 7:
-        POM_CYCLE_TIME_TO_ITERATE = POM_CYCLE_REST;
-        break;
-    }
-
     TimerIteration timerIteration = newTimerIterationInstance();
     TextViewDisplaySync textViewDisplaySync = textViewDisplaySyncForModeThree();
 
@@ -6181,7 +6185,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 startBreakTimer();
               }
 
-              if (trackActivityWithinCycle) {
+              if (!trackActivityWithinCycle) {
                 postSetAndBreakTimeTotalRunnable();
               }
               break;
@@ -6192,7 +6196,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               infinityTimerForBreaksRunnable = infinityRunnableForBreakRounds();
               mHandler.post(infinityTimerForBreaksRunnable);
 
-              if (trackActivityWithinCycle) {
+              if (!trackActivityWithinCycle) {
                 postSetAndBreakTimeTotalRunnable();
               }
               break;
