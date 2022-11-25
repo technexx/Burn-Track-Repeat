@@ -15,7 +15,7 @@ public class DisclaimerFragment extends Fragment {
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.disclaimer_fragment_layout, container, false);
-        root.setBackgroundColor(getResources().getColor(R.color.matte_black));
+        root.setBackgroundColor(getResources().getColor(R.color.alien_black));
 
         return root;
 

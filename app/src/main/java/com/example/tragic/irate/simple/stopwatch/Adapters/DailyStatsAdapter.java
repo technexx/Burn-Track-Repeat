@@ -155,18 +155,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mRowIsSelectedForEditing = !mRowIsSelectedForEditing;
     }
 
-    private void setDefaultMainHolderViewsAndBackgrounds() {
-        mMainViewHolder.fullView.setBackground(null);
-    }
-
-    private void setMainHolderEditModeViews(int position) {
-        if (mEditModeIsActive) {
-            if (position > 0) {
-                mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
-            }
-        }
-    }
-
     @Override
     public int getItemCount() {
         if (!mEditModeIsActive) {
@@ -197,6 +185,19 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         notifyDataSetChanged();
     }
 
+    private void setDefaultMainHolderViewsAndBackgrounds() {
+//        mMainViewHolder.fullView.setBackgroundColor(ContextCompat.getColor(mContext, R.color.matte_black));
+        mMainViewHolder.fullView.setBackground(null);
+    }
+
+    private void setMainHolderEditModeViews(int position) {
+        if (mEditModeIsActive) {
+            if (position > 0) {
+                mMainViewHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.stat_edit_row_border));
+            }
+        }
+    }
+
     private void populateMainRowViews(int position) {
         //Returns on last row in edit mode so we don't try to pull textViews from footer.
         if (position==mItemCount-1 && mEditModeIsActive) {
@@ -204,8 +205,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
 
         if (position == 0) {
-            Log.i("testPop", "setting header font at position " + position);
-
             if (mPhoneHeight <= 1920) {
                 mMainViewHolder.activityTextView.setTextSize(17);
                 mMainViewHolder.setTimeTextView.setTextSize(17);

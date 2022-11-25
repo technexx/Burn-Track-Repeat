@@ -74,7 +74,7 @@ public class tdeeSettingsFragment extends Fragment {
 
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tdee_settings_fragment_layout, container, false);
-        root.setBackgroundColor(getResources().getColor(R.color.matte_black));
+        root.setBackgroundColor(getResources().getColor(R.color.alien_black));
 
         sharedPreferences = getActivity().getSharedPreferences("pref", 0);
         prefEdit = sharedPreferences.edit();
