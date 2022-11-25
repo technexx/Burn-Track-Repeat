@@ -17,8 +17,7 @@
         app:tabTextAppearance="@style/TabLayoutTextStyle"
         app:tabIndicatorColor="@color/off_white"
         app:tabSelectedTextColor="@color/blue_2"
-        app:tabRippleColor="@android:color/transparent"
-        android:background="@color/alien_black" />
+        app:tabRippleColor="@android:color/transparent" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_duration_header_layout"

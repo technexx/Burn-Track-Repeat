@@ -19,8 +19,7 @@
         app:tabSelectedTextColor="@color/blue_2"
         app:tabTextAppearance="@style/TabLayoutTextStyle_h1920"
         app:tabRippleColor="@android:color/transparent"
-        app:tabIndicatorFullWidth="true"
-        android:background="@color/alien_black" />
+        app:tabIndicatorFullWidth="true"/>
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/activity_duration_header_layout"

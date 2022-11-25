@@ -661,9 +661,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Change text hint for mode 3 edit popUp.
-  //Todo: Cursor blip thing.
-      //Todo: Look for overlapping actions between clicking and populating (for adapter)
+  //Todo: BUG: Editing activity in stats frag will ADD calories to previous, rather than replace as it does w/ time.
+  
+  //Todo: Add most/least recent sorts.
+      //Todo: Can do after launch.
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
@@ -2206,7 +2207,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mainActionBar.setCustomView(R.layout.custom_bar);
     }
 
-    mainActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#1C1C1C")));
+    mainActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#28282B")));
 
     fab = findViewById(R.id.fab);
     stopWatchLaunchButton = findViewById(R.id.stopwatch_launch_button);
@@ -2581,7 +2582,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void adjustDotRecyclerLayoutMargins() {
     if (mode == 1) {
       if (trackActivityWithinCycle) {
-        dotsRecyclerConstraintLayout_LayoutParams.bottomMargin = dpConv(0);
+        if (workoutTimeIntegerArray.size() <= 8) {
+          dotsRecyclerConstraintLayout_LayoutParams.bottomMargin = dpConv(4);
+        } else {
+          dotsRecyclerConstraintLayout_LayoutParams.bottomMargin = dpConv(-8);
+        }
       } else {
         dotsRecyclerConstraintLayout_LayoutParams.bottomMargin = dpConv(32);
       }
@@ -7054,7 +7059,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
     if (themeMode == NIGHT_MODE) {
       mainView.setBackgroundColor(Color.BLACK);
-      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.alien_black));
+      savedCyclesTabLayout.setBackgroundColor(ContextCompat.getColor(getApplicationContext(), R.color.retro_black));
       savedCyclesTabLayout.setSelectedTabIndicatorColor(Color.WHITE);
 
       fabDrawable.setStroke(3, Color.WHITE);

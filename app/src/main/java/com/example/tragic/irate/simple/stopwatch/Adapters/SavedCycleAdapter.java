@@ -159,7 +159,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     changeSettingsValues = new ChangeSettingsValues(mContext);
 
-    fullViewBackgroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
+    fullViewBackgroundColor = ContextCompat.getColor(mContext, R.color.matte_black);
     highlightColor = ContextCompat.getColor(mContext, R.color.mid_grey);
     completedRoundColor = ContextCompat.getColor(mContext, R.color.onyx);
   }

@@ -99,7 +99,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
         changeSettingsValues = new ChangeSettingsValues(mContext);
 
-        fullViewBackGroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
+        fullViewBackGroundColor = ContextCompat.getColor(mContext, R.color.matte_black);
         highlightColor = ContextCompat.getColor(mContext, R.color.mid_grey);
         completedRoundColor = ContextCompat.getColor(mContext, R.color.onyx);
     }

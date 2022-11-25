@@ -2129,6 +2129,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesComparisonTabLayout.addTab(tabTwo);
         caloriesComparisonTabLayout.addTab(tabThree);
 
+        caloriesComparisonTabLayout.setBackgroundColor((ContextCompat.getColor(getContext(), R.color.retro_black)));
+
         for (int i=0; i<caloriesComparisonTabLayout.getTabCount(); i++) {
             setCustomTextViewOnTab(caloriesComparisonTabLayout.getTabAt(i));
         }
