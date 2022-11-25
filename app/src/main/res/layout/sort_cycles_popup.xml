@@ -13,7 +13,7 @@
     android:theme="@style/MenuTheme">
 
     <TextView
-        android:text="Cycle Title: A - Z"
+        android:text="Workout Title: A - Z"
         android:id="@+id/sort_title_start"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -24,7 +24,7 @@
     </TextView>
 
     <TextView
-        android:text="Cycle Title: Z - A"
+        android:text="Workout Title: Z - A"
         android:id="@+id/sort_title_end"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -34,12 +34,37 @@
         android:layout_marginTop="10dp">
     </TextView>
 
+
+    <TextView
+        android:text="Activity Title: A - Z"
+        android:id="@+id/sort_activity_ascending_from_cycles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_title_end"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp">
+    </TextView>
+
+    <TextView
+        android:text="Activity Title: Z - A"
+        android:id="@+id/sort_activity_descending_from_cycles"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_activity_ascending_from_cycles"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp">
+    </TextView>
+
     <TextView
         android:text="Round Count: Most"
         android:id="@+id/sort_number_high"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_title_end"
+        app:layout_constraintTop_toBottomOf="@id/sort_activity_descending_from_cycles"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp">
@@ -58,23 +83,22 @@
     </TextView>
 
     <TextView
-        android:text="Activity Title: A - Z"
-        android:id="@+id/sort_activity_ascending_from_cycles"
+        android:text="Added: Most Recent"
+        android:id="@+id/sort_most_recent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@id/sort_number_low"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
-        android:layout_marginStart="4dp"
-        android:layout_marginBottom="4dp">
+        android:layout_marginStart="4dp">
     </TextView>
 
     <TextView
-        android:text="Activity Title: Z - A"
-        android:id="@+id/sort_activity_descending_from_cycles"
+        android:text="Added: Least Recent"
+        android:id="@+id/sort_least_recent"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        app:layout_constraintTop_toBottomOf="@id/sort_activity_ascending_from_cycles"
+        app:layout_constraintTop_toBottomOf="@id/sort_most_recent"
         app:layout_constraintStart_toStartOf="parent"
         android:layout_marginTop="10dp"
         android:layout_marginStart="4dp"

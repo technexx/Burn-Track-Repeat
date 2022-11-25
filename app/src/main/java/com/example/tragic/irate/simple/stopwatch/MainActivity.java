@@ -229,10 +229,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   TextView sortCycleTitleAToZ;
   TextView sortCycleTitleZtoA;
-  TextView sortHigh;
-  TextView sortLow;
   TextView sortActivityTitleAtoZ;
   TextView sortActivityTitleZToA;
+  TextView sortHigh;
+  TextView sortLow;
+  TextView sortCycleMostRecent;
+  TextView sortCycleLeastRecent;
 
   TextView sortActivityStatsAToZTextView;
   TextView sortActivityStatsZToATextView;
@@ -256,6 +258,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView sortButton;
 
   int mode = 1;
+
   int sortMode = 1;
   int sortModePom = 1;
   int sortHolder = 1;
@@ -671,8 +674,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Test Moto again because we changed some layout stuff.
 
   //Todo: After adding current app screenshots, update resume on job sites.
-      //Todo: Some updated screenshots for current app + rename it!
-      //Todo: Rounded verision of app icon could use optimizing.
   //Todo: Okay to release a 1.0.1 version!
 
   //Todo: Change back pom cycle times to original (non-testing).
@@ -691,6 +692,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
   //Todo: Anim reset at end of cycle when clicking in and out of timer likely due to visibility set to GONE and VISIBLE again.
 
+  //Todo: Color option for stat times/calories.
   //Todo: Twitter/FB/Insta "Brag" links.
   //Todo: Stats for Pomodoro for future addition.
   //Todo: Option for ringtone selection.
@@ -2371,10 +2373,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void assignSortPopUpLayoutClassesToTheirIds() {
     sortCycleTitleAToZ = sortCyclePopupView.findViewById(R.id.sort_title_start);
     sortCycleTitleZtoA = sortCyclePopupView.findViewById(R.id.sort_title_end);
-    sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
-    sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
     sortActivityTitleAtoZ = sortCyclePopupView.findViewById(R.id.sort_activity_ascending_from_cycles);
     sortActivityTitleZToA = sortCyclePopupView.findViewById(R.id.sort_activity_descending_from_cycles);
+    sortHigh = sortCyclePopupView.findViewById(R.id.sort_number_high);
+    sortLow = sortCyclePopupView.findViewById(R.id.sort_number_low);
+    sortCycleMostRecent = sortCyclePopupView.findViewById(R.id.sort_most_recent);
+    sortCycleLeastRecent = sortCyclePopupView.findViewById(R.id.sort_least_recent);
 
     sortActivityStatsAToZTextView = sortActivitiesPopupView.findViewById(R.id.sort_activity_name_start);
     sortActivityStatsZToATextView = sortActivitiesPopupView.findViewById(R.id.sort_activity_name_end);
@@ -2965,12 +2969,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return view -> {
       TextView textButton = (TextView) view;
 
-      if (textButton.getText().toString().equals("Cycle Title: A - Z")) sortHolder = 1;
-      if (textButton.getText().toString().equals("Cycle Title: Z - A")) sortHolder = 2;
-      if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 3;
-      if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 4;
-      if (textButton.getText().toString().equals("Activity Title: A - Z")) sortHolder = 5;
-      if (textButton.getText().toString().equals("Activity Title: Z - A")) sortHolder = 6;
+      if (textButton.getText().toString().equals("Workout Title: A - Z")) sortHolder = 1;
+      if (textButton.getText().toString().equals("Workout Title: Z - A")) sortHolder = 2;
+      if (textButton.getText().toString().equals("Activity Title: A - Z")) sortHolder = 3;
+      if (textButton.getText().toString().equals("Activity Title: Z - A")) sortHolder = 4;
+      if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 5;
+      if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 6;
+      if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 7;
+      if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 8;
+
+      Log.i("testSort", "sortHolder is " + sortHolder);
 
       if (mode == 1) {
         sortMode = sortHolder;
@@ -3011,16 +3019,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortCycleTitleZtoA.setBackgroundColor(colorToHighlight);
         break;
       case 3:
-        sortHigh.setBackgroundColor(colorToHighlight);
-        break;
-      case 4:
-        sortLow.setBackgroundColor(colorToHighlight);
-        break;
-      case 5:
         sortActivityTitleAtoZ.setBackgroundColor(colorToHighlight);
         break;
-      case 6:
+      case 4:
         sortActivityTitleZToA.setBackgroundColor(colorToHighlight);
+        break;
+      case 5:
+        sortHigh.setBackgroundColor(colorToHighlight);
+        break;
+      case 6:
+        sortLow.setBackgroundColor(colorToHighlight);
+        break;
+      case 7:
+        sortCycleMostRecent.setBackgroundColor(colorToHighlight);
+        break;
+      case 8:
+        sortCycleLeastRecent.setBackgroundColor(colorToHighlight);
         break;
     }
   }
@@ -3029,10 +3043,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int noHighlight = Color.TRANSPARENT;
     sortCycleTitleAToZ.setBackgroundColor(noHighlight);
     sortCycleTitleZtoA.setBackgroundColor(noHighlight);
-    sortHigh.setBackgroundColor(noHighlight);
-    sortLow.setBackgroundColor(noHighlight);
     sortActivityTitleAtoZ.setBackgroundColor(noHighlight);
     sortActivityTitleZToA.setBackgroundColor(noHighlight);
+    sortHigh.setBackgroundColor(noHighlight);
+    sortLow.setBackgroundColor(noHighlight);
+    sortCycleMostRecent.setBackgroundColor(noHighlight);
+    sortCycleLeastRecent.setBackgroundColor(noHighlight);
   }
 
   private View.OnClickListener activitySortOptionListener() {
@@ -3049,21 +3065,29 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortModeForActivities = 2;
         highlightSelectedSortTextViewForStats(sortActivityStatsZToATextView);
       }
-      if (textView.getText().toString().equals("Time: Most")) {
-        sortModeForActivities = 3;
-        highlightSelectedSortTextViewForStats(sortActivityStatsByMostTimeTextView);
-      }
-      if (textView.getText().toString().equals("Time: Least")) {
-        sortModeForActivities = 4;
-        highlightSelectedSortTextViewForStats(sortActivityStatsByLeastTimeTextView);
-      }
       if (textView.getText().toString().equals("Calories: Most")) {
-        sortModeForActivities = 5;
+        sortModeForActivities = 3;
         highlightSelectedSortTextViewForStats(sortActivityStatsByMostCaloriesTextView);
       }
       if (textView.getText().toString().equals("Calories: Least")) {
-        sortModeForActivities = 6;
+        sortModeForActivities = 4;
         highlightSelectedSortTextViewForStats(sortActivityStatsByLeastCaloriesTextView);
+      }
+      if (textView.getText().toString().equals("Time: Most")) {
+        sortModeForActivities = 5;
+        highlightSelectedSortTextViewForStats(sortActivityStatsByMostTimeTextView);
+      }
+      if (textView.getText().toString().equals("Time: Least")) {
+        sortModeForActivities = 6;
+        highlightSelectedSortTextViewForStats(sortActivityStatsByLeastTimeTextView);
+      }
+      if (textView.getText().toString().equals("Added: Most Recent")) {
+        sortModeForActivities = 7;
+        highlightSelectedSortTextViewForStats(sortActivityStatsByLeastTimeTextView);
+      }
+      if (textView.getText().toString().equals("Added: Least Recent")) {
+        sortModeForActivities = 8;
+        highlightSelectedSortTextViewForStats(sortActivityStatsByLeastTimeTextView);
       }
 
       AsyncTask.execute(() -> {
@@ -3139,6 +3163,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortLow.setOnClickListener(cyclesSortOptionListener());
     sortActivityTitleAtoZ.setOnClickListener(cyclesSortOptionListener());
     sortActivityTitleZToA.setOnClickListener(cyclesSortOptionListener());
+    sortCycleMostRecent.setOnClickListener(cyclesSortOptionListener());
+    sortCycleLeastRecent.setOnClickListener(cyclesSortOptionListener());
 
     sortActivityStatsAToZTextView.setOnClickListener(activitySortOptionListener());
     sortActivityStatsZToATextView.setOnClickListener(activitySortOptionListener());
@@ -4752,9 +4778,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void queryAndSortAllCyclesFromMenu() {
     switch (sortMode) {
-      case 0:
-        cyclesList = cyclesDatabase.cyclesDao().loadCyclesByLeastRecent();
-        break;
       case 1:
         cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleAToZ();
         break;
@@ -4762,16 +4785,22 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         cyclesList = cyclesDatabase.cyclesDao().loadCyclesTitleZToA();
         break;
       case 3:
-        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
-        break;
-      case 4:
-        cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
-        break;
-      case 5:
         cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityAToZ();
         break;
-      case 6:
+      case 4:
         cyclesList = cyclesDatabase.cyclesDao().loadCyclesActivityZToA();
+        break;
+      case 5:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesMostItems();
+        break;
+      case 6:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesLeastItems();
+        break;
+      case 7:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesByMostRecent();
+        break;
+      case 8:
+        cyclesList = cyclesDatabase.cyclesDao().loadCyclesByLeastRecent();
         break;
     }
   }
