@@ -661,8 +661,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: BUG: Editing activity in stats frag will ADD calories to previous, rather than replace as it does w/ time.
-  
   //Todo: Add most/least recent sorts.
       //Todo: Can do after launch.
 

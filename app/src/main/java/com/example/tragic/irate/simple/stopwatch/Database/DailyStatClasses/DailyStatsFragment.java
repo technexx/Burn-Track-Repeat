@@ -1219,6 +1219,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 finalNewActivityTime = cappedTimeForStatEdits(finalNewActivityTime, assignedTime, unassignedTime);
 
                 if (!isCustomActivity) {
+                    dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValueUsingMetScore(finalNewActivityTime);
                 } else {
                     double caloriesPerHour = getIsCaloriesPerHourFromSpecifiCustomActivityForSelecteDays(uniqueIdToCheck, activityString);
