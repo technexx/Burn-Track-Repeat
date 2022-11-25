@@ -661,6 +661,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Change text hint for mode 3 edit popUp.
+  //Todo: Cursor blip thing.
+      //Todo: Look for overlapping actions between clicking and populating (for adapter)
+
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test Stopwatch.
@@ -2120,6 +2124,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               fab.setEnabled(true);
             }
 
+            cycleNameEdit.setHint(getString(R.string.cycle_name_hint));
+
             break;
           case 1:
             mode = 3;
@@ -2138,6 +2144,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               fab.setAlpha(1.0f);
               fab.setEnabled(true);
             }
+
+            cycleNameEdit.setHint(getString(R.string.pom_cycle_name_hint));
 
             break;
         }
@@ -2573,7 +2581,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void adjustDotRecyclerLayoutMargins() {
     if (mode == 1) {
       if (trackActivityWithinCycle) {
-        dotsRecyclerConstraintLayout_LayoutParams.bottomMargin = dpConv(-8);
+        dotsRecyclerConstraintLayout_LayoutParams.bottomMargin = dpConv(0);
       } else {
         dotsRecyclerConstraintLayout_LayoutParams.bottomMargin = dpConv(32);
       }
@@ -2773,6 +2781,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     cycles_completed_textView.setText(R.string.cycles_done);
     pom_cycles_completed_textView.setText(R.string.cycles_done);
+
+    cycleNameEdit.setHint(getString(R.string.cycle_name_hint));
   }
 
   private void retrieveAndImplementCycleSorting() {

@@ -42,7 +42,6 @@
         android:textColorHint="@color/circular_progress_default_subtitle"
         android:textColor="@color/white"
         android:textSize="20sp"
-        android:hint="@string/cycle_name"
         android:background="@null"
         android:textCursorDrawable="@drawable/edit_text_cursor"
         android:singleLine="true"

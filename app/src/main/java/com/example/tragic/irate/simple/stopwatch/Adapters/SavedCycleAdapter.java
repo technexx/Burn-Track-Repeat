@@ -161,7 +161,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
     fullViewBackgroundColor = ContextCompat.getColor(mContext, R.color.night_shadow);
     highlightColor = ContextCompat.getColor(mContext, R.color.mid_grey);
-    completedRoundColor = ContextCompat.getColor(mContext, R.color.dark_grey);
+    completedRoundColor = ContextCompat.getColor(mContext, R.color.onyx);
   }
 
   public void setTimerIsPaused(boolean paused) {
