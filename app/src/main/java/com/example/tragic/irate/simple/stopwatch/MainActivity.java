@@ -2822,6 +2822,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
 
     highlightCyclesSortTextView();
+    highlightPomSortTextView();
   }
 
   private void instantiateTdeeSpinnersAndSetThemOnAdapters() {
