@@ -678,8 +678,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Index crash w/ first tdee spinner using oob position (33). getCategoryList() in TDEEChosen...() class is what populates the array.
       //Todo: Could it be populating it more than once?
 
-  //Todo: Sorting in stats frag may want to not auto-sort each addition.
-      //Todo: Should also have default highlight in sort menu, otherwise it's confusing when it auto-sorts before user tries to sort.
+  //Todo: Add most/least recent for activities and foods in stats fragment.
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
