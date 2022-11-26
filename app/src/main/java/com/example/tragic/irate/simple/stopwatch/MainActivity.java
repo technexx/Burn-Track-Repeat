@@ -676,7 +676,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: 4 digit (e.g. 10:00) rounds decreaing to 3-digit can cause a 3-line string to shrink to a 2-line string.
       //Todo: Inverse would likely be true for infinity rounds.
       //Todo: Can just make 4 digits the default (e.g. 05:00).
-  //Todo: Stopwatch textSize does not decrease post-60 seconds.
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
@@ -1977,8 +1976,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void stopWatchLaunchLogic() {
-    setInitialTextSizeForStopWatch();
-
     stopWatchTimeTextView.setText(displayTime);
     msTimeTextView.setText(displayMs);
     laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
@@ -5283,7 +5280,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchTimeTextView.setText(displayTime);
         msTimeTextView.setText(displayMs);
 
-//        decreaseTextSizeForTimersForStopWatch(stopWatchTotalTime);
+        decreaseTextSizeForTimersForStopWatch(stopWatchTotalTime);
 
         if (stopWatchTotalTime < 3600000) {
           mHandler.postDelayed(this, 10);
