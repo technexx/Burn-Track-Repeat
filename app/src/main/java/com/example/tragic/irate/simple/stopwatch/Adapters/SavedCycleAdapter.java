@@ -340,6 +340,9 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     });
 
     workoutHolder.fullView.setOnClickListener(v -> {
+      Log.i("testClick", "highlight mode on cycles recycler row click is " + mHighlightMode);
+      Log.i("testClick", "active boolean on cycles recycler row click is " + mActiveCycle);
+
       boolean changed = false;
       if (!mHighlightMode) {
         if (mActiveCycle) {

@@ -671,6 +671,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Instance of delayed/non-responsive click in cycles after reset.
+      //Todo: May have been related to recently ended pom cycle.
+  //Todo: Pom break time not iterating.
+      //Todo: Pause/resume begins iteration of work.
+  //Todo: 4 digit (e.g. 10:00) rounds decreaing to 3-digit can cause a 3-line string to shrink to a 2-line string.
+      //Todo: Inverse would likely be true for infinity rounds.
+  //Todo: Stopwatch textSize does not decrease post-60 seconds.
+
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test Stopwatch.
@@ -5642,6 +5650,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     TimerIteration timerIteration = newTimerIterationInstance();
     TextViewDisplaySync textViewDisplaySync = textViewDisplaySyncForModeThree();
 
+    setTypeOfPomCycleTimeToIterate();
+
     if (POM_CYCLE_TIME_TO_ITERATE == POM_CYCLE_WORK) {
       timerIteration.setPreviousTotal(totalCycleWorkTimeInMillis);
     }
@@ -6180,7 +6190,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       roundDownPomCycleTimeValues();
     } else {
       timeLeftForPomCyclesTimer.setText("0");
-//      setNotificationValues();
       roundPomCycleTimeValuesToNearestThousandth();
     }
 
@@ -6196,6 +6205,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     setHasTextSizeChangedForTimers(false);
     next_pom_round.setEnabled(false);
+
     setTotalCycleTimeValuesToTextView();
     removePomCycleTimeRunnable();
 
@@ -6355,7 +6365,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             modeThreeStartObjectAnimator();
             startPomTimer();
           }
-          postPomCycleTimeRunnable();
         } else {
           currentRoundForModeThree = 0;
           progressBarForPom.setProgress(0);
@@ -6365,6 +6374,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           pomCyclesCompleted ++;
           stateOfTimers.setModeThreeTimerEnded(true);
+
+          postWorkAndRestTimeRunnable();
         }
 
         stateOfTimers.setModeThreeTimerDisabled(false);
@@ -6537,7 +6548,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           savedPomCycleAdapter.setCycleAsActive();
           resetButtonForPomCycles.setVisibility(View.GONE);
 
-          postPomCycleTimeRunnable();
+          postWorkAndRestTimeRunnable();
         }
         AsyncTask.execute(globalSaveTotalTimesAndCaloriesInDatabaseRunnable);
       } else {
@@ -6546,7 +6557,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-  private void postPomCycleTimeRunnable() {
+  private void postWorkAndRestTimeRunnable() {
     runnableForWorkAndRestTotalTimes = runnableForWorkAndRestTotalTimes();
 
     if (!mHandler.hasCallbacks(runnableForWorkAndRestTotalTimes)) {
