@@ -592,6 +592,9 @@ public class DailyStatsAccess {
         String activityToDelete = totalActivitiesListForSelectedDuration.get(position);
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
+//            Log.i("testDelete", "times in list during deletion are " + mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
+//            Log.i("testDelete", "calories in list during deletion are " + mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
+
             if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToDelete)) {
                 mStatsForEachActivity = mStatsForEachActivityList.get(i);
                 cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);

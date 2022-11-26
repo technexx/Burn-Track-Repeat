@@ -732,7 +732,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void calendarDateChangeLogic() {
-        dailyStatsAdapter.turnOffEditMode();
         dailyStatsAdapter.getItemCount();
 
         caloriesConsumedAdapter.turnOffEditMode();
@@ -765,7 +764,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
         getActivity().runOnUiThread(()-> {
-            //Todo: Occurs only here.
+            dailyStatsAdapter.turnOffEditMode();
+
             dailyStatsAdapter.notifyDataSetChanged();
             caloriesConsumedAdapter.notifyDataSetChanged();
 
@@ -848,7 +848,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             getActivity().runOnUiThread(()-> {
                 setStatDurationViews(currentStatDurationMode);
 
-                dailyStatsAdapter.turnOffEditMode();
                 dailyStatsAdapter.getItemCount();
 
                 caloriesConsumedAdapter.turnOffEditMode();

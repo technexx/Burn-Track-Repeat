@@ -671,6 +671,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: MET bug is from add followed by edit. Adds too many calories.
+
   //Todo: Sorting in stats frag may want to not auto-sort each addition.
       //Todo: Should also have default highlight in sort menu, otherwise it's confusing when it auto-sorts before user tries to sort.
 
@@ -690,7 +692,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
-  //Todo: MET score might show an add->edit->edit b0rk. Reverted back from bad fix. Unable to replicate again.
+  //Todo: Positional crash on single activity deletion may be due to size returned in adapter. It's set to return +1/+2 for our header + footer.
+  //Todo: May only occur after edits.
+  //Todo: Hard to replicate.
   //Todo: saveAddedOrEditedCycleASyncRunnable() now only executes in timer launch if from edit cycle. Should be fine but keep it in mind.
   //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
   //Todo: Crash from updateActiveTimerPopUpStatsIfEdited() in globalSaveTotalTimesAndCaloriesInDatabaseRunnable() that we haven't replicated.

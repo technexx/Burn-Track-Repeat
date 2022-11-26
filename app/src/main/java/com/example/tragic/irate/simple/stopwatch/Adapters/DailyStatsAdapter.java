@@ -241,10 +241,16 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setTypeface(robotoMedium);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(robotoMedium);
 
-            mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
-            mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
-            //Todo: 3/3 index exception after deleting from list of 4 activities.
-            mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+            Log.i("testDelete", "set time list size is " + mSetTimes.size());
+            Log.i("testDelete", "calorie list size is " + mCaloriesBurned.size());
+
+            if ((position-1) < mActivities.size()) {
+                mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
+                mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
+                //Todo: 3/3 index exception after deleting from list of 4 activities.
+                //Todo: Fetches at (position-1), so getItemCount() must be returning list size +2, consistent w/ edit mode.
+                mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
+            }
 
             mMainViewHolder.activityTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
             mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
