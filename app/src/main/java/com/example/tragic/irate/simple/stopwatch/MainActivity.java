@@ -2861,6 +2861,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     highlightCyclesSortTextView();
     highlightPomSortTextView();
+    highlightSelectedSortTextViewForActivitiesInStatsFragment();
+    highlightSelectedSortTextViewForFoodsInStatsFragment();
   }
 
   private void instantiateTdeeSpinnersAndSetThemOnAdapters() {
