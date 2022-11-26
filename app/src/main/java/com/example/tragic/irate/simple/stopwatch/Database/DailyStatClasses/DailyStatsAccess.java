@@ -613,6 +613,11 @@ public class DailyStatsAccess {
 
     public void setMetScoreFromDatabaseList(int position) {
         mMetScore = mStatsForEachActivityList.get(position).getMetScore();
+
+        String activity = mStatsForEachActivityList.get(position).getActivity();
+        Log.i("testEdit", "mStats activity in position is " + activity);
+        Log.i("testEdit", "mStats MET score is " + mMetScore);
+
     }
 
     public void setIsActivityCustomBoolean(boolean isCustom) {

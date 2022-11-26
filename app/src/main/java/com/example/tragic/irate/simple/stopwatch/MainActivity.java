@@ -671,8 +671,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Instance of delayed/non-responsive click in cycles after reset.
-      //Todo: May have been related to recently ended pom cycle.
+  //Todo: Sorting in stats frag may want to not auto-sort each addition.
+      //Todo: Should also have default highlight in sort menu, otherwise it's confusing when it auto-sorts before user tries to sort.
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
@@ -690,6 +690,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
+  //Todo: MET score might show an add->edit->edit b0rk. Reverted back from bad fix. Unable to replicate again.
   //Todo: saveAddedOrEditedCycleASyncRunnable() now only executes in timer launch if from edit cycle. Should be fine but keep it in mind.
   //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
   //Todo: Crash from updateActiveTimerPopUpStatsIfEdited() in globalSaveTotalTimesAndCaloriesInDatabaseRunnable() that we haven't replicated.

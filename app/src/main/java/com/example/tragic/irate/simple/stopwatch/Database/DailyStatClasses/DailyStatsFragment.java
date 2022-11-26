@@ -765,6 +765,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
         getActivity().runOnUiThread(()-> {
+            //Todo: Occurs only here.
             dailyStatsAdapter.notifyDataSetChanged();
             caloriesConsumedAdapter.notifyDataSetChanged();
 
@@ -1170,6 +1171,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void activityEditItemSelected(int position) {
+        Log.i("testEdit", "position selected to edit is " + position);
+
         this.mPositionToEdit = position;
         launchActivityEditPopUpWithEditTextValuesSet(position);
         setDefaultCustomActivityAdditionViews();
@@ -1219,7 +1222,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 finalNewActivityTime = cappedTimeForStatEdits(finalNewActivityTime, assignedTime, unassignedTime);
 
                 if (!isCustomActivity) {
-                    dailyStatsAccess.setMetScoreFromSpinner(retrieveMetScoreFromSubCategoryPosition());
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValueUsingMetScore(finalNewActivityTime);
                 } else {
                     double caloriesPerHour = getIsCaloriesPerHourFromSpecifiCustomActivityForSelecteDays(uniqueIdToCheck, activityString);
