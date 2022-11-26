@@ -268,7 +268,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   int sortMode = 1;
   int sortModePom = 1;
-  int sortHolder = 1;
 
   int sortModeForActivities;
   int sortModeForFoodConsumed;
@@ -2822,8 +2821,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
     int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
 
-    sortHolder = sortMode;
-    highlightSortTextView();
+    highlightCyclesSortTextView();
   }
 
   private void instantiateTdeeSpinnersAndSetThemOnAdapters() {
@@ -2994,75 +2992,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return view -> {
       TextView textButton = (TextView) view;
 
-      if (textButton.getText().toString().equals("Workout Title: A - Z")) sortHolder = 1;
-      if (textButton.getText().toString().equals("Workout Title: Z - A")) sortHolder = 2;
-      if (textButton.getText().toString().equals("Activity Title: A - Z")) sortHolder = 3;
-      if (textButton.getText().toString().equals("Activity Title: Z - A")) sortHolder = 4;
-      if (textButton.getText().toString().equals("Round Count: Most")) sortHolder = 5;
-      if (textButton.getText().toString().equals("Round Count: Least")) sortHolder = 6;
-      if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 7;
-      if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 8;
+      if (textButton.getText().toString().equals("Workout Title: A - Z")) sortMode = 1;
+      if (textButton.getText().toString().equals("Workout Title: Z - A")) sortMode = 2;
+      if (textButton.getText().toString().equals("Activity Title: A - Z")) sortMode = 3;
+      if (textButton.getText().toString().equals("Activity Title: Z - A")) sortMode = 4;
+      if (textButton.getText().toString().equals("Round Count: Most")) sortMode = 5;
+      if (textButton.getText().toString().equals("Round Count: Least")) sortMode = 6;
+      if (textButton.getText().toString().equals("Added: Most Recent")) sortMode = 7;
+      if (textButton.getText().toString().equals("Added: Least Recent")) sortMode = 8;
 
-      sortMode = sortHolder;
-
-      highlightSortTextView();
-      unHighlightSortTextViews();
+      unHighlightCyclesSortTextView();
+      highlightCyclesSortTextView();
 
       AsyncTask.execute(() -> {
-        if (mode == 1) queryAndSortAllCyclesFromMenu();
-        if (mode == 3) queryAndSortAllPomCyclesFromMenu();
+        queryAndSortAllCyclesFromMenu();
 
         runOnUiThread(() -> {
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-          if (mode == 1) savedCycleAdapter.notifyDataSetChanged();
-          if (mode == 3) savedPomCycleAdapter.notifyDataSetChanged();
+          savedCycleAdapter.notifyDataSetChanged();
         });
       });
 
       prefEdit.putInt("sortMode", sortMode);
-      prefEdit.putInt("sortModePom", sortModePom);
       prefEdit.apply();
 
       sortPopupWindow.dismiss();
     };
   }
 
-  private View.OnClickListener pomCyclesSortOptionListener() {
-    return view -> {
-      TextView textButton = (TextView) view;
-
-      if (textButton.getText().toString().equals("Task Title: A - Z")) sortHolder = 1;
-      if (textButton.getText().toString().equals("Task Title: Z - A")) sortHolder = 2;
-      if (textButton.getText().toString().equals("Added: Most Recent")) sortHolder = 3;
-      if (textButton.getText().toString().equals("Added: Least Recent")) sortHolder = 4;
-
-      sortModePom = sortHolder;
-
-      unHighlightPomSortTextViews();
-      highlightPomSortTextView();
-
-      AsyncTask.execute(() -> {
-        queryAndSortAllPomCyclesFromMenu();
-
-        runOnUiThread(() -> {
-          clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
-          savedPomCycleAdapter.notifyDataSetChanged();
-        });
-
-        prefEdit.putInt("sortModePom", sortModePom);
-        prefEdit.apply();
-
-        sortPopupWindow.dismiss();
-      });
-
-    };
-  }
-
-  private void highlightSortTextView() {
+  private void highlightCyclesSortTextView() {
     int colorToHighlight = getResources().getColor(R.color.test_highlight);
-    switch (sortHolder) {
+
+    switch (sortMode) {
       case 1:
-        sortCycleTitleAToZ.setBackgroundColor(colorToHighlight);
+        sortCycleTitleAToZ.setBackgroundColor(getResources().getColor(R.color.purple_2));
         break;
       case 2:
         sortCycleTitleZtoA.setBackgroundColor(colorToHighlight);
@@ -3088,9 +3051,53 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+
+  private void unHighlightCyclesSortTextView() {
+    int noHighlight = Color.TRANSPARENT;
+
+    sortCycleTitleAToZ.setBackgroundColor(noHighlight);
+    sortCycleTitleZtoA.setBackgroundColor(noHighlight);
+    sortActivityTitleAtoZ.setBackgroundColor(noHighlight);
+    sortActivityTitleZToA.setBackgroundColor(noHighlight);
+    sortHigh.setBackgroundColor(noHighlight);
+    sortLow.setBackgroundColor(noHighlight);
+    sortCycleMostRecent.setBackgroundColor(noHighlight);
+    sortCycleLeastRecent.setBackgroundColor(noHighlight);
+  }
+
+  private View.OnClickListener pomCyclesSortOptionListener() {
+    return view -> {
+      TextView textButton = (TextView) view;
+
+      if (textButton.getText().toString().equals("Task Title: A - Z")) sortModePom = 1;
+      if (textButton.getText().toString().equals("Task Title: Z - A")) sortModePom = 2;
+      if (textButton.getText().toString().equals("Added: Most Recent")) sortModePom = 3;
+      if (textButton.getText().toString().equals("Added: Least Recent")) sortModePom = 4;
+
+      unHighlightPomSortTextViews();
+      highlightPomSortTextView();
+
+      AsyncTask.execute(() -> {
+        queryAndSortAllPomCyclesFromMenu();
+
+        runOnUiThread(() -> {
+          clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
+          savedPomCycleAdapter.notifyDataSetChanged();
+        });
+
+        prefEdit.putInt("sortModePom", sortModePom);
+        prefEdit.apply();
+
+        sortPopupWindow.dismiss();
+      });
+
+    };
+  }
+
   private void highlightPomSortTextView() {
     int colorToHighlight = getResources().getColor(R.color.test_highlight);
-    switch (sortHolder) {
+
+    switch (sortModePom) {
       case 1:
         sortPomCycleTitleAtoZ.setBackgroundColor(colorToHighlight);
         break;
@@ -3104,18 +3111,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortPomCycleLeastRecent.setBackgroundColor(colorToHighlight);
         break;
     }
-  }
-
-  private void unHighlightSortTextViews() {
-    int noHighlight = Color.TRANSPARENT;
-    sortCycleTitleAToZ.setBackgroundColor(noHighlight);
-    sortCycleTitleZtoA.setBackgroundColor(noHighlight);
-    sortActivityTitleAtoZ.setBackgroundColor(noHighlight);
-    sortActivityTitleZToA.setBackgroundColor(noHighlight);
-    sortHigh.setBackgroundColor(noHighlight);
-    sortLow.setBackgroundColor(noHighlight);
-    sortCycleMostRecent.setBackgroundColor(noHighlight);
-    sortCycleLeastRecent.setBackgroundColor(noHighlight);
   }
 
   private void unHighlightPomSortTextViews() {
