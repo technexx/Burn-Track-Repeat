@@ -671,8 +671,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: FAB enabled despite not changing alpha in a few instances. Leads to crashes.
-
   //Todo: Instance of delayed/non-responsive click in cycles after reset.
       //Todo: May have been related to recently ended pom cycle.
 
@@ -1502,9 +1500,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
+  //Disabled on FAB launch and timer launches.
   private void disableMainViewClicks() {
     fab.setEnabled(false);
-    stopWatchLaunchButton.setEnabled(false);
+//    stopWatchLaunchButton.setEnabled(false);
     sortButton.setEnabled(false);
 
     savedCycleAdapter.disableRowClicking();
@@ -1515,7 +1514,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void enableMainViewClicks() {
     fab.setEnabled(true);
-    stopWatchLaunchButton.setEnabled(true);
+//    stopWatchLaunchButton.setEnabled(true);
     sortButton.setEnabled(true);
 
     savedCycleAdapter.enableRowClicking();
@@ -1616,7 +1615,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (!stateOfTimers.isModeOneTimerActive()) {
         enableMainViewClicks();
-        Log.i("testEnable", "mode one timer not active and we are enabling main view clicks");
+        Log.i("testEnable", "In Timer Dismissal: Mode one timer not active and we are enabling main view clicks");
       }
     });
 
@@ -1631,7 +1630,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (!stateOfTimers.isModeThreeTimerActive()) {
         enableMainViewClicks();
-        Log.i("testEnable", "mode three timer not active and we are enabling main view clicks");
+        Log.i("testEnable", "In Timer Dismissal: Mode three timer not active and we are enabling main view clicks");
       }
 
     });
@@ -2151,6 +2150,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
             toggleSortViewsBetweenWorkoutAndPomodoro(SORTING_CYCLES);
 
+            if (!stateOfTimers.isModeOneTimerActive()) {
+              enableMainViewClicks();
+
+              Log.i("testEnable", "In Tab Switch: Mode one timer not active and we are enabling main view clicks");
+
+            }
+
             break;
           case 1:
             mode = 3;
@@ -2173,6 +2179,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             cycleNameEdit.setHint(getString(R.string.pom_cycle_name_hint));
 
             toggleSortViewsBetweenWorkoutAndPomodoro(SORTING_POMODORO);
+
+            if (!stateOfTimers.isModeThreeTimerActive()) {
+              enableMainViewClicks();
+
+              Log.i("testEnable", "In Tab Switch: Mode three timer not active and we are enabling main view clicks");
+
+            }
 
             break;
         }
@@ -6821,6 +6834,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeOneTimerDisabled(false);
     stateOfTimers.setModeOneTimerActive(false);
 
+    enableMainViewClicks();
+
     cyclesTextSizeHasChanged = false;
     vibrator.cancel();
     next_round.setEnabled(true);
@@ -6926,6 +6941,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeThreeTimerEnded(false);
     stateOfTimers.setModeThreeTimerDisabled(false);
     stateOfTimers.setModeThreeTimerActive(false);
+
+    enableMainViewClicks();
 
     pomCyclesTextSizeHasChanged = false;
     next_pom_round.setEnabled(true);
