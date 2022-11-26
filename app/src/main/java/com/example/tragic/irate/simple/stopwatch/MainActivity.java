@@ -534,7 +534,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int CYCLE_SETS = 0;
   int CYCLE_BREAKS = 1;
   int POM_CYCLE_WORK = 0;
-  int POM_CYCLE_REST = 2;
+  int POM_CYCLE_REST = 1;
 
   int TOTAL_DAILY_TIME = 0;
   int SINGLE_ACTIVITY_TIME = 1;
@@ -673,10 +673,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: Instance of delayed/non-responsive click in cycles after reset.
       //Todo: May have been related to recently ended pom cycle.
-  //Todo: Pom break time not iterating.
-      //Todo: Pause/resume begins iteration of work.
   //Todo: 4 digit (e.g. 10:00) rounds decreaing to 3-digit can cause a 3-line string to shrink to a 2-line string.
       //Todo: Inverse would likely be true for infinity rounds.
+      //Todo: Can just make 4 digits the default (e.g. 05:00).
   //Todo: Stopwatch textSize does not decrease post-60 seconds.
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
@@ -6365,6 +6364,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             modeThreeStartObjectAnimator();
             startPomTimer();
           }
+
+          postWorkAndRestTimeRunnable();
         } else {
           currentRoundForModeThree = 0;
           progressBarForPom.setProgress(0);
@@ -6374,8 +6375,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           pomCyclesCompleted ++;
           stateOfTimers.setModeThreeTimerEnded(true);
-
-          postWorkAndRestTimeRunnable();
         }
 
         stateOfTimers.setModeThreeTimerDisabled(false);
