@@ -671,6 +671,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: FAB enabled despite not changing alpha in a few instances. Leads to crashes.
+
   //Todo: Instance of delayed/non-responsive click in cycles after reset.
       //Todo: May have been related to recently ended pom cycle.
 
@@ -1611,8 +1613,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       timerPopUpDismissalLogic();
 
       toggleCustomActionBarButtonVisibilities(false);
-      enableMainViewClicks();
 
+      if (!stateOfTimers.isModeOneTimerActive()) {
+        enableMainViewClicks();
+        Log.i("testEnable", "mode one timer not active and we are enabling main view clicks");
+      }
     });
 
     pomTimerPopUpWindow.setOnDismissListener(() -> {
@@ -1623,7 +1628,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       pomTimerPopUpDismissalLogic();
 
       toggleCustomActionBarButtonVisibilities(false);
-      enableMainViewClicks();
+
+      if (!stateOfTimers.isModeThreeTimerActive()) {
+        enableMainViewClicks();
+        Log.i("testEnable", "mode three timer not active and we are enabling main view clicks");
+      }
+
     });
 
     editPopUpLayout.setOnClickListener(v-> {
@@ -3390,6 +3400,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           positionOfSelectedCycleForModeOne = 0;
           sortedPositionOfSelectedCycleForModeOne = 0;
+
+          resetCyclesTimer();
         });
       }
     }
@@ -3406,6 +3418,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
           positionOfSelectedCycleForModeThree = 0;
           sortedPositionOfSelectedCycleForModeThree = 0;
+
+          resetPomCyclesTimer();
         });
       }
     }
@@ -3635,7 +3649,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       removeCycleHighlights();
     }
 
-    fab.setEnabled(true);
+    //Disabled if timer launches from this popUp, and remains enabled if we simply dismiss to Main.
+    enableMainViewClicks();
+
     cycleRoundsAdapter.setIsRoundCurrentlySelectedBoolean(false);
     cycleRoundsAdapter.notifyDataSetChanged();
 
