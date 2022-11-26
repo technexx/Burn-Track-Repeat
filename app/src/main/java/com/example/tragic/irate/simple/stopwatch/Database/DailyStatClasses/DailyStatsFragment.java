@@ -479,6 +479,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
+            Log.i("testToggle", "toggling edit mode");
             if (dailyStatsRecyclerView.isShown()) {
                 dailyStatsAdapter.toggleEditMode();
                 scrollToBottomOfDailyStatsRecycler();
@@ -1170,8 +1171,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     @Override
     public void activityEditItemSelected(int position) {
-        Log.i("testEdit", "position selected to edit is " + position);
-
         this.mPositionToEdit = position;
         launchActivityEditPopUpWithEditTextValuesSet(position);
         setDefaultCustomActivityAdditionViews();
@@ -1220,6 +1219,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 finalNewActivityTime = newActivityTime;
                 finalNewActivityTime = cappedTimeForStatEdits(finalNewActivityTime, assignedTime, unassignedTime);
 
+                //Todo: I'll bet this is due to sorting!
                 if (!isCustomActivity) {
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValueUsingMetScore(finalNewActivityTime);
                 } else {
@@ -1305,6 +1305,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double retrievedMetScore = dailyStatsAccess.getMetScore();
         double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
         newCaloriesForActivity = ((double) (millis/1000) * caloriesBurnedPerSecond);
+
+        Log.i("testEdit", "mStats MET score during EDIT is " + dailyStatsAccess.getMetScore());
+        Log.i("testEdit", "calories returned during EDIT are " + newCaloriesForActivity);
 
         return newCaloriesForActivity;
     }

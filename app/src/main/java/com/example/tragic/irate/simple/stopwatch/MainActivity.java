@@ -671,7 +671,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: MET bug is from add followed by edit. Adds too many calories.
+  //Todo: MET bug is from add followed by edit. Adds too many calories. Seems to add previously manipulated row's total to edited value.
+  //Todo: Adding an activity at 24hr cap shows +1 time in activities and "-0" in mbr.
+  //Todo: Had a crash after trying to delete activity row right after app launch.
+  //Todo: Index crash w/ first tdee spinner using oob position (33). getCategoryList() in TDEEChosen...() class is what populates the array.
+      //Todo: Could it be populating it more than once?
 
   //Todo: Sorting in stats frag may want to not auto-sort each addition.
       //Todo: Should also have default highlight in sort menu, otherwise it's confusing when it auto-sorts before user tries to sort.
@@ -692,7 +696,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
-  //Todo: Positional crash on single activity deletion may be due to size returned in adapter. It's set to return +1/+2 for our header + footer.
+  //Todo: Positional crash on single activity deletion may be due to size returned in adapter. It's set to return +2 during editMode. Commented in adapter.
   //Todo: May only occur after edits.
   //Todo: Hard to replicate.
   //Todo: saveAddedOrEditedCycleASyncRunnable() now only executes in timer launch if from edit cycle. Should be fine but keep it in mind.

@@ -592,9 +592,6 @@ public class DailyStatsAccess {
         String activityToDelete = totalActivitiesListForSelectedDuration.get(position);
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
-//            Log.i("testDelete", "times in list during deletion are " + mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
-//            Log.i("testDelete", "calories in list during deletion are " + mStatsForEachActivityList.get(i).getTotalCaloriesBurnedForEachActivity());
-
             if (mStatsForEachActivityList.get(i).getActivity().equalsIgnoreCase(activityToDelete)) {
                 mStatsForEachActivity = mStatsForEachActivityList.get(i);
                 cyclesDatabase.cyclesDao().deleteStatsForEachActivity(mStatsForEachActivity);
@@ -618,8 +615,8 @@ public class DailyStatsAccess {
         mMetScore = mStatsForEachActivityList.get(position).getMetScore();
 
         String activity = mStatsForEachActivityList.get(position).getActivity();
-        Log.i("testEdit", "mStats activity in position is " + activity);
-        Log.i("testEdit", "mStats MET score is " + mMetScore);
+//        Log.i("testEdit", "mStats activity in position during EDIT is " + activity);
+        Log.i("testEdit", "mStats MET score during EDIT is " + mMetScore);
 
     }
 
