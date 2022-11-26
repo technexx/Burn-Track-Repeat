@@ -269,8 +269,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   int sortMode = 1;
   int sortModePom = 1;
 
-  int sortModeForActivities;
-  int sortModeForFoodConsumed;
+  int sortModeForActivities = 1;
+  int sortModeForFoodConsumed = 1;
 
   int positionOfSelectedCycleForModeOne;
   int positionOfSelectedCycleForModeThree;
@@ -672,6 +672,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: MET bug is from add followed by edit. Adds too many calories. Seems to add previously manipulated row's total to edited value.
+      //Todo: May be due to sorting?
   //Todo: Adding an activity at 24hr cap shows +1 time in activities and "-0" in mbr.
   //Todo: Had a crash after trying to delete activity row right after app launch.
   //Todo: Index crash w/ first tdee spinner using oob position (33). getCategoryList() in TDEEChosen...() class is what populates the array.
@@ -2855,7 +2856,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   private void retrieveAndImplementCycleSorting() {
     sortMode = sharedPreferences.getInt("sortMode", 1);
     sortModePom = sharedPreferences.getInt("sortModePom", 1);
-    int checkMarkPosition = sharedPreferences.getInt("checkMarkPosition", 0);
+    sortModeForActivities = sharedPreferences.getInt("sortModeForActivities", 1);
+    sortModeForFoodConsumed = sharedPreferences.getInt("sortModeForFoodConsumed", 1);
 
     highlightCyclesSortTextView();
     highlightPomSortTextView();
@@ -3163,79 +3165,40 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     return view -> {
       TextView textView = (TextView) view;
 
-      unHighlightAllSortTextViewsForActivityStats();
-
       if (textView.getText().toString().equals("Activity Name: A - Z")) {
         sortModeForActivities = 1;
-        highlightSelectedSortTextViewForStats(sortActivityStatsAToZTextView);
       }
       if (textView.getText().toString().equals("Activity Name: Z - A")) {
         sortModeForActivities = 2;
-        highlightSelectedSortTextViewForStats(sortActivityStatsZToATextView);
-      }
-      if (textView.getText().toString().equals("Calories: Most")) {
-        sortModeForActivities = 3;
-        highlightSelectedSortTextViewForStats(sortActivityStatsByMostCaloriesTextView);
-      }
-      if (textView.getText().toString().equals("Calories: Least")) {
-        sortModeForActivities = 4;
-        highlightSelectedSortTextViewForStats(sortActivityStatsByLeastCaloriesTextView);
       }
       if (textView.getText().toString().equals("Time: Most")) {
-        sortModeForActivities = 5;
-        highlightSelectedSortTextViewForStats(sortActivityStatsByMostTimeTextView);
+        sortModeForActivities = 3;
       }
       if (textView.getText().toString().equals("Time: Least")) {
-        sortModeForActivities = 6;
-        highlightSelectedSortTextViewForStats(sortActivityStatsByLeastTimeTextView);
+        sortModeForActivities = 4;
       }
+      if (textView.getText().toString().equals("Calories: Most")) {
+        sortModeForActivities = 5;
+      }
+      if (textView.getText().toString().equals("Calories: Least")) {
+        sortModeForActivities = 6;
+      }
+
+      unHighlightAllSortTextViewsForActivityStats();
+      highlightSelectedSortTextViewForActivitiesInStatsFragment();
 
       AsyncTask.execute(() -> {
         dailyStatsFragment.setActivitySortMode(sortModeForActivities);
         dailyStatsFragment.sortActivityStatsAsACallFromMainActivity();
         runOnUiThread(() -> {
           sortPopupWindow.dismiss();
+
+          prefEdit.putInt("sortModeForActivities", sortModeForActivities);
+          prefEdit.apply();
+
         });
       });
     };
-  }
-
-  private View.OnClickListener foodConsumedSortOptionListener() {
-    return view -> {
-      TextView textView = (TextView) view;
-
-      unHighlightAllSortTextViewsForFoodConsumedStats();
-
-      if (textView.getText().toString().equals("Food Name: A - Z")) {
-        sortModeForFoodConsumed = 1;
-        highlightSelectedSortTextViewForStats(sortFoodConsumedStatsAToZTextView);
-      }
-      if (textView.getText().toString().equals("Food Name: Z - A")) {
-        sortModeForFoodConsumed = 2;
-        highlightSelectedSortTextViewForStats(sortFoodConsumedStatsZToATextView);
-      }
-      if (textView.getText().toString().equals("Calories: Most")) {
-        sortModeForFoodConsumed = 3;
-        highlightSelectedSortTextViewForStats(sortFoodConsumedCaloriesByMostTextView);
-      }
-      if (textView.getText().toString().equals("Calories: Least")) {
-        sortModeForFoodConsumed = 4;
-        highlightSelectedSortTextViewForStats(sortFoodConsumedCaloriesByLeastTextView);
-      }
-
-      AsyncTask.execute(() -> {
-        dailyStatsFragment.setFoodConsumedSortMode(sortModeForFoodConsumed);
-        dailyStatsFragment.sortFoodConsumedStatsAsACallFromMainActivity();
-        runOnUiThread(() -> {
-          sortPopupWindow.dismiss();
-        });
-      });
-    };
-  }
-
-  private void highlightSelectedSortTextViewForStats(TextView textView) {
-    int colorToHighlight = getResources().getColor(R.color.test_highlight);
-    textView.setBackgroundColor(colorToHighlight);
   }
 
   private void unHighlightAllSortTextViewsForActivityStats() {
@@ -3248,12 +3211,89 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityStatsByLeastCaloriesTextView.setBackgroundColor(noHighlight);
   }
 
+  private void highlightSelectedSortTextViewForActivitiesInStatsFragment() {
+    int colorToHighlight = getResources().getColor(R.color.test_highlight);
+
+    switch (sortModeForActivities) {
+      case 1:
+        sortActivityStatsAToZTextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 2:
+        sortActivityStatsZToATextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 3:
+        sortActivityStatsByMostTimeTextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 4:
+        sortActivityStatsByLeastTimeTextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 5:
+        sortActivityStatsByMostCaloriesTextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 6:
+        sortActivityStatsByLeastTimeTextView.setBackgroundColor(colorToHighlight);
+        break;
+    }
+  }
+
+  private View.OnClickListener foodConsumedSortOptionListener() {
+    return view -> {
+      TextView textView = (TextView) view;
+
+      if (textView.getText().toString().equals("Food Name: A - Z")) {
+        sortModeForFoodConsumed = 1;
+      }
+      if (textView.getText().toString().equals("Food Name: Z - A")) {
+        sortModeForFoodConsumed = 2;
+      }
+      if (textView.getText().toString().equals("Calories: Most")) {
+        sortModeForFoodConsumed = 3;
+      }
+      if (textView.getText().toString().equals("Calories: Least")) {
+        sortModeForFoodConsumed = 4;
+      }
+
+      unHighlightAllSortTextViewsForFoodConsumedStats();
+      highlightSelectedSortTextViewForFoodsInStatsFragment();
+
+      AsyncTask.execute(() -> {
+        dailyStatsFragment.setFoodConsumedSortMode(sortModeForFoodConsumed);
+        dailyStatsFragment.sortFoodConsumedStatsAsACallFromMainActivity();
+        runOnUiThread(() -> {
+          sortPopupWindow.dismiss();
+
+          prefEdit.putInt("sortModeForFoodConsumed", sortModeForFoodConsumed);
+          prefEdit.apply();
+        });
+      });
+    };
+  }
+
   private void unHighlightAllSortTextViewsForFoodConsumedStats() {
     int noHighlight = Color.TRANSPARENT;
     sortFoodConsumedStatsAToZTextView.setBackgroundColor(noHighlight);
     sortFoodConsumedStatsZToATextView.setBackgroundColor(noHighlight);
     sortFoodConsumedCaloriesByMostTextView.setBackgroundColor(noHighlight);
     sortFoodConsumedStatsZToATextView.setBackgroundColor(noHighlight);
+  }
+
+  private void highlightSelectedSortTextViewForFoodsInStatsFragment() {
+    int colorToHighlight = getResources().getColor(R.color.test_highlight);
+
+    switch (sortModeForFoodConsumed) {
+      case 1:
+        sortFoodConsumedStatsAToZTextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 2:
+        sortFoodConsumedStatsZToATextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 3:
+        sortFoodConsumedCaloriesByMostTextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 4:
+        sortFoodConsumedCaloriesByLeastTextView.setBackgroundColor(colorToHighlight);
+        break;
+    }
   }
 
   private void setAllSortTextViewsOntoClickListeners() {

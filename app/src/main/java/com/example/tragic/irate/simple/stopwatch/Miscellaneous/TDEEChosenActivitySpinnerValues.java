@@ -150,19 +150,6 @@ public class TDEEChosenActivitySpinnerValues {
         subValueListOfStringArrays.add(walking_values);
         subValueListOfStringArrays.add(water_values);
         subValueListOfStringArrays.add(winter_values);
-
-        //Gets number of activities.
-
-//        int itemCount = 0;
-//
-//        for (int i = 0; i <subValueListOfStringArrays.size(); i++) {
-//            String[] stringQueried = subCategoryListOfStringArrays.get(i);
-//            for (int k = 0; k<stringQueried.length; k++) {
-//                itemCount++;
-//            }
-//        }
-
-//        Log.i("testItems", "count is " + itemCount);
     }
 
     public ArrayList<String> getCategoryList() {

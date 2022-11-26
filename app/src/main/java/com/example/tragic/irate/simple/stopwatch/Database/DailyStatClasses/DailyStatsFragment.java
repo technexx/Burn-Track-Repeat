@@ -1219,7 +1219,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 finalNewActivityTime = newActivityTime;
                 finalNewActivityTime = cappedTimeForStatEdits(finalNewActivityTime, assignedTime, unassignedTime);
 
-                //Todo: I'll bet this is due to sorting!
                 if (!isCustomActivity) {
                     finalNewCaloriesBurned = calculateCaloriesFromMillisValueUsingMetScore(finalNewActivityTime);
                 } else {
@@ -1557,22 +1556,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 ArrayList<String> spinnerList = tdeeChosenActivitySpinnerValues.getCategoryList();
-//                int lastPosition = spinnerList.size() - 1;
                 tdeeCategorySpinnerTouchActions();
-
-//                if (position != lastPosition) {
-////                    tdeeCategorySpinnerTouchActions();
-////                    setCustomActivityBoolean(false);
-//                } else {
-//                    addTdeePopUpWindow.dismiss();
-//                    customActivityPopUpWindow.showAsDropDown(topOfRecyclerViewAnchor, 0, dpToPxConv(0));
-//                    addCustomActivityEditText.requestFocus();
-//
-//                    tdee_category_spinner.setSelection(0);
-//                    tdee_sub_category_spinner.setSelection(0);
-//
-////                    setCustomActivityBoolean(true);
-//                }
             }
 
             @Override
