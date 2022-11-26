@@ -5,6 +5,31 @@
     android:id="@+id/custom_action_bar"
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
+<!--    <TextView-->
+<!--        android:id="@+id/app_header_1"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:fontFamily="@font/roboto_medium"-->
+<!--        android:text="@string/twerk"-->
+<!--        android:textSize="22sp"-->
+<!--        app:layout_constraintTop_toTopOf="parent"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        android:layout_marginTop="2dp">-->
+<!--    </TextView>-->
+
+<!--    <TextView-->
+<!--        android:id="@+id/app_header_2"-->
+<!--        android:layout_width="wrap_content"-->
+<!--        android:layout_height="wrap_content"-->
+<!--        android:fontFamily="@font/roboto_medium"-->
+<!--        android:text="@string/after_twerk"-->
+<!--        android:textSize="22sp"-->
+<!--        app:layout_constraintTop_toBottomOf="@id/app_header_1"-->
+<!--        app:layout_constraintStart_toStartOf="parent"-->
+<!--        android:layout_marginTop="4dp"-->
+<!--        android:maxWidth="300dp">-->
+<!--    </TextView>-->
+
     <TextView
         android:id="@+id/app_header"
         android:layout_width="wrap_content"

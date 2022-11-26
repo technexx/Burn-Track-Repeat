@@ -671,9 +671,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Add most/least recent sorts.
-      //Todo: Can do after launch.
-
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test Stopwatch.
@@ -2223,6 +2220,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       mainActionBar.setCustomView(R.layout.custom_bar_h1920);
     } else {
       mainActionBar.setCustomView(R.layout.custom_bar);
+
+//      TextView appNameHeader1 = mainActionBar.getCustomView().findViewById(R.id.app_header_1);
+//      TextView appNameHeader2 = mainActionBar.getCustomView().findViewById(R.id.app_header_2);
+//
+//      appNameHeader1.setTextSize(18);
+//      appNameHeader2.setTextSize(13);
     }
 
     mainActionBar.setBackgroundDrawable(new ColorDrawable(Color.parseColor("#28282B")));
