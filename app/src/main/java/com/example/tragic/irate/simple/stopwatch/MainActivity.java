@@ -3001,6 +3001,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (textButton.getText().toString().equals("Added: Most Recent")) sortMode = 7;
       if (textButton.getText().toString().equals("Added: Least Recent")) sortMode = 8;
 
+      //Must come before highlight, or else all highlights will clear.
       unHighlightCyclesSortTextView();
       highlightCyclesSortTextView();
 
@@ -3020,12 +3021,25 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     };
   }
 
+  private void unHighlightCyclesSortTextView() {
+    int noHighlight = Color.TRANSPARENT;
+
+    sortCycleTitleAToZ.setBackgroundColor(noHighlight);
+    sortCycleTitleZtoA.setBackgroundColor(noHighlight);
+    sortActivityTitleAtoZ.setBackgroundColor(noHighlight);
+    sortActivityTitleZToA.setBackgroundColor(noHighlight);
+    sortHigh.setBackgroundColor(noHighlight);
+    sortLow.setBackgroundColor(noHighlight);
+    sortCycleMostRecent.setBackgroundColor(noHighlight);
+    sortCycleLeastRecent.setBackgroundColor(noHighlight);
+  }
+
   private void highlightCyclesSortTextView() {
     int colorToHighlight = getResources().getColor(R.color.test_highlight);
 
     switch (sortMode) {
       case 1:
-        sortCycleTitleAToZ.setBackgroundColor(getResources().getColor(R.color.purple_2));
+        sortCycleTitleAToZ.setBackgroundColor(colorToHighlight);
         break;
       case 2:
         sortCycleTitleZtoA.setBackgroundColor(colorToHighlight);
@@ -3051,20 +3065,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
   }
 
-
-  private void unHighlightCyclesSortTextView() {
-    int noHighlight = Color.TRANSPARENT;
-
-    sortCycleTitleAToZ.setBackgroundColor(noHighlight);
-    sortCycleTitleZtoA.setBackgroundColor(noHighlight);
-    sortActivityTitleAtoZ.setBackgroundColor(noHighlight);
-    sortActivityTitleZToA.setBackgroundColor(noHighlight);
-    sortHigh.setBackgroundColor(noHighlight);
-    sortLow.setBackgroundColor(noHighlight);
-    sortCycleMostRecent.setBackgroundColor(noHighlight);
-    sortCycleLeastRecent.setBackgroundColor(noHighlight);
-  }
-
   private View.OnClickListener pomCyclesSortOptionListener() {
     return view -> {
       TextView textButton = (TextView) view;
@@ -3084,14 +3084,23 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           clearAndRepopulateCycleAdapterListsFromDatabaseList(false);
           savedPomCycleAdapter.notifyDataSetChanged();
         });
-
-        prefEdit.putInt("sortModePom", sortModePom);
-        prefEdit.apply();
-
-        sortPopupWindow.dismiss();
       });
 
+      prefEdit.putInt("sortModePom", sortModePom);
+      prefEdit.apply();
+
+      sortPopupWindow.dismiss();
     };
+  }
+
+
+  private void unHighlightPomSortTextViews() {
+    int noHighlight = Color.TRANSPARENT;
+
+    sortPomCycleTitleAtoZ.setBackgroundColor(noHighlight);
+    sortPomCycleTitleZtoA.setBackgroundColor(noHighlight);
+    sortPomCycleMostRecent.setBackgroundColor(noHighlight);
+    sortPomCycleLeastRecent.setBackgroundColor(noHighlight);
   }
 
   private void highlightPomSortTextView() {
@@ -3111,15 +3120,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         sortPomCycleLeastRecent.setBackgroundColor(colorToHighlight);
         break;
     }
-  }
-
-  private void unHighlightPomSortTextViews() {
-    int noHighlight = Color.TRANSPARENT;
-
-    sortPomCycleTitleAtoZ.setBackgroundColor(noHighlight);
-    sortPomCycleTitleZtoA.setBackgroundColor(noHighlight);
-    sortPomCycleMostRecent.setBackgroundColor(noHighlight);
-    sortPomCycleLeastRecent.setBackgroundColor(noHighlight);
   }
 
   private View.OnClickListener activitySortOptionListener() {
@@ -3228,6 +3228,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityTitleZToA.setOnClickListener(cyclesSortOptionListener());
     sortCycleMostRecent.setOnClickListener(cyclesSortOptionListener());
     sortCycleLeastRecent.setOnClickListener(cyclesSortOptionListener());
+
+    sortPomCycleTitleAtoZ.setOnClickListener(pomCyclesSortOptionListener());
+    sortPomCycleTitleZtoA.setOnClickListener(pomCyclesSortOptionListener());
+    sortPomCycleMostRecent.setOnClickListener(pomCyclesSortOptionListener());
+    sortPomCycleLeastRecent.setOnClickListener(pomCyclesSortOptionListener());
 
     sortActivityStatsAToZTextView.setOnClickListener(activitySortOptionListener());
     sortActivityStatsZToATextView.setOnClickListener(activitySortOptionListener());
