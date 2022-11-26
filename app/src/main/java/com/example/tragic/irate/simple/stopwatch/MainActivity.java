@@ -1165,7 +1165,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
         changeTextSizeWithoutAnimator(pomMillis);
 
-        savedPomCycleAdapter.setIsConfirmStringVisible(false);
+        savedPomCycleAdapter.setkeepConfirmStringOnTextView(false);
 
         pomTimerPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
       }
@@ -1177,7 +1177,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         resetCyclesTimer();
       }
       if (mode == 3) {
-        savedPomCycleAdapter.setIsConfirmStringVisible(false);
+        savedPomCycleAdapter.setkeepConfirmStringOnTextView(false);
 
         mHandler.removeCallbacks(runnableForRecyclerViewTimesForModeThree);
         savedPomCycleAdapter.removeCycleAsActive();

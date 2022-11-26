@@ -45,7 +45,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
 
     boolean mTimerPaused;
     boolean mActiveCycle;
-    boolean isConfirmStringVisible;
+    boolean keepConfirmStringOnTextView;
     int mPositionOfActiveCycle;
     int mNumberOfRoundsCompleted;
 
@@ -277,8 +277,10 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         });
 
         if (mActiveCycle) {
-            if (!isConfirmStringVisible) {
+            if (!keepConfirmStringOnTextView) {
                 pomHolder.resetCycle.setText(R.string.reset);
+            } else {
+                pomHolder.resetCycle.setText(R.string.confirm_cycle_reset);
             }
 
             if (position==mPositionOfActiveCycle) {
@@ -298,7 +300,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                 pomHolder.resetCycle.setOnClickListener(v-> {
                     if (pomHolder.resetCycle.getText().equals(mContext.getString(R.string.reset))) {
                         pomHolder.resetCycle.setText(R.string.confirm_cycle_reset);
-                        isConfirmStringVisible = true;
+                        keepConfirmStringOnTextView = true;
                     } else {
                         mOnResumeOrResetCycle.ResumeOrResetCycle(RESETTING_CYCLE_FROM_TIMER);
                     }
@@ -313,8 +315,8 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
         }
     }
 
-    public void setIsConfirmStringVisible(boolean isVisible) {
-        this.isConfirmStringVisible = isVisible;
+    public void setkeepConfirmStringOnTextView(boolean isVisible) {
+        this.keepConfirmStringOnTextView = isVisible;
     }
 
     @Override
