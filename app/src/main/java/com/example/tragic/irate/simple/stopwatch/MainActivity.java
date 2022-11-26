@@ -673,7 +673,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   //Todo: MET bug is from add followed by edit. Adds too many calories. Seems to add previously manipulated row's total to edited value.
       //Todo: May be due to sorting?
-  //Todo: Adding an activity at 24hr cap shows +1 time in activities and "-0" in mbr.
   //Todo: Had a crash after trying to delete activity row right after app launch.
   //Todo: Index crash w/ first tdee spinner using oob position (33). getCategoryList() in TDEEChosen...() class is what populates the array.
       //Todo: Could it be populating it more than once?

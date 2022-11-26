@@ -1343,7 +1343,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         if (activityTime > modifiedRemainingTime) {
             activityTime = modifiedRemainingTime;
-            activityTime = roundUpMillisValues(activityTime);
+//            activityTime = roundUpMillisValues(activityTime);
         }
 
         return activityTime;
@@ -1351,16 +1351,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private long cappedActivityTimeForStatInsertions(long activityTime, long remainingTime) {
         if (remainingTime > 0) {
-            if (activityTime > remainingTime) {
-                activityTime = remainingTime;
-                activityTime = roundUpMillisValues(activityTime);
+            long twentyFourHours = dailyStatsAccess.getTwentyFourHoursInMillis();
+            long currentTotalActivityTime = dailyStatsAccess.getTotalActivityTimeForSelectedDuration();
 
-                long twentyFourHours = dailyStatsAccess.getTwentyFourHoursInMillis();
-                long currentTotalActivityTime = dailyStatsAccess.getTotalActivityTimeForSelectedDuration();
-
-                if ((currentTotalActivityTime + activityTime) > twentyFourHours) {
-                    activityTime = twentyFourHours - currentTotalActivityTime;
-                }
+            if ((currentTotalActivityTime + activityTime) > twentyFourHours) {
+                activityTime = twentyFourHours - currentTotalActivityTime;
             }
         } else {
             activityTime = 0;
