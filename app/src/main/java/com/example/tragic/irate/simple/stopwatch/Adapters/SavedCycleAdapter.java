@@ -2,44 +2,30 @@ package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
-import android.content.res.ColorStateList;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
 import android.graphics.Typeface;
-import android.graphics.drawable.Drawable;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.TextUtils;
-import android.text.style.AbsoluteSizeSpan;
-import android.text.style.BackgroundColorSpan;
 import android.text.style.ForegroundColorSpan;
-import android.text.style.ImageSpan;
 import android.text.style.StyleSpan;
-import android.text.style.TextAppearanceSpan;
 import android.util.Log;
-import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.animation.AlphaAnimation;
-import android.widget.LinearLayout;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.core.content.ContextCompat;
-import androidx.core.content.res.ResourcesCompat;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.tragic.irate.simple.stopwatch.SettingsFragments.ChangeSettingsValues;
 import com.example.tragic.irate.simple.stopwatch.R;
 
-import java.lang.reflect.Type;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
@@ -269,6 +255,8 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
       workoutHolder.titleAndRoundsLayoutParams.endToStart = R.id.activity_string_textView_for_tracking_cycles;
     } else {
       workoutHolder.activityStringTextView.setVisibility(View.GONE);
+
+      workoutHolder.titleAndRoundsLayoutParams.endToStart = ConstraintLayout.LayoutParams.UNSET;
     }
 
     if (mActiveTdeeModeBooleanList.get(position)) {
@@ -396,7 +384,7 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
           workoutHolder.pauseOrResume.setText(R.string.pause);
         }
 
-        workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+        workoutHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.active_cycle_background_border));
 
         workoutHolder.pauseOrResume.setOnClickListener(v-> {
           mOnPauseOrResumeListener.onPauseOrResume(mTimerPaused);
@@ -499,8 +487,19 @@ public class SavedCycleAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     if (totalSeconds >=60) {
       minutes = totalSeconds/60;
       remainingSeconds = totalSeconds % 60;
+
       return (minutes + ":" + df.format(remainingSeconds));
-    } else if (totalSeconds >=10) return "0:" + totalSeconds;
-    else return "0:0" + totalSeconds;
+
+//      if (minutes < 10) {
+//        return ("0" + minutes + ":" + df.format(remainingSeconds));
+//      } else {
+//        return (minutes + ":" + df.format(remainingSeconds));
+//      }
+    } else if (totalSeconds >=10) {
+      return "0:" + totalSeconds;
+    }
+    else {
+      return "0:0" + totalSeconds;
+    }
   }
 }

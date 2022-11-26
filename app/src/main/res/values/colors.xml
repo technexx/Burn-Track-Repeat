@@ -75,13 +75,6 @@
     <color name="dark_orange">#F57C00</color>
     <color name="light_orange">#FFCC80</color>
 
-    <color name="fade_white_1">#F5F5F5</color>
-    <color name="fade_white_2">#EEEEEE</color>
-    <color name="fade_white_3">#E0E0E0</color>
-    <color name="fade_white_4">#BDBDBD</color>
-    <color name="fade_white_5">#9E9E9E</color>
-    <color name="fade_white_6">#757575</color>
-
     <color name="android_green">#ff00ff00</color>
     <color name="android_red">#ffff0000</color>
     <color name="android_blue">#ff0000ff</color>

@@ -1,7 +1,6 @@
 package com.example.tragic.irate.simple.stopwatch.Adapters;
 
 import android.content.Context;
-import android.graphics.Color;
 import android.graphics.Typeface;
 import android.text.Spannable;
 import android.text.SpannableString;
@@ -9,7 +8,6 @@ import android.text.Spanned;
 import android.text.TextUtils;
 import android.text.style.ForegroundColorSpan;
 import android.text.style.StyleSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -306,7 +304,7 @@ public class SavedPomCycleAdapter extends RecyclerView.Adapter<RecyclerView.View
                     }
                 });
 
-                pomHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.cycle_row_edit_border));
+                pomHolder.fullView.setBackground(ContextCompat.getDrawable(mContext, R.drawable.active_cycle_background_border));
             } else {
                 pomHolder.fullView.setBackgroundColor(fullViewBackGroundColor);
             }
