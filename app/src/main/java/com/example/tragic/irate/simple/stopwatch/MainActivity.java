@@ -6844,13 +6844,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         secondRoundTypeHeaderInEditPopUp.setText(R.string.break_time);
         firstRoundTypeHeaderInEditPopUp.setText(R.string.set_time);
 
-        secondEditHeaderParams.rightMargin = 20;
+        if (phoneHeight <= 1920) {
+          secondEditHeaderParams.rightMargin = 20;
+          deleteEditTimerNumbersParams.rightMargin = dpConv(28);
+          deleteEditTimerNumbersParams.bottomMargin = dpConv(8);
+        } else {
+          secondEditHeaderParams.rightMargin = 20;
+          deleteEditTimerNumbersParams.rightMargin = dpConv(45);
+        }
+
 
         deleteEditTimerNumbersParams.startToEnd = R.id.timerValueInEditPopUpTextView;
         deleteEditTimerNumbersParams.endToEnd = R.id.toggle_infinity_rounds;
         deleteEditTimerNumbersParams.topToTop = R.id.timerValueInEditPopUpTextView;
         deleteEditTimerNumbersParams.bottomToBottom = R.id.timerValueInEditPopUpTextView;
-        deleteEditTimerNumbersParams.rightMargin = dpConv(45);
 
         thirdRoundTypeHeaderInEditPopUp.setVisibility(View.GONE);
         toggleInfinityRounds.setVisibility(View.VISIBLE);
@@ -6871,13 +6878,21 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 3:
         firstRoundTypeHeaderInEditPopUp.setTextColor(workColor);
 
+        if (phoneHeight <= 1920) {
+          secondEditHeaderParams.rightMargin = 0;
+          deleteEditTimerNumbersParams.rightMargin = dpConv(12);
+          deleteEditTimerNumbersParams.bottomMargin = dpConv(18);
+        } else {
         secondEditHeaderParams.rightMargin = 0;
+        deleteEditTimerNumbersParams.rightMargin = dpConv(9);
+        }
+
 
         deleteEditTimerNumbersParams.startToEnd = (ConstraintLayout.LayoutParams.UNSET);
         deleteEditTimerNumbersParams.endToEnd = R.id.edit_cycle_layout;
         deleteEditTimerNumbersParams.topToTop = R.id.pomTimerValueInEditPopUpTextViewThree;
         deleteEditTimerNumbersParams.bottomToBottom = R.id.pomTimerValueInEditPopUpTextViewThree;
-        deleteEditTimerNumbersParams.rightMargin = 0;
+
 
         firstRoundHeaderParams.startToStart = R.id.edit_cycle_layout;
         firstRoundHeaderParams.endToStart = R.id.secondRoundTypeHeaderInEditPopUp;

@@ -98,7 +98,7 @@
         app:layout_constraintTop_toBottomOf="@id/firstRoundTypeHeaderInEditPopUp"
         android:layout_marginTop="0dp"
         android:layout_marginEnd="21dp"
-        android:textSize="35sp">
+        android:textSize="38sp">
     </TextView>
 
     <TextView
@@ -142,7 +142,7 @@
         app:layout_constraintBottom_toTopOf="@id/number_pad_layout"
         android:layout_marginStart="0dp"
         android:layout_marginEnd="12dp"
-        android:layout_marginBottom="18dp"
+        android:layout_marginBottom="8dp"
         android:src="@drawable/cancel_x_black_small"
         android:backgroundTint="@color/light_grey"
         android:background="@drawable/ripple_effect_2">
