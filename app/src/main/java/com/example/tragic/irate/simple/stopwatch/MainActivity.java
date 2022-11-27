@@ -684,9 +684,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Update resume on job sites.
   //Todo: Release a 1.0.1 version!!!
 
-  //Todo: Run code inspector for redundancies, etc.
-  //Todo: Rename app, of course.
-
+  /////////Potential, non-replicable bugs////////////////////
   //Todo: Removing animation of addition button seemed to fix intermittent activity deletion bug. If it reoccurs:
       //Todo: Try not using global mItemCount for list size.
   //Todo: MET bug of wrong MET score on editing activity not recently replicated.
@@ -695,11 +693,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: If activity deletes after timer dismissal, check deleteLastAccessedActivityCycleIfItHasZeroTime(). We've added conditional tho to only delete if timer is not active.
   //Todo: Crash from updateActiveTimerPopUpStatsIfEdited() in globalSaveTotalTimesAndCaloriesInDatabaseRunnable() that we haven't replicated.
   //Todo: Bug of notifications and timer textView showing 2nd round numbers, while still iterating first. Happened after prolonged minimization. Unable to replicate.
-  //Todo: Closing app briefly display notifications (onStop/onDestroy)
   //Todo: Activity time runnable display will skip if removed/re-posted after in-transition day change.
   //Todo: Had instance of exiting stats frag retaining its onOptionsSelected menu. Haven't been able to replicate.
   //Todo: Anim reset at end of cycle when clicking in and out of timer likely due to visibility set to GONE and VISIBLE again.
 
+  //////////////Future additions//////////////////
   //Todo: Color option for stat times/calories.
   //Todo: Twitter/FB/Insta "Brag" links.
   //Todo: Stats for Pomodoro for future addition.
