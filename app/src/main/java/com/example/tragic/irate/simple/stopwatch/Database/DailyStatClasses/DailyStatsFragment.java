@@ -748,42 +748,32 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
-        if (caloriesComparisonTabLayout.getSelectedTabPosition() == 0) {
-            dailyStatsAccess.clearStatsForEachActivityArrayLists();
+        dailyStatsAccess.clearStatsForEachActivityArrayLists();
+        dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
+        dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
+        dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
 
-            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-            dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
+        dailyStatsAccess.clearFoodConsumedArrayLists();
+        dailyStatsAccess.setTotalFoodConsumedForSelectedDaysToArrayLists();
 
-            dailyStatsAccess.setAggregateTimeForSelectedDuration();
-            dailyStatsAccess.setUnassignedTotalCalories();
+        dailyStatsAccess.setAggregateTimeForSelectedDuration();
+        dailyStatsAccess.setUnassignedTotalCalories();
 
-            dailyStatsAccess.setAggregateCaloriesForSelectedDuration();
-            dailyStatsAccess.setUnassignedDailyTotalTime();
-        }
-
-        if (caloriesComparisonTabLayout.getSelectedTabPosition() == 1) {
-            dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
-
-            dailyStatsAccess.clearFoodConsumedArrayLists();
-            dailyStatsAccess.setTotalFoodConsumedForSelectedDaysToArrayLists();
-        }
+        dailyStatsAccess.setAggregateCaloriesForSelectedDuration();
+        dailyStatsAccess.setUnassignedDailyTotalTime();
 
         dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
         getActivity().runOnUiThread(()-> {
-            dailyStatsAdapter.turnOffEditMode();
+            dailyStatsAdapter.notifyDataSetChanged();
+            caloriesConsumedAdapter.notifyDataSetChanged();
 
-            if (caloriesComparisonTabLayout.getSelectedTabPosition() == 0) {
-                dailyStatsAdapter.notifyDataSetChanged();
-                setTotalActivityStatsFooterTextViews();
-            }
-
-            if (caloriesComparisonTabLayout.getSelectedTabPosition() == 1) {
-                caloriesConsumedAdapter.notifyDataSetChanged();
-                setTotalCaloriesConsumedFooterTextViews();
-            }
+            setTotalActivityStatsFooterTextViews();
+            setTotalCaloriesConsumedFooterTextViews();
 
             setTotalCaloriesComparedTextViews(false);
+
+//            setSimplifiedViewTextViews();
         });
     }
 
