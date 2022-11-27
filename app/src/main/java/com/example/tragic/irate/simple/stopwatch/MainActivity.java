@@ -681,9 +681,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Notifications SOMETIMES do not dismiss if app is minimized and then killed.
-      //Todo: Run a service that kills notifications when it's stopped?
-
   //Todo: Update resume on job sites.
   //Todo: Release a 1.0.1 version!!!
 
@@ -1532,24 +1529,14 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleAdapter.notifyDataSetChanged();
   }
 
-//  @Nullable
-//  @Override
-//  public IBinder onBind(Intent intent) {
-//    return null;
-//  }
-//
-//  @Override
-//  public void onTaskRemoved(Intent rootIntent) {
-//      Log.i("testRemove", "remove called!");
-//      notificationManagerCompat.cancelAll();
-////      stopSelf();
-//  }
-
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
   protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
+
+    MyService myService = new MyService();
+    startService(new Intent(this, MyService.class));
 
    Log.i("testVer", "ver is " + Build.VERSION.SDK_INT);
 
