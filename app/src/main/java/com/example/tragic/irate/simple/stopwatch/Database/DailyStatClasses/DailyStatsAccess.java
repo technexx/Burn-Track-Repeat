@@ -989,6 +989,7 @@ public class DailyStatsAccess {
         mCaloriesForEachFood.setUniqueIdTiedToEachFood(daySelected);
         mCaloriesForEachFood.setTypeOfFood(mFoodString);
         mCaloriesForEachFood.setCaloriesConsumedForEachFoodType(mCaloriesInFoodItem);
+        mCaloriesForEachFood.setTimeAdded(System.currentTimeMillis());
 
         cyclesDatabase.cyclesDao().insertCaloriesForEachFoodRow(mCaloriesForEachFood);
     }
