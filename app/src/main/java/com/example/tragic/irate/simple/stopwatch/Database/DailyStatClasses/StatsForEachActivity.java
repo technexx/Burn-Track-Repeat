@@ -20,6 +20,7 @@ public class StatsForEachActivity {
     public boolean customActivity;
     double caloriesPerHour;
 
+    public long timeAdded;
 
     public long getStatsForActivityId() {
         return statsForActivityId;
@@ -99,5 +100,13 @@ public class StatsForEachActivity {
 
     public void setIsCustomActivity(boolean customActivity) {
         this.customActivity = customActivity;
+    }
+
+    public long getTimeAdded() {
+        return timeAdded;
+    }
+
+    public void setTimeAdded(long timeAdded) {
+        this.timeAdded = timeAdded;
     }
 }

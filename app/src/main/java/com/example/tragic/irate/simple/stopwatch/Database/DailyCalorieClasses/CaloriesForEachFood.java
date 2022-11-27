@@ -14,6 +14,8 @@ public class CaloriesForEachFood {
     double portionForEachFoodType;
     double caloriesConsumedForEachFoodType;
 
+    public long timeAdded;
+
     public long getCaloriesForEachFoodId() {
         return caloriesForEachFoodId;
     }
@@ -52,5 +54,13 @@ public class CaloriesForEachFood {
 
     public void setCaloriesConsumedForEachFoodType(double caloriesConsumedForEachFoodType) {
         this.caloriesConsumedForEachFoodType = caloriesConsumedForEachFoodType;
+    }
+
+    public long getTimeAdded() {
+        return timeAdded;
+    }
+
+    public void setTimeAdded(long timeAdded) {
+        this.timeAdded = timeAdded;
     }
 }

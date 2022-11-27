@@ -158,6 +158,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 //Invalid item position 6(offset:6).state:7
 
                 //Todo: Positions return very funky post-delete. They went 4-9 with no 0-3.
+                //Todo: Try not using global mItemCount.
                 mainViewHolder.activityTextView.setText(mActivities.get(position-1));
                 mainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
                 mainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));

@@ -161,6 +161,12 @@ public class DailyStatsAccess {
             case 6:
                 listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByLeastCaloriesBurned(listOfDays);
                 break;
+            case 7:
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByMostRecent(listOfDays);
+                break;
+            case 8:
+                listToReturn = cyclesDatabase.cyclesDao().loadActivitiesByLeastRecent(listOfDays);
+                break;
         }
 
         return listToReturn;
@@ -181,6 +187,12 @@ public class DailyStatsAccess {
                 break;
             case 4:
                 listToReturn = cyclesDatabase.cyclesDao().loadCaloriesForEachFoodByLeastCaloriesBurned(listOfDays);
+                break;
+            case 5:
+                listToReturn = cyclesDatabase.cyclesDao().loadCaloriesForEachFoodByMostRecent(listOfDays);
+                break;
+            case 6:
+                listToReturn = cyclesDatabase.cyclesDao().loadCaloriesForEachFoodByLeastRecent(listOfDays);
                 break;
 
         }
@@ -558,6 +570,8 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setCaloriesPerHour(mCaloriesBurnedPerHour);
         mStatsForEachActivity.setIsCustomActivity(mIsActivityCustom);
 
+        mStatsForEachActivity.setTimeAdded(System.currentTimeMillis());
+
         cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
     }
 
@@ -645,6 +659,8 @@ public class DailyStatsAccess {
         mStatsForEachActivity.setTotalSetTimeForEachActivity(0);
         mStatsForEachActivity.setTotalBreakTimeForEachActivity(0);
         mStatsForEachActivity.setTotalCaloriesBurnedForEachActivity(0);
+
+        mStatsForEachActivity.setTimeAdded(System.currentTimeMillis());
 
         cyclesDatabase.cyclesDao().insertStatsForEachActivity(mStatsForEachActivity);
     }

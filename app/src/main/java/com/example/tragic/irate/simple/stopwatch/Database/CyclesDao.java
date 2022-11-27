@@ -55,6 +55,12 @@ CyclesDao {
     @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by totalCaloriesBurnedForEachActivity ASC")
     List<StatsForEachActivity> loadActivitiesByLeastCaloriesBurned(List<Integer> uniqueIDs);
 
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by timeAdded DESC")
+    List<StatsForEachActivity> loadActivitiesByMostRecent(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IN (:uniqueIDs) ORDER by timeAdded ASC")
+    List<StatsForEachActivity> loadActivitiesByLeastRecent(List<Integer> uniqueIDs);
+
     @Query("DELETE from StatsForEachActivity WHERE uniqueIdTiedToTheSelectedActivity IS:listID")
     void deleteActivityStatsForSingleDay (long listID);
 
@@ -93,17 +99,17 @@ CyclesDao {
     @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by typeOfFood DESC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodByZToAName(List<Integer> uniqueIDs);
 
-    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by portionForEachFoodType DESC")
-    List<CaloriesForEachFood> loadCaloriesForEachFoodByLargestPortion(List<Integer> uniqueIDs);
-
-    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by portionForEachFoodType ASC")
-    List<CaloriesForEachFood> loadCaloriesForEachFoodBySmallestPortion(List<Integer> uniqueIDs);
-
     @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by caloriesConsumedForEachFoodType DESC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodByMostCaloriesBurned(List<Integer> uniqueIDs);
 
     @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by caloriesConsumedForEachFoodType ASC")
     List<CaloriesForEachFood> loadCaloriesForEachFoodByLeastCaloriesBurned(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by timeAdded DESC")
+    List<CaloriesForEachFood> loadCaloriesForEachFoodByMostRecent(List<Integer> uniqueIDs);
+
+    @Query("SELECT * from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IN (:uniqueIDs) ORDER by timeAdded ASC")
+    List<CaloriesForEachFood> loadCaloriesForEachFoodByLeastRecent(List<Integer> uniqueIDs);
 
     @Query("DELETE from CaloriesForEachFood WHERE uniqueIdTiedToEachFood IS:listID")
     void deleteCaloriesForEachFoodForSingleDay (long listID);

@@ -249,11 +249,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   TextView sortActivityStatsByLeastTimeTextView;
   TextView sortActivityStatsByMostCaloriesTextView;
   TextView sortActivityStatsByLeastCaloriesTextView;
+  TextView sortActivityStatsByMostRecentTextView;
+  TextView sortActivityStatsByLeastRecentTextView;
 
   TextView sortFoodConsumedStatsAToZTextView;
   TextView sortFoodConsumedStatsZToATextView;
   TextView sortFoodConsumedCaloriesByMostTextView;
   TextView sortFoodConsumedCaloriesByLeastTextView;
+  TextView sortFoodConsumedCaloriesByMostRecentTextView;
+  TextView sortFoodConsumedCaloriesByLeastRecentTextView;
 
   TextView delete_all_text;
   Button delete_all_confirm;
@@ -2437,11 +2441,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityStatsByLeastTimeTextView = sortActivitiesPopupView.findViewById(R.id.sort_least_time);
     sortActivityStatsByMostCaloriesTextView = sortActivitiesPopupView.findViewById(R.id.sort_calories_expended_most);
     sortActivityStatsByLeastCaloriesTextView = sortActivitiesPopupView.findViewById(R.id.sort_calories_expended_least);
+    sortActivityStatsByMostTimeTextView = sortActivitiesPopupView.findViewById(R.id.sort_activity_most_recent);
+    sortActivityStatsByLeastRecentTextView = sortActivitiesPopupView.findViewById(R.id.sort_activity_least_recent);
 
     sortFoodConsumedStatsAToZTextView = sortFoodConsumedPopupView.findViewById(R.id.sort_food_name_start);
     sortFoodConsumedStatsZToATextView = sortFoodConsumedPopupView.findViewById(R.id.sort_food_name_end);
     sortFoodConsumedCaloriesByMostTextView = sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_most);
     sortFoodConsumedCaloriesByLeastTextView = sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_least);
+    sortFoodConsumedCaloriesByMostRecentTextView = sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_most_recent);
+    sortFoodConsumedCaloriesByLeastRecentTextView = sortFoodConsumedPopupView.findViewById(R.id.sort_calories_consumed_least_recent);
   }
 
   private void assignDeletePopUpLayoutClassesToTheirIds() {
@@ -3176,6 +3184,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       if (textView.getText().toString().equals("Calories: Least")) {
         sortModeForActivities = 6;
       }
+      if (textView.getText().toString().equals("Added: Most Recent")) {
+        sortModeForActivities = 7;
+      }
+      if (textView.getText().toString().equals("Added: Least Recent")) {
+        sortModeForActivities = 8;
+      }
 
       unHighlightAllSortTextViewsForActivityStats();
       highlightSelectedSortTextViewForActivitiesInStatsFragment();
@@ -3202,6 +3216,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortActivityStatsByLeastTimeTextView.setBackgroundColor(noHighlight);
     sortActivityStatsByMostCaloriesTextView.setBackgroundColor(noHighlight);
     sortActivityStatsByLeastCaloriesTextView.setBackgroundColor(noHighlight);
+    sortActivityStatsByMostRecentTextView.setBackgroundColor(noHighlight);
+    sortActivityStatsByLeastRecentTextView.setBackgroundColor(noHighlight);
   }
 
   private void highlightSelectedSortTextViewForActivitiesInStatsFragment() {
@@ -3226,6 +3242,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       case 6:
         sortActivityStatsByLeastTimeTextView.setBackgroundColor(colorToHighlight);
         break;
+      case 7:
+        sortActivityStatsByMostRecentTextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 8:
+        sortActivityStatsByLeastRecentTextView.setBackgroundColor(colorToHighlight);
+        break;
     }
   }
 
@@ -3244,6 +3266,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
       if (textView.getText().toString().equals("Calories: Least")) {
         sortModeForFoodConsumed = 4;
+      }
+      if (textView.getText().toString().equals("Added: Most Recent")) {
+        sortModeForFoodConsumed = 5;
+      }
+      if (textView.getText().toString().equals("Added: Least Recent")) {
+        sortModeForFoodConsumed = 6;
       }
 
       unHighlightAllSortTextViewsForFoodConsumedStats();
@@ -3267,7 +3295,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     sortFoodConsumedStatsAToZTextView.setBackgroundColor(noHighlight);
     sortFoodConsumedStatsZToATextView.setBackgroundColor(noHighlight);
     sortFoodConsumedCaloriesByMostTextView.setBackgroundColor(noHighlight);
-    sortFoodConsumedStatsZToATextView.setBackgroundColor(noHighlight);
+    sortFoodConsumedCaloriesByLeastTextView.setBackgroundColor(noHighlight);
+    sortFoodConsumedCaloriesByMostRecentTextView.setBackgroundColor(noHighlight);
+    sortFoodConsumedCaloriesByLeastRecentTextView.setBackgroundColor(noHighlight);
   }
 
   private void highlightSelectedSortTextViewForFoodsInStatsFragment() {
@@ -3285,6 +3315,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         break;
       case 4:
         sortFoodConsumedCaloriesByLeastTextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 5:
+        sortFoodConsumedCaloriesByMostRecentTextView.setBackgroundColor(colorToHighlight);
+        break;
+      case 6:
+        sortFoodConsumedCaloriesByLeastRecentTextView.setBackgroundColor(colorToHighlight);
         break;
     }
   }

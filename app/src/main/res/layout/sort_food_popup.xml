@@ -56,4 +56,27 @@
         android:layout_marginBottom="4dp">
     </TextView>
 
+    <TextView
+        android:text="Added: Most Recent"
+        android:id="@+id/sort_calories_consumed_most_recent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_calories_consumed_least"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp">
+    </TextView>
+
+    <TextView
+        android:text="Added: Least Recent"
+        android:id="@+id/sort_calories_consumed_least_recent"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/sort_calories_consumed_most_recent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginTop="10dp"
+        android:layout_marginStart="4dp"
+        android:layout_marginBottom="4dp">
+    </TextView>
+
 </androidx.constraintlayout.widget.ConstraintLayout>
