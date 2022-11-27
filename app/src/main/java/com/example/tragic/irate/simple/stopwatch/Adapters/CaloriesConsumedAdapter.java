@@ -126,6 +126,7 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
         } else if (holder instanceof CaloriesConsumedAdapter.FootViewHolder) {
             FootViewHolder footViewHolder = (FootViewHolder) holder;
 
+            footViewHolder.addActivity.clearAnimation();
             footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
             footViewHolder.addActivity.setOnClickListener(v-> {
@@ -133,6 +134,17 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
                 mCaloriesConsumedAddition.onAddingFood();
             });
         }
+    }
+
+
+    private void setAnimations() {
+        slideInFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_left);
+        slideInFromLeft.setDuration(200);
+//        slideInFromLeft.setFillAfter(true);
+
+        slideOutFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_left);
+        slideOutFromLeft.setDuration(200);
+//        slideOutFromLeft.setFillAfter(true);
     }
 
     private void setAddingOrEditingFoodVariable(int addingOrEditing) {
@@ -233,16 +245,6 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
         mMainViewHolder.foodEatenTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         mMainViewHolder.caloriesConsumedTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
-    }
-
-    private void setAnimations() {
-        slideInFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_left);
-        slideInFromLeft.setDuration(200);
-        slideInFromLeft.setFillAfter(true);
-
-        slideOutFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_left);
-        slideOutFromLeft.setDuration(200);
-        slideOutFromLeft.setFillAfter(true);
     }
 
     public class MainViewHolder extends RecyclerView.ViewHolder {
