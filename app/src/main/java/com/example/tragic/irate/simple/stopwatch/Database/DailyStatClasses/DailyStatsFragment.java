@@ -482,10 +482,12 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             Log.i("testToggle", "toggling edit mode");
             if (dailyStatsRecyclerView.isShown()) {
                 dailyStatsAdapter.toggleEditMode();
+                dailyStatsAdapter.notifyDataSetChanged();
                 scrollToBottomOfDailyStatsRecycler();
             }
             if (caloriesConsumedRecyclerView.isShown()) {
                 caloriesConsumedAdapter.toggleEditMode();
+                caloriesConsumedAdapter.notifyDataSetChanged();
                 scrollToBottomOfCaloriesConsumedRecycler();
             }
         });

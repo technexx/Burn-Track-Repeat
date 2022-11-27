@@ -161,10 +161,14 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
 
     @Override
     public int getItemCount() {
+        int listSize = mFoodEaten.size();
+
         if (!mEditModeIsActive) {
-            return mItemCount = mFoodEaten.size()+1;
+            mItemCount = listSize += 1;
+            return mItemCount;
         } else {
-            return mItemCount = mFoodEaten.size()+2;
+            mItemCount = listSize += 2;
+            return mItemCount;
         }
     }
 
@@ -185,7 +189,6 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void toggleEditMode() {
         mEditModeIsActive = !mEditModeIsActive;
         animateButtonSliding= true;
-        notifyDataSetChanged();
     }
 
     private void populateMainRowViews(int position) {
