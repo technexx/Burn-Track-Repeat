@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".35">
+        app:layout_constraintGuide_percent=".3">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".37">
+        app:layout_constraintGuide_percent=".3">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -38,7 +38,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".62">
+        app:layout_constraintGuide_percent=".6">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -68,7 +68,7 @@
             android:id="@+id/cycles_completed_textView"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="12dp"
             android:textColor="@color/white"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
@@ -80,7 +80,7 @@
             android:id="@+id/total_set_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="12dp"
             android:textSize="20sp"
             app:layout_constraintEnd_toStartOf="@id/reset_total_cycle_times"
             app:layout_constraintStart_toStartOf="parent"
@@ -91,7 +91,7 @@
             android:id="@+id/total_break_header"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="12dp"
             android:textSize="20sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toEndOf="@id/reset_total_cycle_times"

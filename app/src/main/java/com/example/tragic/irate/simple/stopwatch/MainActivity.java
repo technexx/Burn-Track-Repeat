@@ -7,6 +7,7 @@ import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -29,7 +30,9 @@ import android.os.Build;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
+import android.os.IBinder;
 import android.os.Vibrator;
+import android.provider.SyncStateContract;
 import android.text.Spannable;
 import android.text.SpannableString;
 import android.text.Spanned;
@@ -66,6 +69,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
@@ -675,12 +679,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Stopwatch notification may not have been removed after app close.
+  //Todo: /1920 timer dots cut off.
+  //Todo: Notifications SOMETIMES do not dismiss if app is minimized and then killed.
+      //Todo: Perform a check for services within it?
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test all concurrent timers + notifications + notification dismissals.
-      //Todo: Test Moto again because we changed some layout stuff.
       //Todo: Test on <1920 Nexus. Font sizes in Timer may want increase.
   //Todo: Test timer layout w/ 2 rows of dots + long activity string on /1920 moto
   //Todo: Change back pom cycle times to original (non-testing).
@@ -723,6 +728,20 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //We can also commit just specific files, remember!
   //REMINDER: Try next app w/ Kotlin + learn Kotlin.
 
+//  public class testServce extends Service {
+//    @Override
+//    public void onTaskRemoved(Intent rootIntent) {
+//      super.onTaskRemoved(rootIntent);
+//      stopSelf();
+//    }
+//
+//    @Nullable
+//    @Override
+//    public IBinder onBind(Intent intent) {
+//      return null;
+//    }
+//  }
+
   @Override
   public void onResume() {
     super.onResume();
@@ -763,8 +782,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       }
 
     }, 300);
-
-
   }
 
   @Override
@@ -799,8 +816,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onDestroy() {
     super.onDestroy();
 
-    notificationManagerCompat.cancel(1);
-    mHandler.removeCallbacks(globalNotficationsRunnable);
+    notificationManagerCompat.cancelAll();
+//    mHandler.removeCallbacks(globalNotficationsRunnable);
 
   }
 
@@ -2765,10 +2782,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     addTdeePopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     aboutSettingsPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
 
-//    timerPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
     timerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
     pomTimerPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
-    stopWatchPopUpWindow.setAnimationStyle(R.style.SlideFromLeftAnimationShort);
+    stopWatchPopUpWindow.setAnimationStyle(R.style.WindowAnimation);
 
   }
 
@@ -4206,6 +4222,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               .addLine(bodyThree)
       );
 
+
       Notification notification = notificationManagerBuilder.build();
       notificationManagerCompat.notify(1, notification);
     }
@@ -4251,6 +4268,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       @Override
       public void run() {
         updateNotificationsIfTimerTextViewHasChanged(textViewDisplaySync);
+
+
 
         mHandler.postDelayed(this, 50);
       }
