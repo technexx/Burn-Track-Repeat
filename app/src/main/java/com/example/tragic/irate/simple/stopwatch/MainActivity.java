@@ -681,11 +681,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       //Todo: Test for Pom, too
       //Todo: Test all concurrent timers + notifications + notification dismissals.
       //Todo: Test Moto again because we changed some layout stuff.
+  //Todo: Test timer layout w/ 2 rows of dots + long activity string on /1920 moto
+  //Todo: Change back pom cycle times to original (non-testing).
 
   //Todo: Update resume on job sites.
   //Todo: Release a 1.0.1 version!!!
 
-  //Todo: Change back pom cycle times to original (non-testing).
   //Todo: Test end of rounds/simultaneous endings/vibs and ringtones.
   //Todo: Deep test of all database stuff.
   //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.

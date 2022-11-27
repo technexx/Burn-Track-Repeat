@@ -14,7 +14,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".25">
+        app:layout_constraintGuide_percent=".3">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -22,7 +22,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        app:layout_constraintGuide_percent=".28">
+        app:layout_constraintGuide_percent=".32">
     </androidx.constraintlayout.widget.Guideline>
 
     <androidx.constraintlayout.widget.Guideline
@@ -186,9 +186,9 @@
         <ProgressBar
             android:id="@+id/progressBarForPom"
             style="?android:attr/progressBarStyleHorizontal"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginBottom="12dp"
+            android:layout_width="240dp"
+            android:layout_height="240dp"
+            android:layout_marginBottom="4dp"
             android:background="@drawable/circle_shape"
             android:max="10000"
             android:progressDrawable="@drawable/circle_progress"
