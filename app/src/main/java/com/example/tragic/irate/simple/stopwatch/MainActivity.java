@@ -14,6 +14,7 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
@@ -87,6 +88,7 @@ import androidx.preference.PreferenceManager;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.work.impl.foreground.SystemForegroundService;
 
 import com.example.tragic.irate.simple.stopwatch.Adapters.CycleRoundsAdapter;
 import com.example.tragic.irate.simple.stopwatch.Adapters.DotsAdapter;
@@ -680,19 +682,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   boolean resetCycleTimeVarsWithinRunnable;
 
   //Todo: Notifications SOMETIMES do not dismiss if app is minimized and then killed.
-      //Todo: Perform a check for services within it?
-
-  //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
-      //Todo: Test for Pom, too
-      //Todo: Test all concurrent timers + notifications + notification dismissals.
-  //Todo: Change back pom cycle times to original (non-testing).
+      //Todo: Run a service that kills notifications when it's stopped?
 
   //Todo: Update resume on job sites.
   //Todo: Release a 1.0.1 version!!!
 
-  //Todo: Test end of rounds/simultaneous endings/vibs and ringtones.
-  //Todo: Deep test of all database stuff.
-  //Todo: Test minimized vibrations on <26 api. Test all vibrations/ringtones again.
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
@@ -724,20 +718,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Drawable height may sync w/ textView height for alignment.
   //We can also commit just specific files, remember!
   //REMINDER: Try next app w/ Kotlin + learn Kotlin.
-
-//  public class testServce extends Service {
-//    @Override
-//    public void onTaskRemoved(Intent rootIntent) {
-//      super.onTaskRemoved(rootIntent);
-//      stopSelf();
-//    }
-//
-//    @Nullable
-//    @Override
-//    public IBinder onBind(Intent intent) {
-//      return null;
-//    }
-//  }
 
   @Override
   public void onResume() {
@@ -785,6 +765,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   public void onPause() {
     super.onPause();
 
+    Log.i("testNote", "onPause called!");
+
 //    timerPopUpWindow.setAnimationStyle(android.R.style.Animation);
 //    overridePendingTransition(0, 0);
 
@@ -807,6 +789,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       notificationManagerCompat.cancel(1);
       mHandler.removeCallbacks(globalNotficationsRunnable);
     }
+
+    Log.i("testNote", "onStop called!");
   }
 
   @Override
@@ -815,6 +799,9 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     notificationManagerCompat.cancelAll();
 //    mHandler.removeCallbacks(globalNotficationsRunnable);
+
+    Log.i("testNote", "onDestroy called!");
+
 
   }
 
@@ -1544,6 +1531,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     savedPomCycleAdapter.enableRowClicking();
     savedPomCycleAdapter.notifyDataSetChanged();
   }
+
+//  @Nullable
+//  @Override
+//  public IBinder onBind(Intent intent) {
+//    return null;
+//  }
+//
+//  @Override
+//  public void onTaskRemoved(Intent rootIntent) {
+//      Log.i("testRemove", "remove called!");
+//      notificationManagerCompat.cancelAll();
+////      stopSelf();
+//  }
 
   @SuppressLint({"UseCompatLoadingForDrawables", "ClickableViewAccessibility", "CommitPrefEdits", "CutPasteId"})
   @Override
@@ -5134,15 +5134,16 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
           String[] fetchedPomCycle = pomArray.get(positionOfSelectedCycleForModeThree).split(" - ");
 
           /////---------Testing pom round iterations---------------/////////
-          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(8000);
+//          for (int i=0; i<8; i++) if (i%2!=0) pomValuesTime.add(5000); else pomValuesTime.add(8000);
 
           for (int i = 0; i < fetchedPomCycle.length; i++) {
             int integerValue = Integer.parseInt(fetchedPomCycle[i]);
 
-            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(pomValuesTime.get(i) / 1000));
+            //Used for testing.
+//            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(pomValuesTime.get(i) / 1000));
 
-//            pomValuesTime.add(integerValue);
-//            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue / 1000));
+            pomValuesTime.add(integerValue);
+            pomStringListOfRoundValues.add(longToStringConverters.convertSecondsToMinutesBasedString(integerValue / 1000));
           }
 
           pomDotsAdapter.setPomCycleRoundsAsStringsList(pomStringListOfRoundValues);
