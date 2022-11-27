@@ -203,6 +203,7 @@ public class DailyStatsAccess {
     public void setActivityListsForDatabaseObjectsForStatsFragment(List<Integer> integerListOfDaysSelected) {
         if (integerListOfDaysSelected.size()>0) {
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfDaysSelected);
+            Log.i("testDelete", "List size being pulled from database is " + mStatsForEachActivityList.size());
         } else {
             mStatsForEachActivityList = new ArrayList<>();
         }
@@ -249,8 +250,6 @@ public class DailyStatsAccess {
 
         int firstAggregatedDayOfYearToUse = firstDayOfDuration + valueAddedForFutureYears;
         convertToStringAndSetFirstAndLastDurationDays(firstDayOfDuration, lastDayOfDuration);
-
-        Log.i("testDate", "mYear var in duration retrieval method is is " + mYearSelectedForDurationStartDate);
 
         clearAllActivityAndFoodIntegerDayLists();
 
@@ -739,6 +738,8 @@ public class DailyStatsAccess {
     }
 
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
+        Log.i("testDelete", "List size being populated, POST-PULL, from database is " + mStatsForEachActivityList.size());
+
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getActivity()!=null) {
                 if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {

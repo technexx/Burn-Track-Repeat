@@ -158,10 +158,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
     @Override
     public int getItemCount() {
         if (!mEditModeIsActive) {
-            Log.i("testDelete", "editMode NOT active and returning mItemCount of" + mItemCount);
+//            Log.i("testDelete", "From getItemCount(): editMode NOT active and returning mItemCount of " + mItemCount);
             return mItemCount = mActivities.size()+1;
         } else {
-            Log.i("testDelete", "editMode ACTIVE and returning mItemCount of" + mItemCount);
+//            Log.i("testDelete", "From getItemCount(): editMode ACTIVE and returning mItemCount of " + mItemCount);
             return mItemCount = mActivities.size()+2;
         }
     }
@@ -244,11 +244,12 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.caloriesBurnedTextView.setTypeface(robotoMedium);
 
             Log.i("testDelete", "set time list size is " + mSetTimes.size());
-            Log.i("testDelete", "calorie list size is " + mCaloriesBurned.size());
 
+            //Todo: In our delete crashes, list sizes received here do not reflect the ones pulled from database.
+                //Todo: Not always this, though. Could still be extra footer position?
+            //Invalid item position 6(offset:6).state:7
             mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
             mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
-            //Todo: Fetches at (position-1), so getItemCount() must be returning list size +2, consistent w/ edit mode.
             mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
 
             mMainViewHolder.activityTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));

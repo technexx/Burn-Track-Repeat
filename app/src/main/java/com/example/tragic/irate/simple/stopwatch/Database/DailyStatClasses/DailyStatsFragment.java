@@ -748,34 +748,42 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
-        dailyStatsAccess.clearStatsForEachActivityArrayLists();
-        dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
-        dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
-        dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
+        if (caloriesComparisonTabLayout.getSelectedTabPosition() == 0) {
+            dailyStatsAccess.clearStatsForEachActivityArrayLists();
 
-        dailyStatsAccess.clearFoodConsumedArrayLists();
-        dailyStatsAccess.setTotalFoodConsumedForSelectedDaysToArrayLists();
+            dailyStatsAccess.setTotalActivityStatsForSelectedDaysToArrayLists();
+            dailyStatsAccess.setTotalSetTimeVariableForSelectedDuration();
 
-        dailyStatsAccess.setAggregateTimeForSelectedDuration();
-        dailyStatsAccess.setUnassignedTotalCalories();
+            dailyStatsAccess.setAggregateTimeForSelectedDuration();
+            dailyStatsAccess.setUnassignedTotalCalories();
 
-        dailyStatsAccess.setAggregateCaloriesForSelectedDuration();
-        dailyStatsAccess.setUnassignedDailyTotalTime();
+            dailyStatsAccess.setAggregateCaloriesForSelectedDuration();
+            dailyStatsAccess.setUnassignedDailyTotalTime();
+        }
+
+        if (caloriesComparisonTabLayout.getSelectedTabPosition() == 1) {
+            dailyStatsAccess.setTotalCaloriesVariableForSelectedDuration();
+
+            dailyStatsAccess.clearFoodConsumedArrayLists();
+            dailyStatsAccess.setTotalFoodConsumedForSelectedDaysToArrayLists();
+        }
 
         dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
         getActivity().runOnUiThread(()-> {
             dailyStatsAdapter.turnOffEditMode();
 
-            dailyStatsAdapter.notifyDataSetChanged();
-            caloriesConsumedAdapter.notifyDataSetChanged();
+            if (caloriesComparisonTabLayout.getSelectedTabPosition() == 0) {
+                dailyStatsAdapter.notifyDataSetChanged();
+                setTotalActivityStatsFooterTextViews();
+            }
 
-            setTotalActivityStatsFooterTextViews();
-            setTotalCaloriesConsumedFooterTextViews();
+            if (caloriesComparisonTabLayout.getSelectedTabPosition() == 1) {
+                caloriesConsumedAdapter.notifyDataSetChanged();
+                setTotalCaloriesConsumedFooterTextViews();
+            }
 
             setTotalCaloriesComparedTextViews(false);
-
-//            setSimplifiedViewTextViews();
         });
     }
 
@@ -1189,6 +1197,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             double newCaloriesBurned = 0;
 
             dailyStatsAccess.setStatsForEachActivityEntityFromPosition(mPositionToEdit);
+            //Received whenever + icon is clicked (from callback). Rows should already be sorted so doubt this is it.
             dailyStatsAccess.setMetScoreFromDatabaseList(mPositionToEdit);
 
             newActivityTime = getMillisValueToSaveFromEditTextString();
