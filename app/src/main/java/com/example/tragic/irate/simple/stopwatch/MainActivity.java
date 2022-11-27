@@ -675,12 +675,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Activity deletion bug.
+  //Todo: Stopwatch notification may not have been removed after app close.
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test all concurrent timers + notifications + notification dismissals.
       //Todo: Test Moto again because we changed some layout stuff.
+      //Todo: Test on <1920 Nexus. Font sizes in Timer may want increase.
   //Todo: Test timer layout w/ 2 rows of dots + long activity string on /1920 moto
   //Todo: Change back pom cycle times to original (non-testing).
 
@@ -693,6 +694,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   //Todo: Run code inspector for redundancies, etc.
   //Todo: Rename app, of course.
 
+  //Todo: Removing animation of addition button seemed to fix intermittent activity deletion bug. If it reoccurs:
+      //Todo: Try not using global mItemCount for list size.
   //Todo: MET bug of wrong MET score on editing activity not recently replicated.
       //Todo: If comes back, check sorting.
   //Todo: saveAddedOrEditedCycleASyncRunnable() now only executes in timer launch if from edit cycle. Should be fine but keep it in mind.

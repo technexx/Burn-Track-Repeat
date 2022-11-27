@@ -134,7 +134,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             } else {
                 footViewHolder.addActivity.setBackground(ContextCompat.getDrawable(mContext, R.drawable.add_40));            }
 
-            footViewHolder.addActivity.startAnimation(slideInFromLeft);
+//            footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
             footViewHolder.addActivity.setOnClickListener(v-> {
                 setAddingOrEditingActivityVariable(ADDING_ACTIVITY);
@@ -244,10 +244,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             Log.i("testDelete", "activity list size is " + mActivities.size());
             Log.i("testDelete", "calorie list size is " + mCaloriesBurned.size());
             Log.i("testDelete", "position is " + position);
-            //Invalid item position 6(offset:6).state:7
-
-            //Todo: Positions return very funky post-delete. They went 4-9 with no 0-3 (before revert).
-            //Todo: Try not using global mItemCount.
 
             mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
             mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
