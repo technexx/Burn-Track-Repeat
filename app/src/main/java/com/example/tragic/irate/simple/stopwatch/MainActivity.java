@@ -679,15 +679,12 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: /1920 timer dots cut off.
   //Todo: Notifications SOMETIMES do not dismiss if app is minimized and then killed.
       //Todo: Perform a check for services within it?
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
       //Todo: Test all concurrent timers + notifications + notification dismissals.
-      //Todo: Test on <1920 Nexus. Font sizes in Timer may want increase.
-  //Todo: Test timer layout w/ 2 rows of dots + long activity string on /1920 moto
   //Todo: Change back pom cycle times to original (non-testing).
 
   //Todo: Update resume on job sites.

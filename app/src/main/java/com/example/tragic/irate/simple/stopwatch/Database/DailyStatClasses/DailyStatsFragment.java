@@ -736,9 +736,10 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     private void calendarDateChangeLogic() {
         dailyStatsAdapter.getItemCount();
-
-        caloriesConsumedAdapter.turnOffEditMode();
         caloriesConsumedAdapter.getItemCount();
+
+        dailyStatsAdapter.turnOffEditMode();
+        caloriesConsumedAdapter.turnOffEditMode();
     }
 
     private void setSelectionDayIfSelectingSingleDayFromCustomDuration() {
