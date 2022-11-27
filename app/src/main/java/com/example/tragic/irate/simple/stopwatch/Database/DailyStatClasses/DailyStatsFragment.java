@@ -747,6 +747,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         }
     }
 
+    //At present, we're keeping this query of both entities on each execution. They are intertwined in our access class.
     public void populateListsAndTextViewsFromEntityListsInDatabase() {
         setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(currentStatDurationMode);
 
@@ -767,17 +768,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
         getActivity().runOnUiThread(()-> {
-            dailyStatsAdapter.turnOffEditMode();
+            dailyStatsAdapter.notifyDataSetChanged();
+            caloriesConsumedAdapter.notifyDataSetChanged();
 
             setTotalActivityStatsFooterTextViews();
             setTotalCaloriesConsumedFooterTextViews();
 
             setTotalCaloriesComparedTextViews(false);
-
-//            setSimplifiedViewTextViews();
         });
     }
 
+    //Here is where we access database for both entities. We would have to changes our fetches based on tab selection in order to query for only selected tab, and then call populateListsAndTextViewsFromEntityListsInDatabase() on each tab switch.
     private void setDayAndStatsForEachActivityEntityListsForChosenDurationOfDays(int mode) {
         if (mode==DAILY_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForSingleDay(mCalendar.get(Calendar.DAY_OF_YEAR));

@@ -483,8 +483,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   double stopWatchMinutes;
   double savedLapStopWatchMs;
 
-  String displayMs = "00";
-  String displayTime = "0";
+  String stopWatchDisplayMs = "00";
+  String stopWatchDisplayTime = "0";
   String newEntries;
   String savedEntries;
   ArrayList<String> currentLapList;
@@ -675,16 +675,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Add most/least recent for activities and foods in stats fragment.
+  //Todo: Activity deletion bug.
 
   //Todo: Test fresh install add/sub cycles etc. Row clicks/sorting/orders of cycles.
       //Todo: Test for Pom, too
-      //Todo: Test Stopwatch.
       //Todo: Test all concurrent timers + notifications + notification dismissals.
-  //Todo: Test Moto again because we changed some layout stuff.
+      //Todo: Test Moto again because we changed some layout stuff.
 
-  //Todo: After adding current app screenshots, update resume on job sites.
-  //Todo: Okay to release a 1.0.1 version!
+  //Todo: Update resume on job sites.
+  //Todo: Release a 1.0.1 version!!!
 
   //Todo: Change back pom cycle times to original (non-testing).
   //Todo: Test end of rounds/simultaneous endings/vibs and ringtones.
@@ -1987,8 +1986,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   }
 
   private void stopWatchLaunchLogic() {
-    stopWatchTimeTextView.setText(displayTime);
-    msTimeTextView.setText(displayMs);
+    stopWatchTimeTextView.setText(stopWatchDisplayTime);
+    msTimeTextView.setText(stopWatchDisplayMs);
     laps_completed_textView.setText(getString(R.string.laps_completed, lapsNumber));
 
     stopWatchPopUpWindow.showAtLocation(mainView, Gravity.NO_GRAVITY, 0, 0);
@@ -4179,7 +4178,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         }
       }
 
-      if (!displayTime.equals("0") || displayMs.equals("0")) {
+      if (!stopWatchDisplayTime.equals("0") || stopWatchDisplayMs.equals("0")) {
         headerThree = getString(R.string.notification_stopwatch_header);
         bodyThree = longToStringConverters.convertTimerValuesToStringForNotifications((long) stopWatchSeconds);
       }
@@ -5382,11 +5381,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         stopWatchMinutes = (int) stopWatchSeconds / 60;
         stopWatchMs = (stopWatchTotalTime % 1000) / 10;
 
-        displayTime = longToStringConverters.convertSecondsToMinutesBasedString((long) stopWatchSeconds);
-        displayMs = df2.format(stopWatchMs);
+        stopWatchDisplayTime = longToStringConverters.convertSecondsToMinutesBasedString((long) stopWatchSeconds);
+        stopWatchDisplayMs = df2.format(stopWatchMs);
 
-        stopWatchTimeTextView.setText(displayTime);
-        msTimeTextView.setText(displayMs);
+        stopWatchTimeTextView.setText(stopWatchDisplayTime);
+        msTimeTextView.setText(stopWatchDisplayMs);
 
         decreaseTextSizeForTimersForStopWatch(stopWatchTotalTime);
 
@@ -6730,7 +6729,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     stopWatchTimeTextView.setAlpha(1);
     stopWatchTimeTextView.setText("0");
+    stopWatchDisplayTime = "0";
+    stopWatchDisplayMs = "0";
     msTimeTextView.setText("00");
+    laps_completed_textView.setText(getString(R.string.laps_completed, 0));
 
     if (currentLapList.size() > 0) currentLapList.clear();
     if (savedLapList.size() > 0) savedLapList.clear();

@@ -246,7 +246,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             Log.i("testDelete", "position is " + position);
             //Invalid item position 6(offset:6).state:7
 
-            //Todo: Positions return very funky post-delete. They went 4-9 with no 0-3.
+            //Todo: Positions return very funky post-delete. They went 4-9 with no 0-3 (before revert).
             //Todo: Try not using global mItemCount.
 
             mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
