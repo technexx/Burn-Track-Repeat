@@ -134,13 +134,24 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             } else {
                 footViewHolder.addActivity.setBackground(ContextCompat.getDrawable(mContext, R.drawable.add_40));            }
 
-//            footViewHolder.addActivity.startAnimation(slideInFromLeft);
+            footViewHolder.addActivity.clearAnimation();
+            footViewHolder.addActivity.startAnimation(slideInFromLeft);
 
             footViewHolder.addActivity.setOnClickListener(v-> {
                 setAddingOrEditingActivityVariable(ADDING_ACTIVITY);
                 mTdeeActivityAddition.onAddingActivity(position);
             });
         }
+    }
+
+    private void setAnimations() {
+        slideInFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_left);
+        slideInFromLeft.setDuration(200);
+//        slideInFromLeft.setFillAfter(true);
+
+        slideOutFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_left);
+        slideOutFromLeft.setDuration(200);
+//        slideOutFromLeft.setFillAfter(true);
     }
 
     private void setAddingOrEditingActivityVariable(int addingOrEditing) {
@@ -253,16 +264,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
             mMainViewHolder.caloriesBurnedTextView.setTextColor(ContextCompat.getColor(mContext, R.color.white));
         }
-    }
-
-    private void setAnimations() {
-        slideInFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_in_from_left);
-        slideInFromLeft.setDuration(200);
-        slideInFromLeft.setFillAfter(true);
-
-        slideOutFromLeft = AnimationUtils.loadAnimation(mContext, R.anim.slide_out_from_left);
-        slideOutFromLeft.setDuration(200);
-        slideOutFromLeft.setFillAfter(true);
     }
 
     public class MainViewHolder extends RecyclerView.ViewHolder {

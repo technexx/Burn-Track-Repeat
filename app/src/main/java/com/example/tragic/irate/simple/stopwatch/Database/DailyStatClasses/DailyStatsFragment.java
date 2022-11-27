@@ -2012,6 +2012,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         addTdeePopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
+            dailyStatsAdapter.notifyDataSetChanged();
         });
     }
 
@@ -2056,6 +2057,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tdeeEditPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
+            dailyStatsAdapter.notifyDataSetChanged();
         });
     }
 
@@ -2076,6 +2078,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedAddAndEditPopUpWindow.setOnDismissListener(()-> {
             caloriesConsumedAdapter.turnOffEditMode();
             caloriesConsumedAdapter.getItemCount();
+            caloriesConsumedAdapter.notifyDataSetChanged();
         });
     }
 

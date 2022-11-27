@@ -309,7 +309,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     } else if (position==mPosSubHolder) {
       textView.clearAnimation();
       textView.startAnimation(animateOut);
-      Log.i("testAnim", "setAnimationOne running");
     }
   }
 
@@ -320,7 +319,6 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
     } else if (position==mPosSubHolder) {
       imageView.clearAnimation();
       imageView.startAnimation(animateOut);
-      Log.i("testAnim", "setAnimationTwo running");
     }
   }
 
