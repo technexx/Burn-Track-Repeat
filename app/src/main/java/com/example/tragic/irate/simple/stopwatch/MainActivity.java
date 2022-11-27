@@ -1538,6 +1538,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     setPhoneDimensions();
     groupAllAppStartInstantiations();
 
+    setInitialTextSizeForStopWatch();
+
     launchDisclaimerIfNotPreviouslyAgreedTo();
     setPromptToLaunchUserSettingsOnFirstAppLaunch();
 
@@ -2398,7 +2400,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     lapRecycler = stopWatchPopUpView.findViewById(R.id.lap_recycler);
     stopWatchPauseResumeButton = stopWatchPopUpView.findViewById(R.id.stopwatchPauseResumeButton);
     stopWatchTimeTextView = stopWatchPopUpView.findViewById(R.id.stopWatchTimeTextView);
-    stopWatchTimeTextView.setTextSize(120f);
     new_lap = stopWatchPopUpView.findViewById(R.id.new_lap);
     msTimeTextView = stopWatchPopUpView.findViewById(R.id.msTimeTextView);
     empty_laps = stopWatchPopUpView.findViewById(R.id.empty_laps_text);
@@ -6118,7 +6119,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     }
 
     if (phoneHeight <= 1920) {
-      stopWatchTimeTextView.setTextSize(90f);
+      stopWatchTimeTextView.setTextSize(100f);
     } else {
       stopWatchTimeTextView.setTextSize(120f);
     }
@@ -6137,8 +6138,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   private void changeValueAnimatorNumbers() {
     if (phoneHeight <= 1920) {
-      valueAnimatorDown.setFloatValues(90f, 70f);
-      valueAnimatorUp.setFloatValues(70f, 90f);
+      valueAnimatorDown.setFloatValues(100f, 75f);
+      valueAnimatorUp.setFloatValues(75f, 100f);
     } else {
       valueAnimatorDown.setFloatValues(120f, 90f);
       valueAnimatorUp.setFloatValues(90f, 120f);
