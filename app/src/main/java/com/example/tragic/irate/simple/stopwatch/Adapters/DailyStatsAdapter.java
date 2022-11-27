@@ -111,9 +111,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mainViewHolder.fullView.setBackground(null);
 
             //Returns on last row in edit mode so we don't try to pull textViews from footer.
-            if (position==mItemCount-1 && mEditModeIsActive) {
-                return;
-            }
+//            if (position==mItemCount-1 && mEditModeIsActive) {
+//                return;
+//            }
 
             if (position == 0) {
                 if (mPhoneHeight <= 1920) {
@@ -157,6 +157,7 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 Log.i("testDelete", "position is " + position);
                 //Invalid item position 6(offset:6).state:7
 
+                //Todo: Positions return very funky post-delete. They went 4-9 with no 0-3.
                 mainViewHolder.activityTextView.setText(mActivities.get(position-1));
                 mainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
                 mainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));
@@ -176,9 +177,11 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mainViewHolder.fullView.setOnClickListener(v-> {
                 if (position > 0) {
                     if (mEditModeIsActive) {
-                        setAddingOrEditingActivityVariable(EDITING_ACTIVITY);
-                        mTdeeEditedItemIsSelected.activityEditItemSelected(position-1);
-                        toggleRowSelectionForEditing();
+                        if (position < mItemCount-1) {
+                            setAddingOrEditingActivityVariable(EDITING_ACTIVITY);
+                            mTdeeEditedItemIsSelected.activityEditItemSelected(position-1);
+                            toggleRowSelectionForEditing();
+                        }
                     }
                 }
             });
@@ -199,16 +202,14 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         }
     }
 
-    //Todo: Edit list (+2) seems execute before we only need (+1) for population
     @Override
     public int getItemCount() {
         int listSize = mActivities.size();
 
         if (!mEditModeIsActive) {
-            int adjustedItemCount = listSize += 1;
-            Log.i("testDelete", "item count in non-edit mode is " + adjustedItemCount);
+            Log.i("testDelete", "item count in non-edit mode is " + listSize);
 
-            mItemCount = adjustedItemCount += 1;
+            mItemCount = listSize += 1;
             return mItemCount;
         } else {
             int adjustedItemCount = listSize += 2;
@@ -216,6 +217,16 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
 
             mItemCount = adjustedItemCount;
             return mItemCount;
+        }
+    }
+
+    @Override
+    public int getItemViewType(int position) {
+        //<= because header takes up first position and doesn't pull from list.
+        if (position < mActivities.size() +1 || !mEditModeIsActive){
+            return MAIN_VIEW;
+        } else {
+            return FOOTER_VIEW;
         }
     }
 
@@ -231,19 +242,10 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
         mRowIsSelectedForEditing = !mRowIsSelectedForEditing;
     }
 
-    @Override
-    public int getItemViewType(int position) {
-        //<= because header takes up first position and doesn't pull from list.
-        if (position <= mActivities.size() || !mEditModeIsActive){
-            return MAIN_VIEW;
-        } else {
-            return FOOTER_VIEW;
-        }
-    }
-
     public void turnOffEditMode() {
         mEditModeIsActive = false;
         animateButtonSliding = false;
+        notifyDataSetChanged();
     }
 
     public void toggleEditMode() {

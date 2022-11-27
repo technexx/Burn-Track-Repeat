@@ -184,6 +184,7 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
     public void turnOffEditMode() {
         mEditModeIsActive = false;
         animateButtonSliding = false;
+        notifyDataSetChanged();
     }
 
     public void toggleEditMode() {

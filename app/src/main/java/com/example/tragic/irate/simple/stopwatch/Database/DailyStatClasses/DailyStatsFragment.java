@@ -767,8 +767,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
         getActivity().runOnUiThread(()-> {
-            dailyStatsAdapter.notifyDataSetChanged();
-            caloriesConsumedAdapter.notifyDataSetChanged();
+            dailyStatsAdapter.turnOffEditMode();
 
             setTotalActivityStatsFooterTextViews();
             setTotalCaloriesConsumedFooterTextViews();
@@ -1284,6 +1283,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
     }
 
     private void deleteActivityFromStats(int position) {
+        dailyStatsAdapter.turnOffEditMode();
         numberOfDaysWithActivitiesHasChanged = true;
 
         AsyncTask.execute(() -> {
@@ -2011,7 +2011,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         addTdeePopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
-            dailyStatsAdapter.notifyDataSetChanged();
         });
     }
 
@@ -2056,7 +2055,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         tdeeEditPopUpWindow.setOnDismissListener(()-> {
             dailyStatsAdapter.turnOffEditMode();
-            dailyStatsAdapter.notifyDataSetChanged();
         });
     }
 
@@ -2077,7 +2075,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         caloriesConsumedAddAndEditPopUpWindow.setOnDismissListener(()-> {
             caloriesConsumedAdapter.turnOffEditMode();
             caloriesConsumedAdapter.getItemCount();
-            caloriesConsumedAdapter.notifyDataSetChanged();
         });
     }
 
@@ -2225,9 +2222,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 simplifiedStatsLayout.setVisibility(View.INVISIBLE);
 
                 dailyStatsAdapter.turnOffEditMode();
-                dailyStatsAdapter.notifyDataSetChanged();
                 caloriesConsumedAdapter.turnOffEditMode();
-                caloriesConsumedAdapter.notifyDataSetChanged();
 
                 resetCustomTabTextViewColors();
             }
