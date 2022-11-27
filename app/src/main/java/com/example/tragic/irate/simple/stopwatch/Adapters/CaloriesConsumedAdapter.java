@@ -223,8 +223,8 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
                 mMainViewHolder.foodEatenTextView.setTextSize(17);
                 mMainViewHolder.caloriesConsumedTextView.setTextSize(17);
             } else {
-                mMainViewHolder.foodEatenTextView.setTextSize(20);
-                mMainViewHolder.caloriesConsumedTextView.setTextSize(20);
+                mMainViewHolder.foodEatenTextView.setTextSize(22);
+                mMainViewHolder.caloriesConsumedTextView.setTextSize(22);
             }
         } else {
             mMainViewHolder.foodEatenTextView.setTypeface(robotoMedium);
@@ -237,8 +237,8 @@ public class CaloriesConsumedAdapter extends RecyclerView.Adapter<RecyclerView.V
                 mMainViewHolder.foodEatenTextView.setTextSize(16);
                 mMainViewHolder.caloriesConsumedTextView.setTextSize(17);
             } else {
-                mMainViewHolder.foodEatenTextView.setTextSize(19);
-                mMainViewHolder.caloriesConsumedTextView.setTextSize(20);
+                mMainViewHolder.foodEatenTextView.setTextSize(18);
+                mMainViewHolder.caloriesConsumedTextView.setTextSize(18);
             }
         }
     }

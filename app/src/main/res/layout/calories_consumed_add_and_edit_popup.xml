@@ -29,7 +29,7 @@
         android:layout_marginTop="4dp"
         android:textColor="@color/white"
         android:textCursorDrawable="@drawable/edit_text_cursor"
-        android:maxLength="30"
+        android:maxLength="40"
         android:maxLines="1"
         android:minWidth="140dp"
         android:textSize="22sp"

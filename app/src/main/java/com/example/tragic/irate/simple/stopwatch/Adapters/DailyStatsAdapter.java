@@ -221,9 +221,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mMainViewHolder.setTimeTextView.setTextSize(17);
                 mMainViewHolder.caloriesBurnedTextView.setTextSize(17);
             } else {
-                mMainViewHolder.activityTextView.setTextSize(20);
-                mMainViewHolder.setTimeTextView.setTextSize(20);
-                mMainViewHolder.caloriesBurnedTextView.setTextSize(20);
+                mMainViewHolder.activityTextView.setTextSize(22);
+                mMainViewHolder.setTimeTextView.setTextSize(22);
+                mMainViewHolder.caloriesBurnedTextView.setTextSize(22);
             }
 
             mMainViewHolder.activityTextView.setText(R.string.activity_text_header);
@@ -243,9 +243,9 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
                 mMainViewHolder.setTimeTextView.setTextSize(17);
                 mMainViewHolder.caloriesBurnedTextView.setTextSize(17);
             } else {
-                mMainViewHolder.activityTextView.setTextSize(17);
-                mMainViewHolder.setTimeTextView.setTextSize(19);
-                mMainViewHolder.caloriesBurnedTextView.setTextSize(19);
+                mMainViewHolder.activityTextView.setTextSize(18);
+                mMainViewHolder.setTimeTextView.setTextSize(18);
+                mMainViewHolder.caloriesBurnedTextView.setTextSize(18);
             }
 
             mMainViewHolder.activityTextView.setTypeface(robotoMedium);
