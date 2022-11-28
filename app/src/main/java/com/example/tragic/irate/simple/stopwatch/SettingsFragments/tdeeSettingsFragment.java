@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
@@ -31,7 +32,7 @@ public class tdeeSettingsFragment extends Fragment {
 
     SharedPreferences sharedPreferences;
     SharedPreferences.Editor prefEdit;
-    Toast mToast;
+    Handler mHandler;
 
     Button imperialSettingButton;
     Button metricSettingButton;
@@ -67,6 +68,7 @@ public class tdeeSettingsFragment extends Fragment {
 
     @Override
     public void onStop() {
+        saveSpinnerStatsToSharedPreferences(metricMode);
         saveUpdatedBmrSettings();
         Log.i("testTdee", "onStop called in tdee frag!");
         super.onStop();
@@ -75,6 +77,8 @@ public class tdeeSettingsFragment extends Fragment {
     public View onCreateView(final LayoutInflater inflater, final ViewGroup container, final Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.tdee_settings_fragment_layout, container, false);
         root.setBackgroundColor(getResources().getColor(R.color.alien_black));
+
+        mHandler = new Handler();
 
         sharedPreferences = getActivity().getSharedPreferences("pref", 0);
         prefEdit = sharedPreferences.edit();
@@ -167,33 +171,38 @@ public class tdeeSettingsFragment extends Fragment {
     }
 
     private void toggleMetricAndImperial(boolean selectingMetric) {
-        if (selectingMetric) {
-            //Going from Imperial to Metric.
-            saveSpinnerStatsToSharedPreferences(false);
+        //This conditional prevents switches before stuff is set.
+        if (selectingMetric != metricMode) {
+            if (selectingMetric) {
+                //Going from Imperial to Metric.
+                saveSpinnerStatsToSharedPreferences(false);
 
-            metricMode = true;
-            imperialSettingButton.setAlpha(0.5f);
-            metricSettingButton.setAlpha(1.0f);
-        } else {
-            //Going from Metric to Imperial.
-            saveSpinnerStatsToSharedPreferences(true);
+                metricMode = true;
+                imperialSettingButton.setAlpha(0.5f);
+                metricSettingButton.setAlpha(1.0f);
+            } else {
+                //Going from Metric to Imperial.
+                saveSpinnerStatsToSharedPreferences(true);
 
-            metricMode = false;
-            imperialSettingButton.setAlpha(1.0f);
-            metricSettingButton.setAlpha(0.5f);
+                metricMode = false;
+                imperialSettingButton.setAlpha(1.0f);
+                metricSettingButton.setAlpha(0.5f);
+            }
+
+            clearWeightAndHeightListsAndAdapters();
+
+            populateWeightSpinnerStringList();
+            populateHeightSpinnerStringList();
+
+            refreshWeightAndHeightSpinnerAdapters();
+
+            retrieveAndSetSpinnerValues(metricMode);
+            bmrTextView.setText(calculatedBMRString());
+
+            prefEdit.putBoolean("metricMode", metricMode);
+            prefEdit.apply();
         }
 
-        clearWeightAndHeightListsAndAdapters();
-
-        populateWeightSpinnerStringList();
-        populateHeightSpinnerStringList();
-
-        refreshWeightAndHeightSpinnerAdapters();
-
-        retrieveAndSetSpinnerValues(metricMode);
-
-        saveUpdatedBmrSettings();
-        bmrTextView.setText(calculatedBMRString());
     }
 
     private void clearWeightAndHeightListsAndAdapters() {
@@ -208,19 +217,21 @@ public class tdeeSettingsFragment extends Fragment {
         heightAdapter.notifyDataSetChanged();
     }
 
-    //Todo: Will cause index exceptions if metric ever saved incorrectly.
     public void saveSpinnerStatsToSharedPreferences(boolean savingMetric) {
         if (savingMetric) {
             prefEdit.putInt("weightPositionMetric", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionMetric", height_spinner.getSelectedItemPosition());
             prefEdit.putInt("activityLevelPositionMetric", activity_level_spinner.getSelectedItemPosition());
+
+            Log.i("testTdee", "metric saving of spinner positions");
+
         } else {
             prefEdit.putInt("weightPositionImperial", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionImperial", height_spinner.getSelectedItemPosition());
             prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
-        }
 
-        prefEdit.putBoolean("metricMode", metricMode);
+            Log.i("testTdee", "imperial saving of spinner positions");
+        }
 
         prefEdit.putString("tdeeGender", getStringValueFromSpinner(gender_spinner));
         prefEdit.putInt("tdeeAge", getIntegerValueFromFullSpinnerString(age_spinner));
@@ -248,15 +259,21 @@ public class tdeeSettingsFragment extends Fragment {
         if (isMetric) {
             weightPosition = sharedPreferences.getInt("weightPositionMetric", 25);
             heightPosition = sharedPreferences.getInt("heightPositionMetric", 60);
+
+            Log.i("testTdee", "metric retrieval of spinner positions");
+
         } else {
             weightPosition = sharedPreferences.getInt("weightPositionImperial", 50);
             heightPosition = sharedPreferences.getInt("heightPositionImperial", 24);
+
+            Log.i("testTdee", "imperial retrieval of spinner positions");
+
         }
 
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
 
-         activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 3);
+        activityLevelPosition = sharedPreferences.getInt("activityLevelPosition", 3);
         activity_level_spinner.setSelection(activityLevelPosition);
     }
 
@@ -412,10 +429,13 @@ public class tdeeSettingsFragment extends Fragment {
             for (int i = 45; i < 151; i++) {
                 weightList.add((getAppendingStringForSpinnerList(i, WEIGHT)));
             }
+            Log.i("testTdee", "metric population of weight list");
         } else {
             for (int i = 100; i < 301; i++) {
                 weightList.add((getAppendingStringForSpinnerList( i, WEIGHT)));
             }
+            Log.i("testTdee", "imperial population of weight list");
+
         }
     }
 
