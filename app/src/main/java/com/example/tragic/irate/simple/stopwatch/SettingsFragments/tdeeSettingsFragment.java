@@ -67,8 +67,9 @@ public class tdeeSettingsFragment extends Fragment {
 
     @Override
     public void onStop() {
-//        saveSpinnerStatsToSharedPreferences(metricMode);
-//        saveUpdatedBmrSettings();
+        saveSpinnerStatsToSharedPreferences(metricMode);
+        saveUpdatedBmrSettings();
+        Log.i("testTdee", "onStop called in tdee frag!");
         super.onStop();
     }
 
@@ -149,14 +150,6 @@ public class tdeeSettingsFragment extends Fragment {
             toggleMetricAndImperial(true);
         });
 
-//        saveTdeeSettingsButton.setOnClickListener(v -> {
-//            saveSpinnerStatsToSharedPreferences(metricMode);
-//            bmrTextView.setText(calculatedBMRString());
-//            saveUpdatedBmrSettings();
-//            showToastIfNoneActive("Updated");
-//
-//        });
-
         return root;
     }
 
@@ -177,26 +170,24 @@ public class tdeeSettingsFragment extends Fragment {
     }
 
     private void toggleMetricAndImperial(boolean selectingMetric) {
-        if (selectingMetric!=metricMode) {
-            if (selectingMetric) {
-                metricMode = true;
-                imperialSettingButton.setAlpha(0.5f);
-                metricSettingButton.setAlpha(1.0f);
-                saveSpinnerStatsToSharedPreferences(false);
-            } else {
-                metricMode = false;
-                imperialSettingButton.setAlpha(1.0f);
-                metricSettingButton.setAlpha(0.5f);
-                saveSpinnerStatsToSharedPreferences(true);
-            }
-
-            clearAndRepopulateWeightAndHeightSpinnerAdapters();
-            clearAndRepopulateWeightAndHeightSpinnerList();
-            refreshWeightAndHeightSpinnerAdapters();
-
-            retrieveAndSetSpinnerValues(selectingMetric);
-            bmrTextView.setText(calculatedBMRString());
+        if (selectingMetric) {
+            metricMode = true;
+            imperialSettingButton.setAlpha(0.5f);
+            metricSettingButton.setAlpha(1.0f);
+            saveSpinnerStatsToSharedPreferences(false);
+        } else {
+            metricMode = false;
+            imperialSettingButton.setAlpha(1.0f);
+            metricSettingButton.setAlpha(0.5f);
+            saveSpinnerStatsToSharedPreferences(true);
         }
+
+        clearAndRepopulateWeightAndHeightSpinnerAdapters();
+        clearAndRepopulateWeightAndHeightSpinnerList();
+        refreshWeightAndHeightSpinnerAdapters();
+
+        retrieveAndSetSpinnerValues(selectingMetric);
+        bmrTextView.setText(calculatedBMRString());
     }
 
     private void clearAndRepopulateWeightAndHeightSpinnerAdapters() {
@@ -204,26 +195,28 @@ public class tdeeSettingsFragment extends Fragment {
         heightAdapter.addAll(heightList);
     }
 
+
+    private void clearAndRepopulateWeightAndHeightSpinnerList() {
+        weightList.clear();
+        weightAdapter.clear();
+        heightList.clear();
+        heightAdapter.clear();
+
+        populateWeightSpinnerStringList();
+        populateHeightSpinnerStringList();
+    }
+
     private void refreshWeightAndHeightSpinnerAdapters() {
         weightAdapter.notifyDataSetChanged();
         heightAdapter.notifyDataSetChanged();
     }
 
-    private void populateGenderSpinnerStringList() {
-        genderList.add(getString(R.string.male));
-        genderList.add(getString(R.string.female));
-    }
-
     public void saveSpinnerStatsToSharedPreferences(boolean savingMetric) {
         if (savingMetric) {
-//            prefEdit.putInt("genderPositionMetric", gender_spinner.getSelectedItemPosition());
-//            prefEdit.putInt("agePositionMetric", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionMetric", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionMetric", height_spinner.getSelectedItemPosition());
             prefEdit.putInt("activityLevelPositionMetric", activity_level_spinner.getSelectedItemPosition());
         } else {
-//            prefEdit.putInt("genderPositionImperial", gender_spinner.getSelectedItemPosition());
-//            prefEdit.putInt("agePositionImperial", age_spinner.getSelectedItemPosition());
             prefEdit.putInt("weightPositionImperial", weight_spinner.getSelectedItemPosition());
             prefEdit.putInt("heightPositionImperial", height_spinner.getSelectedItemPosition());
             prefEdit.putInt("activityLevelPositionImperial", activity_level_spinner.getSelectedItemPosition());
@@ -250,26 +243,18 @@ public class tdeeSettingsFragment extends Fragment {
     }
 
     private void retrieveAndSetSpinnerValues(boolean selectingMetric) {
-        int genderPosition;
-        int agePosition;
         int weightPosition;
         int heightPosition;
         int activityLevelPosition;
 
         if (selectingMetric) {
-//            genderPosition = sharedPreferences.getInt("genderPositionMetric", 0);
-//            agePosition = sharedPreferences.getInt("agePositionMetric", 0);
             weightPosition = sharedPreferences.getInt("weightPositionMetric", 25);
             heightPosition = sharedPreferences.getInt("heightPositionMetric", 60);
         } else {
-//            genderPosition = sharedPreferences.getInt("genderPositionImperial", 0);
-//            agePosition = sharedPreferences.getInt("agePositionImperial", 0);
             weightPosition = sharedPreferences.getInt("weightPositionImperial", 50);
             heightPosition = sharedPreferences.getInt("heightPositionImperial", 24);
         }
 
-//        gender_spinner.setSelection(genderPosition);
-//        age_spinner.setSelection(agePosition);
         weight_spinner.setSelection(weightPosition);
         height_spinner.setSelection(heightPosition);
 
@@ -284,55 +269,6 @@ public class tdeeSettingsFragment extends Fragment {
 
     private String getStringValueFromSpinner(Spinner spinner) {
         return (String) spinner.getSelectedItem();
-    }
-
-    private void clearAndRepopulateWeightAndHeightSpinnerList() {
-        weightList.clear();
-        weightAdapter.clear();
-        heightList.clear();
-        heightAdapter.clear();
-
-        populateWeightSpinnerStringList();
-        populateHeightSpinnerStringList();
-    }
-
-    private void populateAgeSpinnerStringList() {
-        for (int i = 18; i < 101; i++) {
-            ageList.add(i + " " + "years");
-        }
-    }
-
-    private void populateWeightSpinnerStringList() {
-        if (metricMode) {
-            for (int i = 45; i < 151; i++) {
-                weightList.add((getAppendingStringForSpinnerList(i, WEIGHT)));
-            }
-        } else {
-            for (int i = 100; i < 301; i++) {
-                weightList.add((getAppendingStringForSpinnerList( i, WEIGHT)));
-            }
-        }
-    }
-
-    private void populateHeightSpinnerStringList() {
-        if (metricMode) {
-            for (int i = 120; i < 251; i++) {
-                heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
-            }
-        } else {
-            for (int i = 48; i < 100; i++) {
-                heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
-            }
-        }
-    }
-
-    private void populateActivityLevelStringList() {
-        activityLevelList.add(getString(R.string.act_0));
-        activityLevelList.add(getString(R.string.act_1));
-        activityLevelList.add(getString(R.string.act_2));
-        activityLevelList.add(getString(R.string.act_3));
-        activityLevelList.add(getString(R.string.act_4));
-        activityLevelList.add(getString(R.string.act_5));
     }
 
     private String calculatedBMRString() {
@@ -462,11 +398,47 @@ public class tdeeSettingsFragment extends Fragment {
         return multiplierToReturn;
     }
 
-    private void showToastIfNoneActive (String message){
-        if (mToast != null) {
-            mToast.cancel();
+    private void populateGenderSpinnerStringList() {
+        genderList.add(getString(R.string.male));
+        genderList.add(getString(R.string.female));
+    }
+
+    private void populateAgeSpinnerStringList() {
+        for (int i = 18; i < 101; i++) {
+            ageList.add(i + " " + "years");
         }
-        mToast = Toast.makeText(getContext(), message, Toast.LENGTH_SHORT);
-        mToast.show();
+    }
+
+    private void populateWeightSpinnerStringList() {
+        if (metricMode) {
+            for (int i = 45; i < 151; i++) {
+                weightList.add((getAppendingStringForSpinnerList(i, WEIGHT)));
+            }
+        } else {
+            for (int i = 100; i < 301; i++) {
+                weightList.add((getAppendingStringForSpinnerList( i, WEIGHT)));
+            }
+        }
+    }
+
+    private void populateHeightSpinnerStringList() {
+        if (metricMode) {
+            for (int i = 120; i < 251; i++) {
+                heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
+            }
+        } else {
+            for (int i = 48; i < 100; i++) {
+                heightList.add(getAppendingStringForSpinnerList(i, HEIGHT));
+            }
+        }
+    }
+
+    private void populateActivityLevelStringList() {
+        activityLevelList.add(getString(R.string.act_0));
+        activityLevelList.add(getString(R.string.act_1));
+        activityLevelList.add(getString(R.string.act_2));
+        activityLevelList.add(getString(R.string.act_3));
+        activityLevelList.add(getString(R.string.act_4));
+        activityLevelList.add(getString(R.string.act_5));
     }
 }
