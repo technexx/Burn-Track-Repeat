@@ -36,7 +36,7 @@ public class tdeeSettingsFragment extends Fragment {
     Button imperialSettingButton;
     Button metricSettingButton;
 
-    private boolean metricMode;
+    boolean metricMode;
     Spinner gender_spinner;
     Spinner age_spinner;
     Spinner weight_spinner;
@@ -67,7 +67,6 @@ public class tdeeSettingsFragment extends Fragment {
 
     @Override
     public void onStop() {
-        saveSpinnerStatsToSharedPreferences(metricMode);
         saveUpdatedBmrSettings();
         Log.i("testTdee", "onStop called in tdee frag!");
         super.onStop();
@@ -140,8 +139,6 @@ public class tdeeSettingsFragment extends Fragment {
 
         bmrTextView.setText(calculatedBMRString());
 
-        toggleMetricAndImperial(false);
-
         imperialSettingButton.setOnClickListener(v -> {
             toggleMetricAndImperial(false);
         });
@@ -157,8 +154,8 @@ public class tdeeSettingsFragment extends Fragment {
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                saveUpdatedBmrSettings();
-                saveSpinnerStatsToSharedPreferences(metricMode);
+//                saveUpdatedBmrSettings();
+//                saveSpinnerStatsToSharedPreferences(metricMode);
                 bmrTextView.setText(calculatedBMRString());
             }
 
@@ -171,39 +168,39 @@ public class tdeeSettingsFragment extends Fragment {
 
     private void toggleMetricAndImperial(boolean selectingMetric) {
         if (selectingMetric) {
+            //Going from Imperial to Metric.
+            saveSpinnerStatsToSharedPreferences(false);
+
             metricMode = true;
             imperialSettingButton.setAlpha(0.5f);
             metricSettingButton.setAlpha(1.0f);
-            saveSpinnerStatsToSharedPreferences(false);
         } else {
+            //Going from Metric to Imperial.
+            saveSpinnerStatsToSharedPreferences(true);
+
             metricMode = false;
             imperialSettingButton.setAlpha(1.0f);
             metricSettingButton.setAlpha(0.5f);
-            saveSpinnerStatsToSharedPreferences(true);
         }
 
-        clearAndRepopulateWeightAndHeightSpinnerAdapters();
-        clearAndRepopulateWeightAndHeightSpinnerList();
+        clearWeightAndHeightListsAndAdapters();
+
+        populateWeightSpinnerStringList();
+        populateHeightSpinnerStringList();
+
         refreshWeightAndHeightSpinnerAdapters();
 
-        retrieveAndSetSpinnerValues(selectingMetric);
+        retrieveAndSetSpinnerValues(metricMode);
+
+        saveUpdatedBmrSettings();
         bmrTextView.setText(calculatedBMRString());
     }
 
-    private void clearAndRepopulateWeightAndHeightSpinnerAdapters() {
-        weightAdapter.addAll(weightList);
-        heightAdapter.addAll(heightList);
-    }
-
-
-    private void clearAndRepopulateWeightAndHeightSpinnerList() {
+    private void clearWeightAndHeightListsAndAdapters() {
         weightList.clear();
         weightAdapter.clear();
         heightList.clear();
         heightAdapter.clear();
-
-        populateWeightSpinnerStringList();
-        populateHeightSpinnerStringList();
     }
 
     private void refreshWeightAndHeightSpinnerAdapters() {
@@ -211,6 +208,7 @@ public class tdeeSettingsFragment extends Fragment {
         heightAdapter.notifyDataSetChanged();
     }
 
+    //Todo: Will cause index exceptions if metric ever saved incorrectly.
     public void saveSpinnerStatsToSharedPreferences(boolean savingMetric) {
         if (savingMetric) {
             prefEdit.putInt("weightPositionMetric", weight_spinner.getSelectedItemPosition());
@@ -242,12 +240,12 @@ public class tdeeSettingsFragment extends Fragment {
         prefEdit.apply();
     }
 
-    private void retrieveAndSetSpinnerValues(boolean selectingMetric) {
+    private void retrieveAndSetSpinnerValues(boolean isMetric) {
         int weightPosition;
         int heightPosition;
         int activityLevelPosition;
 
-        if (selectingMetric) {
+        if (isMetric) {
             weightPosition = sharedPreferences.getInt("weightPositionMetric", 25);
             heightPosition = sharedPreferences.getInt("heightPositionMetric", 60);
         } else {
