@@ -807,17 +807,17 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       return;
     }
 
-    if (timerPopUpWindow.isShowing()) {
-      timerPopUpDismissalLogic();
-    }
-
-    if (pomTimerPopUpWindow.isShowing()) {
-      pomTimerPopUpDismissalLogic();
-    }
-
-    if (editCyclesPopupWindow.isShowing()) {
-      editCyclesPopUpDismissalLogic();
-    }
+//    if (timerPopUpWindow.isShowing()) {
+//      timerPopUpDismissalLogic();
+//    }
+//
+//    if (pomTimerPopUpWindow.isShowing()) {
+//      pomTimerPopUpDismissalLogic();
+//    }
+//
+//    if (editCyclesPopupWindow.isShowing()) {
+//      editCyclesPopUpDismissalLogic();
+//    }
 
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
       if (!isAnimationActive) {
@@ -1207,15 +1207,19 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (mode == 1) {
       if (savedCycleAdapter.isCycleActive()) {
         sortButton.setEnabled(false);
+        sortButton.setAlpha(0.3f);
       } else {
         sortButton.setEnabled(true);
+        sortButton.setAlpha(1.0f);
       }
-      if (mode==3) {
-        if (savedPomCycleAdapter.isCycleActive()) {
-          sortButton.setEnabled(false);
-        } else {
-          sortButton.setEnabled(true);
-        }
+    }
+    if (mode == 3) {
+      if (savedPomCycleAdapter.isCycleActive()) {
+        sortButton.setEnabled(false);
+        sortButton.setAlpha(0.3f);
+      } else {
+        sortButton.setEnabled(true);
+        sortButton.setAlpha(1.0f);
       }
     }
   }
@@ -2156,14 +2160,11 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
             }
 
             cycleNameEdit.setHint(getString(R.string.cycle_name_hint));
-
             toggleSortViewsBetweenWorkoutAndPomodoro(SORTING_CYCLES);
+            toggleSortButtonBasedOnIfCycleIsActive();
 
             if (!stateOfTimers.isModeOneTimerActive()) {
               enableMainViewClicks();
-
-              Log.i("testEnable", "In Tab Switch: Mode one timer not active and we are enabling main view clicks");
-
             }
 
             break;
@@ -2185,15 +2186,13 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
               fab.setEnabled(true);
             }
 
-            cycleNameEdit.setHint(getString(R.string.pom_cycle_name_hint));
 
+            cycleNameEdit.setHint(getString(R.string.pom_cycle_name_hint));
             toggleSortViewsBetweenWorkoutAndPomodoro(SORTING_POMODORO);
+            toggleSortButtonBasedOnIfCycleIsActive();
 
             if (!stateOfTimers.isModeThreeTimerActive()) {
               enableMainViewClicks();
-
-              Log.i("testEnable", "In Tab Switch: Mode three timer not active and we are enabling main view clicks");
-
             }
 
             break;
@@ -4831,6 +4830,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     toggleSortButtonBasedOnIfCycleIsActive();
 
+    Log.i("testDismiss", "timer dismissal method executed!");
   }
 
   private void pomTimerPopUpDismissalLogic() {
@@ -6940,6 +6940,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeOneTimerDisabled(false);
     stateOfTimers.setModeOneTimerActive(false);
 
+    toggleSortButtonBasedOnIfCycleIsActive();
+
     enableMainViewClicks();
 
     cyclesTextSizeHasChanged = false;
@@ -7047,6 +7049,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     stateOfTimers.setModeThreeTimerEnded(false);
     stateOfTimers.setModeThreeTimerDisabled(false);
     stateOfTimers.setModeThreeTimerActive(false);
+
+    toggleSortButtonBasedOnIfCycleIsActive();
 
     enableMainViewClicks();
 
