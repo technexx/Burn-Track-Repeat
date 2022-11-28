@@ -12,7 +12,6 @@
     <color name="teal_200">#FF03DAC5</color>
     <color name="teal_700">#FF018786</color>
     <color name="light_teal">#80DEEA</color>
-    <color name="test_teal">#26C6DA</color>
     <color name="dark_teal">#0097A7</color>
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
@@ -50,7 +49,6 @@
     <color name="yellow_1">#FFFF00</color>
     <color name="yellow_2">#F0F4C3</color>
     <color name="yellow_3">#FFEE58</color>
-    <color name="orange">#F57C00</color>
     <color name="darker_red">#C51162</color>
     <color name="light_black">#2f2f2f</color>
     <color name="grey_2">#424949</color>
@@ -68,9 +66,9 @@
 
     <color name="eerie_black">#1b1b1b </color>
 
+    <color name="orange">#F57C00</color>
     <color name="orange_1">#FF8C00</color>
     <color name="orange_2">#ff8001</color>
-    <color name="test_orange_1">#CE93D8</color>
     <color name="dark_orange">#F57C00</color>
     <color name="light_orange">#FFCC80</color>
 
@@ -82,5 +80,6 @@
     <color name="android_cyan">#ff00ffff</color>
 
     <color name="test_grey">#455A64</color>
+    <color name="test_teal">#80DEEA</color>
 
 </resources>
