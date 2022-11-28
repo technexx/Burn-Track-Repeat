@@ -759,12 +759,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
   @Override
   public void onPause() {
     super.onPause();
-
     Log.i("testNote", "onPause called!");
-
-//    timerPopUpWindow.setAnimationStyle(android.R.style.Animation);
-//    overridePendingTransition(0, 0);
-
   }
 
   @Override
@@ -793,7 +788,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     super.onDestroy();
 
     notificationManagerCompat.cancelAll();
-//    mHandler.removeCallbacks(globalNotficationsRunnable);
 
     Log.i("testNote", "onDestroy called!");
 
@@ -806,18 +800,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     if (!timerPopUpIsVisible && !pomTimerPopUpIsVisible && mainActivityFragmentFrameLayout.getVisibility() == View.INVISIBLE) {
       return;
     }
-
-//    if (timerPopUpWindow.isShowing()) {
-//      timerPopUpDismissalLogic();
-//    }
-//
-//    if (pomTimerPopUpWindow.isShowing()) {
-//      pomTimerPopUpDismissalLogic();
-//    }
-//
-//    if (editCyclesPopupWindow.isShowing()) {
-//      editCyclesPopUpDismissalLogic();
-//    }
 
     if (rootSettingsFragment.isVisible() || dailyStatsFragment.isVisible()) {
       if (!isAnimationActive) {
@@ -1333,7 +1315,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
       workoutIntegerListOfRoundTypeForFirstAdapter.clear();
 
       for (int i = 0; i < convertedWorkoutTimeStringArray.size(); i++) {
-        Log.i("testAnim", "list size is " + convertedWorkoutTimeStringArray.size());
         workoutStringListOfRoundValuesForFirstAdapter.add(convertedWorkoutTimeStringArray.get(i));
         workoutIntegerListOfRoundTypeForFirstAdapter.add(typeOfRound.get(i));
       }
@@ -1628,7 +1609,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (!stateOfTimers.isModeOneTimerActive()) {
         enableMainViewClicks();
-        Log.i("testEnable", "In Timer Dismissal: Mode one timer not active and we are enabling main view clicks");
       }
     });
 
@@ -1643,9 +1623,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
       if (!stateOfTimers.isModeThreeTimerActive()) {
         enableMainViewClicks();
-        Log.i("testEnable", "In Timer Dismissal: Mode three timer not active and we are enabling main view clicks");
       }
-
     });
 
     editPopUpLayout.setOnClickListener(v-> {
@@ -2945,8 +2923,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycles.setTotalBreakTime(totalCycleBreakTimeInMillis);
     cycles.setCyclesCompleted(cyclesCompleted);
     cyclesDatabase.cyclesDao().updateCycles(cycles);
-
-    Log.i("testDel", "set time updated in setCycleValues method at " + totalCycleSetTimeInMillis);
   }
 
   private void setPomCyclesValuesAndUpdateInDatabase() {
@@ -4829,8 +4805,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     deleteLastAccessedActivityCycleIfItHasZeroTime(positionOfSelectedCycleForModeOne);
 
     toggleSortButtonBasedOnIfCycleIsActive();
-
-    Log.i("testDismiss", "timer dismissal method executed!");
   }
 
   private void pomTimerPopUpDismissalLogic() {
@@ -5100,10 +5074,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
         dotsAdapter.setCycleRoundsAsStringsList(convertedWorkoutRoundList);
         dotsAdapter.setTypeOfRoundList(typeOfRound);
         dotsAdapter.notifyDataSetChanged();
-
-        Log.i("testLaunch", "string array in populateCycle method is " + workoutCyclesArray);
-        Log.i("testLaunch", "fetched array from string in populateCycle method is " + workoutCyclesArray);
-        Log.i("testLaunch", "integer array in populateCycle method is " + workoutTimeIntegerArray);
 
         cycleTitle = workoutTitleArray.get(positionOfSelectedCycleForModeOne);
         break;
@@ -5995,7 +5965,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
         if (mode == 3) {
           increaseTextSizeForTimers(startMillis, pomMillis);
-          Log.i("testChange", "changing textSize!");
         }
 
         pomDotsAdapter.notifyDataSetChanged();

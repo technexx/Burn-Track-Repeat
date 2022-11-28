@@ -252,10 +252,6 @@ public class DailyStatsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHol
             mMainViewHolder.setTimeTextView.setTypeface(robotoMedium);
             mMainViewHolder.caloriesBurnedTextView.setTypeface(robotoMedium);
 
-            Log.i("testDelete", "activity list size is " + mActivities.size());
-            Log.i("testDelete", "calorie list size is " + mCaloriesBurned.size());
-            Log.i("testDelete", "position is " + position);
-
             mMainViewHolder.activityTextView.setText(mActivities.get(position-1));
             mMainViewHolder.setTimeTextView.setText(longToStringConverters.convertMillisToHourBasedString(mSetTimes.get(position-1)));
             mMainViewHolder.caloriesBurnedTextView.setText(formatCalorieString(mCaloriesBurned.get(position-1)));

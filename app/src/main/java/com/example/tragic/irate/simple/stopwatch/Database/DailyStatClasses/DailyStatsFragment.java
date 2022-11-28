@@ -479,7 +479,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         });
 
         editTdeeStatsButton.setOnClickListener(v-> {
-            Log.i("testToggle", "toggling edit mode");
             if (dailyStatsRecyclerView.isShown()) {
                 dailyStatsAdapter.toggleEditMode();
                 dailyStatsAdapter.notifyDataSetChanged();
@@ -1308,9 +1307,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
         double caloriesBurnedPerSecond = calculateCaloriesBurnedPerSecond(retrievedMetScore);
         newCaloriesForActivity = ((double) (millis/1000) * caloriesBurnedPerSecond);
 
-        Log.i("testEdit", "mStats MET score during EDIT is " + dailyStatsAccess.getMetScore());
-        Log.i("testEdit", "calories returned during EDIT are " + newCaloriesForActivity);
-
         return newCaloriesForActivity;
     }
 
@@ -1643,10 +1639,8 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
                     if (!dailyStatsAccess.doesFoodExistInDatabaseForMultipleDaysBoolean(uniqueDayIdToCheck)) {
                         dailyStatsAccess.insertCaloriesAndEachFoodForSingleDay(uniqueDayIdToCheck);
-                        Log.i("testFood", "day " + uniqueDayIdToCheck + " does not exist and is inserting!");
                     } else {
                         dailyStatsAccess.updateCaloriesAndEachFoodInDatabaseFromDayId(uniqueDayIdToCheck);
-                        Log.i("testFood", "day " + uniqueDayIdToCheck + " exists and is updating!");
                     }
                 }
 

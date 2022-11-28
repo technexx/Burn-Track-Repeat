@@ -215,7 +215,6 @@ public class DailyStatsAccess {
     public void setActivityListsForDatabaseObjectsForStatsFragment(List<Integer> integerListOfDaysSelected) {
         if (integerListOfDaysSelected.size()>0) {
             mStatsForEachActivityList = assignStatsForEachActivityListBySortMode(integerListOfDaysSelected);
-            Log.i("testDelete", "List size being pulled from database is " + mStatsForEachActivityList.size());
         } else {
             mStatsForEachActivityList = new ArrayList<>();
         }
@@ -626,11 +625,6 @@ public class DailyStatsAccess {
 
     public void setMetScoreFromDatabaseList(int position) {
         mMetScore = mStatsForEachActivityList.get(position).getMetScore();
-
-        String activity = mStatsForEachActivityList.get(position).getActivity();
-//        Log.i("testEdit", "mStats activity in position during EDIT is " + activity);
-        Log.i("testEdit", "mStats MET score during EDIT is " + mMetScore);
-
     }
 
     public void setIsActivityCustomBoolean(boolean isCustom) {
@@ -641,7 +635,6 @@ public class DailyStatsAccess {
         List<Integer> singleDayList = Collections.singletonList(dayToRetrieve);
         mStatsForEachActivityList = cyclesDatabase.cyclesDao().loadActivitiesForMultipleDays(singleDayList);
         for (int i = 0; i<mStatsForEachActivityList.size(); i++) {
-            Log.i("testUpdate", "mStats list times retrieved are " + mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
         }
     }
 
@@ -727,7 +720,6 @@ public class DailyStatsAccess {
 
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getUniqueIdTiedToTheSelectedActivity()==day) {
-//                Log.i("testUpdate", "mStats list times are " + mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity());
                 valueToReturn += mStatsForEachActivityList.get(i).getTotalSetTimeForEachActivity();
             }
         }
@@ -754,8 +746,6 @@ public class DailyStatsAccess {
     }
 
     public void setTotalActivityStatsForSelectedDaysToArrayLists() {
-        Log.i("testDelete", "List size being populated, POST-PULL, from database is " + mStatsForEachActivityList.size());
-
         for (int i=0; i<mStatsForEachActivityList.size(); i++) {
             if (mStatsForEachActivityList.get(i).getActivity()!=null) {
                 if (!doesTotalActivitiesListContainSelectedString(mStatsForEachActivityList.get(i).getActivity())) {
