@@ -681,6 +681,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Those ghosting cursor things...
+
   //Todo: Update resume on job sites.
   //Todo: Release a 1.0.1 version!!!
 
