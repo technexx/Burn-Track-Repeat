@@ -69,10 +69,10 @@ public class ColorSettingsFragment extends PreferenceFragmentCompat {
         fullBreakPreference = findPreference("listPrefColorSettingForFullBreak");
 
         defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "green_setting");
-        defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "red_setting");
+        defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "orange_setting");
 
         defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "green_setting");
-        defaultColorSettingForMiniBreaks = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
+        defaultColorSettingForMiniBreaks = prefShared.getString("colorSettingForMiniBreaks", "orange_setting");
         defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "cyan_setting");
 
         CharSequence[] colorEntryListForSets = setPreference.getEntries();

@@ -209,7 +209,7 @@
 
     <string-array name="color_setting_option_values">
         <item>green_setting</item>
-        <item>red_setting</item>
+        <item>orange_setting</item>
         <item>blue_setting</item>
         <item>yellow_setting</item>
         <item>magenta_setting</item>

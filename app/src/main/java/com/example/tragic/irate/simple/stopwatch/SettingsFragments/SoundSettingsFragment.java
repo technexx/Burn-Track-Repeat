@@ -187,8 +187,6 @@ public class SoundSettingsFragment extends PreferenceFragmentCompat {
 
         if (defaultSoundSettingForSets.equals("")) {
             setPreference.setSummary(soundStringArray[1]);
-
-            mOnChangedSoundSetting.changeSoundSetting(SET_SETTING, 1);
         }
 
         if (defaultSoundSettingForBreaks.equals("")) {

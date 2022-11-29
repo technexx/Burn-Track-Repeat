@@ -52,7 +52,7 @@ public class ChangeSettingsValues {
         if (setting.equals("green_setting")) {
             assignedValue = 0;
         }
-        if (setting.equals("red_setting")) {
+        if (setting.equals("orange_setting")) {
             assignedValue = 1;
         }
         if (setting.equals("blue_setting")) {

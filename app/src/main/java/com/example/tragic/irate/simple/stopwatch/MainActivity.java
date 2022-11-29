@@ -3565,10 +3565,10 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     boolean defaultSoundSettingForFullBreak = prefShared.getBoolean("soundSettingForRestRound", true);
 
     String defaultColorSettingForSets = prefShared.getString("colorSettingForSets", "green_setting");
-    String defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "red_setting");
+    String defaultColorSettingForBreaks = prefShared.getString("colorSettingForBreaks", "orange_setting");
 
     String defaultColorSettingForWork = prefShared.getString("colorSettingForWork", "green_setting");
-    String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "red_setting");
+    String defaultColorSettingForMiniBreak = prefShared.getString("colorSettingForMiniBreaks", "orange_setting");
     String defaultColorSettingForFullBreak = prefShared.getString("colorSettingForFullBreak", "cyan_setting");
 
     vibrationSettingForSets = changeSettingsValues.assignSoundSettingNumericValue(defaultSoundSettingForSets);
