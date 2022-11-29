@@ -20,12 +20,19 @@
         <item name="alertDialogTheme">@style/AlertDialogCustom</item>
     </style>
 
-    <style name="SecondaryTextColorOverride" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="android:textColorSecondary">@color/purple_200</item>
+    <style name="SecondaryTextColorOverride">
+        <item name="android:textColorSecondary">@color/test_black</item>
     </style>
 
-    <style name="ActionBarStyling" parent="Theme.MaterialComponents.Light.DarkActionBar">
-        <item name="backgroundTint">@color/night_shadow</item>
+    <style name="EditActivityPopUpTheme">
+        <item name="editTextColor">@color/white</item>
+        <item name="android:textColor">@color/white</item>
+        <item name="android:textColorHint">@color/light_grey</item>
+    </style>
+
+    <style name="RoundRecyclerRowTheme">
+        <item name="android:textColor">@color/white</item>
+
     </style>
 
     <style name="AlertDialogCustom" parent="Theme.AppCompat.DayNight.Dialog">
@@ -123,10 +130,6 @@
 
     </style>
 
-    <style name="EditActivityPopUpTheme">
-        <item name="android:textColor">@color/white</item>
-    </style>
-
     <style name="CustomActivityAdditionPopUpTheme">
         <item name="android:textSize">22sp</item>
         <item name="android:textColor">@color/white</item>
@@ -145,8 +148,6 @@
     <style name="CalendarWeekDayHeader">
         <item name="android:textSize">17sp</item>
     </style>
-
-
 
     <style name="CalendarHeader_h1920">
         <item name="android:textSize">17sp</item>
