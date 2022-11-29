@@ -2992,9 +2992,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
     disableMainViewClicks();
 
-    roundIsSelected = false;
-    roundSelectedPosition = 0;
-
     //For some reason, shownAsDropDown vs showAtLocation prevents soft kb displacing layout.
     editCyclesPopupWindow.showAsDropDown(savedCyclesTabLayout);
   }
@@ -3734,6 +3731,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     cycleRoundsAdapter.notifyDataSetChanged();
 
     toggleCustomActionBarButtonVisibilities(false);
+
+    roundIsSelected = false;
   }
 
   private void assignOldCycleValuesToCheckForChanges() {
