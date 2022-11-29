@@ -767,6 +767,11 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
         dailyStatsAccess.setCalendarObjectSelectedFromFragment(mCalendar);
 
+        if (numberOfDaysWithActivitiesHasChanged) {
+            colorDaysWithAtLeastOneActivity();
+            numberOfDaysWithActivitiesHasChanged = false;
+        }
+
         getActivity().runOnUiThread(()-> {
             dailyStatsAdapter.notifyDataSetChanged();
             caloriesConsumedAdapter.notifyDataSetChanged();
@@ -797,11 +802,6 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 //        }
         if (mode==CUSTOM_STATS) {
             dailyStatsAccess.setAllDayAndStatListsForCustomDatesFromDatabase(customCalendarDayList, mCalendar.get(Calendar.DAY_OF_YEAR));
-        }
-
-        if (numberOfDaysWithActivitiesHasChanged) {
-            colorDaysWithAtLeastOneActivity();
-            numberOfDaysWithActivitiesHasChanged = false;
         }
 
         setListOfStatsForEachActivity();
@@ -876,16 +876,17 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
 
     public void colorDaysWithAtLeastOneActivity() {
         List<Integer> daysWithAtLeastOneActivityList = dailyStatsAccess.getListOfDaysWithAtLeastOneActivity();
-        List<CalendarDay> calendarDayList = new ArrayList<>();
-        Calendar calendarColoringObject = Calendar.getInstance(Locale.getDefault());
-
-        for (int i=0; i<daysWithAtLeastOneActivityList.size(); i++) {
-            calendarColoringObject.set(Calendar.DAY_OF_YEAR, daysWithAtLeastOneActivityList.get(i));
-
-            calendarDayList.add(CalendarDay.from(calendarColoringObject.get(Calendar.YEAR), calendarColoringObject.get(Calendar.MONTH) + 1, calendarColoringObject.get(Calendar.DAY_OF_MONTH)));
-        }
 
         getActivity().runOnUiThread(()->{
+            List<CalendarDay> calendarDayList = new ArrayList<>();
+            Calendar calendarColoringObject = Calendar.getInstance(Locale.getDefault());
+
+            for (int i=0; i<daysWithAtLeastOneActivityList.size(); i++) {
+                calendarColoringObject.set(Calendar.DAY_OF_YEAR, daysWithAtLeastOneActivityList.get(i));
+
+                calendarDayList.add(CalendarDay.from(calendarColoringObject.get(Calendar.YEAR), calendarColoringObject.get(Calendar.MONTH) + 1, calendarColoringObject.get(Calendar.DAY_OF_MONTH)));
+            }
+
             activityDecoration.setCalendarDayList(calendarDayList);
             calendarView.addDecorator(activityDecoration);
         });
@@ -1108,9 +1109,9 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
                 }
             }
 
-            populateListsAndTextViewsFromEntityListsInDatabase();
-
             numberOfDaysWithActivitiesHasChanged = true;
+
+            populateListsAndTextViewsFromEntityListsInDatabase();
 
             getActivity().runOnUiThread(()-> {
                 showToastIfNoneActive("Saved!");

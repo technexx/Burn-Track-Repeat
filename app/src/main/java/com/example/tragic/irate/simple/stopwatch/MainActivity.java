@@ -681,8 +681,6 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
-  //Todo: Adding activity to whole month didn't update day color right away.
-
   //Todo: Those ghosting cursor things...
       //Todo: Both xmls use drawables as backgrounds.
 
