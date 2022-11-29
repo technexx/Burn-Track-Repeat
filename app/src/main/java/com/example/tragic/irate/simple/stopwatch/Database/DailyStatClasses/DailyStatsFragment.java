@@ -849,6 +849,7 @@ public class DailyStatsFragment extends Fragment implements DailyStatsAdapter.td
             getActivity().runOnUiThread(()-> {
                 setStatDurationViews(currentStatDurationMode);
 
+                dailyStatsAdapter.turnOffEditMode();
                 dailyStatsAdapter.getItemCount();
 
                 caloriesConsumedAdapter.turnOffEditMode();
