@@ -70,7 +70,6 @@ public class tdeeSettingsFragment extends Fragment {
     public void onStop() {
         saveSpinnerStatsToSharedPreferences(metricMode);
         saveUpdatedBmrSettings();
-        metricMode = false;
 
 //        Log.i("testTdee", "onStop called in tdee frag!");
         super.onStop();
@@ -94,16 +93,19 @@ public class tdeeSettingsFragment extends Fragment {
 
         imperialSettingButton = root.findViewById(R.id.imperial_setting);
         metricSettingButton = root.findViewById(R.id.metric_setting);
-        imperialSettingButton.setAlpha(1.0f);
-        metricSettingButton.setAlpha(0.5f);
 
-        Button saveTdeeSettingsButton = root.findViewById(R.id.save_tdee_settings_button);
-        //Removed for moment
-        saveTdeeSettingsButton.setVisibility(View.GONE);
+        metricMode = sharedPreferences.getBoolean("metricMode", false);
+
+        if (metricMode) {
+            imperialSettingButton.setAlpha(0.5f);
+            metricSettingButton.setAlpha(1.0f);
+        } else {
+            imperialSettingButton.setAlpha(1.0f);
+            metricSettingButton.setAlpha(0.5f);
+        }
 
         imperialSettingButton.setText(R.string.imperial);
         metricSettingButton.setText(R.string.metric);
-        saveTdeeSettingsButton.setText(R.string.update);
 
         genderList = new ArrayList<>();
         ageList = new ArrayList<>();
@@ -142,8 +144,8 @@ public class tdeeSettingsFragment extends Fragment {
         activity_level_spinner.setAdapter(activityLevelAdapter);
 
         mHandler.postDelayed(()-> {
-            retrieveAndSetSpinnerValues(false);
-        }, 50);
+            retrieveAndSetSpinnerValues(metricMode);
+        }, 75);
 
 
         imperialSettingButton.setOnClickListener(v -> {
@@ -203,7 +205,6 @@ public class tdeeSettingsFragment extends Fragment {
             prefEdit.putBoolean("metricMode", metricMode);
             prefEdit.apply();
         }
-
     }
 
     private void clearWeightAndHeightListsAndAdapters() {

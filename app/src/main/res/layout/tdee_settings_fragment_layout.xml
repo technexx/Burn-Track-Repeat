@@ -209,23 +209,4 @@
         android:textStyle="bold">
     </TextView>
 
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/save_tdee_settings_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/user_settings_calories_burned_header"
-        android:paddingStart="16dp"
-        android:paddingEnd="16dp"
-        android:paddingTop="4dp"
-        android:paddingBottom="4dp"
-        android:layout_marginTop="32dp"
-        android:textColor="@color/test_blue"
-        app:cornerRadius="10dp"
-        app:rippleColor="#33AAAAAA"
-        app:strokeColor="@color/white"
-        app:strokeWidth="1dp">
-    </com.google.android.material.button.MaterialButton>
-
 </androidx.constraintlayout.widget.ConstraintLayout>
