@@ -70,7 +70,9 @@ public class tdeeSettingsFragment extends Fragment {
     public void onStop() {
         saveSpinnerStatsToSharedPreferences(metricMode);
         saveUpdatedBmrSettings();
-        Log.i("testTdee", "onStop called in tdee frag!");
+        metricMode = false;
+
+//        Log.i("testTdee", "onStop called in tdee frag!");
         super.onStop();
     }
 
@@ -89,12 +91,6 @@ public class tdeeSettingsFragment extends Fragment {
         height_spinner = root.findViewById(R.id.height_spinner);
         activity_level_spinner = root.findViewById(R.id.activity_level_spinner);
         bmrTextView = root.findViewById(R.id.user_settings_calories_burned_textView);
-
-        gender_spinner.setOnItemSelectedListener(spinnerClickListener());
-        age_spinner.setOnItemSelectedListener(spinnerClickListener());
-        weight_spinner.setOnItemSelectedListener(spinnerClickListener());
-        height_spinner.setOnItemSelectedListener(spinnerClickListener());
-        activity_level_spinner.setOnItemSelectedListener(spinnerClickListener());
 
         imperialSettingButton = root.findViewById(R.id.imperial_setting);
         metricSettingButton = root.findViewById(R.id.metric_setting);
@@ -133,15 +129,22 @@ public class tdeeSettingsFragment extends Fragment {
         heightAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         activityLevelAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
+        gender_spinner.setOnItemSelectedListener(spinnerClickListener());
+        age_spinner.setOnItemSelectedListener(spinnerClickListener());
+        weight_spinner.setOnItemSelectedListener(spinnerClickListener());
+        height_spinner.setOnItemSelectedListener(spinnerClickListener());
+        activity_level_spinner.setOnItemSelectedListener(spinnerClickListener());
+
         gender_spinner.setAdapter(genderAdapter);
         age_spinner.setAdapter(ageAdapter);
         weight_spinner.setAdapter(weightAdapter);
         height_spinner.setAdapter(heightAdapter);
         activity_level_spinner.setAdapter(activityLevelAdapter);
 
-        retrieveAndSetSpinnerValues(false);
+        mHandler.postDelayed(()-> {
+            retrieveAndSetSpinnerValues(false);
+        }, 50);
 
-        bmrTextView.setText(calculatedBMRString());
 
         imperialSettingButton.setOnClickListener(v -> {
             toggleMetricAndImperial(false);
@@ -158,8 +161,6 @@ public class tdeeSettingsFragment extends Fragment {
         return new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-//                saveUpdatedBmrSettings();
-//                saveSpinnerStatsToSharedPreferences(metricMode);
                 bmrTextView.setText(calculatedBMRString());
             }
 
@@ -240,13 +241,14 @@ public class tdeeSettingsFragment extends Fragment {
 
         int activityLevelPosition = activity_level_spinner.getSelectedItemPosition();
         String activityLevelString = getActivityLevelString(activityLevelPosition);
+
         prefEdit.putInt("activityLevelPosition", activityLevelPosition);
         prefEdit.putString("activityLevelString", activityLevelString);
 
         prefEdit.apply();
     }
 
-    public void saveUpdatedBmrSettings() {
+    private void saveUpdatedBmrSettings() {
         prefEdit.putInt("savedBmr", calculateBMR());
         prefEdit.apply();
     }
