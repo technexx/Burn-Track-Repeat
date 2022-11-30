@@ -24,16 +24,17 @@
         <item name="android:textColorSecondary">@color/test_black</item>
     </style>
 
+    <!---These transparent colors in textColorSecondary prevent the Preference Fragment glitch!-->
     <style name="EditActivityPopUpTheme">
         <item name="android:editTextColor">@color/white</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:textColorHint">@color/light_grey</item>
-        <item name="android:textColorSecondary">@color/light_grey</item>
+        <item name="android:textColorSecondary">@android:color/transparent</item>
     </style>
 
     <style name="RoundRecyclerRowTheme">
         <item name="android:textColor">@color/white</item>
-        <item name="android:textColorSecondary">@color/light_grey</item>
+        <item name="android:textColorSecondary">@android:color/transparent</item>
 
     </style>
 
