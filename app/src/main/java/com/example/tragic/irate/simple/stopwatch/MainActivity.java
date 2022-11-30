@@ -681,8 +681,15 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
 
   boolean resetCycleTimeVarsWithinRunnable;
 
+  //Todo: Add dot drawables underneath calendar date.
+
   //Todo: Those ghosting cursor things...
-      //Todo: Both xmls use drawables as backgrounds.
+  //Todo: Almost certainly to do w/ our fragments and/or framelayout.
+  //Todo: Does NOT occur following DailyStatsFragment.
+  //Todo: Occurs even when framelayout is GONE and we just call .replace on our rootSettingsFragment.
+  //Todo: If it occurs, it does it consistently throughout lifecycle. Otherwise, it does not.
+  //Todo: Occurs even when clicking on items in round recycler, tho not when clicking on editText/colon in stats editPopUp.
+  //Todo: It's very likely a PreferenceFragment thing. Regular fragments (i.e. tdee + stats) do not cause this.
 
   //Todo: Update resume on job sites.
   //Todo: Release a 1.0.1 version!!!
@@ -905,10 +912,8 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
                 .replace(R.id.settings_fragment_frameLayout, rootSettingsFragment)
                 .commit();
       }
-      sortButton.setVisibility(View.INVISIBLE);
 
       setTypeOfOnOptionsSelectedMenu(SETTINGS_MENU);
-
       sortButton.setVisibility(View.GONE);
     }
   }

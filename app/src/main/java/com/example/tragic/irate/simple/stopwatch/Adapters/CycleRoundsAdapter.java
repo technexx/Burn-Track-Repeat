@@ -211,10 +211,8 @@ public class CycleRoundsAdapter extends RecyclerView.Adapter<RecyclerView.ViewHo
 
       //Only runs fade animation if adding/subtracting rounds.
       if (mRunRoundAnimation) {
-        //Animates round number.
         if (mPosAddHolder >=0 || mPosSubHolder >=0) {
           setAnimationOne(modeOneRounds.round_count, position);
-          //Animates round value (either infinity or timer value).
           if (mTypeOfRound.get(position)==1 || mTypeOfRound.get(position)==3) {
             setAnimationOne(modeOneRounds.workout_rounds, position);
           } else {

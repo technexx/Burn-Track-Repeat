@@ -108,6 +108,7 @@
         android:id="@+id/settings_fragment_frameLayout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/savedCyclesTabLayout"
         android:background="@color/night_shadow"
         android:clickable="true"

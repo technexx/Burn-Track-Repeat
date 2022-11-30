@@ -28,4 +28,4 @@
 </PreferenceScreen>
 
     <!--Will allow custom layout-->
-    <!--        android:layout="@layout/custom_settings_layout"-->
+<!--            android:layout="@layout/custom_settings_layout"-->
