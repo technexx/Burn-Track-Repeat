@@ -7,7 +7,7 @@ android {
     buildToolsVersion "30.0.2"
 
     defaultConfig {
-        applicationId "com.example.tragic.irate.simple.stopwatch"
+        applicationId "burn.track.repeat"
         minSdkVersion 21
         targetSdkVersion 31
         versionCode 1

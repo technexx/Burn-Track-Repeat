@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.tragic.irate.simple.stopwatch">
+    package="burn.track.repeat">
 
     <uses-permission android:name="android.permission.VIBRATE"/>
     <application
@@ -11,7 +11,7 @@
         android:roundIcon="@mipmap/tdee_icon_2_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".MainActivity"
+        <activity android:name="burn.track.repeat.MainActivity"
             android:screenOrientation="portrait"
             android:windowSoftInputMode="adjustNothing"
             android:exported="true">
@@ -26,12 +26,12 @@
             android:resource="@array/preloaded_fonts" />
 
         <receiver
-            android:name=".MainActivity$DismissReceiver"
+            android:name="burn.track.repeat.MainActivity$DismissReceiver"
             android:exported="false" >
         </receiver>
 
         <service
-            android:name="com.example.tragic.irate.simple.stopwatch.MyService"
+            android:name="burn.track.repeat.MyService"
             android:stopWithTask="false" />
 
     </application>

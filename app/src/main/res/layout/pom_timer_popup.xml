@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+    tools:context="burn.track.repeat.MainActivity"
     android:id="@+id/pom_main_timer_layout"
     android:theme="@style/TimerTheme"
     android:backgroundTint="@color/eerie_black">
