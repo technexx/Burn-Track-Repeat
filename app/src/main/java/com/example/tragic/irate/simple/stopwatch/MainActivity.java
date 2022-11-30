@@ -4086,7 +4086,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     Intent recallAppIntent = pm.getLaunchIntentForPackage(getApplicationContext().getPackageName());
     recallAppIntent.setPackage(null);
 
-    PendingIntent recallAppPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, recallAppIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    PendingIntent recallAppPendingIntent = PendingIntent.getActivity(getApplicationContext(), 0, recallAppIntent, PendingIntent.FLAG_IMMUTABLE);
 
     return recallAppPendingIntent;
   }
@@ -4096,7 +4096,7 @@ public class MainActivity extends AppCompatActivity implements SavedCycleAdapter
     dismissIntent.putExtra("testMethod", "launchTimer");
     dismissIntent.putExtra("Dismiss ID", notificationId);
 
-    PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), notificationId, dismissIntent, 0);
+    PendingIntent dismissPendingIntent = PendingIntent.getBroadcast(context.getApplicationContext(), notificationId, dismissIntent, PendingIntent.FLAG_IMMUTABLE);
 
     return dismissPendingIntent;
   }
