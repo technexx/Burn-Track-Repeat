@@ -3,13 +3,12 @@ plugins {
 }
 
 android {
-    compileSdkVersion 33
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 34
 
     defaultConfig {
         applicationId "burn.track.repeat"
         minSdkVersion 21
-        targetSdkVersion 31
+        targetSdkVersion 34
         versionCode 2
         versionName "1.0.1"
 
